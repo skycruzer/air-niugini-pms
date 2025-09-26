@@ -1,0 +1,237 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+  const { login } = useAuth()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
+    try {
+      const success = await login(email, password)
+      if (success) {
+        router.push('/dashboard')
+      } else {
+        setError('Invalid email or password. Please check your credentials.')
+      }
+    } catch (err) {
+      setError('An error occurred during login')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red overflow-hidden">
+      {/* Background Elements - Reduced interference */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 right-10 opacity-10">
+          <span className="text-white text-[200px] transform -rotate-12 block">✈️</span>
+        </div>
+        <div className="absolute bottom-10 right-20 opacity-8">
+          <span className="text-air-niugini-gold text-[250px] block">🌍</span>
+        </div>
+        <div className="absolute top-1/3 right-1/4 opacity-5">
+          <span className="text-white text-[100px] transform rotate-45 block">⚡</span>
+        </div>
+      </div>
+
+      {/* Header */}
+      <header className="relative z-10">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <a
+                href="/"
+                className="btn btn-ghost text-white hover:bg-white/10 border-white/20"
+              >
+                ← Back to Home
+              </a>
+            </div>
+            <div className="flex items-center text-white">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-30"></div>
+                <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
+                  <span className="text-air-niugini-gold text-2xl">✈️</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <h1 className="text-xl font-bold">Air Niugini</h1>
+                <p className="text-xs text-blue-100">B767 Fleet Operations</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Login Section */}
+      <main className="relative z-10 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left Side - Branding & Info */}
+            <div className="text-center lg:text-left animate-fade-in">
+              <div className="mb-8">
+                <div className="inline-flex items-center bg-white px-4 py-2 rounded-full text-sm font-bold mb-6 text-gray-900 shadow-lg">
+                  🛡️ Secure Access Portal
+                </div>
+                <h2 className="text-display-medium font-black mb-4 text-white" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
+                  Welcome Back
+                </h2>
+                <p className="text-body-large text-white leading-relaxed max-w-lg font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>
+                  Access your professional pilot management dashboard with secure authentication.
+                  Manage certifications, leave requests, and fleet compliance with confidence.
+                </p>
+              </div>
+
+              {/* Features Highlight */}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-green-600">✅</span>
+                  </div>
+                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Real-time certification tracking</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-blue-600">✅</span>
+                  </div>
+                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Intelligent roster management</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
+                    <span className="text-purple-600">✅</span>
+                  </div>
+                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Comprehensive compliance monitoring</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Login Form */}
+            <div className="animate-slide-in-right">
+              <div className="card-premium bg-white/95 backdrop-blur-md border border-white/20 shadow-2xl">
+                <div className="text-center mb-8">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-air-niugini-red/20 rounded-2xl blur-lg"></div>
+                    <div className="relative w-16 h-16 bg-gradient-to-br from-air-niugini-red to-red-600 rounded-2xl flex items-center justify-center mx-auto">
+                      <span className="text-white text-3xl">🛡️</span>
+                    </div>
+                  </div>
+                  <h3 className="text-heading-large text-gray-900 mb-2">Secure Sign In</h3>
+                  <p className="text-body-medium text-gray-600">
+                    Enter your credentials to access the dashboard
+                  </p>
+                </div>
+
+
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start">
+                    <span className="text-red-500 mr-3 mt-0.5 flex-shrink-0 text-lg">⚠️</span>
+                    <div>
+                      <p className="font-medium text-red-800">Authentication Error</p>
+                      <p className="text-red-700 text-sm mt-1">{error}</p>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Email Field */}
+                  <div>
+                    <label className="form-label">
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span className="h-5 w-5 text-gray-400">📧</span>
+                      </div>
+                      <input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="form-input pl-12"
+                        placeholder="your.email@airniugini.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password Field */}
+                  <div>
+                    <label className="form-label">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span className="h-5 w-5 text-gray-400">🔒</span>
+                      </div>
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="form-input pl-12 pr-12"
+                        placeholder="Enter your password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        <span className="h-5 w-5 text-gray-400 hover:text-gray-600">
+                          {showPassword ? '🙈' : '👁️'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Login Button */}
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="btn btn-primary w-full btn-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="loading-spinner-lg mr-3"></div>
+                        Authenticating...
+                      </>
+                    ) : (
+                      <>
+                        🛡️ Sign In to Dashboard
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Footer */}
+                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                  <p className="text-caption text-gray-500">
+                    Secured by Supabase Authentication
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    © 2025 Air Niugini - Development Environment
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}

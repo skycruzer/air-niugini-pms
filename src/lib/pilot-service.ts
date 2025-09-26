@@ -1,0 +1,795 @@
+import { supabase, handleSupabaseError, Pilot, PilotCheck, CheckType } from './supabase'
+import { getCertificationStatus } from './certification-utils'
+
+// Calculate seniority number based on commencement date
+export async function calculateSeniorityNumber(commencementDate: string, excludePilotId?: string): Promise<number> {
+  try {
+    // Get all pilots ordered by commencement date
+    let query = supabase
+      .from('pilots')
+      .select('commencement_date')
+      .not('commencement_date', 'is', null)
+      .order('commencement_date', { ascending: true })
+
+    // Exclude the current pilot if updating
+    if (excludePilotId) {
+      query = query.not('id', 'eq', excludePilotId)
+    }
+
+    const { data: pilots, error } = await query
+
+    if (error) throw error
+
+    // Count pilots with earlier commencement dates
+    const targetDate = new Date(commencementDate)
+    const earlierPilots = (pilots || []).filter(pilot => {
+      if (!pilot.commencement_date) return false
+      return new Date(pilot.commencement_date) < targetDate
+    })
+
+    return earlierPilots.length + 1
+  } catch (error) {
+    console.error('Error calculating seniority number:', error)
+    return 1 // Default to 1 if calculation fails
+  }
+}
+
+export interface PilotWithCertifications extends Pilot {
+  certificationStatus: {
+    current: number
+    expiring: number
+    expired: number
+  }
+  email?: string
+  phone?: string
+  address?: string
+  emergencyContact?: {
+    name: string
+    phone: string
+    relationship: string
+  }
+}
+
+export interface PilotFormData {
+  employee_id: string
+  first_name: string
+  middle_name?: string
+  last_name: string
+  role: 'Captain' | 'First Officer'
+  contract_type?: string
+  nationality?: string
+  passport_number?: string
+  passport_expiry?: string
+  date_of_birth?: string
+  commencement_date?: string
+  seniority_number?: number
+  is_active: boolean
+  email?: string
+  phone?: string
+  address?: string
+  emergency_contact_name?: string
+  emergency_contact_phone?: string
+  emergency_contact_relationship?: string
+}
+
+// Get all pilots with certification counts
+export async function getAllPilots(): Promise<PilotWithCertifications[]> {
+  try {
+    console.log('🔍 getAllPilots: Starting query for pilots...')
+
+    // In development mode, use API route to bypass RLS issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 getAllPilots: Using API route for development mode...')
+
+      try {
+        const response = await fetch('/api/pilots')
+
+        console.log('🔍 getAllPilots: API response status:', response.status)
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`)
+        }
+
+        const result = await response.json()
+
+        console.log('🔍 getAllPilots: API response:', {
+          success: result.success,
+          dataLength: result.data?.length || 0
+        })
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch pilots')
+        }
+
+        console.log('🔍 getAllPilots: API returned', result.data?.length || 0, 'pilots')
+        return result.data || []
+      } catch (error) {
+        console.error('🚨 getAllPilots: API fetch error:', error)
+        // Fall back to direct Supabase query if API fails
+        console.log('🔍 getAllPilots: Falling back to direct Supabase query...')
+      }
+    }
+
+    // Production mode - use direct Supabase queries
+    // Check current session
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log('🔍 getAllPilots: Current session:', {
+      hasSession: !!session,
+      user: session?.user?.email || null
+    })
+
+    // Get all pilots
+    const { data: pilots, error: pilotsError } = await supabase
+      .from('pilots')
+      .select('*')
+      .order('seniority_number', { ascending: true, nullsFirst: false })
+
+    console.log('🔍 getAllPilots: Pilots query result:', {
+      pilots: pilots?.length || 0,
+      error: pilotsError?.message || null
+    })
+
+    if (pilotsError) {
+      console.error('🚨 getAllPilots: Pilots query error:', pilotsError)
+      throw pilotsError
+    }
+
+    if (!pilots || pilots.length === 0) {
+      console.log('🔍 getAllPilots: No pilots found in database')
+      return []
+    }
+
+    console.log('🔍 getAllPilots: Processing certification data for', pilots.length, 'pilots')
+
+    // Get certification counts for each pilot
+    const pilotsWithCerts = await Promise.all(
+      (pilots || []).map(async (pilot) => {
+        console.log(`🔍 getAllPilots: Processing pilot ${pilot.first_name} ${pilot.last_name} (${pilot.id})`)
+
+        const { data: checks, error: checksError } = await supabase
+          .from('pilot_checks')
+          .select(`
+            expiry_date,
+            check_types (check_code, check_description, category)
+          `)
+          .eq('pilot_id', pilot.id)
+
+        console.log(`🔍 getAllPilots: Checks for ${pilot.first_name}:`, {
+          checks: checks?.length || 0,
+          error: checksError?.message || null
+        })
+
+        if (checksError) {
+          console.warn(`Error fetching checks for pilot ${pilot.id}:`, checksError)
+        }
+
+        // Calculate certification status
+        const certifications = checks || []
+        const certificationCounts = certifications.reduce(
+          (acc, check) => {
+            const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+            if (status.color === 'green') acc.current++
+            else if (status.color === 'yellow') acc.expiring++
+            else if (status.color === 'red') acc.expired++
+            return acc
+          },
+          { current: 0, expiring: 0, expired: 0 }
+        )
+
+        return {
+          ...pilot,
+          certificationStatus: certificationCounts
+        }
+      })
+    )
+
+    console.log('🔍 getAllPilots: Final result:', {
+      totalPilots: pilotsWithCerts.length,
+      samplePilot: pilotsWithCerts[0] ? {
+        name: `${pilotsWithCerts[0].first_name} ${pilotsWithCerts[0].last_name}`,
+        id: pilotsWithCerts[0].id,
+        certStatus: pilotsWithCerts[0].certificationStatus
+      } : null
+    })
+
+    return pilotsWithCerts
+  } catch (error) {
+    console.error('🚨 getAllPilots: Fatal error:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Get a single pilot by ID
+export async function getPilotById(pilotId: string): Promise<PilotWithCertifications | null> {
+  try {
+    console.log('🔍 getPilotById: Fetching pilot with ID:', pilotId)
+
+    // Production mode or API fallback - use direct Supabase queries
+    const { data: pilot, error: pilotError } = await supabase
+      .from('pilots')
+      .select('*')
+      .eq('id', pilotId)
+      .single()
+
+    if (pilotError) throw pilotError
+    if (!pilot) return null
+
+    // Get pilot's certifications
+    const { data: checks, error: checksError } = await supabase
+      .from('pilot_checks')
+      .select(`
+        id,
+        expiry_date,
+        check_types (
+          id,
+          check_code,
+          check_description,
+          category
+        )
+      `)
+      .eq('pilot_id', pilotId)
+
+    if (checksError) {
+      console.warn(`Error fetching checks for pilot ${pilotId}:`, checksError)
+    }
+
+    // Calculate certification status
+    const certifications = checks || []
+    const certificationCounts = certifications.reduce(
+      (acc, check) => {
+        const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+        if (status.color === 'green') acc.current++
+        else if (status.color === 'yellow') acc.expiring++
+        else if (status.color === 'red') acc.expired++
+        return acc
+      },
+      { current: 0, expiring: 0, expired: 0 }
+    )
+
+    return {
+      ...pilot,
+      certificationStatus: certificationCounts
+    }
+  } catch (error) {
+    console.error('Error fetching pilot:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Get pilot's certifications
+export async function getPilotCertifications(pilotId: string) {
+  try {
+    console.log('🔍 getPilotCertifications: Starting query for pilot:', pilotId)
+
+    // In development mode, use API route to bypass RLS issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 getPilotCertifications: Using API route for development mode...')
+
+      try {
+        const response = await fetch(`/api/certifications?pilotId=${pilotId}`)
+
+        console.log('🔍 getPilotCertifications: API response status:', response.status)
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`)
+        }
+
+        const result = await response.json()
+
+        console.log('🔍 getPilotCertifications: API response:', {
+          success: result.success,
+          dataLength: result.data?.length || 0
+        })
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch certifications')
+        }
+
+        // Filter to only show certifications that have data (existing pilot_checks)
+        const certificationsWithData = result.data.filter((cert: any) => cert.hasData)
+
+        console.log('🔍 getPilotCertifications: API returned', certificationsWithData.length, 'certifications with data')
+
+        return certificationsWithData.map((cert: any) => ({
+          id: cert.checkTypeId,
+          checkCode: cert.checkCode,
+          checkDescription: cert.checkDescription,
+          category: cert.category,
+          expiryDate: cert.expiryDate ? new Date(cert.expiryDate) : null,
+          status: cert.status
+        }))
+      } catch (error) {
+        console.error('🚨 getPilotCertifications: API fetch error:', error)
+        // Fall back to direct Supabase query if API fails
+        console.log('🔍 getPilotCertifications: Falling back to direct Supabase query...')
+      }
+    }
+
+    // Production mode or API fallback - use direct Supabase queries
+    const { data: checks, error } = await supabase
+      .from('pilot_checks')
+      .select(`
+        id,
+        expiry_date,
+        created_at,
+        updated_at,
+        check_types (
+          id,
+          check_code,
+          check_description,
+          category
+        )
+      `)
+      .eq('pilot_id', pilotId)
+      .order('expiry_date', { ascending: true, nullsFirst: false })
+
+    if (error) throw error
+
+    return (checks || []).map((check: any) => ({
+      id: check.id,
+      checkCode: check.check_types?.check_code || '',
+      checkDescription: check.check_types?.check_description || '',
+      category: check.check_types?.category || '',
+      expiryDate: check.expiry_date ? new Date(check.expiry_date) : null,
+      status: getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+    }))
+  } catch (error) {
+    console.error('🚨 getPilotCertifications: Fatal error:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Create a new pilot
+export async function createPilot(pilotData: PilotFormData): Promise<Pilot> {
+  try {
+    // Calculate seniority number if commencement date is provided
+    let seniorityNumber = null
+    if (pilotData.commencement_date) {
+      seniorityNumber = await calculateSeniorityNumber(pilotData.commencement_date)
+    }
+
+    const { data, error } = await supabase
+      .from('pilots')
+      .insert([{
+        employee_id: pilotData.employee_id,
+        first_name: pilotData.first_name,
+        middle_name: pilotData.middle_name,
+        last_name: pilotData.last_name,
+        role: pilotData.role,
+        contract_type: pilotData.contract_type,
+        nationality: pilotData.nationality,
+        passport_number: pilotData.passport_number,
+        passport_expiry: pilotData.passport_expiry,
+        date_of_birth: pilotData.date_of_birth,
+        commencement_date: pilotData.commencement_date,
+        seniority_number: seniorityNumber,
+        is_active: pilotData.is_active,
+        // Note: email, phone, address, emergency contact would be stored in separate tables
+        // or as JSONB columns in a real implementation
+      }])
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error creating pilot:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Update a pilot
+export async function updatePilot(pilotId: string, pilotData: Partial<PilotFormData>): Promise<Pilot> {
+  try {
+    // Calculate seniority number if commencement date is being updated
+    let seniorityNumber = undefined
+    if (pilotData.commencement_date) {
+      seniorityNumber = await calculateSeniorityNumber(pilotData.commencement_date, pilotId)
+    }
+
+    // Only include fields that exist in the database
+    const updateData = {
+      employee_id: pilotData.employee_id,
+      first_name: pilotData.first_name,
+      middle_name: pilotData.middle_name,
+      last_name: pilotData.last_name,
+      role: pilotData.role,
+      contract_type: pilotData.contract_type,
+      nationality: pilotData.nationality,
+      passport_number: pilotData.passport_number,
+      passport_expiry: pilotData.passport_expiry,
+      date_of_birth: pilotData.date_of_birth,
+      commencement_date: pilotData.commencement_date,
+      seniority_number: seniorityNumber,
+      is_active: pilotData.is_active,
+      // Note: email, phone, address, emergency contact fields don't exist in the current schema
+      // They would need to be added to the database schema or stored in a separate table
+    }
+
+    // Remove undefined values and convert empty strings to null for database consistency
+    const cleanedData = Object.fromEntries(
+      Object.entries(updateData)
+        .filter(([key, value]) => value !== undefined)
+        .map(([key, value]) => [key, value === '' ? null : value])
+    )
+
+    // In development mode, use API route to bypass RLS issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 updatePilot: Using API route for development mode...')
+
+      try {
+        const response = await fetch(`/api/pilots?id=${pilotId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(cleanedData),
+        })
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`)
+        }
+
+        const result = await response.json()
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to update pilot')
+        }
+
+        console.log('🔍 updatePilot: API returned updated pilot data')
+        return result.data
+      } catch (error) {
+        console.error('🚨 updatePilot: API fetch error:', error)
+        // Fall back to direct Supabase query if API fails
+        console.log('🔍 updatePilot: Falling back to direct Supabase query...')
+      }
+    }
+
+    // Production mode or API fallback - use direct Supabase queries
+    const { data, error } = await supabase
+      .from('pilots')
+      .update(cleanedData)
+      .eq('id', pilotId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error updating pilot:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Delete a pilot
+export async function deletePilot(pilotId: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('pilots')
+      .delete()
+      .eq('id', pilotId)
+
+    if (error) throw error
+  } catch (error) {
+    console.error('Error deleting pilot:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Search pilots
+export async function searchPilots(
+  searchTerm: string,
+  filters: {
+    role?: 'Captain' | 'First Officer' | 'all'
+    status?: 'active' | 'inactive' | 'all'
+  } = {}
+): Promise<PilotWithCertifications[]> {
+  try {
+    let query = supabase
+      .from('pilots')
+      .select('*')
+
+    // Apply search term
+    if (searchTerm) {
+      query = query.or(`
+        first_name.ilike.%${searchTerm}%,
+        last_name.ilike.%${searchTerm}%,
+        employee_id.ilike.%${searchTerm}%
+      `)
+    }
+
+    // Apply role filter
+    if (filters.role && filters.role !== 'all') {
+      query = query.eq('role', filters.role)
+    }
+
+    // Apply status filter
+    if (filters.status && filters.status !== 'all') {
+      query = query.eq('is_active', filters.status === 'active')
+    }
+
+    const { data: pilots, error } = await query.order('first_name', { ascending: true })
+
+    if (error) throw error
+
+    // Add certification counts (simplified for search results)
+    const pilotsWithCerts = (pilots || []).map(pilot => ({
+      ...pilot,
+      certificationStatus: { current: 0, expiring: 0, expired: 0 } // Placeholder
+    }))
+
+    return pilotsWithCerts
+  } catch (error) {
+    console.error('Error searching pilots:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Check if employee ID exists
+export async function checkEmployeeIdExists(employeeId: string, excludePilotId?: string): Promise<boolean> {
+  try {
+    let query = supabase
+      .from('pilots')
+      .select('id')
+      .eq('employee_id', employeeId)
+
+    if (excludePilotId) {
+      query = query.neq('id', excludePilotId)
+    }
+
+    const { data, error } = await query.maybeSingle()
+
+    if (error) throw error
+    return data !== null
+  } catch (error) {
+    console.error('Error checking employee ID:', error)
+    return false
+  }
+}
+
+// Get pilot statistics
+export async function getPilotStats() {
+  try {
+    const { data: pilots, error } = await supabase
+      .from('pilots')
+      .select('role, is_active')
+
+    if (error) throw error
+
+    const stats = (pilots || []).reduce(
+      (acc, pilot) => {
+        acc.total++
+        if (pilot.is_active) acc.active++
+        else acc.inactive++
+
+        if (pilot.role === 'Captain') acc.captains++
+        else if (pilot.role === 'First Officer') acc.firstOfficers++
+
+        return acc
+      },
+      {
+        total: 0,
+        active: 0,
+        inactive: 0,
+        captains: 0,
+        firstOfficers: 0
+      }
+    )
+
+    return stats
+  } catch (error) {
+    console.error('Error fetching pilot stats:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Get all check types
+export async function getAllCheckTypes() {
+  try {
+    const { data: checkTypes, error } = await supabase
+      .from('check_types')
+      .select('*')
+      .order('category', { ascending: true })
+      .order('check_code', { ascending: true })
+
+    if (error) throw error
+    return checkTypes || []
+  } catch (error) {
+    console.error('Error fetching check types:', error)
+    return []
+  }
+}
+
+// Get expiring certifications
+export async function getExpiringCertifications(daysAhead: number = 60) {
+  try {
+    const { data: expiringChecks, error } = await supabase
+      .from('expiring_checks')
+      .select('*')
+      .gte('days_until_expiry', 0)
+      .lte('days_until_expiry', daysAhead)
+      .order('expiry_date', { ascending: true })
+
+    if (error) throw error
+
+    return (expiringChecks || []).map((check: any) => ({
+      pilotName: check.pilot_name,
+      employeeId: check.employee_id,
+      checkCode: check.check_code,
+      checkDescription: check.check_description,
+      category: check.category,
+      expiryDate: new Date(check.expiry_date),
+      status: getCertificationStatus(new Date(check.expiry_date))
+    }))
+  } catch (error) {
+    console.error('Error fetching expiring certifications:', error)
+    return []
+  }
+}
+
+// Get pilots with expired certifications
+export async function getPilotsWithExpiredCertifications() {
+  try {
+    const { data: expiredChecks, error } = await supabase
+      .from('pilot_checks_overview')
+      .select('*')
+      .lt('expiry_date', new Date().toISOString())
+      .order('expiry_date', { ascending: true })
+
+    if (error) throw error
+
+    // Group by pilot
+    const pilotMap = new Map()
+    expiredChecks?.forEach((check: any) => {
+      const key = check.employee_id
+      if (!pilotMap.has(key)) {
+        pilotMap.set(key, {
+          pilot_name: check.pilot_name,
+          employee_id: check.employee_id,
+          expired_count: 0,
+          certifications: []
+        })
+      }
+      pilotMap.get(key).expired_count++
+      pilotMap.get(key).certifications.push({
+        check_code: check.check_code,
+        check_description: check.check_description,
+        expiry_date: check.expiry_date
+      })
+    })
+
+    return Array.from(pilotMap.values())
+  } catch (error) {
+    console.error('Error fetching pilots with expired certifications:', error)
+    return []
+  }
+}
+
+// Update pilot certification
+export async function updatePilotCertification(pilotId: string, checkTypeId: string, expiryDate: string | null) {
+  try {
+    const { data, error } = await supabase
+      .from('pilot_checks')
+      .upsert({
+        pilot_id: pilotId,
+        check_type_id: checkTypeId,
+        expiry_date: expiryDate,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'pilot_id,check_type_id'
+      })
+      .select()
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error updating pilot certification:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Bulk update pilot certifications
+export async function updatePilotCertifications(pilotId: string, certifications: { checkTypeId: string; expiryDate: string | null }[]) {
+  try {
+    const updates = certifications.map(cert => ({
+      pilot_id: pilotId,
+      check_type_id: cert.checkTypeId,
+      expiry_date: cert.expiryDate,
+      updated_at: new Date().toISOString()
+    }))
+
+    const { data, error } = await supabase
+      .from('pilot_checks')
+      .upsert(updates, {
+        onConflict: 'pilot_id,check_type_id'
+      })
+      .select()
+
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('Error bulk updating pilot certifications:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Get pilot certifications with all check types (including missing ones)
+export async function getPilotCertificationsWithAllTypes(pilotId: string) {
+  try {
+    console.log('🔍 getPilotCertificationsWithAllTypes: Starting query for pilot:', pilotId)
+
+    // In development mode, use API route to bypass RLS issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 getPilotCertificationsWithAllTypes: Using API route for development mode...')
+
+      try {
+        const response = await fetch(`/api/certifications?pilotId=${pilotId}`)
+
+        console.log('🔍 getPilotCertificationsWithAllTypes: API response status:', response.status)
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`)
+        }
+
+        const result = await response.json()
+
+        console.log('🔍 getPilotCertificationsWithAllTypes: API response:', {
+          success: result.success,
+          dataLength: result.data?.length || 0
+        })
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch certifications')
+        }
+
+        console.log('🔍 getPilotCertificationsWithAllTypes: API returned', result.data?.length || 0, 'certification types')
+        return result.data || []
+      } catch (error) {
+        console.error('🚨 getPilotCertificationsWithAllTypes: API fetch error:', error)
+        // Fall back to direct Supabase query if API fails
+        console.log('🔍 getPilotCertificationsWithAllTypes: Falling back to direct Supabase query...')
+      }
+    }
+
+    // Production mode or API fallback - use direct Supabase queries
+    // Get all check types
+    const { data: checkTypes, error: checkTypesError } = await supabase
+      .from('check_types')
+      .select('*')
+      .order('category', { ascending: true })
+      .order('check_code', { ascending: true })
+
+    if (checkTypesError) throw checkTypesError
+
+    // Get existing certifications for this pilot
+    const { data: pilotChecks, error: checksError } = await supabase
+      .from('pilot_checks')
+      .select('*')
+      .eq('pilot_id', pilotId)
+
+    if (checksError) throw checksError
+
+    // Create a map of existing certifications
+    const existingChecks = new Map()
+    pilotChecks?.forEach(check => {
+      existingChecks.set(check.check_type_id, check)
+    })
+
+    // Combine all check types with existing certifications
+    return (checkTypes || []).map(checkType => {
+      const existingCheck = existingChecks.get(checkType.id)
+      return {
+        checkTypeId: checkType.id,
+        checkCode: checkType.check_code,
+        checkDescription: checkType.check_description,
+        category: checkType.category,
+        expiryDate: existingCheck?.expiry_date || null,
+        status: getCertificationStatus(existingCheck?.expiry_date ? new Date(existingCheck.expiry_date) : null),
+        hasData: !!existingCheck
+      }
+    })
+  } catch (error) {
+    console.error('🚨 getPilotCertificationsWithAllTypes: Fatal error:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
