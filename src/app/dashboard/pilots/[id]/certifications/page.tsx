@@ -12,6 +12,7 @@ import {
   updatePilotCertifications
 } from '@/lib/pilot-service-client'
 import { format } from 'date-fns'
+import { getCategoryIcon } from '@/lib/certification-utils'
 
 interface CertificationData {
   checkTypeId: string
@@ -224,9 +225,13 @@ export default function PilotCertificationsPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('🔧 DEBUG: handleSubmit called!', { saving, formData })
     e.preventDefault()
 
-    if (saving) return
+    if (saving) {
+      console.log('🔧 DEBUG: Already saving, returning early')
+      return
+    }
 
     const isValid = validateForm()
     if (!isValid) return
@@ -395,15 +400,7 @@ export default function PilotCertificationsPage() {
                 <div className="px-6 py-4 border-b border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                     <span className="mr-2">
-                      {category === 'Proficiency' ? '🎯' :
-                       category === 'Medical' ? '🏥' :
-                       category === 'License' ? '📜' :
-                       category === 'Training' ? '📚' :
-                       category === 'Security' ? '🔒' :
-                       category === 'Safety' ? '🦺' :
-                       category === 'Instructor' ? '👨‍🏫' :
-                       '✈️'
-                      }
+                      {getCategoryIcon(category)}
                     </span>
                     {category} Certifications
                     <span className="ml-2 text-sm text-gray-500">
@@ -452,6 +449,7 @@ export default function PilotCertificationsPage() {
                 <button
                   type="submit"
                   disabled={saving}
+                  onClick={() => console.log('🔧 DEBUG: Save button clicked!')}
                   className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {saving ? (

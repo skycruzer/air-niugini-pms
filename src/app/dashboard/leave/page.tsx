@@ -168,6 +168,7 @@ export default function LeaveRequestsPage() {
           {showForm && (
             <div className="mb-8">
               <LeaveRequestForm
+                key="new-form"
                 onSuccess={handleFormSuccess}
                 onCancel={() => setShowForm(false)}
               />

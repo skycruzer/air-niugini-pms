@@ -10,6 +10,7 @@ import {
   getExpiringCertifications,
   getPilotsWithExpiredCertifications
 } from '@/lib/pilot-service-client'
+import { getCategoryIcon, getCategoryColor } from '@/lib/certification-utils'
 
 interface CheckType {
   id: string
@@ -39,31 +40,14 @@ function CheckTypeCard({ checkType }: { checkType: CheckType }) {
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
             <span className="text-lg font-bold text-[#E4002B]">{checkType.check_code}</span>
-            <span className={`px-2 py-1 text-xs rounded-full ${
-              checkType.category === 'Proficiency' ? 'bg-blue-100 text-blue-800' :
-              checkType.category === 'Medical' ? 'bg-green-100 text-green-800' :
-              checkType.category === 'License' ? 'bg-purple-100 text-purple-800' :
-              checkType.category === 'Training' ? 'bg-yellow-100 text-yellow-800' :
-              checkType.category === 'Security' ? 'bg-red-100 text-red-800' :
-              checkType.category === 'Safety' ? 'bg-orange-100 text-orange-800' :
-              checkType.category === 'Instructor' ? 'bg-indigo-100 text-indigo-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+            <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(checkType.category)}`}>
               {checkType.category}
             </span>
           </div>
           <h3 className="font-semibold text-gray-900 mb-1">{checkType.check_description}</h3>
         </div>
         <div className="text-2xl">
-          {checkType.category === 'Proficiency' ? '🎯' :
-           checkType.category === 'Medical' ? '🏥' :
-           checkType.category === 'License' ? '📜' :
-           checkType.category === 'Training' ? '📚' :
-           checkType.category === 'Security' ? '🔒' :
-           checkType.category === 'Safety' ? '🦺' :
-           checkType.category === 'Instructor' ? '👨‍🏫' :
-           '✈️'
-          }
+          {getCategoryIcon(checkType.category)}
         </div>
       </div>
     </div>
@@ -334,15 +318,7 @@ export default function CertificationsPage() {
                 return (
                   <div key={category} className="text-center p-4 bg-gray-50 rounded-lg">
                     <div className="text-2xl mb-2">
-                      {category === 'Proficiency' ? '🎯' :
-                       category === 'Medical' ? '🏥' :
-                       category === 'License' ? '📜' :
-                       category === 'Training' ? '📚' :
-                       category === 'Security' ? '🔒' :
-                       category === 'Safety' ? '🦺' :
-                       category === 'Instructor' ? '👨‍🏫' :
-                       '✈️'
-                      }
+                      {getCategoryIcon(category)}
                     </div>
                     <p className="font-semibold text-gray-900">{count}</p>
                     <p className="text-sm text-gray-600">{category}</p>

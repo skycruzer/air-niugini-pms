@@ -74,21 +74,22 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
     setError,
     clearErrors
   } = useForm<LeaveRequestFormData>({
     resolver: zodResolver(leaveRequestSchema),
-    defaultValues: editingRequest ? {
-      pilot_id: editingRequest.pilot_id,
-      request_type: editingRequest.request_type,
-      start_date: editingRequest.start_date,
-      end_date: editingRequest.end_date,
-      request_date: editingRequest.request_date || format(new Date(), 'yyyy-MM-dd'),
-      request_method: editingRequest.request_method || 'EMAIL',
-      reason: editingRequest.reason || '',
-      is_late_request: editingRequest.is_late_request || false
-    } : undefined
+    defaultValues: {
+      pilot_id: '',
+      request_type: 'RDO',
+      start_date: '',
+      end_date: '',
+      request_date: format(new Date(), 'yyyy-MM-dd'),
+      request_method: 'EMAIL',
+      reason: '',
+      is_late_request: false
+    }
   })
 
   const pilotId = watch('pilot_id')
@@ -120,49 +121,52 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
     loadPilots()
   }, [])
 
-  // Reset form when editing request changes and pilots are loaded
+  // Set form values when editing request changes and pilots are loaded
   useEffect(() => {
-    console.log('🔧 Form reset useEffect triggered:', {
+    console.log('🔧 Form values useEffect triggered:', {
       editingRequest: editingRequest?.id,
       pilot_id: editingRequest?.pilot_id,
       pilotsLoaded: pilots.length > 0
     })
 
-    // Only reset if we have pilots loaded, to avoid race conditions
-    if (pilots.length === 0) {
-      console.log('🔧 Pilots not loaded yet, skipping reset')
-      return
-    }
-
     if (editingRequest) {
-      const resetData = {
-        pilot_id: editingRequest.pilot_id,
-        request_type: editingRequest.request_type,
-        start_date: editingRequest.start_date,
-        end_date: editingRequest.end_date,
-        request_date: editingRequest.request_date || format(new Date(), 'yyyy-MM-dd'),
-        request_method: editingRequest.request_method || 'EMAIL',
-        reason: editingRequest.reason || '',
-        is_late_request: editingRequest.is_late_request || false
+      // Only set values if we have pilots loaded, to avoid race conditions
+      if (pilots.length === 0) {
+        console.log('🔧 Pilots not loaded yet, skipping setValue for edit mode')
+        return
       }
-      console.log('🔧 Resetting form with data:', resetData)
-      reset(resetData)
+
+      console.log('🔧 Setting individual form values for editing:', editingRequest.pilot_id)
+
+      // Verify pilot exists in the loaded pilots
+      const pilotExists = pilots.find(p => p.id === editingRequest.pilot_id)
+      console.log('🔧 Pilot exists in list:', !!pilotExists, pilotExists?.first_name, pilotExists?.last_name)
+
+      // Set each field individually using setValue
+      setValue('pilot_id', editingRequest.pilot_id, { shouldValidate: false })
+      setValue('request_type', editingRequest.request_type, { shouldValidate: false })
+      setValue('start_date', editingRequest.start_date, { shouldValidate: false })
+      setValue('end_date', editingRequest.end_date, { shouldValidate: false })
+      setValue('request_date', editingRequest.request_date || format(new Date(), 'yyyy-MM-dd'), { shouldValidate: false })
+      setValue('request_method', editingRequest.request_method || 'EMAIL', { shouldValidate: false })
+      setValue('reason', editingRequest.reason || '', { shouldValidate: false })
+      setValue('is_late_request', editingRequest.is_late_request || false, { shouldValidate: false })
+
+      console.log('🔧 All form values set for edit mode')
     } else {
       // Reset to empty form for new requests
-      const emptyData = {
-        pilot_id: '',
-        request_type: 'RDO',
-        start_date: '',
-        end_date: '',
-        request_date: format(new Date(), 'yyyy-MM-dd'),
-        request_method: 'EMAIL',
-        reason: '',
-        is_late_request: false
-      }
-      console.log('🔧 Resetting form to empty:', emptyData)
-      reset(emptyData)
+      console.log('🔧 Setting form to empty for new request')
+      setValue('pilot_id', '', { shouldValidate: false })
+      setValue('request_type', 'RDO', { shouldValidate: false })
+      setValue('start_date', '', { shouldValidate: false })
+      setValue('end_date', '', { shouldValidate: false })
+      setValue('request_date', format(new Date(), 'yyyy-MM-dd'), { shouldValidate: false })
+      setValue('request_method', 'EMAIL', { shouldValidate: false })
+      setValue('reason', '', { shouldValidate: false })
+      setValue('is_late_request', false, { shouldValidate: false })
+      console.log('🔧 All form values set for new request mode')
     }
-  }, [editingRequest, reset, pilots])
+  }, [editingRequest?.id, setValue, pilots.length])
 
   // Check for conflicts and update roster periods when pilot or dates change
   useEffect(() => {

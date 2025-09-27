@@ -130,3 +130,55 @@ export function calculateCompliancePercentage(
 
   return Math.round((currentCerts.length / certifications.length) * 100)
 }
+
+/**
+ * Get category icon for certification categories
+ */
+export function getCategoryIcon(category: string | null): string {
+  if (!category) return '✈️'
+
+  switch (category) {
+    case 'Flight Checks':
+      return '🎯'
+    case 'pilot_medical':
+      return '🏥'
+    case 'simulator_checks':
+      return '📚'
+    case 'ID Cards':
+      return '🔒'
+    case 'Travel Visa':
+      return '🦺'
+    case 'Ground Courses Refresher':
+      return '👨‍🏫'
+    case 'Foreign Pilot Work Permit':
+      return '📜'
+    default:
+      return '✈️'
+  }
+}
+
+/**
+ * Get category color for certification categories
+ */
+export function getCategoryColor(category: string | null): string {
+  if (!category) return 'bg-gray-100 text-gray-800'
+
+  switch (category) {
+    case 'Flight Checks':
+      return 'bg-blue-100 text-blue-800'
+    case 'pilot_medical':
+      return 'bg-green-100 text-green-800'
+    case 'simulator_checks':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'ID Cards':
+      return 'bg-red-100 text-red-800'
+    case 'Travel Visa':
+      return 'bg-orange-100 text-orange-800'
+    case 'Ground Courses Refresher':
+      return 'bg-indigo-100 text-indigo-800'
+    case 'Foreign Pilot Work Permit':
+      return 'bg-purple-100 text-purple-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+}

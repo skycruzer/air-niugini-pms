@@ -245,6 +245,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
           </button>
         </div>
         <LeaveRequestForm
+          key={editingRequest?.id || 'edit-form'}
           editingRequest={editingRequest}
           onSuccess={handleEditSuccess}
           onCancel={() => setEditingRequest(null)}
