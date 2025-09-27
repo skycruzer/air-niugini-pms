@@ -64,3 +64,4 @@ screenshots/
 # Supabase local development (if using local setup)
 supabase/.branches
 supabase/.temp
+.vercel

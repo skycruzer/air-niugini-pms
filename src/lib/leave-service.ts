@@ -30,7 +30,7 @@ export interface LeaveRequestFormData {
   start_date: string
   end_date: string
   request_date: string
-  request_method: 'ORACLE' | 'EMAIL' | 'LEAVE_BIDS'
+  request_method: 'ORACLE' | 'EMAIL' | 'LEAVE_BIDS' | 'SYSTEM'
   reason?: string
   is_late_request?: boolean
 }
