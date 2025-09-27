@@ -123,7 +123,13 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 - **Development Mode**: Authentication not yet implemented
 - **Roster Calculations**: Based on RP11/2025 ending October 10, 2025
 
+## 👨‍💻 Developer
+
+**Maurice Rondeau** - [PIN PNG LTD](https://pinpng.com)
+*Professional software development for Papua New Guinea*
+
 ---
 
 **Air Niugini** - Papua New Guinea's National Airline
 *B767 Fleet Operations Management System v1.0*
+*Powered by PIN PNG LTD*

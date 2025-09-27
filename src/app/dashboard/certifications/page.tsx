@@ -216,7 +216,7 @@ export default function CertificationsPage() {
                   Certification Management
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Track and manage pilot certifications across 38 different check types for the B767 fleet
+                  Track and manage pilot certifications across 34 different check types for the B767 fleet
                 </p>
               </div>
               <div className="text-right">

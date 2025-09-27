@@ -140,9 +140,9 @@ export function getCategoryIcon(category: string | null): string {
   switch (category) {
     case 'Flight Checks':
       return '🎯'
-    case 'pilot_medical':
+    case 'Pilot Medical':
       return '🏥'
-    case 'simulator_checks':
+    case 'Simulator Checks':
       return '📚'
     case 'ID Cards':
       return '🔒'
@@ -152,6 +152,8 @@ export function getCategoryIcon(category: string | null): string {
       return '👨‍🏫'
     case 'Foreign Pilot Work Permit':
       return '📜'
+    case 'Non-renewal':
+      return '📋'
     default:
       return '✈️'
   }
@@ -166,9 +168,9 @@ export function getCategoryColor(category: string | null): string {
   switch (category) {
     case 'Flight Checks':
       return 'bg-blue-100 text-blue-800'
-    case 'pilot_medical':
+    case 'Pilot Medical':
       return 'bg-green-100 text-green-800'
-    case 'simulator_checks':
+    case 'Simulator Checks':
       return 'bg-yellow-100 text-yellow-800'
     case 'ID Cards':
       return 'bg-red-100 text-red-800'
@@ -178,6 +180,8 @@ export function getCategoryColor(category: string | null): string {
       return 'bg-indigo-100 text-indigo-800'
     case 'Foreign Pilot Work Permit':
       return 'bg-purple-100 text-purple-800'
+    case 'Non-renewal':
+      return 'bg-slate-100 text-slate-800'
     default:
       return 'bg-gray-100 text-gray-800'
   }

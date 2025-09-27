@@ -370,6 +370,9 @@ export default async function HomePage() {
               <p className="text-sm text-gray-400">
                 © 2025 Air Niugini. All rights reserved. | Version 1.0 - Server-Side Rendered
               </p>
+              <p className="text-xs text-gray-500 mt-2">
+                Powered by PIN PNG LTD | Developer: Maurice Rondeau
+              </p>
             </div>
           </div>
         </div>

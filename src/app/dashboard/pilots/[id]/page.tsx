@@ -6,7 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { permissions } from '@/lib/auth-utils'
-import { getCertificationStatus } from '@/lib/certification-utils'
+import { getCertificationStatus, getCategoryIcon } from '@/lib/certification-utils'
 import { getPilotById, getPilotCertifications } from '@/lib/pilot-service-client'
 import { format, differenceInYears } from 'date-fns'
 // Using emojis and custom SVGs instead of Lucide React icons
@@ -371,10 +371,42 @@ export default function PilotDetailPage() {
                 <p className="text-gray-600">This pilot doesn't have any certifications recorded.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {certifications.map((cert) => (
-                  <CertificationCard key={cert.id} cert={cert} />
-                ))}
+              <div className="space-y-6">
+                {(() => {
+                  // Group certifications by category
+                  const categorizedCertifications = certifications.reduce((acc, cert) => {
+                    if (!acc[cert.category]) {
+                      acc[cert.category] = []
+                    }
+                    acc[cert.category].push(cert)
+                    return acc
+                  }, {} as Record<string, Certification[]>)
+
+                  const categories = Object.keys(categorizedCertifications).sort()
+
+                  return categories.map(category => (
+                    <div key={category} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                          <span className="mr-2">
+                            {getCategoryIcon(category)}
+                          </span>
+                          {category}
+                          <span className="ml-2 text-sm text-gray-500">
+                            ({categorizedCertifications[category].length} items)
+                          </span>
+                        </h3>
+                      </div>
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {categorizedCertifications[category].map((cert) => (
+                            <CertificationCard key={cert.id} cert={cert} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                })()}
               </div>
             )}
           </div>

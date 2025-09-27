@@ -1,7 +1,7 @@
 {
   "name": "air-niugini-pms",
   "version": "1.0.0",
-  "description": "",
+  "description": "Air Niugini B767 Pilot Management System - Professional fleet operations management with pilot certification tracking and leave management",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
@@ -9,8 +9,8 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["aviation", "pilot-management", "air-niugini", "b767", "fleet-operations", "certification-tracking"],
+  "author": "Maurice Rondeau <PIN PNG LTD>",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
