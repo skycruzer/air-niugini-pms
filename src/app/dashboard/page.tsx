@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
-import { getCurrentRosterPeriod, formatRosterPeriod } from '@/lib/roster-utils'
+import { getCurrentRosterPeriod, formatRosterPeriod, getFutureRosterPeriods } from '@/lib/roster-utils'
 import { permissions } from '@/lib/auth-utils'
 import { getPilotStats, getAllCheckTypes, getExpiringCertifications, getPilotsWithExpiredCertifications } from '@/lib/pilot-service-client'
 // Using emojis and custom SVGs instead of Lucide React icons
@@ -134,6 +134,7 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
 export default function DashboardPage() {
   const { user } = useAuth()
   const [currentRoster, setCurrentRoster] = useState<any>(null)
+  const [futureRosters, setFutureRosters] = useState<any[]>([])
   const [pilotStats, setPilotStats] = useState<any>(null)
   const [checkTypes, setCheckTypes] = useState<any[]>([])
   const [expiringCerts, setExpiringCerts] = useState<any[]>([])
@@ -146,6 +147,10 @@ export default function DashboardPage() {
         // Load roster period data
         const roster = getCurrentRosterPeriod()
         setCurrentRoster(roster)
+
+        // Load future roster periods (12 months ahead)
+        const futureRosterPeriods = getFutureRosterPeriods(12)
+        setFutureRosters(futureRosterPeriods)
 
         // Load pilot statistics
         const stats = await getPilotStats()
@@ -292,6 +297,119 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Future Roster Periods Scrolling Section */}
+          {isLoaded && futureRosters.length > 0 && (
+            <div className="mb-8 animate-fade-in">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-heading-medium text-gray-900 mb-1">Upcoming Roster Periods</h3>
+                  <p className="text-body-medium text-gray-600">Next 12 months scheduling overview</p>
+                </div>
+                <div className="flex items-center text-body-small text-gray-500">
+                  <span className="mr-1">📅</span>
+                  {futureRosters.length} periods ahead
+                </div>
+              </div>
+
+              {/* Scrolling container */}
+              <div className="relative">
+                <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {futureRosters.map((roster, index) => {
+                    const isCurrentRoster = roster.code === currentRoster?.code
+                    const monthYear = roster.startDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                    const startDay = roster.startDate?.toLocaleDateString('en-US', { day: 'numeric' })
+                    const endDay = roster.endDate?.toLocaleDateString('en-US', { day: 'numeric' })
+
+                    return (
+                      <div
+                        key={roster.code}
+                        className={`flex-shrink-0 w-48 rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-lg hover:scale-105 ${
+                          isCurrentRoster
+                            ? 'bg-gradient-to-br from-[#E4002B]/10 to-[#E4002B]/20 border-[#E4002B] shadow-lg'
+                            : index < 3
+                            ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300'
+                            : 'bg-white border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                            isCurrentRoster
+                              ? 'bg-[#E4002B] text-white'
+                              : index < 3
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-500 text-white'
+                          }`}>
+                            {roster.code}
+                          </div>
+                          {isCurrentRoster && (
+                            <span className="text-xs bg-[#FFC72C] text-[#E4002B] font-bold px-2 py-1 rounded-full">
+                              ACTIVE
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-gray-700">
+                            <p className="text-xs text-gray-500 mb-1">{monthYear}</p>
+                            <p className="font-medium text-sm">
+                              {startDay} - {endDay}
+                            </p>
+                          </div>
+
+                          <div className={`flex items-center text-xs ${
+                            isCurrentRoster ? 'text-[#E4002B]' : 'text-gray-600'
+                          }`}>
+                            <span className="mr-1">📊</span>
+                            {roster.daysRemaining > 0 ? (
+                              `${roster.daysRemaining} days left`
+                            ) : (
+                              `Starts in ${Math.abs(roster.daysRemaining)} days`
+                            )}
+                          </div>
+
+                          {index < 3 && (
+                            <div className="flex items-center text-xs text-blue-600">
+                              <span className="mr-1">⭐</span>
+                              Planning window
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Progress bar for current roster */}
+                        {isCurrentRoster && roster.daysRemaining >= 0 && (
+                          <div className="mt-3">
+                            <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-[#E4002B] h-full transition-all duration-500"
+                                style={{
+                                  width: `${Math.max(0, Math.min(100, ((28 - roster.daysRemaining) / 28) * 100))}%`
+                                }}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 text-center">
+                              Day {28 - roster.daysRemaining} of 28
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Scroll indicators */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+              </div>
+
+              {/* Help text */}
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-500">
+                  💡 Scroll horizontally to view more periods • Planning horizon extends 12 months ahead
+                </p>
               </div>
             </div>
           )}

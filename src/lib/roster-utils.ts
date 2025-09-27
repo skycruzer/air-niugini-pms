@@ -310,3 +310,23 @@ export function getAffectedRosterPeriods(startDate: Date, endDate: Date): Roster
 
   return periods
 }
+
+/**
+ * Get future roster periods (for dashboard scrolling display)
+ */
+export function getFutureRosterPeriods(monthsAhead: number = 12): RosterPeriod[] {
+  const periods: RosterPeriod[] = []
+  const current = getCurrentRosterPeriod()
+  let currentPeriod = current
+
+  // Calculate approximately how many periods we need for the given months
+  // Roughly 365 days / 28 days per period = ~13 periods per year
+  const periodsNeeded = Math.ceil((monthsAhead * 30) / ROSTER_DURATION)
+
+  for (let i = 0; i < periodsNeeded; i++) {
+    periods.push(currentPeriod)
+    currentPeriod = getNextRosterPeriod(currentPeriod)
+  }
+
+  return periods
+}
