@@ -23,7 +23,11 @@ export const {
   // New certification management functions
   updatePilotCertification,
   updatePilotCertifications,
-  getPilotCertificationsWithAllTypes
+  getPilotCertificationsWithAllTypes,
+  // New dashboard statistics functions
+  getFleetUtilization,
+  getDashboardStats,
+  getRecentActivity
 } = pilotService
 
 console.log('🚀 Using REAL pilot service with Supabase')

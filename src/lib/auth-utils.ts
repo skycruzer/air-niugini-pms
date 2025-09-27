@@ -56,15 +56,28 @@ export const authService = {
   // Login with Supabase Auth
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      // TEMPORARY TEST MODE: Allow admin@airniugini.com with any password for testing
-      if (email === 'admin@airniugini.com' && process.env.NODE_ENV === 'development') {
+      // TEMPORARY TEST MODE: Allow specific emails with any password for testing
+      if ((email === 'admin@airniugini.com' || email === 'skycruzer@icloud.com') && process.env.NODE_ENV === 'development') {
         console.log('🚀 Using TEST MODE authentication for development')
-        const user: AuthUser = {
-          id: '1',
-          email: 'admin@airniugini.com',
-          name: 'Admin User',
-          role: 'admin' as UserRole,
-          created_at: new Date().toISOString()
+
+        // Get the correct user profile from database for test mode
+        let user: AuthUser
+        if (email === 'skycruzer@icloud.com') {
+          user = {
+            id: '73d6a362-1ef5-46e5-90d4-92473d1be3c9',
+            email: 'skycruzer@icloud.com',
+            name: 'Sky Cruzer',
+            role: 'admin' as UserRole,
+            created_at: new Date().toISOString()
+          }
+        } else {
+          user = {
+            id: 'ea5e67c8-f5a9-4455-a477-316874478d12',
+            email: 'admin@airniugini.com',
+            name: 'Admin User',
+            role: 'admin' as UserRole,
+            created_at: new Date().toISOString()
+          }
         }
 
         // Store user in localStorage for quick access

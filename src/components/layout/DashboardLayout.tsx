@@ -270,6 +270,43 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           )}
 
+          {/* About Section */}
+          {!sidebarCollapsed && (
+            <div className="px-4 mb-4">
+              <div className="bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-xl p-4 text-white">
+                <h4 className="text-xs font-medium mb-3 uppercase tracking-wider opacity-90">About</h4>
+                <div className="space-y-3">
+                  <div>
+                    <h5 className="text-sm font-semibold mb-1 flex items-center">
+                      <span className="mr-2">✈️</span>
+                      Air Niugini B767 PMS
+                    </h5>
+                    <p className="text-xs opacity-80 leading-relaxed">
+                      Professional pilot management system for Papua New Guinea's national airline fleet operations.
+                    </p>
+                  </div>
+
+                  <div className="border-t border-white/20 pt-3">
+                    <h6 className="text-xs font-medium mb-2 flex items-center">
+                      <span className="mr-2">🏢</span>
+                      Developed by PIN PNG LTD
+                    </h6>
+                    <div className="space-y-1 text-xs opacity-80">
+                      <p className="flex items-center">
+                        <span className="mr-2">👨‍💻</span>
+                        Developer: Maurice Rondeau
+                      </p>
+                      <p className="flex items-center">
+                        <span className="mr-2">📅</span>
+                        Version 1.0 • 2025
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Desktop User Section */}
           <div className="flex-shrink-0 border-t border-gray-200 p-4">
             <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''}`}>

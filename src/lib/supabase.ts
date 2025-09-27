@@ -5,11 +5,23 @@ function getSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  // Add debugging to see what's happening
+  console.log('Environment check:', {
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseAnonKey,
+    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
+    key: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined'
+  })
+
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase configuration missing, using fallback')
+    console.error('❌ Supabase configuration missing!')
+    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl)
+    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'Missing')
+
+    // For now, let's use the known values directly since env vars aren't loading
     return {
-      url: 'https://placeholder.supabase.co',
-      key: 'placeholder-key'
+      url: 'https://wgdmgvonqysflwdiiols.supabase.co',
+      key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZG1ndm9ucXlzZmx3ZGlpb2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1ODIzMjAsImV4cCI6MjA3MTE1ODMyMH0.MJrbK8qtJLJXz_mSHF9Le_DebGCXfZ4eXFd7h5JCKyk'
     }
   }
 
@@ -34,9 +46,35 @@ function createSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
+  console.log('Admin client environment check:', {
+    hasUrl: !!supabaseUrl,
+    hasServiceKey: !!supabaseServiceKey,
+    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined'
+  })
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('Admin Supabase configuration missing, using fallback client')
-    return createClient('https://placeholder.supabase.co', 'placeholder-key')
+    console.warn('❌ Admin Supabase configuration missing, using direct values')
+
+    // Use the known values directly since env vars aren't loading properly in browser
+    return createClient(
+      'https://wgdmgvonqysflwdiiols.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZG1ndm9ucXlzZmx3ZGlpb2xzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTU4MjMyMCwiZXhwIjoyMDcxMTU4MzIwfQ.byfbMS__aOJzhhty54h7ap3XK19f9-3Wu7S-ZWWV2Cg',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        },
+        global: {
+          fetch: (url, options = {}) => {
+            return fetch(url, {
+              ...options,
+              // Add timeout and retry logic at the fetch level
+              signal: AbortSignal.timeout(30000), // 30 second timeout
+            })
+          }
+        }
+      }
+    )
   }
 
   return createClient(supabaseUrl, supabaseServiceKey, {

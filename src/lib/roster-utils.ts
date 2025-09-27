@@ -1,4 +1,4 @@
-import { differenceInDays, addDays, format } from 'date-fns'
+import { differenceInDays, addDays, format, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns'
 
 // Constants based on the current roster information
 const ROSTER_DURATION = 28
@@ -329,4 +329,65 @@ export function getFutureRosterPeriods(monthsAhead: number = 12): RosterPeriod[]
   }
 
   return periods
+}
+
+/**
+ * Countdown interface for time remaining until next roster period
+ */
+export interface RosterCountdown {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+  totalDays: number
+  isNextRoster: boolean
+  nextRoster: RosterPeriod
+}
+
+/**
+ * Get countdown to the next roster period start
+ */
+export function getNextRosterCountdown(): RosterCountdown {
+  const now = new Date()
+  const current = getCurrentRosterPeriod()
+  const next = getNextRosterPeriod(current)
+
+  // Calculate time difference to next roster start
+  const totalDays = differenceInDays(next.startDate, now)
+  const totalHours = differenceInHours(next.startDate, now)
+  const totalMinutes = differenceInMinutes(next.startDate, now)
+  const totalSeconds = differenceInSeconds(next.startDate, now)
+
+  // Calculate remaining time components
+  const days = Math.floor(totalHours / 24)
+  const hours = totalHours % 24
+  const minutes = totalMinutes % 60
+  const seconds = totalSeconds % 60
+
+  return {
+    days: Math.max(0, days),
+    hours: Math.max(0, hours),
+    minutes: Math.max(0, minutes),
+    seconds: Math.max(0, seconds),
+    totalDays: Math.max(0, totalDays),
+    isNextRoster: totalDays >= 0,
+    nextRoster: next
+  }
+}
+
+/**
+ * Format countdown for display
+ */
+export function formatCountdown(countdown: RosterCountdown): string {
+  if (countdown.totalDays > 1) {
+    return `${countdown.days} days, ${countdown.hours} hours`
+  } else if (countdown.days === 1) {
+    return `1 day, ${countdown.hours} hours`
+  } else if (countdown.hours > 0) {
+    return `${countdown.hours} hours, ${countdown.minutes} minutes`
+  } else if (countdown.minutes > 0) {
+    return `${countdown.minutes} minutes`
+  } else {
+    return `${countdown.seconds} seconds`
+  }
 }

@@ -5,7 +5,7 @@ export async function GET() {
   try {
     // Use Promise.allSettled to handle partial failures gracefully
     const [pilotResult, certificationResult, checkTypesResult, complianceResult] = await Promise.allSettled([
-      supabaseAdmin.from('pilots').select('role').eq('is_active', true),
+      supabaseAdmin.from('pilots').select('role, captain_qualifications').eq('is_active', true),
       supabaseAdmin.from('pilot_checks').select('*', { count: 'exact', head: true }),
       supabaseAdmin.from('check_types').select('*', { count: 'exact', head: true }),
       supabaseAdmin.from('pilot_checks').select('expiry_date')
@@ -31,10 +31,21 @@ export async function GET() {
       console.warn('Error fetching compliance data:', complianceResult.reason)
     }
 
-    // Calculate pilots by role
+    // Calculate pilots by role and qualifications
     const totalPilots = pilotData?.length || 0
     const captains = pilotData?.filter(p => p.role === 'Captain').length || 0
     const firstOfficers = pilotData?.filter(p => p.role === 'First Officer').length || 0
+
+    // Count specialized qualifications
+    const trainingCaptains = pilotData?.filter(p =>
+      p.captain_qualifications && Array.isArray(p.captain_qualifications) &&
+      p.captain_qualifications.includes('training_captain')
+    ).length || 0
+
+    const examiners = pilotData?.filter(p =>
+      p.captain_qualifications && Array.isArray(p.captain_qualifications) &&
+      p.captain_qualifications.includes('examiner')
+    ).length || 0
 
     // Calculate compliance (certifications that are current)
     const currentDate = new Date()
@@ -51,6 +62,8 @@ export async function GET() {
       totalPilots,
       captains,
       firstOfficers,
+      trainingCaptains,
+      examiners,
       certifications: certificationCount || 0,
       checkTypes: checkTypesCount || 0,
       compliance
@@ -64,6 +77,8 @@ export async function GET() {
         totalPilots: 0,
         captains: 0,
         firstOfficers: 0,
+        trainingCaptains: 0,
+        examiners: 0,
         certifications: 0,
         checkTypes: 0,
         compliance: 0

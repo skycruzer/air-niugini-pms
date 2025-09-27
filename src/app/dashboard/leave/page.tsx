@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { LeaveRequestForm } from '@/components/leave/LeaveRequestForm'
+import { LeaveRequestModal } from '@/components/leave/LeaveRequestModal'
 import { LeaveRequestsList } from '@/components/leave/LeaveRequestsList'
 import { LeaveCalendarView } from '@/components/leave/LeaveCalendarView'
 import { useAuth } from '@/contexts/AuthContext'
@@ -14,7 +14,7 @@ import { format } from 'date-fns'
 
 export default function LeaveRequestsPage() {
   const { user } = useAuth()
-  const [showForm, setShowForm] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [activeTab, setActiveTab] = useState<'requests' | 'calendar'>('requests')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [stats, setStats] = useState<LeaveRequestStats | null>(null)
@@ -33,8 +33,8 @@ export default function LeaveRequestsPage() {
     loadStats()
   }, [refreshTrigger])
 
-  const handleFormSuccess = () => {
-    setShowForm(false)
+  const handleModalSuccess = () => {
+    setShowModal(false)
     setRefreshTrigger(prev => prev + 1)
   }
 
@@ -60,11 +60,11 @@ export default function LeaveRequestsPage() {
               </div>
               {permissions.canCreate(user) && (
                 <button
-                  onClick={() => setShowForm(!showForm)}
-                  className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors"
+                  onClick={() => setShowModal(true)}
+                  className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors shadow-lg hover:shadow-xl"
                 >
-                  <span className="mr-2">{showForm ? '✕' : '📝'}</span>
-                  {showForm ? 'Cancel' : 'New Request'}
+                  <span className="mr-2">📝</span>
+                  New Request
                 </button>
               )}
             </div>
@@ -164,16 +164,12 @@ export default function LeaveRequestsPage() {
             </div>
           )}
 
-          {/* New Request Form */}
-          {showForm && (
-            <div className="mb-8">
-              <LeaveRequestForm
-                key="new-form"
-                onSuccess={handleFormSuccess}
-                onCancel={() => setShowForm(false)}
-              />
-            </div>
-          )}
+          {/* New Request Modal */}
+          <LeaveRequestModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            onSuccess={handleModalSuccess}
+          />
 
           {/* Tabs */}
           <div className="flex items-center space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
