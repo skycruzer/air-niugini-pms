@@ -46,10 +46,12 @@ function createSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  console.log('Admin client environment check:', {
+  console.log('🔧 Admin client environment check:', {
     hasUrl: !!supabaseUrl,
     hasServiceKey: !!supabaseServiceKey,
-    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined'
+    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
+    serviceKeyLength: supabaseServiceKey ? supabaseServiceKey.length : 0,
+    serviceKeyStart: supabaseServiceKey ? supabaseServiceKey.substring(0, 20) + '...' : 'undefined'
   })
 
   if (!supabaseUrl || !supabaseServiceKey) {
@@ -58,13 +60,18 @@ function createSupabaseAdmin() {
     throw new Error('Supabase configuration missing - cannot perform admin operations')
   }
 
-  return createClient(supabaseUrl, supabaseServiceKey, {
+  const client = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     },
     global: {
       fetch: (url, options = {}) => {
+        console.log('🌐 Supabase fetch:', {
+          url: url.substring(0, 50) + '...',
+          method: options?.method || 'GET',
+          hasAuth: !!(options?.headers as any)?.Authorization
+        })
         return fetch(url, {
           ...options,
           // Add timeout and retry logic at the fetch level
@@ -73,6 +80,9 @@ function createSupabaseAdmin() {
       }
     }
   })
+
+  console.log('✅ Admin client created successfully')
+  return client
 }
 
 // Lazy initialization of admin client to avoid build-time errors

@@ -115,6 +115,8 @@ export async function PUT(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin()
   try {
     console.log('🚀 API /pilots PUT: Starting PUT request')
+    console.log('🔍 API /pilots PUT: Admin client type:', typeof supabaseAdmin)
+    console.log('🔍 API /pilots PUT: Admin client has from method:', !!supabaseAdmin.from)
 
     const { searchParams } = new URL(request.url)
     const pilotId = searchParams.get('id')
@@ -185,6 +187,27 @@ export async function PUT(request: NextRequest) {
 
     // Use service role client to bypass RLS
     console.log('🔧 API /pilots PUT: Performing update...')
+    console.log('🔧 API /pilots PUT: Service role client ready, attempting database update')
+
+    try {
+      // Test if we can do a simple select first
+      console.log('🧪 Testing service role with simple select...')
+      const testResult = await supabaseAdmin
+        .from('pilots')
+        .select('id')
+        .eq('id', pilotId)
+        .single()
+
+      console.log('🧪 Test select result:', {
+        success: !testResult.error,
+        error: testResult.error?.message,
+        data: !!testResult.data
+      })
+    } catch (testError) {
+      console.error('🧪 Test select failed:', testError)
+    }
+
+    console.log('🔧 Now attempting actual update...')
     const { data, error } = await supabaseAdmin
       .from('pilots')
       .update(cleanedBody)
