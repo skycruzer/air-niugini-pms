@@ -56,8 +56,12 @@ function getCurrentRosterPeriod() {
 
 async function getDashboardStats() {
   try {
-    // Use environment variable or fallback to localhost
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Use Vercel's automatic URL or fallback to localhost for development
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    console.log('🔍 Dashboard stats fetch URL:', baseUrl)
     const response = await fetch(`${baseUrl}/api/dashboard/stats`, {
       cache: 'no-store',
       // Add timeout to prevent hanging
