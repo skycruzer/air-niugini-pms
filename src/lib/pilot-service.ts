@@ -77,122 +77,52 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
   try {
     console.log('🔍 getAllPilots: Starting query for pilots...')
 
-    // In development mode, use API route to bypass RLS issues
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 getAllPilots: Using API route for development mode...')
+    // Always use API route to ensure service role access and bypass RLS
+    console.log('🔍 getAllPilots: Using API route for all environments...')
 
-      try {
-        const response = await fetch('/api/pilots')
+    // Determine the base URL for API calls
+    const baseUrl = typeof window !== 'undefined'
+      ? '' // Client-side - use relative URLs
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-        console.log('🔍 getAllPilots: API response status:', response.status)
+    const apiUrl = `${baseUrl}/api/pilots`
+    console.log('🔍 getAllPilots: API URL:', apiUrl)
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`)
-        }
+    try {
+      const response = await fetch(apiUrl)
 
-        const result = await response.json()
+      console.log('🔍 getAllPilots: API response status:', response.status)
 
-        console.log('🔍 getAllPilots: API response:', {
-          success: result.success,
-          dataLength: result.data?.length || 0
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('🚨 getAllPilots: API request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
         })
-
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch pilots')
-        }
-
-        console.log('🔍 getAllPilots: API returned', result.data?.length || 0, 'pilots')
-        return result.data || []
-      } catch (error) {
-        console.error('🚨 getAllPilots: API fetch error:', error)
-        // Fall back to direct Supabase query if API fails
-        console.log('🔍 getAllPilots: Falling back to direct Supabase query...')
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`)
       }
-    }
 
-    // Production mode - use direct Supabase queries
-    // Check current session
-    const { data: { session } } = await supabase.auth.getSession()
-    console.log('🔍 getAllPilots: Current session:', {
-      hasSession: !!session,
-      user: session?.user?.email || null
-    })
+      const result = await response.json()
 
-    // Get all pilots
-    const { data: pilots, error: pilotsError } = await supabase
-      .from('pilots')
-      .select('*')
-      .order('seniority_number', { ascending: true, nullsFirst: false })
-
-    console.log('🔍 getAllPilots: Pilots query result:', {
-      pilots: pilots?.length || 0,
-      error: pilotsError?.message || null
-    })
-
-    if (pilotsError) {
-      console.error('🚨 getAllPilots: Pilots query error:', pilotsError)
-      throw pilotsError
-    }
-
-    if (!pilots || pilots.length === 0) {
-      console.log('🔍 getAllPilots: No pilots found in database')
-      return []
-    }
-
-    console.log('🔍 getAllPilots: Processing certification data for', pilots.length, 'pilots')
-
-    // Get certification counts for each pilot
-    const pilotsWithCerts = await Promise.all(
-      (pilots || []).map(async (pilot) => {
-        console.log(`🔍 getAllPilots: Processing pilot ${pilot.first_name} ${pilot.last_name} (${pilot.id})`)
-
-        const { data: checks, error: checksError } = await supabase
-          .from('pilot_checks')
-          .select(`
-            expiry_date,
-            check_types (check_code, check_description, category)
-          `)
-          .eq('pilot_id', pilot.id)
-
-        console.log(`🔍 getAllPilots: Checks for ${pilot.first_name}:`, {
-          checks: checks?.length || 0,
-          error: checksError?.message || null
-        })
-
-        if (checksError) {
-          console.warn(`Error fetching checks for pilot ${pilot.id}:`, checksError)
-        }
-
-        // Calculate certification status
-        const certifications = checks || []
-        const certificationCounts = certifications.reduce(
-          (acc, check) => {
-            const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
-            if (status.color === 'green') acc.current++
-            else if (status.color === 'yellow') acc.expiring++
-            else if (status.color === 'red') acc.expired++
-            return acc
-          },
-          { current: 0, expiring: 0, expired: 0 }
-        )
-
-        return {
-          ...pilot,
-          certificationStatus: certificationCounts
-        }
+      console.log('🔍 getAllPilots: API response:', {
+        success: result.success,
+        dataLength: result.data?.length || 0
       })
-    )
 
-    console.log('🔍 getAllPilots: Final result:', {
-      totalPilots: pilotsWithCerts.length,
-      samplePilot: pilotsWithCerts[0] ? {
-        name: `${pilotsWithCerts[0].first_name} ${pilotsWithCerts[0].last_name}`,
-        id: pilotsWithCerts[0].id,
-        certStatus: pilotsWithCerts[0].certificationStatus
-      } : null
-    })
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch pilots')
+      }
 
-    return pilotsWithCerts
+      console.log('🔍 getAllPilots: API returned', result.data?.length || 0, 'pilots')
+      return result.data || []
+    } catch (error) {
+      console.error('🚨 getAllPilots: API fetch error:', error)
+      throw error
+    }
+
   } catch (error) {
     console.error('🚨 getAllPilots: Fatal error:', error)
     throw new Error(handleSupabaseError(error))
@@ -261,77 +191,56 @@ export async function getPilotCertifications(pilotId: string) {
   try {
     console.log('🔍 getPilotCertifications: Starting query for pilot:', pilotId)
 
-    // In development mode, use API route to bypass RLS issues
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 getPilotCertifications: Using API route for development mode...')
+    // Always use API route to ensure service role access and bypass RLS
+    console.log('🔍 getPilotCertifications: Using API route for all environments...')
 
-      try {
-        const response = await fetch(`/api/certifications?pilotId=${pilotId}`)
+    // Determine the base URL for API calls
+    const baseUrl = typeof window !== 'undefined'
+      ? '' // Client-side - use relative URLs
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-        console.log('🔍 getPilotCertifications: API response status:', response.status)
+    const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`
+    console.log('🔍 getPilotCertifications: API URL:', apiUrl)
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`)
-        }
+    const response = await fetch(apiUrl)
 
-        const result = await response.json()
+    console.log('🔍 getPilotCertifications: API response status:', response.status)
 
-        console.log('🔍 getPilotCertifications: API response:', {
-          success: result.success,
-          dataLength: result.data?.length || 0
-        })
-
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch certifications')
-        }
-
-        // Filter to only show certifications that have data (existing pilot_checks)
-        const certificationsWithData = result.data.filter((cert: any) => cert.hasData)
-
-        console.log('🔍 getPilotCertifications: API returned', certificationsWithData.length, 'certifications with data')
-
-        return certificationsWithData.map((cert: any) => ({
-          id: cert.checkTypeId,
-          checkCode: cert.checkCode,
-          checkDescription: cert.checkDescription,
-          category: cert.category,
-          expiryDate: cert.expiryDate ? new Date(cert.expiryDate) : null,
-          status: cert.status
-        }))
-      } catch (error) {
-        console.error('🚨 getPilotCertifications: API fetch error:', error)
-        // Fall back to direct Supabase query if API fails
-        console.log('🔍 getPilotCertifications: Falling back to direct Supabase query...')
-      }
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('🚨 getPilotCertifications: API request failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      })
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`)
     }
 
-    // Production mode or API fallback - use direct Supabase queries
-    const { data: checks, error } = await supabase
-      .from('pilot_checks')
-      .select(`
-        id,
-        expiry_date,
-        created_at,
-        updated_at,
-        check_types (
-          id,
-          check_code,
-          check_description,
-          category
-        )
-      `)
-      .eq('pilot_id', pilotId)
-      .order('expiry_date', { ascending: true, nullsFirst: false })
+    const result = await response.json()
 
-    if (error) throw error
+    console.log('🔍 getPilotCertifications: API response:', {
+      success: result.success,
+      dataLength: result.data?.length || 0
+    })
 
-    return (checks || []).map((check: any) => ({
-      id: check.id,
-      checkCode: check.check_types?.check_code || '',
-      checkDescription: check.check_types?.check_description || '',
-      category: check.check_types?.category || '',
-      expiryDate: check.expiry_date ? new Date(check.expiry_date) : null,
-      status: getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to fetch certifications')
+    }
+
+    // Filter to only show certifications that have data (existing pilot_checks)
+    const certificationsWithData = result.data.filter((cert: any) => cert.hasData)
+
+    console.log('🔍 getPilotCertifications: API returned', certificationsWithData.length, 'certifications with data')
+
+    return certificationsWithData.map((cert: any) => ({
+      id: cert.checkTypeId,
+      checkCode: cert.checkCode,
+      checkDescription: cert.checkDescription,
+      category: cert.category,
+      expiryDate: cert.expiryDate ? new Date(cert.expiryDate) : null,
+      status: cert.status
     }))
   } catch (error) {
     console.error('🚨 getPilotCertifications: Fatal error:', error)
@@ -413,48 +322,46 @@ export async function updatePilot(pilotId: string, pilotData: Partial<PilotFormD
         .map(([key, value]) => [key, value === '' ? null : value])
     )
 
-    // In development mode, use API route to bypass RLS issues
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 updatePilot: Using API route for development mode...')
+    // Always use API route to ensure service role access and bypass RLS
+    console.log('🔍 updatePilot: Using API route for all environments...')
 
-      try {
-        const response = await fetch(`/api/pilots?id=${pilotId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(cleanedData),
-        })
+    // Determine the base URL for API calls
+    const baseUrl = typeof window !== 'undefined'
+      ? '' // Client-side - use relative URLs
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`)
-        }
+    const apiUrl = `${baseUrl}/api/pilots?id=${pilotId}`
+    console.log('🔍 updatePilot: API URL:', apiUrl)
 
-        const result = await response.json()
+    const response = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cleanedData),
+    })
 
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to update pilot')
-        }
-
-        console.log('🔍 updatePilot: API returned updated pilot data')
-        return result.data
-      } catch (error) {
-        console.error('🚨 updatePilot: API fetch error:', error)
-        // Fall back to direct Supabase query if API fails
-        console.log('🔍 updatePilot: Falling back to direct Supabase query...')
-      }
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('🚨 updatePilot: API request failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      })
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`)
     }
 
-    // Production mode or API fallback - use direct Supabase queries
-    const { data, error } = await supabase
-      .from('pilots')
-      .update(cleanedData)
-      .eq('id', pilotId)
-      .select()
-      .single()
+    const result = await response.json()
 
-    if (error) throw error
-    return data
+    if (!result.success) {
+      console.error('🚨 updatePilot: API returned error:', result.error)
+      throw new Error(result.error || 'Failed to update pilot')
+    }
+
+    console.log('🔍 updatePilot: Successfully updated pilot via API')
+    return result.data
   } catch (error) {
     console.error('Error updating pilot:', error)
     throw new Error(handleSupabaseError(error))
@@ -732,76 +639,46 @@ export async function getPilotCertificationsWithAllTypes(pilotId: string) {
   try {
     console.log('🔍 getPilotCertificationsWithAllTypes: Starting query for pilot:', pilotId)
 
-    // In development mode, use API route to bypass RLS issues
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 getPilotCertificationsWithAllTypes: Using API route for development mode...')
+    // Always use API route to ensure service role access and bypass RLS
+    console.log('🔍 getPilotCertificationsWithAllTypes: Using API route for all environments...')
 
-      try {
-        const response = await fetch(`/api/certifications?pilotId=${pilotId}`)
+    // Determine the base URL for API calls
+    const baseUrl = typeof window !== 'undefined'
+      ? '' // Client-side - use relative URLs
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-        console.log('🔍 getPilotCertificationsWithAllTypes: API response status:', response.status)
+    const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`
+    console.log('🔍 getPilotCertificationsWithAllTypes: API URL:', apiUrl)
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`)
-        }
+    const response = await fetch(apiUrl)
 
-        const result = await response.json()
+    console.log('🔍 getPilotCertificationsWithAllTypes: API response status:', response.status)
 
-        console.log('🔍 getPilotCertificationsWithAllTypes: API response:', {
-          success: result.success,
-          dataLength: result.data?.length || 0
-        })
-
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch certifications')
-        }
-
-        console.log('🔍 getPilotCertificationsWithAllTypes: API returned', result.data?.length || 0, 'certification types')
-        return result.data || []
-      } catch (error) {
-        console.error('🚨 getPilotCertificationsWithAllTypes: API fetch error:', error)
-        // Fall back to direct Supabase query if API fails
-        console.log('🔍 getPilotCertificationsWithAllTypes: Falling back to direct Supabase query...')
-      }
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('🚨 getPilotCertificationsWithAllTypes: API request failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      })
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`)
     }
 
-    // Production mode or API fallback - use direct Supabase queries
-    // Get all check types
-    const { data: checkTypes, error: checkTypesError } = await supabase
-      .from('check_types')
-      .select('*')
-      .order('category', { ascending: true })
-      .order('check_code', { ascending: true })
+    const result = await response.json()
 
-    if (checkTypesError) throw checkTypesError
-
-    // Get existing certifications for this pilot
-    const { data: pilotChecks, error: checksError } = await supabase
-      .from('pilot_checks')
-      .select('*')
-      .eq('pilot_id', pilotId)
-
-    if (checksError) throw checksError
-
-    // Create a map of existing certifications
-    const existingChecks = new Map()
-    pilotChecks?.forEach(check => {
-      existingChecks.set(check.check_type_id, check)
+    console.log('🔍 getPilotCertificationsWithAllTypes: API response:', {
+      success: result.success,
+      dataLength: result.data?.length || 0
     })
 
-    // Combine all check types with existing certifications
-    return (checkTypes || []).map(checkType => {
-      const existingCheck = existingChecks.get(checkType.id)
-      return {
-        checkTypeId: checkType.id,
-        checkCode: checkType.check_code,
-        checkDescription: checkType.check_description,
-        category: checkType.category,
-        expiryDate: existingCheck?.expiry_date || null,
-        status: getCertificationStatus(existingCheck?.expiry_date ? new Date(existingCheck.expiry_date) : null),
-        hasData: !!existingCheck
-      }
-    })
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to fetch certifications')
+    }
+
+    console.log('🔍 getPilotCertificationsWithAllTypes: API returned', result.data?.length || 0, 'certification types')
+    return result.data || []
   } catch (error) {
     console.error('🚨 getPilotCertificationsWithAllTypes: Fatal error:', error)
     throw new Error(handleSupabaseError(error))
