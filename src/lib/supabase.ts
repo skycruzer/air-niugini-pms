@@ -68,7 +68,7 @@ function createSupabaseAdmin() {
     global: {
       fetch: (url, options = {}) => {
         console.log('🌐 Supabase fetch:', {
-          url: url.substring(0, 50) + '...',
+          url: String(url).substring(0, 50) + '...',
           method: options?.method || 'GET',
           hasAuth: !!(options?.headers as any)?.Authorization
         })
