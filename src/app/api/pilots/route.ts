@@ -198,7 +198,13 @@ export async function PUT(request: NextRequest) {
       console.error('🚨 API /pilots PUT: Error message:', error.message)
       console.error('🚨 API /pilots PUT: Error details:', error.details)
       return NextResponse.json(
-        { success: false, error: error.message },
+        {
+          success: false,
+          error: error.message,
+          details: error.details,
+          code: error.code,
+          hint: error.hint
+        },
         { status: 500 }
       )
     }

@@ -69,7 +69,7 @@ function createSupabaseAdmin() {
             return fetch(url, {
               ...options,
               // Add timeout and retry logic at the fetch level
-              signal: AbortSignal.timeout(30000), // 30 second timeout
+              signal: AbortSignal.timeout(15000), // 15 second timeout for production
             })
           }
         }
