@@ -3,6 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for non-critical background elements
+const BackgroundElements = dynamic(() => import('./components/BackgroundElements'), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red" />
+})
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -35,18 +42,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red overflow-hidden">
-      {/* Background Elements - Reduced interference */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 right-10 opacity-10">
-          <span className="text-white text-[200px] transform -rotate-12 block">✈️</span>
-        </div>
-        <div className="absolute bottom-10 right-20 opacity-8">
-          <span className="text-air-niugini-gold text-[250px] block">🌍</span>
-        </div>
-        <div className="absolute top-1/3 right-1/4 opacity-5">
-          <span className="text-white text-[100px] transform rotate-45 block">⚡</span>
-        </div>
-      </div>
+      {/* Background Elements - Dynamically loaded */}
+      <BackgroundElements />
 
       {/* Header */}
       <header className="relative z-10">
@@ -64,7 +61,11 @@ export default function LoginPage() {
               <div className="relative mr-4">
                 <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-30"></div>
                 <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
-                  <span className="text-air-niugini-gold text-2xl">✈️</span>
+                  <img
+                    src="/images/air-niugini-logo.jpg"
+                    alt="Air Niugini Logo"
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
               </div>
               <div className="text-right">
@@ -94,6 +95,15 @@ export default function LoginPage() {
                   Access your professional pilot management dashboard with secure authentication.
                   Manage certifications, leave requests, and fleet compliance with confidence.
                 </p>
+              </div>
+
+              {/* Air Niugini B767 Aircraft Photo */}
+              <div className="mb-8 flex justify-center lg:justify-start">
+                <img
+                  src="/images/air-niugini-b767-new.jpg"
+                  alt="Air Niugini Boeing 767-300ER P2-ANG 'Bulolo'"
+                  className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
+                />
               </div>
 
               {/* Features Highlight */}
@@ -220,11 +230,8 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                  <p className="text-caption text-gray-500">
-                    Secured by Supabase Authentication
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">
-                    © 2025 Air Niugini - Development Environment
+                  <p className="text-xs text-gray-400">
+                    Powered by PIN Modern Technology
                   </p>
                 </div>
               </div>

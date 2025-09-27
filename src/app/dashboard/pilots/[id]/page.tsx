@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { permissions } from '@/lib/auth-utils'
 import { getCertificationStatus, getCategoryIcon } from '@/lib/certification-utils'
 import { getPilotById, getPilotCertifications } from '@/lib/pilot-service-client'
+import { calculateRetirementInfo, getRetirementAge, formatRetirementDate, getRetirementStatusColor } from '@/lib/retirement-utils'
 import { format, differenceInYears } from 'date-fns'
 // Using emojis and custom SVGs instead of Lucide React icons
 
@@ -62,10 +63,11 @@ function InfoCard({ title, children, className = "" }: {
   )
 }
 
-function InfoRow({ label, value, type = "text" }: {
+function InfoRow({ label, value, type = "text", className = "" }: {
   label: string
   value: string | number | Date | null | undefined
   type?: "text" | "date" | "years"
+  className?: string
 }) {
   let displayValue: string
 
@@ -82,7 +84,7 @@ function InfoRow({ label, value, type = "text" }: {
   return (
     <div className="flex justify-between py-2 border-b border-gray-100 last:border-b-0">
       <span className="text-sm font-medium text-gray-600">{label}</span>
-      <span className="text-sm text-gray-900">{displayValue}</span>
+      <span className={`text-sm ${className || 'text-gray-900'}`}>{displayValue}</span>
     </div>
   )
 }
@@ -120,7 +122,10 @@ export default function PilotDetailPage() {
   const { user } = useAuth()
   const [pilot, setPilot] = useState<PilotDetail | null>(null)
   const [certifications, setCertifications] = useState<Certification[]>([])
+  const [retirementInfo, setRetirementInfo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const pilotId = params.id as string
 
@@ -159,6 +164,20 @@ export default function PilotDetailPage() {
         }
 
         setCertifications(certData || [])
+
+        // Calculate retirement information if pilot has date of birth
+        if (pilotData?.date_of_birth) {
+          try {
+            const retirementAge = await getRetirementAge()
+            const retirement = calculateRetirementInfo(pilotData.date_of_birth, retirementAge)
+            setRetirementInfo(retirement)
+          } catch (error) {
+            console.error('Error calculating retirement info:', error)
+            // Use default retirement age if settings fail to load
+            const retirement = calculateRetirementInfo(pilotData.date_of_birth, 65)
+            setRetirementInfo(retirement)
+          }
+        }
       } catch (error) {
         console.error('Error fetching pilot data:', error)
         // Keep pilot as null to show "not found" message
@@ -169,6 +188,32 @@ export default function PilotDetailPage() {
 
     fetchPilotData()
   }, [pilotId])
+
+  const handleDeletePilot = async () => {
+    if (!pilot) return
+
+    setDeleting(true)
+    try {
+      const response = await fetch(`/api/pilots/${pilot.id}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete pilot')
+      }
+
+      // Redirect to pilots list after successful deletion
+      router.push('/dashboard/pilots')
+    } catch (error) {
+      console.error('Error deleting pilot:', error)
+      alert(`Failed to delete pilot: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setDeleting(false)
+      setShowDeleteConfirm(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -248,19 +293,21 @@ export default function PilotDetailPage() {
               {permissions.canEdit(user) && (
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => router.push(`/dashboard/pilots/${pilot.id}/edit`)}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <span className="mr-2">✏️</span>
-                    Edit Pilot
-                  </button>
-                  <button
                     onClick={() => router.push(`/dashboard/pilots/${pilot.id}/certifications`)}
                     className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <span className="mr-2">🛡️</span>
                     Manage Certifications
                   </button>
+                  {permissions.canDelete(user) && (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <span className="mr-2">🗑️</span>
+                      Delete Pilot
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -300,6 +347,19 @@ export default function PilotDetailPage() {
                 <InfoRow label="Full Name" value={`${pilot.firstName} ${pilot.middleName || ''} ${pilot.lastName}`} />
                 <InfoRow label="Date of Birth" value={pilot.dateOfBirth} type="date" />
                 <InfoRow label="Age" value={pilot.dateOfBirth} type="years" />
+                {retirementInfo && (
+                  <>
+                    <InfoRow
+                      label="Years to Retirement"
+                      value={retirementInfo.displayText}
+                      className={`${getRetirementStatusColor(retirementInfo.retirementStatus).textClass}`}
+                    />
+                    <InfoRow
+                      label="Retirement Date"
+                      value={formatRetirementDate(retirementInfo.retirementDate)}
+                    />
+                  </>
+                )}
                 <InfoRow label="Nationality" value={pilot.nationality} />
                 <InfoRow label="Passport Number" value={pilot.passportNumber} />
                 <InfoRow label="Passport Expiry" value={pilot.passportExpiry} type="date" />
@@ -411,6 +471,57 @@ export default function PilotDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <div className="flex items-center mb-4">
+                <span className="text-red-500 text-2xl mr-3">⚠️</span>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Pilot</h3>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete <strong>{pilot?.firstName} {pilot?.lastName}</strong>?
+                This action cannot be undone and will permanently remove:
+              </p>
+
+              <ul className="text-sm text-gray-600 mb-6 space-y-1 ml-4">
+                <li>• Pilot record and personal information</li>
+                <li>• All certification records</li>
+                <li>• All leave requests</li>
+                <li>• All associated data</li>
+              </ul>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeletePilot}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {deleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">🗑️</span>
+                      Delete Permanently
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
   )

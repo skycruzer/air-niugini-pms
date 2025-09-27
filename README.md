@@ -58,7 +58,7 @@ All tables are prefixed with `an_` to avoid conflicts:
 
 - **Frontend**: Next.js 14, React, TypeScript
 - **Styling**: TailwindCSS with custom Air Niugini theme
-- **Database**: Supabase PostgreSQL
+- **Database**: PostgreSQL
 - **State**: React Query (planned)
 - **Forms**: React Hook Form + Zod (planned)
 

@@ -5,81 +5,47 @@ import { differenceInDays } from 'date-fns'
 
 export async function GET() {
   try {
-    console.log('🔍 API /leave-requests: Fetching leave requests with service role...')
+    console.log('🔍 API /leave-requests: Fetching leave requests with OPTIMIZED JOIN query...')
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Get leave requests with pilot information using service role with retry logic
-    let requests = null
-    let error = null
-
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const result = await supabaseAdmin
-          .from('leave_requests')
-          .select('*')
-          .order('created_at', { ascending: false })
-
-        requests = result.data
-        error = result.error
-        console.log('🔍 API /leave-requests: Raw result count:', result.data?.length || 0)
-        console.log('🔍 API /leave-requests: Raw result IDs:', result.data?.map((r: any) => r.id) || [])
-        if (result.error) {
-          console.error('🚨 API /leave-requests: Query error:', result.error)
-        }
-        break // Success, exit retry loop
-      } catch (fetchError) {
-        console.warn(`🚨 API /leave-requests: Attempt ${attempt} failed:`, fetchError)
-        error = fetchError
-        if (attempt === 2) {
-          console.error('🚨 API /leave-requests: Error fetching leave requests:', {
-            message: fetchError instanceof Error ? fetchError.message : 'Unknown error',
-            details: fetchError instanceof Error ? fetchError.stack : String(fetchError),
-            hint: '',
-            code: ''
-          })
-        }
-      }
-    }
+    // ⚡ OPTIMIZED: Single query with JOIN to eliminate N+1 pattern
+    const { data: requests, error } = await supabaseAdmin
+      .from('leave_requests')
+      .select(`
+        *,
+        pilots:pilot_id (
+          first_name,
+          middle_name,
+          last_name,
+          employee_id
+        )
+      `)
+      .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('🚨 API /leave-requests: Final error after retries:', error)
+      console.error('🚨 API /leave-requests: Query error:', error)
       return NextResponse.json(
-        { success: false, error: error instanceof Error ? error.message : 'Failed to fetch leave requests' },
+        { success: false, error: error.message || 'Failed to fetch leave requests' },
         { status: 500 }
       )
     }
 
-    // Get pilot information for each request
-    const transformedRequests = []
-    for (const request of requests || []) {
-      try {
-        const { data: pilot } = await supabaseAdmin
-          .from('pilots')
-          .select('first_name, middle_name, last_name, employee_id')
-          .eq('id', request.pilot_id)
-          .single()
+    console.log('🔍 API /leave-requests: Found', requests?.length || 0, 'leave requests')
 
-        transformedRequests.push({
-          ...request,
-          pilot_name: pilot
-            ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
-            : 'Unknown Pilot',
-          employee_id: pilot?.employee_id || 'N/A',
-          reviewer_name: null // We'll get this separately if needed
-        })
-      } catch (pilotError) {
-        console.warn(`Could not fetch pilot for request ${request.id}:`, pilotError)
-        transformedRequests.push({
-          ...request,
-          pilot_name: 'Unknown Pilot',
-          employee_id: 'N/A',
-          reviewer_name: null
-        })
+    // ⚡ OPTIMIZED: Transform data without additional queries
+    const transformedRequests = (requests || []).map((request: any) => {
+      const pilot = request.pilots
+      return {
+        ...request,
+        pilot_name: pilot
+          ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+          : 'Unknown Pilot',
+        employee_id: pilot?.employee_id || 'N/A',
+        reviewer_name: null, // We'll get this separately if needed
+        pilots: undefined // Remove the nested object from response
       }
-    }
-
-    console.log('🔍 API /leave-requests: Found', transformedRequests.length, 'leave requests')
+    })
     console.log('🔍 API /leave-requests: Sample request:', JSON.stringify(transformedRequests[0], null, 2))
 
     return NextResponse.json({

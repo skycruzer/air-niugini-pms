@@ -470,7 +470,126 @@ body {
   animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Responsive Design */
+/* Enhanced Mobile Responsiveness */
+
+/* Mobile-First Touch Targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-friendly-spacing {
+  margin: 8px;
+}
+
+/* Mobile Optimized Components */
+.mobile-card {
+  @apply rounded-lg border border-gray-200 p-4 mb-4 bg-white shadow-sm;
+}
+
+.mobile-card:hover {
+  @apply shadow-md;
+}
+
+.mobile-filter-grid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.mobile-action-buttons {
+  @apply flex flex-col space-y-2 w-full;
+}
+
+.mobile-action-buttons > button {
+  @apply w-full min-h-[44px] flex items-center justify-center;
+}
+
+.mobile-stats-grid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+/* Enhanced Horizontal Scroll */
+.mobile-horizontal-scroll {
+  @apply flex gap-4 overflow-x-auto pb-4;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-horizontal-scroll > * {
+  @apply flex-shrink-0;
+  scroll-snap-align: start;
+}
+
+/* Mobile Navigation Enhancements */
+.mobile-nav-item {
+  @apply flex items-center w-full p-4 text-left rounded-lg transition-colors;
+  min-height: 56px;
+}
+
+.mobile-nav-item:hover {
+  @apply bg-gray-50;
+}
+
+.mobile-nav-item.active {
+  @apply bg-gradient-to-r from-red-500 to-red-600 text-white;
+}
+
+/* Mobile Typography */
+.mobile-heading {
+  @apply text-xl font-semibold leading-tight;
+}
+
+.mobile-subheading {
+  @apply text-lg font-medium leading-snug;
+}
+
+.mobile-text {
+  @apply text-base leading-relaxed;
+}
+
+.mobile-caption {
+  @apply text-sm text-gray-600 leading-normal;
+}
+
+/* Mobile Form Elements */
+.mobile-input {
+  @apply w-full px-4 py-3 text-base border border-gray-300 rounded-lg;
+  min-height: 44px;
+}
+
+.mobile-input:focus {
+  @apply outline-none border-red-500 ring-2 ring-red-500/20;
+}
+
+.mobile-select {
+  @apply w-full px-4 py-3 text-base border border-gray-300 rounded-lg bg-white;
+  min-height: 44px;
+}
+
+.mobile-button {
+  @apply w-full px-4 py-3 text-base font-medium rounded-lg transition-colors;
+  min-height: 44px;
+}
+
+.mobile-button-primary {
+  @apply mobile-button bg-red-600 text-white;
+}
+
+.mobile-button-primary:hover {
+  @apply bg-red-700;
+}
+
+.mobile-button-secondary {
+  @apply mobile-button border border-gray-300 text-gray-700 bg-white;
+}
+
+.mobile-button-secondary:hover {
+  @apply bg-gray-50;
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 640px) {
   .mobile-hidden {
     display: none !important;
@@ -484,6 +603,15 @@ body {
     flex-direction: column !important;
   }
 
+  .mobile-center {
+    text-align: center !important;
+  }
+
+  .mobile-left {
+    text-align: left !important;
+  }
+
+  /* Card Responsive Adjustments */
   .card {
     @apply p-4;
   }
@@ -491,10 +619,135 @@ body {
   .card-premium {
     @apply p-6;
   }
+
+  .fleet-card {
+    @apply p-4;
+  }
+
+  /* Button Size Adjustments */
+  .btn {
+    @apply px-4 py-3 text-base;
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    @apply px-3 py-2 text-sm;
+    min-height: 40px;
+  }
+
+  .btn-lg {
+    @apply px-6 py-4 text-lg;
+    min-height: 52px;
+  }
+
+  /* Navigation Mobile Optimizations */
+  .nav-link {
+    @apply px-4 py-3 text-base;
+    min-height: 48px;
+  }
+
+  /* Grid Adjustments */
+  .mobile-grid-1 {
+    @apply grid-cols-1 !important;
+  }
+
+  .mobile-grid-2 {
+    @apply grid-cols-2 !important;
+  }
+
+  /* Spacing Adjustments */
+  .mobile-space-y-2 > * + * {
+    margin-top: 0.5rem !important;
+  }
+
+  .mobile-space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .mobile-space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  /* Pilot Card Mobile Optimizations */
+  .pilot-card-mobile {
+    @apply flex flex-col space-y-3;
+  }
+
+  .pilot-card-actions {
+    @apply flex justify-end space-x-2 mt-3;
+  }
+
+  .pilot-card-actions button {
+    @apply touch-target;
+  }
+
+  /* Filter Form Mobile Layout */
+  .filter-form-mobile {
+    @apply space-y-3;
+  }
+
+  .filter-form-mobile .grid {
+    @apply grid-cols-1 gap-3;
+  }
+
+  /* Roster Banner Mobile */
+  .roster-banner {
+    @apply p-4 text-center;
+  }
+
+  /* Mobile Dashboard Stats */
+  .dashboard-stats-mobile {
+    @apply grid grid-cols-1 gap-4;
+  }
+
+  /* Quick Actions Mobile */
+  .quick-actions-mobile {
+    @apply grid grid-cols-1 gap-3;
+  }
+
+  /* Analytics Cards Mobile */
+  .analytics-cards-mobile {
+    @apply grid grid-cols-1 gap-4;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .tablet-hidden {
+    display: none !important;
+  }
+
+  .tablet-grid-1 {
+    @apply grid-cols-1 !important;
+  }
+
+  .tablet-grid-2 {
+    @apply grid-cols-2 !important;
+  }
+
+  .tablet-grid-3 {
+    @apply grid-cols-3 !important;
+  }
+
+  /* Tablet Optimizations */
+  .pilot-cards-tablet {
+    @apply grid-cols-1 gap-4;
+  }
+
+  .dashboard-stats-tablet {
+    @apply grid-cols-2 gap-4;
+  }
+
+  .quick-actions-tablet {
+    @apply grid-cols-2 gap-4;
+  }
+
+  .analytics-cards-tablet {
+    @apply grid-cols-2 gap-4;
+  }
 }
 
 @media (max-width: 768px) {
-  .tablet-hidden {
+  .tablet-mobile-hidden {
     display: none !important;
   }
 
@@ -504,6 +757,41 @@ body {
 
   .text-display-medium {
     font-size: 2rem;
+  }
+
+  .text-display-small {
+    font-size: 1.75rem;
+  }
+
+  .text-heading-large {
+    font-size: 1.5rem;
+  }
+
+  .text-heading-medium {
+    font-size: 1.25rem;
+  }
+
+  /* Mobile Form Improvements */
+  .form-input {
+    @apply px-4 py-3 text-base;
+    min-height: 44px;
+  }
+
+  /* Mobile Table Alternative */
+  .mobile-table-card {
+    @apply bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm;
+  }
+
+  .mobile-table-row {
+    @apply flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0;
+  }
+
+  .mobile-table-label {
+    @apply font-medium text-gray-700 text-sm;
+  }
+
+  .mobile-table-value {
+    @apply text-gray-900 text-sm text-right;
   }
 }
 

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { getRoleDisplayName, getRoleColor, permissions } from '@/lib/auth-utils'
 import { getCurrentRosterPeriod, formatRosterPeriod } from '@/lib/roster-utils'
@@ -13,6 +14,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [currentRoster, setCurrentRoster] = useState<any>(null)
@@ -25,8 +27,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠', description: 'Overview and analytics' },
     { name: 'Pilots', href: '/dashboard/pilots', icon: '👥', description: 'Manage pilot records' },
-    { name: 'Certifications', href: '/dashboard/certifications', icon: '📄', description: 'Track certifications' },
-    { name: 'Leave Requests', href: '/dashboard/leave', icon: '📅', description: 'Manage leave requests' },
+    {
+      name: 'Certifications',
+      href: '/dashboard/certifications',
+      icon: '📄',
+      description: 'Track certifications',
+      submenu: [
+        { name: 'Certification List', href: '/dashboard/certifications', description: 'Manage certifications' },
+        { name: 'Bulk Updates', href: '/dashboard/certifications/bulk', description: 'Mass certification updates' },
+        { name: 'Expiry Calendar', href: '/dashboard/certifications/calendar', description: 'Visual expiry timeline' }
+      ]
+    },
+    {
+      name: 'Leave Requests',
+      href: '/dashboard/leave',
+      icon: '📅',
+      description: 'Manage leave requests',
+      submenu: [
+        { name: 'Leave Requests', href: '/dashboard/leave', description: 'Manage requests' },
+        { name: 'Leave Calendar', href: '/dashboard/leave/calendar', description: 'Visual leave timeline' }
+      ]
+    },
     { name: 'Reports', href: '/dashboard/reports', icon: '📊', description: 'Fleet reports', requiresPermission: 'reports' },
     { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', description: 'System configuration', requiresPermission: 'settings' },
   ]
@@ -38,14 +59,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       return permissions.canViewReports(user)
     }
     if (item.requiresPermission === 'settings') {
-      return permissions.canManageSettings && permissions.canManageSettings(user)
+      return permissions.canManageSettings ? permissions.canManageSettings(user) : false
     }
     return true
   })
 
   const handleLogout = async () => {
     await logout()
-    window.location.href = '/'
+    router.push('/')
   }
 
   // Notifications would come from real data in a complete implementation
@@ -53,18 +74,36 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {/* Skip to content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-air-niugini-red text-white px-4 py-2 rounded-lg z-50 focus:z-50"
+      >
+        Skip to main content
+      </a>
+
       {/* Mobile Sidebar Overlay */}
-      <div className={`lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+      <div
+        className={`lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation menu"
+      >
         <div className="fixed inset-0 z-50 flex">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-          <div className="relative flex w-full max-w-xs flex-col bg-white shadow-2xl">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+          />
+          <nav className="relative flex w-full max-w-xs flex-col bg-white shadow-2xl" aria-label="Main navigation">
             <div className="absolute top-0 right-0 -mr-14 p-1">
               <button
                 type="button"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white touch-target"
                 onClick={() => setSidebarOpen(false)}
+                aria-label="Close navigation menu"
               >
-                <span className="h-6 w-6 text-white text-2xl">✖️</span>
+                <span className="h-6 w-6 text-white text-2xl" aria-hidden="true">✖️</span>
               </button>
             </div>
 
@@ -76,7 +115,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   <div className="relative">
                     <div className="absolute inset-0 bg-air-niugini-gold rounded-lg blur-md opacity-30"></div>
                     <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <span className="h-6 w-6 text-air-niugini-gold text-2xl">✈️</span>
+                      <img
+                        src="/images/air-niugini-logo.jpg"
+                        alt="Air Niugini Logo"
+                        className="h-6 w-6 rounded object-cover"
+                      />
                     </div>
                   </div>
                   <div className="ml-3">
@@ -102,25 +145,53 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               )}
 
               {/* Mobile Navigation */}
-              <nav className="px-4 space-y-2">
-                {filteredNavigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`nav-link ${
-                      pathname === item.href
-                        ? 'nav-link-active'
-                        : 'nav-link-inactive'
-                    }`}
-                  >
-                    <span className="h-5 w-5 mr-3 text-lg">{item.icon}</span>
-                    <div>
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs opacity-75">{item.description}</p>
+              <nav className="px-4 space-y-2" role="navigation" aria-label="Main navigation">
+                {filteredNavigation.map((item) => {
+                  const isMainActive = pathname === item.href
+                  const hasSubmenuActive = item.submenu?.some(sub => pathname === sub.href)
+                  const isActive = isMainActive || hasSubmenuActive
+
+                  return (
+                    <div key={item.name}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`mobile-nav-item ${
+                          isActive
+                            ? 'active'
+                            : ''
+                        }`}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        <span className="h-5 w-5 mr-3 text-lg" aria-hidden="true">{item.icon}</span>
+                        <div className="flex-1">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-xs opacity-75">{item.description}</p>
+                        </div>
+                      </Link>
+
+                      {/* Mobile Submenu */}
+                      {item.submenu && hasSubmenuActive && (
+                        <div className="ml-8 mt-2 space-y-1">
+                          {item.submenu.map((subItem) => (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              onClick={() => setSidebarOpen(false)}
+                              className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
+                                pathname === subItem.href
+                                  ? 'bg-[#E4002B] text-white'
+                                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                              }`}
+                            >
+                              {subItem.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </a>
-                ))}
+                  )
+                })}
               </nav>
 
               {/* Mobile User Section */}
@@ -140,22 +211,26 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-target"
                     title="Sign Out"
+                    aria-label="Sign out of your account"
                   >
-                    <span className="h-5 w-5 text-lg">🚪</span>
+                    <span className="h-5 w-5 text-lg" aria-hidden="true">🚪</span>
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </nav>
         </div>
       </div>
 
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 transition-all duration-300 ${
-        sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
-      }`}>
+      <aside
+        className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:border-r lg:border-gray-200 transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
+        }`}
+        aria-label="Main navigation"
+      >
         <div className="flex flex-col h-full bg-white shadow-lg">
           {/* Desktop Header */}
           <div className="aviation-header p-6">
@@ -164,7 +239,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div className="relative">
                   <div className="absolute inset-0 bg-air-niugini-gold rounded-lg blur-md opacity-30"></div>
                   <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                    <span className="h-6 w-6 text-air-niugini-gold text-2xl">✈️</span>
+                    <img
+                      src="/images/air-niugini-logo.jpg"
+                      alt="Air Niugini Logo"
+                      className="h-6 w-6 rounded object-cover"
+                    />
                   </div>
                 </div>
                 {!sidebarCollapsed && (
@@ -176,9 +255,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors touch-target"
+                aria-label={sidebarCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu'}
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
-                <span className={`h-4 w-4 transform transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`}>▶️</span>
+                <span className={`h-4 w-4 transform transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} aria-hidden="true">▶️</span>
               </button>
             </div>
           </div>
@@ -216,33 +297,57 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Desktop Navigation */}
           <nav className={`flex-1 space-y-1 ${sidebarCollapsed ? 'px-2' : 'px-4'}`}>
             {filteredNavigation.map((item) => {
-              const isActive = pathname === item.href
+              const isMainActive = pathname === item.href
+              const hasSubmenuActive = item.submenu?.some(sub => pathname === sub.href)
+              const isActive = isMainActive || hasSubmenuActive
+
               return (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={`nav-link group relative ${
-                    isActive
-                      ? 'nav-link-active'
-                      : 'nav-link-inactive'
-                  } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                  title={sidebarCollapsed ? `${item.name} - ${item.description}` : undefined}
-                >
-                  <span className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} text-lg`}>{item.icon}</span>
-                  {!sidebarCollapsed && (
-                    <div className="flex-1">
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs opacity-75 group-hover:opacity-100 transition-opacity">
-                        {item.description}
-                      </p>
+                <div key={item.name}>
+                  <Link
+                    href={item.href}
+                    className={`nav-link group relative ${
+                      isActive
+                        ? 'nav-link-active'
+                        : 'nav-link-inactive'
+                    } ${sidebarCollapsed ? 'justify-center' : ''}`}
+                    title={sidebarCollapsed ? `${item.name} - ${item.description}` : undefined}
+                  >
+                    <span className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} text-lg`}>{item.icon}</span>
+                    {!sidebarCollapsed && (
+                      <div className="flex-1">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-xs opacity-75 group-hover:opacity-100 transition-opacity">
+                          {item.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Active indicator for collapsed state */}
+                    {sidebarCollapsed && isActive && (
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-air-niugini-gold rounded-l-full"></div>
+                    )}
+                  </Link>
+
+                  {/* Desktop Submenu */}
+                  {item.submenu && !sidebarCollapsed && hasSubmenuActive && (
+                    <div className="ml-8 mt-1 space-y-1">
+                      {item.submenu.map((subItem) => (
+                        <Link
+                          key={subItem.name}
+                          href={subItem.href}
+                          className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
+                            pathname === subItem.href
+                              ? 'bg-[#E4002B] text-white'
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className="font-medium">{subItem.name}</span>
+                          <p className="text-xs opacity-75 mt-0.5">{subItem.description}</p>
+                        </Link>
+                      ))}
                     </div>
                   )}
-
-                  {/* Active indicator for collapsed state */}
-                  {sidebarCollapsed && isActive && (
-                    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-air-niugini-gold rounded-l-full"></div>
-                  )}
-                </a>
+                </div>
               )
             })}
           </nav>
@@ -346,19 +451,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'}`}>
         {/* Top Bar for Mobile */}
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 lg:hidden">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 lg:hidden">
           <div className="flex items-center justify-between px-4 py-3">
             <button
               type="button"
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors touch-target"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Open navigation menu"
+              aria-expanded={sidebarOpen}
+              aria-controls="mobile-sidebar"
             >
-              <span className="h-5 w-5 text-lg">☰</span>
+              <span className="h-5 w-5 text-lg" aria-hidden="true">☰</span>
             </button>
 
             <div className="flex items-center">
@@ -367,26 +475,33 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
 
             <div className="flex items-center space-x-2">
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-                <span className="h-5 w-5">🔔</span>
+              <button
+                className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+                aria-label={`Notifications${notifications.length > 0 ? ` (${notifications.length} new)` : ''}`}
+                title="View notifications"
+              >
+                <span className="h-5 w-5" aria-hidden="true">🔔</span>
                 {notifications.length > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    <span className="sr-only">{notifications.length} new notifications</span>
                     {notifications.length}
                   </span>
                 )}
               </button>
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-target"
+                aria-label="Sign out of your account"
+                title="Sign out"
               >
-                <span className="h-5 w-5">🚪</span>
+                <span className="h-5 w-5" aria-hidden="true">🚪</span>
               </button>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Page Content */}
-        <main className="flex-1">
+        <main className="flex-1" id="main-content" role="main">
           {children}
         </main>
       </div>

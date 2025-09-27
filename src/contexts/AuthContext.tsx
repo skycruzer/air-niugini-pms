@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { AuthUser, authService } from '@/lib/auth-utils'
+import { initializeCacheWarmUp } from '@/app/cache-warmup'
 
 interface AuthContextType {
   user: AuthUser | null
@@ -34,6 +35,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         setUser(currentUser)
+
+        // Initialize cache warm-up after auth is established
+        // This runs in parallel to avoid blocking the UI
+        if (currentUser) {
+          initializeCacheWarmUp()
+        }
       } catch (error) {
         console.error('Auth initialization error:', error)
         setUser(null)

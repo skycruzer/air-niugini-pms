@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { invalidateCache, CACHE_INVALIDATION_PATTERNS } from '@/lib/cache-service'
 
 async function getSinglePilot(pilotId: string) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -242,6 +243,11 @@ export async function PUT(request: NextRequest) {
 
     console.log('✅ API /pilots PUT: Successfully updated pilot')
     console.log('✅ API /pilots PUT: Updated data:', JSON.stringify(data, null, 2))
+
+    // Invalidate cache since pilot data was updated
+    invalidateCache([...CACHE_INVALIDATION_PATTERNS.PILOT_DATA_UPDATED])
+    console.log('🗑️ Cache invalidated for pilot data update')
+
     return NextResponse.json({
       success: true,
       data
@@ -286,73 +292,71 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 API /pilots: Found', pilots?.length || 0, 'pilots')
 
-    // Get certification counts for each pilot with retry logic
-    const pilotsWithCerts = await Promise.all(
-      (pilots || []).map(async (pilot: any) => {
-        let checks = null
-        let checksError = null
+    // ✅ PERFORMANCE OPTIMIZATION: Single query instead of N+1 queries
+    // Fetch all pilot checks in one query with JOIN to avoid N+1 problem
+    const { data: allPilotChecks, error: checksError } = await supabaseAdmin
+      .from('pilot_checks')
+      .select(`
+        pilot_id,
+        expiry_date,
+        check_types (check_code, check_description, category)
+      `)
+      .in('pilot_id', (pilots || []).map((p: any) => p.id))
+      .order('pilot_id')
 
-        // Retry logic for flaky network connections
-        for (let attempt = 1; attempt <= 2; attempt++) {
-          try {
-            const result = await supabaseAdmin
-              .from('pilot_checks')
-              .select(`
-                expiry_date,
-                check_types (check_code, check_description, category)
-              `)
-              .eq('pilot_id', pilot.id)
+    if (checksError) {
+      console.error('🚨 API /pilots: Error fetching pilot checks:', checksError)
+      // Continue with pilots data even if checks fail
+    }
 
-            checks = result.data
-            checksError = result.error
-            break // Success, exit retry loop
-          } catch (error) {
-            console.warn(`🚨 API /pilots: Attempt ${attempt} failed for pilot ${pilot.id}:`, error)
-            checksError = error
-            if (attempt === 2) {
-              // Final attempt failed, log the error
-              console.error(`🚨 API /pilots: Error fetching checks for pilot ${pilot.id}:`, {
-                message: error instanceof Error ? error.message : 'Unknown error',
-                details: error instanceof Error ? error.stack : String(error),
-                hint: '',
-                code: ''
-              })
-            }
+    console.log('🔍 API /pilots: Fetched', allPilotChecks?.length || 0, 'certification records in single query')
+
+    // Group checks by pilot_id for efficient lookup
+    const checksByPilot = (allPilotChecks || []).reduce((acc: any, check: any) => {
+      if (!acc[check.pilot_id]) {
+        acc[check.pilot_id] = []
+      }
+      acc[check.pilot_id].push(check)
+      return acc
+    }, {})
+
+    // Calculate certification status for each pilot
+    const today = new Date()
+    const pilotsWithCerts = (pilots || []).map((pilot: any) => {
+      const certifications = checksByPilot[pilot.id] || []
+
+      const certificationCounts = certifications.reduce(
+        (acc: any, check: any) => {
+          if (!check.expiry_date) {
+            return acc // Skip checks without expiry dates
           }
-        }
 
-        // Calculate certification status
-        const certifications = checks || []
-        const today = new Date()
+          const expiryDate = new Date(check.expiry_date)
+          const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
-        const certificationCounts = certifications.reduce(
-          (acc: any, check: any) => {
-            if (!check.expiry_date) {
-              return acc // Skip checks without expiry dates
-            }
+          if (daysUntilExpiry < 0) {
+            acc.expired++
+          } else if (daysUntilExpiry <= 30) {
+            acc.expiring++
+          } else {
+            acc.current++
+          }
 
-            const expiryDate = new Date(check.expiry_date)
-            const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+          return acc
+        },
+        { current: 0, expiring: 0, expired: 0 }
+      )
 
-            if (daysUntilExpiry < 0) {
-              acc.expired++
-            } else if (daysUntilExpiry <= 30) {
-              acc.expiring++
-            } else {
-              acc.current++
-            }
-
-            return acc
-          },
-          { current: 0, expiring: 0, expired: 0 }
-        )
-
-        return {
-          ...pilot,
-          certificationStatus: certificationCounts
-        }
-      })
-    )
+      return {
+        ...pilot,
+        certificationStatus: certificationCounts,
+        // Add total count for completeness
+        total_checks: certifications.length,
+        current_checks: certificationCounts.current,
+        expiring_checks: certificationCounts.expiring,
+        expired_checks: certificationCounts.expired
+      }
+    })
 
     console.log('🔍 API /pilots: Returning', pilotsWithCerts.length, 'pilots with certification data')
 

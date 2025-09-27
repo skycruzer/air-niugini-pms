@@ -59,7 +59,7 @@ async function getDashboardStats() {
     // Use Vercel's automatic URL or fallback to localhost for development
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3004}`
 
     console.log('🔍 Dashboard stats fetch URL:', baseUrl)
     const response = await fetch(`${baseUrl}/api/dashboard/stats`, {
@@ -106,9 +106,11 @@ export default async function HomePage() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-30"></div>
                   <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <svg className="w-12 h-12 text-air-niugini-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
+                    <img
+                      src="/images/air-niugini-logo.jpg"
+                      alt="Air Niugini Logo"
+                      className="w-12 h-12 object-contain"
+                    />
                   </div>
                 </div>
                 <div className="ml-6">
@@ -144,6 +146,14 @@ export default async function HomePage() {
 
             {/* Statistics Panel */}
             <div className="flex-shrink-0 animate-slide-in-right">
+              {/* B767 Hero Image */}
+              <div className="mb-6">
+                <img
+                  src="/images/air-niugini-b767-new.jpg"
+                  alt="Air Niugini Boeing 767-300ER P2-ANG 'Bulolo'"
+                  className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
+                />
+              </div>
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Fleet Overview</h3>
@@ -298,7 +308,7 @@ export default async function HomePage() {
                 <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow"></div>
                 <div className="text-center">
                   <p className="font-semibold text-gray-900">Database Connected</p>
-                  <p className="text-sm text-gray-600">Supabase PostgreSQL</p>
+                  <p className="text-sm text-gray-600">PostgreSQL</p>
                 </div>
               </div>
 
@@ -358,7 +368,11 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center mb-6">
-              <span className="text-air-niugini-gold text-2xl mr-3">✈️</span>
+              <img
+                src="/images/air-niugini-logo.jpg"
+                alt="Air Niugini Logo"
+                className="w-8 h-8 object-contain mr-3"
+              />
               <div>
                 <h4 className="text-xl font-bold">Air Niugini</h4>
                 <p className="text-gray-400 text-sm">Papua New Guinea's National Airline</p>

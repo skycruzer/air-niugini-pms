@@ -28,9 +28,15 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#E4002B" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Air Niugini PMS" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#E4002B" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-neutral-50" id="app-root">
           <Providers>
             {children}
           </Providers>

@@ -56,47 +56,26 @@ export const authService = {
   // Login with Supabase Auth
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      // TEMPORARY TEST MODE: Allow specific emails with any password for testing
-      if ((email === 'admin@airniugini.com' || email === 'skycruzer@icloud.com') && process.env.NODE_ENV === 'development') {
-        console.log('🚀 Using TEST MODE authentication for development')
-
-        // Get the correct user profile from database for test mode
-        let user: AuthUser
-        if (email === 'skycruzer@icloud.com') {
-          user = {
-            id: '73d6a362-1ef5-46e5-90d4-92473d1be3c9',
-            email: 'skycruzer@icloud.com',
-            name: 'Sky Cruzer',
-            role: 'admin' as UserRole,
-            created_at: new Date().toISOString()
-          }
-        } else {
-          user = {
-            id: 'ea5e67c8-f5a9-4455-a477-316874478d12',
-            email: 'admin@airniugini.com',
-            name: 'Admin User',
-            role: 'admin' as UserRole,
-            created_at: new Date().toISOString()
-          }
-        }
-
-        // Store user in localStorage for quick access
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('auth-user', JSON.stringify(user))
-        }
-
-        return user
-      }
+      console.log('🔐 Starting login attempt for:', email)
 
       const { data: { user: authUser }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
+      console.log('🔍 Supabase Auth response:', {
+        hasUser: !!authUser,
+        userId: authUser?.id,
+        email: authUser?.email,
+        error: signInError?.message
+      })
+
       if (signInError || !authUser) {
-        console.error('Authentication failed:', signInError?.message)
+        console.error('❌ Authentication failed:', signInError?.message)
         return null
       }
+
+      console.log('✅ Supabase Auth successful, fetching user profile...')
 
       // Get user profile from our users table
       const { data: userData, error: userError } = await supabase
@@ -105,8 +84,15 @@ export const authService = {
         .eq('email', authUser.email)
         .single()
 
+      console.log('🔍 User profile query result:', {
+        hasData: !!userData,
+        userEmail: userData?.email,
+        userRole: userData?.role,
+        error: userError?.message
+      })
+
       if (userError || !userData) {
-        console.error('Failed to get user profile:', userError?.message)
+        console.error('❌ Failed to get user profile:', userError?.message)
         return null
       }
 
@@ -118,6 +104,12 @@ export const authService = {
         created_at: userData.created_at
       }
 
+      console.log('✅ Login successful for user:', {
+        name: user.name,
+        email: user.email,
+        role: user.role
+      })
+
       // Store user in localStorage for quick access
       if (typeof window !== 'undefined') {
         localStorage.setItem('auth-user', JSON.stringify(user))
@@ -125,7 +117,7 @@ export const authService = {
 
       return user
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('🚨 Login error:', error)
       return null
     }
   },

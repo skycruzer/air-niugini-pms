@@ -8,6 +8,7 @@ import { getCurrentRosterPeriod, formatRosterPeriod, getFutureRosterPeriods, get
 import { permissions } from '@/lib/auth-utils'
 import { getPilotStats, getAllCheckTypes, getExpiringCertifications, getPilotsWithExpiredCertifications, getDashboardStats, getFleetUtilization, getRecentActivity } from '@/lib/pilot-service-client'
 import { getLeaveRequestStats } from '@/lib/leave-service'
+import { RetirementReportModal } from '@/components/reports/RetirementReportModal'
 // Using emojis and custom SVGs instead of Lucide React icons
 
 interface StatCardProps {
@@ -22,9 +23,10 @@ interface StatCardProps {
     label?: string
   }
   animate?: boolean
+  onClick?: () => void
 }
 
-function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate = false }: StatCardProps) {
+function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate = false, onClick }: StatCardProps) {
   const colorClasses = {
     red: 'from-red-500 to-red-600',
     yellow: 'from-amber-500 to-amber-600',
@@ -44,7 +46,10 @@ function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate
   }
 
   return (
-    <div className={`fleet-card bg-gradient-to-br ${backgroundClasses[color]} relative overflow-hidden group ${animate ? 'animate-fade-in' : ''}`}>
+    <div
+      className={`fleet-card bg-gradient-to-br ${backgroundClasses[color]} relative overflow-hidden group ${animate ? 'animate-fade-in' : ''} ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
+      onClick={onClick}
+    >
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.08]">
         <div className="absolute inset-0 transform rotate-12 translate-x-8 -translate-y-8 text-8xl flex items-center justify-center text-gray-400">
@@ -144,6 +149,8 @@ export default function DashboardPage() {
   const [leaveStats, setLeaveStats] = useState<any>(null)
   const [fleetStats, setFleetStats] = useState<any>(null)
   const [recentActivity, setRecentActivity] = useState<any[]>([])
+  const [retirementData, setRetirementData] = useState<any>(null)
+  const [showRetirementModal, setShowRetirementModal] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [rosterCountdown, setRosterCountdown] = useState<RosterCountdown | null>(null)
 
@@ -163,7 +170,7 @@ export default function DashboardPage() {
         setRosterCountdown(countdown)
 
         // Load all live data - use API endpoints for better reliability
-        const [apiStatsResponse, types, expiring, expired, leave, fleet, activity] = await Promise.all([
+        const [apiStatsResponse, types, expiring, expired, leave, fleet, activity, retirement] = await Promise.all([
           fetch(`${window.location.origin}/api/dashboard/stats`)
             .then(res => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -171,14 +178,24 @@ export default function DashboardPage() {
             })
             .catch(err => {
               console.error('API fetch failed:', err)
-              return { totalPilots: 0, captains: 0, firstOfficers: 0, trainingCaptains: 0, examiners: 0, certifications: 0, compliance: 95 }
+              return { totalPilots: 0, captains: 0, firstOfficers: 0, trainingCaptains: 0, examiners: 0, nearingRetirement: 0, certifications: 0, compliance: 95 }
             }),
           getAllCheckTypes(),
           getExpiringCertifications(30), // Next 30 days
           getPilotsWithExpiredCertifications(),
           getLeaveRequestStats(),
           getFleetUtilization(),
-          getRecentActivity()
+          getRecentActivity(),
+          fetch(`${window.location.origin}/api/retirement`)
+            .then(res => {
+              if (!res.ok) throw new Error(`HTTP ${res.status}`)
+              return res.json()
+            })
+            .then(result => result.success ? result.data : { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] })
+            .catch(err => {
+              console.error('Retirement API fetch failed:', err)
+              return { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] }
+            })
         ])
 
         setPilotStats({
@@ -202,6 +219,7 @@ export default function DashboardPage() {
         setLeaveStats(leave)
         setFleetStats(fleet)
         setRecentActivity(activity)
+        setRetirementData(retirement)
       } catch (error) {
         console.error('Error loading dashboard data:', error)
       } finally {
@@ -277,19 +295,19 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="mb-8 animate-fade-in">
+          <header className="mb-6 md:mb-8 animate-fade-in">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="mb-4 lg:mb-0">
-                <h1 className="text-display-small text-gray-900 mb-2">
+                <h1 className="text-xl md:text-2xl lg:text-display-small text-gray-900 mb-2">
                   Welcome back, {user?.name}
                 </h1>
-                <div className="flex items-center text-body-medium text-gray-600">
-                  <span className="mr-2">🌏</span>
-                  Air Niugini B767 Fleet Operations Dashboard
+                <div className="flex items-center text-sm md:text-base text-gray-600">
+                  <span className="mr-2" aria-hidden="true">🌏</span>
+                  <span className="mobile-text lg:text-body-medium">Air Niugini B767 Fleet Operations Dashboard</span>
                 </div>
-                <p className="text-body-small text-gray-500 mt-1">
+                <p className="text-xs md:text-sm text-gray-500 mt-1">
                   {currentDate} • {currentTime} (Port Moresby Time)
                 </p>
               </div>
@@ -305,15 +323,12 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </header>
 
           {/* Current Roster Banner */}
           {isLoaded && currentRoster && (
             <div className="mb-8 animate-slide-in-right">
               <div className="roster-banner relative overflow-hidden">
-                <div className="absolute top-0 right-0 opacity-10 text-white text-8xl">
-                  📊
-                </div>
                 <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                   <div className="flex-1">
                     <div className="flex items-center mb-3">
@@ -484,7 +499,9 @@ export default function DashboardPage() {
           )}
 
           {/* Key Metrics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <section className="mb-6 md:mb-8">
+            <h2 className="sr-only">Key Fleet Metrics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
             <StatCard
               title="Total Pilots"
               value={stats.total}
@@ -533,10 +550,33 @@ export default function DashboardPage() {
               trend={{ value: Math.abs(dashboardStats?.trends?.expired || 8.3), direction: (dashboardStats?.trends?.expired || -8.3) >= 0 ? 'up' : 'down', label: 'improvement' }}
               animate
             />
-          </div>
+
+            <StatCard
+              title="Nearing Retirement"
+              value={retirementData?.nearingRetirement || 0}
+              subtitle={
+                <div className="space-y-1">
+                  <div>Within 5 years</div>
+                  {retirementData?.dueSoon > 0 && (
+                    <div className="text-orange-600">• {retirementData.dueSoon} due soon</div>
+                  )}
+                  {retirementData?.overdue > 0 && (
+                    <div className="text-red-600">• {retirementData.overdue} overdue</div>
+                  )}
+                </div>
+              }
+              icon="⏰"
+              color="purple"
+              animate
+              onClick={() => setShowRetirementModal(true)}
+            />
+            </div>
+          </section>
 
           {/* Compliance & Performance Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <section className="mb-6 md:mb-8">
+            <h2 className="sr-only">Fleet Performance Metrics</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <StatCard
               title="Compliance Rate"
               value={`${complianceRate}%`}
@@ -565,22 +605,23 @@ export default function DashboardPage() {
               color="blue"
               animate
             />
-          </div>
+            </div>
+          </section>
 
           {/* Quick Actions Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-heading-medium text-gray-900">Quick Actions</h3>
-                <p className="text-body-medium text-gray-600">Access frequently used features</p>
+          <section className="mb-6 md:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 md:mb-6">
+              <div className="mb-3 sm:mb-0">
+                <h3 className="text-lg md:text-xl lg:text-heading-medium text-gray-900 mb-1">Quick Actions</h3>
+                <p className="text-sm md:text-base lg:text-body-medium text-gray-600">Access frequently used features</p>
               </div>
-              <div className="flex items-center text-body-small text-gray-500">
-                <span className="mr-1">⭐</span>
-                Personalized for {user?.role}
+              <div className="flex items-center text-xs md:text-sm text-gray-500">
+                <span className="mr-1" aria-hidden="true">⭐</span>
+                <span>Personalized for {user?.role}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="quick-actions-mobile md:grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <QuickAction
                 title="Manage Pilots"
                 description="View and edit pilot records"
@@ -618,6 +659,219 @@ export default function DashboardPage() {
                   badge="Premium"
                 />
               )}
+            </div>
+          </section>
+
+          {/* Advanced Analytics Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-heading-medium text-gray-900">Advanced Analytics</h3>
+                <p className="text-body-medium text-gray-600">Interactive charts and detailed insights</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center text-body-small text-gray-500">
+                  <span className="mr-1">📊</span>
+                  Real-time insights
+                </div>
+                <a
+                  href="/dashboard/analytics"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-[#E4002B] rounded-lg hover:bg-[#C00020] transition-colors"
+                >
+                  <span>📈</span>
+                  <span>View Full Analytics</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Analytics Preview Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Certification Compliance Chart */}
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900">Certification Status</h4>
+                  <span className="text-2xl">📋</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Current</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">
+                      {totalCertifications - expiringCount - expiredCount}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Expiring Soon</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{expiringCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Expired</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{expiredCount}</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Compliance Rate</span>
+                    <span className={`text-lg font-bold ${
+                      complianceRate >= 95 ? 'text-green-600' :
+                      complianceRate >= 85 ? 'text-amber-600' : 'text-red-600'
+                    }`}>
+                      {complianceRate}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        complianceRate >= 95 ? 'bg-green-500' :
+                        complianceRate >= 85 ? 'bg-amber-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${complianceRate}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pilot Role Distribution */}
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900">Pilot Roles</h4>
+                  <span className="text-2xl">👨‍✈️</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#E4002B] rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Captains</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{stats.captains}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#FFC72C] rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">First Officers</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{stats.firstOfficers}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Training Captains</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{stats.trainingCaptains}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                      <span className="text-sm text-gray-700">Examiners</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{stats.examiners}</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="text-center">
+                    <span className="text-2xl font-bold text-[#E4002B]">{stats.total}</span>
+                    <p className="text-sm text-gray-600">Total Active Pilots</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fleet Utilization */}
+              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900">Fleet Status</h4>
+                  <span className="text-2xl">✈️</span>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-700">Utilization</span>
+                      <span className="text-sm font-medium text-gray-900">{fleetStats?.utilization || 78}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${fleetStats?.utilization || 78}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-700">Compliance</span>
+                      <span className="text-sm font-medium text-gray-900">{complianceRate}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-500 ${
+                          complianceRate >= 95 ? 'bg-green-500' :
+                          complianceRate >= 85 ? 'bg-amber-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${complianceRate}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-700">Readiness</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {Math.round((complianceRate + (fleetStats?.utilization || 78)) / 2)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-[#E4002B] h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.round((complianceRate + (fleetStats?.utilization || 78)) / 2)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Analytics Features Highlight */}
+            <div className="mt-6 bg-gradient-to-r from-[#E4002B]/10 to-[#FFC72C]/10 rounded-xl p-6 border border-[#E4002B]/20">
+              <div className="flex flex-col lg:flex-row items-center justify-between">
+                <div className="flex-1 mb-4 lg:mb-0">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                    🚀 Enhanced Analytics Available
+                  </h4>
+                  <p className="text-gray-700">
+                    Access interactive charts, trend analysis, retirement planning, risk assessments, and comprehensive fleet insights with our advanced analytics dashboard.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border">
+                      📊 Interactive Charts
+                    </span>
+                    <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border">
+                      📈 Trend Analysis
+                    </span>
+                    <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border">
+                      🎯 Risk Assessment
+                    </span>
+                    <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border">
+                      📋 Export Reports
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-shrink-0">
+                  <a
+                    href="/dashboard/analytics"
+                    className="btn bg-[#E4002B] text-white hover:bg-[#C00020] px-6 py-3 text-lg font-medium"
+                  >
+                    <span className="mr-2">🔍</span>
+                    Explore Analytics
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -753,6 +1007,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Retirement Report Modal */}
+        <RetirementReportModal
+          isOpen={showRetirementModal}
+          onClose={() => setShowRetirementModal(false)}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   )

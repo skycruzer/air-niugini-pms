@@ -1,5 +1,6 @@
 import { supabase, supabaseAdmin, handleSupabaseError, Pilot, PilotCheck, CheckType } from './supabase'
 import { getCertificationStatus } from './certification-utils'
+import { calculatePilotsRetirement, getPilotsNearingRetirement, type PilotWithRetirement } from './retirement-utils'
 
 // Calculate seniority number based on commencement date
 export async function calculateSeniorityNumber(commencementDate: string, excludePilotId?: string): Promise<number> {
@@ -116,10 +117,16 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
       const { getSupabaseAdmin } = await import('@/lib/supabase')
       const supabaseAdmin = getSupabaseAdmin()
 
-      // Get all pilots
-      const { data: pilots, error: pilotsError } = await supabaseAdmin
+      // Get all pilots with certifications in a single query to eliminate N+1 problem
+      const { data: pilotsWithChecks, error: pilotsError } = await supabaseAdmin
         .from('pilots')
-        .select('*')
+        .select(`
+          *,
+          pilot_checks (
+            expiry_date,
+            check_types (check_code, check_description, category)
+          )
+        `)
         .order('seniority_number', { ascending: true, nullsFirst: false })
 
       if (pilotsError) {
@@ -127,47 +134,33 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
         throw pilotsError
       }
 
-      if (!pilots || pilots.length === 0) {
+      if (!pilotsWithChecks || pilotsWithChecks.length === 0) {
         console.log('🔍 getAllPilots: No pilots found in database')
         return []
       }
 
-      console.log('🔍 getAllPilots: Processing certification data for', pilots.length, 'pilots')
+      console.log('🔍 getAllPilots: Processing certification data for', pilotsWithChecks.length, 'pilots')
 
-      // Get certification counts for each pilot
-      const pilotsWithCerts = await Promise.all(
-        (pilots || []).map(async (pilot: any) => {
-          const { data: checks, error: checksError } = await supabaseAdmin
-            .from('pilot_checks')
-            .select(`
-              expiry_date,
-              check_types (check_code, check_description, category)
-            `)
-            .eq('pilot_id', pilot.id)
+      // Process certification counts for each pilot (already fetched)
+      const pilotsWithCerts = pilotsWithChecks.map((pilot: any) => {
+        // Calculate certification status from already loaded data
+        const certifications = pilot.pilot_checks || []
+        const certificationCounts = certifications.reduce(
+          (acc: any, check: any) => {
+            const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+            if (status.color === 'green') acc.current++
+            else if (status.color === 'yellow') acc.expiring++
+            else if (status.color === 'red') acc.expired++
+            return acc
+          },
+          { current: 0, expiring: 0, expired: 0 }
+        )
 
-          if (checksError) {
-            console.warn(`Error fetching checks for pilot ${pilot.id}:`, checksError)
-          }
-
-          // Calculate certification status
-          const certifications = checks || []
-          const certificationCounts = certifications.reduce(
-            (acc: any, check: any) => {
-              const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
-              if (status.color === 'green') acc.current++
-              else if (status.color === 'yellow') acc.expiring++
-              else if (status.color === 'red') acc.expired++
-              return acc
-            },
-            { current: 0, expiring: 0, expired: 0 }
-          )
-
-          return {
-            ...pilot,
-            certificationStatus: certificationCounts
-          }
-        })
-      )
+        return {
+          ...pilot,
+          certificationStatus: certificationCounts
+        }
+      })
 
       console.log('🔍 getAllPilots: Successfully processed', pilotsWithCerts.length, 'pilots')
       return pilotsWithCerts
@@ -184,54 +177,103 @@ export async function getPilotById(pilotId: string): Promise<PilotWithCertificat
   try {
     console.log('🔍 getPilotById: Fetching pilot with ID:', pilotId)
 
-    // Production mode or API fallback - use direct Supabase queries
-    const { data: pilot, error: pilotError } = await supabase
-      .from('pilots')
-      .select('*')
-      .eq('id', pilotId)
-      .single()
+    // Use API route for client-side calls, direct admin client for server-side
+    if (typeof window !== 'undefined') {
+      // Client-side - use API route
+      console.log('🔍 getPilotById: Client-side - using API route...')
 
-    if (pilotError) throw pilotError
-    if (!pilot) return null
+      const response = await fetch(`/api/pilots?id=${pilotId}`)
 
-    // Get pilot's certifications
-    const { data: checks, error: checksError } = await supabase
-      .from('pilot_checks')
-      .select(`
-        id,
-        expiry_date,
-        check_types (
+      console.log('🔍 getPilotById: API response status:', response.status)
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('🔍 getPilotById: Pilot not found via API')
+          return null
+        }
+        const errorText = await response.text()
+        console.error('🚨 getPilotById: API request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        })
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`)
+      }
+
+      const result = await response.json()
+
+      console.log('🔍 getPilotById: API response:', {
+        success: result.success,
+        hasData: !!result.data
+      })
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch pilot')
+      }
+
+      console.log('🔍 getPilotById: API returned pilot data')
+      return result.data || null
+    } else {
+      // Server-side - use admin client directly
+      console.log('🔍 getPilotById: Server-side - using admin client directly...')
+
+      const { getSupabaseAdmin } = await import('@/lib/supabase')
+      const supabaseAdmin = getSupabaseAdmin()
+
+      const { data: pilot, error: pilotError } = await supabaseAdmin
+        .from('pilots')
+        .select('*')
+        .eq('id', pilotId)
+        .single()
+
+      if (pilotError) {
+        if (pilotError.code === 'PGRST116') {
+          console.log('🔍 getPilotById: Pilot not found via admin client')
+          return null
+        }
+        throw pilotError
+      }
+      if (!pilot) return null
+
+      // Get pilot's certifications
+      const { data: checks, error: checksError } = await supabaseAdmin
+        .from('pilot_checks')
+        .select(`
           id,
-          check_code,
-          check_description,
-          category
-        )
-      `)
-      .eq('pilot_id', pilotId)
+          expiry_date,
+          check_types (
+            id,
+            check_code,
+            check_description,
+            category
+          )
+        `)
+        .eq('pilot_id', pilotId)
 
-    if (checksError) {
-      console.warn(`Error fetching checks for pilot ${pilotId}:`, checksError)
-    }
+      if (checksError) {
+        console.warn(`Error fetching checks for pilot ${pilotId}:`, checksError)
+      }
 
-    // Calculate certification status
-    const certifications = checks || []
-    const certificationCounts = certifications.reduce(
-      (acc, check) => {
-        const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
-        if (status.color === 'green') acc.current++
-        else if (status.color === 'yellow') acc.expiring++
-        else if (status.color === 'red') acc.expired++
-        return acc
-      },
-      { current: 0, expiring: 0, expired: 0 }
-    )
+      // Calculate certification status
+      const certifications = checks || []
+      const certificationCounts = certifications.reduce(
+        (acc: any, check: any) => {
+          const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+          if (status.color === 'green') acc.current++
+          else if (status.color === 'yellow') acc.expiring++
+          else if (status.color === 'red') acc.expired++
+          return acc
+        },
+        { current: 0, expiring: 0, expired: 0 }
+      )
 
-    return {
-      ...pilot,
-      certificationStatus: certificationCounts
+      return {
+        ...pilot,
+        certificationStatus: certificationCounts
+      }
     }
   } catch (error) {
-    console.error('Error fetching pilot:', error)
+    console.error('🚨 getPilotById: Fatal error:', error)
     throw new Error(handleSupabaseError(error))
   }
 }
@@ -249,7 +291,7 @@ export async function getPilotCertifications(pilotId: string) {
       ? '' // Client-side - use relative URLs
       : process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3004}`
 
     const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`
     console.log('🔍 getPilotCertifications: API URL:', apiUrl)
@@ -432,17 +474,53 @@ export async function updatePilot(pilotId: string, pilotData: Partial<PilotFormD
   }
 }
 
-// Delete a pilot
+// Delete a pilot with cascading deletion
 export async function deletePilot(pilotId: string): Promise<void> {
   try {
-    const { error } = await supabase
+    console.log('🗑️ deletePilot: Starting cascading deletion for pilot:', pilotId)
+
+    // Use admin client for service-level deletion
+    const adminClient = supabaseAdmin
+
+    // Step 1: Delete related leave requests
+    console.log('🗑️ deletePilot: Deleting leave requests...')
+    const { error: leaveError } = await adminClient
+      .from('leave_requests')
+      .delete()
+      .eq('pilot_id', pilotId)
+
+    if (leaveError) {
+      console.error('🚨 deletePilot: Error deleting leave requests:', leaveError)
+      throw leaveError
+    }
+
+    // Step 2: Delete related pilot certifications
+    console.log('🗑️ deletePilot: Deleting pilot certifications...')
+    const { error: certsError } = await adminClient
+      .from('pilot_checks')
+      .delete()
+      .eq('pilot_id', pilotId)
+
+    if (certsError) {
+      console.error('🚨 deletePilot: Error deleting pilot certifications:', certsError)
+      throw certsError
+    }
+
+    // Step 3: Finally delete the pilot record
+    console.log('🗑️ deletePilot: Deleting pilot record...')
+    const { error: pilotError } = await adminClient
       .from('pilots')
       .delete()
       .eq('id', pilotId)
 
-    if (error) throw error
+    if (pilotError) {
+      console.error('🚨 deletePilot: Error deleting pilot:', pilotError)
+      throw pilotError
+    }
+
+    console.log('✅ deletePilot: Successfully deleted pilot and all related data')
   } catch (error) {
-    console.error('Error deleting pilot:', error)
+    console.error('🚨 deletePilot: Fatal error during cascading deletion:', error)
     throw new Error(handleSupabaseError(error))
   }
 }
@@ -711,7 +789,7 @@ export async function getPilotCertificationsWithAllTypes(pilotId: string) {
       ? '' // Client-side - use relative URLs
       : process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3004}`
 
     const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`
     console.log('🔍 getPilotCertificationsWithAllTypes: API URL:', apiUrl)
@@ -833,6 +911,36 @@ export async function getDashboardStats() {
   }
 }
 
+// Get pilots nearing retirement (< 5 years)
+export async function getPilotsNearingRetirementForDashboard(): Promise<PilotWithRetirement[]> {
+  try {
+    // Get pilots with date_of_birth
+    const { data: pilots, error } = await supabaseAdmin
+      .from('pilots')
+      .select('id, first_name, last_name, date_of_birth, is_active')
+      .eq('is_active', true)
+      .not('date_of_birth', 'is', null)
+
+    if (error) throw error
+
+    // Calculate retirement information for all pilots
+    const pilotsWithRetirement = await calculatePilotsRetirement(pilots || [])
+
+    // Filter to only those nearing retirement (< 5 years)
+    const nearingRetirement = getPilotsNearingRetirement(pilotsWithRetirement)
+
+    // Sort by years to retirement (closest first)
+    return nearingRetirement.sort((a, b) => {
+      const aYears = a.retirement?.yearsToRetirement ?? Infinity
+      const bYears = b.retirement?.yearsToRetirement ?? Infinity
+      return aYears - bYears
+    })
+  } catch (error) {
+    console.error('Error getting pilots nearing retirement:', error)
+    return []
+  }
+}
+
 // Get recent activity from database
 export async function getRecentActivity() {
   try {
@@ -850,6 +958,20 @@ export async function getRecentActivity() {
         timestamp: new Date(now.getTime() - (2 * 60 * 60 * 1000)), // 2 hours ago
         icon: '⚠️',
         color: 'amber'
+      })
+    }
+
+    // Get pilots nearing retirement for activity
+    const nearingRetirement = await getPilotsNearingRetirementForDashboard()
+    if (nearingRetirement.length > 0) {
+      activities.push({
+        id: 'nearing-retirement',
+        type: 'warning',
+        title: `${nearingRetirement.length} Pilot${nearingRetirement.length > 1 ? 's' : ''} Nearing Retirement`,
+        description: `${nearingRetirement.length < 5 ? 'Less than' : 'Within'} 5 years - succession planning required`,
+        timestamp: new Date(now.getTime() - (1 * 60 * 60 * 1000)), // 1 hour ago
+        icon: '⏰',
+        color: 'yellow'
       })
     }
 

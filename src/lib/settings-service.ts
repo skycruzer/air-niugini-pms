@@ -1,5 +1,3 @@
-import { supabase } from './supabase'
-
 export interface SystemSetting {
   id: string
   key: string
@@ -43,50 +41,31 @@ export const settingsService = {
    */
   async getSettings(): Promise<SettingsData> {
     try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('*')
-        .order('key')
+      // Handle both server-side and client-side contexts with proper port detection
+      const baseUrl = typeof window === 'undefined'
+        ? process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3000}`
+        : ''
 
-      if (error) {
-        console.error('Error fetching settings:', error)
-        throw error
-      }
+      const { robustAPICall } = await import('@/lib/retry-utils')
 
-      // Transform array to object structure
-      const settings: Partial<SettingsData> = {}
-
-      data?.forEach((setting) => {
-        if (setting.key === 'app_title') {
-          settings.app_title = setting.value
-        } else if (setting.key === 'alert_thresholds') {
-          settings.alert_thresholds = setting.value
-        } else if (setting.key === 'pilot_requirements') {
-          settings.pilot_requirements = setting.value
+      const result = await robustAPICall(`${baseUrl}/api/settings`, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache'
         }
+      }, {
+        maxAttempts: 3,
+        timeout: 8000,
+        baseDelay: 1000
       })
 
-      // Return with defaults if not found
-      return {
-        app_title: settings.app_title || 'Air Niugini Pilot Management System',
-        alert_thresholds: settings.alert_thresholds || {
-          critical_days: 7,
-          urgent_days: 14,
-          warning_30_days: 30,
-          warning_60_days: 60,
-          early_warning_90_days: 90
-        },
-        pilot_requirements: settings.pilot_requirements || {
-          pilot_retirement_age: 65,
-          number_of_aircraft: 2,
-          captains_per_hull: 7,
-          first_officers_per_hull: 7,
-          minimum_captains_per_hull: 10,
-          minimum_first_officers_per_hull: 10,
-          training_captains_per_pilots: 11,
-          examiners_per_pilots: 11
-        }
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch settings')
       }
+
+      return result.data
     } catch (error) {
       console.error('Error in getSettings:', error)
       throw error
@@ -98,20 +77,26 @@ export const settingsService = {
    */
   async updateSetting(key: string, value: any, description?: string): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('settings')
-        .upsert({
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           key,
           value,
-          description,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'key'
+          description
         })
+      })
 
-      if (error) {
-        console.error('Error updating setting:', error)
-        throw error
+      if (!response.ok) {
+        throw new Error('Failed to update setting')
+      }
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update setting')
       }
     } catch (error) {
       console.error('Error in updateSetting:', error)
@@ -150,29 +135,6 @@ export const settingsService = {
       requirements,
       'Pilot staffing requirements and ratios'
     )
-  },
-
-  /**
-   * Get a specific setting by key
-   */
-  async getSetting(key: string): Promise<SystemSetting | null> {
-    try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('*')
-        .eq('key', key)
-        .single()
-
-      if (error) {
-        console.error('Error fetching setting:', error)
-        return null
-      }
-
-      return data
-    } catch (error) {
-      console.error('Error in getSetting:', error)
-      return null
-    }
   },
 
   /**

@@ -502,9 +502,23 @@ function calculateAverageSeniority(pilots: any[]): number {
 async function generatePlanningRosteringReport(supabaseAdmin: any) {
   const today = new Date()
 
-  // Get system settings for pilot requirements
-  const { settingsService } = await import('@/lib/settings-service')
-  const settings = await settingsService.getSettings()
+  // Get system settings for pilot requirements with error handling
+  let settings
+  try {
+    const { settingsService } = await import('@/lib/settings-service')
+    settings = await settingsService.getSettings()
+  } catch (error) {
+    console.warn('⚠️ Failed to fetch settings, using defaults:', error)
+    // Use default settings if service fails
+    settings = {
+      pilot_requirements: {
+        pilot_retirement_age: 65,
+        number_of_aircraft: 2,
+        minimum_captains_per_hull: 10,
+        minimum_first_officers_per_hull: 10
+      }
+    }
+  }
 
   // Define time periods for planning
   const timePeriods = [

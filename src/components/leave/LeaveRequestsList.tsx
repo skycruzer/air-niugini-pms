@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { format, differenceInDays } from 'date-fns'
 import { getAllLeaveRequests, getPendingLeaveRequests, deleteLeaveRequest, updateLeaveRequest, type LeaveRequest, type LeaveRequestStats } from '@/lib/leave-service'
-import { LeaveApprovalWorkflow } from './LeaveApprovalWorkflow'
 import { LeaveRequestForm } from './LeaveRequestForm'
+import { LeaveRequestEditModal } from './LeaveRequestEditModal'
+import { LeaveRequestReviewModal } from './LeaveRequestReviewModal'
 import { useAuth } from '@/contexts/AuthContext'
 import { permissions } from '@/lib/auth-utils'
 
@@ -21,6 +22,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
   const [error, setError] = useState<string | null>(null)
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null)
   const [editingRequest, setEditingRequest] = useState<LeaveRequest | null>(null)
+  const [reviewingRequest, setReviewingRequest] = useState<LeaveRequest | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const loadRequests = async () => {
@@ -87,6 +89,11 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
 
   const handleEditSuccess = () => {
     setEditingRequest(null)
+    loadRequests() // Refresh the list and stats
+  }
+
+  const handleReviewSuccess = (updatedRequest: LeaveRequest) => {
+    setReviewingRequest(null)
     loadRequests() // Refresh the list and stats
   }
 
@@ -211,49 +218,6 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
     )
   }
 
-  if (selectedRequest) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Review Leave Request</h3>
-          <button
-            onClick={() => setSelectedRequest(null)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <span className="text-xl">✕</span>
-          </button>
-        </div>
-        <LeaveApprovalWorkflow
-          request={selectedRequest}
-          onUpdate={handleRequestUpdate}
-          onError={setError}
-        />
-      </div>
-    )
-  }
-
-  if (editingRequest) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Edit Leave Request</h3>
-          <button
-            onClick={() => setEditingRequest(null)}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <span className="text-xl">✕</span>
-          </button>
-        </div>
-        <LeaveRequestForm
-          key={editingRequest?.id || 'edit-form'}
-          editingRequest={editingRequest}
-          onSuccess={handleEditSuccess}
-          onCancel={() => setEditingRequest(null)}
-        />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4">
       {requests.map((request) => (
@@ -323,7 +287,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
               <div className="flex items-center space-x-2">
                 {request.status === 'PENDING' && permissions.canApprove(user) && (
                   <button
-                    onClick={() => setSelectedRequest(request)}
+                    onClick={() => setReviewingRequest(request)}
                     className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Review
@@ -355,6 +319,26 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
           </div>
         </div>
       ))}
+
+      {/* Edit Modal */}
+      {editingRequest && (
+        <LeaveRequestEditModal
+          isOpen={!!editingRequest}
+          onClose={() => setEditingRequest(null)}
+          onSuccess={handleEditSuccess}
+          editingRequest={editingRequest}
+        />
+      )}
+
+      {/* Review Modal */}
+      {reviewingRequest && (
+        <LeaveRequestReviewModal
+          isOpen={!!reviewingRequest}
+          onClose={() => setReviewingRequest(null)}
+          onSuccess={handleReviewSuccess}
+          request={reviewingRequest}
+        />
+      )}
     </div>
   )
 }

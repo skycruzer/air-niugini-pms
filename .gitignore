@@ -61,6 +61,15 @@ temp/
 # Screenshots (if they contain sensitive info)
 screenshots/
 
+# Test results and reports
+test-results/
+*.png
+*.jpg
+*.jpeg
+
+# Playwright cache
+.playwright-mcp/
+
 # Supabase local development (if using local setup)
 supabase/.branches
 supabase/.temp

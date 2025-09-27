@@ -10,6 +10,13 @@ import {
   AvailabilityGauge,
   RiskTrendChart
 } from '@/components/charts/ReportCharts'
+import {
+  exportPilotsToCSV,
+  exportCertificationsToCSV,
+  exportLeaveRequestsToCSV,
+  exportComplianceReport
+} from '@/lib/export-utils'
+import { calculateRetirementInfo } from '@/lib/retirement-utils'
 
 interface ReportSummary {
   totalPilots: number
@@ -40,53 +47,82 @@ const REPORT_TYPES = [
   {
     id: 'fleet-compliance',
     title: 'Fleet Compliance Report',
-    description: 'Overall certification status and compliance rates',
+    description: 'Overall certification status and compliance rates with detailed analysis',
     icon: '📊',
-    color: 'blue'
+    color: 'blue',
+    pdfSupported: true
   },
   {
     id: 'risk-assessment',
     title: 'Risk Assessment Report',
-    description: 'Expired and expiring certifications analysis',
+    description: 'Critical and high-risk pilot certification analysis with immediate action items',
     icon: '⚠️',
-    color: 'red'
+    color: 'red',
+    pdfSupported: true
   },
   {
     id: 'pilot-summary',
     title: 'Pilot Summary Report',
-    description: 'Individual pilot certification status',
+    description: 'Complete pilot roster with certification status and performance metrics',
     icon: '👨‍✈️',
-    color: 'green'
+    color: 'green',
+    pdfSupported: true
+  },
+  {
+    id: 'fleet-management',
+    title: 'Fleet Management Report',
+    description: 'Comprehensive fleet analysis including roster, qualifications, and succession planning',
+    icon: '🛫',
+    color: 'purple',
+    pdfSupported: true
+  },
+  {
+    id: 'operational-readiness',
+    title: 'Operational Readiness Report',
+    description: 'Current operational capacity, crew availability, and readiness assessment',
+    icon: '💼',
+    color: 'indigo',
+    pdfSupported: true
   },
   {
     id: 'certification-forecast',
     title: 'Certification Forecast Report',
     description: 'Upcoming renewals and planning',
     icon: '📅',
-    color: 'purple'
+    color: 'yellow',
+    pdfSupported: false
   },
   {
     id: 'fleet-analytics',
     title: 'Fleet Analytics Report',
     description: 'Performance metrics and trends',
     icon: '📈',
-    color: 'indigo'
-  },
-  {
-    id: 'operational-readiness',
-    title: 'Operational Readiness Report',
-    description: 'Leave requests and availability',
-    icon: '💼',
-    color: 'yellow'
+    color: 'teal',
+    pdfSupported: false
   },
   {
     id: 'planning-rostering',
     title: 'Planning & Rostering Report',
     description: 'Certification expiry planning (7, 14, 28, 60, 90 days) with pilot requirements and roster analysis',
     icon: '📋',
-    color: 'orange'
+    color: 'orange',
+    pdfSupported: false
   }
 ]
+
+// Helper function to add retirement information to pilot data
+const addRetirementInfoToPilot = (pilot: any) => {
+  const retirementInfo = pilot.date_of_birth ? calculateRetirementInfo(pilot.date_of_birth) : null
+
+  return {
+    ...pilot,
+    retirement: retirementInfo ? {
+      retirementDate: retirementInfo.retirementDate.toISOString().split('T')[0],
+      timeToRetirement: retirementInfo.displayText,
+      retirementStatus: retirementInfo.retirementStatus
+    } : undefined
+  }
+}
 
 export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<string | null>(null)
@@ -135,40 +171,122 @@ export default function ReportsPage() {
     URL.revokeObjectURL(url)
   }
 
-  const downloadPDF = async () => {
-    if (!reportData || !selectedReport) return
+  const downloadPDF = async (reportType?: string, pilotId?: string) => {
+    const targetReportType = reportType || selectedReport
+    if (!targetReportType) return
 
     setLoading(true)
     try {
+      const requestBody: any = {
+        reportType: targetReportType,
+        generatedBy: 'Air Niugini User' // You might want to get this from auth context
+      }
+
+      // Add pilot ID for individual pilot reports
+      if (pilotId) {
+        requestBody.pilotId = pilotId
+      }
+
       const response = await fetch('/api/reports/pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          reportType: selectedReport,
-          reportData: reportData
-        })
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate PDF')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate PDF')
       }
+
+      // Get filename from Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition')
+      const filename = contentDisposition
+        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
+        : `${targetReportType}-report-${new Date().toISOString().split('T')[0]}.pdf`
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
 
       const link = document.createElement('a')
       link.href = url
-      link.download = `${selectedReport}-report-${new Date().toISOString().split('T')[0]}.pdf`
+      link.download = filename
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
+
+      console.log(`✅ Successfully downloaded ${targetReportType} PDF report`)
     } catch (err) {
+      console.error('❌ PDF download error:', err)
       setError(err instanceof Error ? err.message : 'Failed to generate PDF')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const downloadCSV = () => {
+    if (!reportData || !selectedReport) return
+
+    try {
+      switch (selectedReport) {
+        case 'fleet-compliance':
+          if (reportData.pilots) {
+            exportPilotsToCSV(reportData.pilots.map(pilot => ({
+              ...addRetirementInfoToPilot(pilot),
+              certificationStatus: pilot.certificationSummary || {
+                total: 0,
+                current: 0,
+                expiring: 0,
+                expired: 0
+              }
+            })), false)
+          }
+          break
+
+        case 'risk-assessment':
+          if (reportData.expiredCertifications) {
+            exportCertificationsToCSV(reportData.expiredCertifications.map(cert => ({
+              pilot_name: cert.pilot,
+              employee_id: cert.employeeId,
+              check_code: cert.checkType,
+              check_description: cert.checkType,
+              category: 'Risk Assessment',
+              expiry_date: cert.expiryDate,
+              status: 'Expired',
+              days_until_expiry: cert.daysOverdue ? -cert.daysOverdue : undefined
+            })), true)
+          }
+          break
+
+        case 'pilot-summary':
+          if (reportData.pilots) {
+            exportPilotsToCSV(reportData.pilots.map(pilot => ({
+              ...addRetirementInfoToPilot(pilot),
+              certificationStatus: pilot.certificationSummary || {
+                total: 0,
+                current: 0,
+                expiring: 0,
+                expired: 0
+              }
+            })), false)
+          }
+          break
+
+        case 'operational-readiness':
+          if (reportData.upcomingLeave) {
+            exportLeaveRequestsToCSV(reportData.upcomingLeave, false)
+          }
+          break
+
+        default:
+          // Generic JSON export for other report types
+          downloadReport()
+          break
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to export CSV')
     }
   }
 
@@ -203,6 +321,8 @@ export default function ReportsPage() {
                   report.color === 'green' ? 'bg-green-100 text-green-600' :
                   report.color === 'purple' ? 'bg-purple-100 text-purple-600' :
                   report.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
+                  report.color === 'teal' ? 'bg-teal-100 text-teal-600' :
+                  report.color === 'orange' ? 'bg-orange-100 text-orange-600' :
                   'bg-yellow-100 text-yellow-600'
                 }`}>
                   <span className="text-xl">{report.icon}</span>
@@ -214,6 +334,143 @@ export default function ReportsPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Professional PDF Export Section */}
+        <div className="card-aviation mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 bg-[#E4002B] rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm">📄</span>
+            </span>
+            Professional PDF Reports
+          </h2>
+          <p className="text-gray-600 text-sm mb-4">
+            Generate high-quality PDF reports with Air Niugini branding for professional documentation and regulatory compliance.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {REPORT_TYPES.filter(report => report.pdfSupported).map((report) => (
+              <button
+                key={report.id}
+                onClick={() => downloadPDF(report.id)}
+                className="btn-secondary text-sm justify-center flex items-center gap-2"
+                disabled={loading}
+                title={`Generate ${report.title} as PDF`}
+              >
+                <span>{report.icon}</span>
+                <span>{report.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Data Export Section */}
+        <div className="card-aviation mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 bg-[#E4002B] rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm">📊</span>
+            </span>
+            Quick Data Exports
+          </h2>
+          <p className="text-gray-600 text-sm mb-4">
+            Export current pilot and certification data directly to CSV format without generating a full report.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button
+              onClick={() => {
+                // Export all pilots with current data
+                fetch('/api/pilots')
+                  .then(res => res.json())
+                  .then(result => {
+                    if (result.success) {
+                      exportPilotsToCSV(result.data.map((pilot: any) => ({
+                        ...addRetirementInfoToPilot(pilot),
+                        certificationStatus: {
+                          total: pilot.total_checks || 0,
+                          current: pilot.current_checks || 0,
+                          expiring: pilot.expiring_checks || 0,
+                          expired: pilot.expired_checks || 0
+                        }
+                      })), false)
+                    }
+                  })
+                  .catch(() => setError('Failed to export pilots data'))
+              }}
+              className="btn-secondary text-sm justify-center"
+            >
+              📋 Export All Pilots
+            </button>
+
+            <button
+              onClick={() => {
+                // Export pilots with certification issues
+                fetch('/api/pilots')
+                  .then(res => res.json())
+                  .then(result => {
+                    if (result.success) {
+                      const nonCompliantPilots = result.data.filter((pilot: any) =>
+                        (pilot.expired_checks || 0) > 0 || (pilot.expiring_checks || 0) > 0
+                      )
+                      exportComplianceReport(nonCompliantPilots.map((pilot: any) => ({
+                        ...addRetirementInfoToPilot(pilot),
+                        certificationStatus: {
+                          total: pilot.total_checks || 0,
+                          current: pilot.current_checks || 0,
+                          expiring: pilot.expiring_checks || 0,
+                          expired: pilot.expired_checks || 0
+                        }
+                      })))
+                    }
+                  })
+                  .catch(() => setError('Failed to export compliance report'))
+              }}
+              className="btn-secondary text-sm justify-center"
+            >
+              ⚠️ Compliance Report
+            </button>
+
+            <button
+              onClick={() => {
+                // Export all certifications
+                fetch('/api/certifications')
+                  .then(res => res.json())
+                  .then(result => {
+                    if (result.success) {
+                      exportCertificationsToCSV(result.data.map((cert: any) => ({
+                        pilot_name: cert.pilot_name,
+                        employee_id: cert.employee_id,
+                        check_code: cert.check_code,
+                        check_description: cert.check_description,
+                        category: cert.category,
+                        expiry_date: cert.expiry_date,
+                        status: cert.status,
+                        days_until_expiry: cert.days_until_expiry
+                      })), false)
+                    }
+                  })
+                  .catch(() => setError('Failed to export certifications data'))
+              }}
+              className="btn-secondary text-sm justify-center"
+            >
+              🎯 All Certifications
+            </button>
+
+            <button
+              onClick={() => {
+                // Export leave requests
+                fetch('/api/leave-requests')
+                  .then(res => res.json())
+                  .then(result => {
+                    if (result.success) {
+                      exportLeaveRequestsToCSV(result.data, false)
+                    }
+                  })
+                  .catch(() => setError('Failed to export leave requests'))
+              }}
+              className="btn-secondary text-sm justify-center"
+            >
+              📅 Leave Requests
+            </button>
+          </div>
         </div>
 
         {/* Loading State */}
@@ -256,12 +513,32 @@ export default function ReportsPage() {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={downloadPDF}
+                    onClick={downloadCSV}
                     className="btn-secondary text-sm"
                     disabled={loading}
+                    title="Export report data to CSV format"
                   >
-                    📄 Download PDF
+                    📊 Export CSV
                   </button>
+                  {REPORT_TYPES.find(r => r.id === selectedReport)?.pdfSupported ? (
+                    <button
+                      onClick={() => downloadPDF()}
+                      className="btn-secondary text-sm"
+                      disabled={loading}
+                      title="Download professional PDF report with Air Niugini branding"
+                    >
+                      📄 Professional PDF
+                    </button>
+                  ) : (
+                    <button
+                      onClick={downloadReport}
+                      className="btn-secondary text-sm"
+                      disabled={loading}
+                      title="Download report data in JSON format"
+                    >
+                      📄 Download Data
+                    </button>
+                  )}
                   <button
                     onClick={printReport}
                     className="btn-secondary text-sm"
