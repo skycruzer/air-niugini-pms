@@ -94,7 +94,24 @@ function createSupabaseAdmin() {
   })
 }
 
-export const supabaseAdmin = createSupabaseAdmin()
+// Lazy initialization of admin client to avoid build-time errors
+let _supabaseAdmin: any = null
+export function getSupabaseAdmin() {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createSupabaseAdmin()
+  }
+  return _supabaseAdmin
+}
+
+// Legacy export for backward compatibility - deprecated, use getSupabaseAdmin() instead
+export const supabaseAdmin = {
+  get from() { return getSupabaseAdmin().from },
+  get auth() { return getSupabaseAdmin().auth },
+  get storage() { return getSupabaseAdmin().storage },
+  get rpc() { return getSupabaseAdmin().rpc },
+  get channel() { return getSupabaseAdmin().channel },
+  get realtime() { return getSupabaseAdmin().realtime }
+}
 
 // Database types for Air Niugini PMS
 export interface User {

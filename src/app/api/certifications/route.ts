@@ -2,17 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getCertificationStatus } from '@/lib/certification-utils'
 
-// Create service role client for server-side operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
+// Function to create service role client for server-side operations
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
     }
-  }
-)
+  )
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
     console.log('🔍 API /certifications: Fetching certifications for pilot:', pilotId)
 
     // Get all check types using service role (bypasses RLS)
-    const { data: checkTypes, error: checkTypesError } = await supabaseAdmin
+    const { data: checkTypes, error: checkTypesError } = await getSupabaseAdmin()
       .from('check_types')
       .select('*')
       .order('category', { ascending: true })
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get existing certifications for this pilot using service role (bypasses RLS)
-    const { data: pilotChecks, error: checksError } = await supabaseAdmin
+    const { data: pilotChecks, error: checksError } = await getSupabaseAdmin()
       .from('pilot_checks')
       .select('*')
       .eq('pilot_id', pilotId)
@@ -128,7 +130,7 @@ export async function PUT(request: NextRequest) {
     }))
 
     // Use service role to bypass RLS and perform upsert
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('pilot_checks')
       .upsert(updates, {
         onConflict: 'pilot_id,check_type_id'

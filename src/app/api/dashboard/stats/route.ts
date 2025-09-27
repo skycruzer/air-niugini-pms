@@ -33,16 +33,16 @@ export async function GET() {
 
     // Calculate pilots by role and qualifications
     const totalPilots = pilotData?.length || 0
-    const captains = pilotData?.filter(p => p.role === 'Captain').length || 0
-    const firstOfficers = pilotData?.filter(p => p.role === 'First Officer').length || 0
+    const captains = pilotData?.filter((p: any) => p.role === 'Captain').length || 0
+    const firstOfficers = pilotData?.filter((p: any) => p.role === 'First Officer').length || 0
 
     // Count specialized qualifications
-    const trainingCaptains = pilotData?.filter(p =>
+    const trainingCaptains = pilotData?.filter((p: any) =>
       p.captain_qualifications && Array.isArray(p.captain_qualifications) &&
       p.captain_qualifications.includes('training_captain')
     ).length || 0
 
-    const examiners = pilotData?.filter(p =>
+    const examiners = pilotData?.filter((p: any) =>
       p.captain_qualifications && Array.isArray(p.captain_qualifications) &&
       p.captain_qualifications.includes('examiner')
     ).length || 0
@@ -50,7 +50,7 @@ export async function GET() {
     // Calculate compliance (certifications that are current)
     const currentDate = new Date()
     const totalCerts = complianceData?.length || 0
-    const currentCerts = complianceData?.filter(cert => {
+    const currentCerts = complianceData?.filter((cert: any) => {
       if (!cert.expiry_date) return false
       const expiryDate = new Date(cert.expiry_date)
       return expiryDate > currentDate

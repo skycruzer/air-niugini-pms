@@ -21,7 +21,7 @@ export async function GET() {
         requests = result.data
         error = result.error
         console.log('🔍 API /leave-requests: Raw result count:', result.data?.length || 0)
-        console.log('🔍 API /leave-requests: Raw result IDs:', result.data?.map(r => r.id) || [])
+        console.log('🔍 API /leave-requests: Raw result IDs:', result.data?.map((r: any) => r.id) || [])
         if (result.error) {
           console.error('🚨 API /leave-requests: Query error:', result.error)
         }

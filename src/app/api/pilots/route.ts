@@ -69,7 +69,7 @@ async function getSinglePilot(pilotId: string) {
     const today = new Date()
 
     const certificationCounts = certifications.reduce(
-      (acc, check) => {
+      (acc: any, check: any) => {
         if (!check.expiry_date) {
           return acc // Skip checks without expiry dates
         }
@@ -256,7 +256,7 @@ export async function GET(request: NextRequest) {
 
     // Get certification counts for each pilot with retry logic
     const pilotsWithCerts = await Promise.all(
-      (pilots || []).map(async (pilot) => {
+      (pilots || []).map(async (pilot: any) => {
         let checks = null
         let checksError = null
 
@@ -294,7 +294,7 @@ export async function GET(request: NextRequest) {
         const today = new Date()
 
         const certificationCounts = certifications.reduce(
-          (acc, check) => {
+          (acc: any, check: any) => {
             if (!check.expiry_date) {
               return acc // Skip checks without expiry dates
             }

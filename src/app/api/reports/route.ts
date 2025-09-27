@@ -78,8 +78,8 @@ async function generateFleetComplianceReport() {
   const today = new Date()
   const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000))
 
-  pilots?.forEach(pilot => {
-    pilot.pilot_checks?.forEach(check => {
+  pilots?.forEach((pilot: any) => {
+    pilot.pilot_checks?.forEach((check: any) => {
       totalCertifications++
 
       if (!check.expiry_date) {
@@ -113,23 +113,23 @@ async function generateFleetComplianceReport() {
       expiredCertifications,
       complianceRate: Math.round(complianceRate * 100) / 100
     },
-    pilotBreakdown: pilots?.map(pilot => ({
+    pilotBreakdown: pilots?.map((pilot: any) => ({
       id: pilot.id,
       name: `${pilot.first_name} ${pilot.last_name}`,
       employeeId: pilot.employee_id,
       role: pilot.role,
       totalChecks: pilot.pilot_checks?.length || 0,
-      currentChecks: pilot.pilot_checks?.filter(check => {
+      currentChecks: pilot.pilot_checks?.filter((check: any) => {
         if (!check.expiry_date) return false
         const expiryDate = new Date(check.expiry_date)
         return expiryDate >= thirtyDaysFromNow
       }).length || 0,
-      expiringChecks: pilot.pilot_checks?.filter(check => {
+      expiringChecks: pilot.pilot_checks?.filter((check: any) => {
         if (!check.expiry_date) return false
         const expiryDate = new Date(check.expiry_date)
         return expiryDate >= today && expiryDate <= thirtyDaysFromNow
       }).length || 0,
-      expiredChecks: pilot.pilot_checks?.filter(check => {
+      expiredChecks: pilot.pilot_checks?.filter((check: any) => {
         if (!check.expiry_date) return true
         const expiryDate = new Date(check.expiry_date)
         return expiryDate < today
@@ -254,7 +254,7 @@ async function generatePilotSummaryReport() {
   if (error) throw error
 
   const reportData = {
-    pilots: pilots?.map(pilot => {
+    pilots: pilots?.map((pilot: any) => {
       const certifications = pilot.pilot_checks || []
       const today = new Date()
 
@@ -391,8 +391,8 @@ async function generateFleetAnalyticsReport() {
   const reportData = {
     fleetSummary: {
       totalPilots: pilots?.length || 0,
-      totalCaptains: pilots?.filter(p => p.role === 'Captain').length || 0,
-      totalFirstOfficers: pilots?.filter(p => p.role === 'First Officer').length || 0,
+      totalCaptains: pilots?.filter((p: any) => p.role === 'Captain').length || 0,
+      totalFirstOfficers: pilots?.filter((p: any) => p.role === 'First Officer').length || 0,
       averageAge: calculateAverageAge(pilots || []),
       averageSeniority: calculateAverageSeniority(pilots || [])
     },
@@ -444,11 +444,11 @@ async function generateOperationalReadinessReport() {
   const reportData = {
     availability: {
       totalPilots: pilots?.length || 0,
-      availablePilots: (pilots?.length || 0) - (leaveRequests?.filter(lr => lr.status === 'APPROVED').length || 0),
-      onLeave: leaveRequests?.filter(lr => lr.status === 'APPROVED').length || 0,
-      pendingLeaveRequests: leaveRequests?.filter(lr => lr.status === 'PENDING').length || 0
+      availablePilots: (pilots?.length || 0) - (leaveRequests?.filter((lr: any) => lr.status === 'APPROVED').length || 0),
+      onLeave: leaveRequests?.filter((lr: any) => lr.status === 'APPROVED').length || 0,
+      pendingLeaveRequests: leaveRequests?.filter((lr: any) => lr.status === 'PENDING').length || 0
     },
-    upcomingLeave: leaveRequests?.map(lr => ({
+    upcomingLeave: leaveRequests?.map((lr: any) => ({
       pilot: lr.pilot ? `${lr.pilot.first_name} ${lr.pilot.last_name}` : 'Unknown',
       employeeId: lr.pilot?.employee_id,
       role: lr.pilot?.role,
@@ -522,12 +522,12 @@ async function generatePlanningRosteringReport() {
     .select('id, role, date_of_birth, is_active')
     .eq('is_active', true)
 
-  const currentCaptains = allPilots?.filter(p => p.role === 'Captain').length || 0
-  const currentFirstOfficers = allPilots?.filter(p => p.role === 'First Officer').length || 0
+  const currentCaptains = allPilots?.filter((p: any) => p.role === 'Captain').length || 0
+  const currentFirstOfficers = allPilots?.filter((p: any) => p.role === 'First Officer').length || 0
 
   // Calculate retirement implications
   const retirementAge = settings.pilot_requirements.pilot_retirement_age
-  const pilotsNearRetirement = allPilots?.filter(pilot => {
+  const pilotsNearRetirement = allPilots?.filter((pilot: any) => {
     if (!pilot.date_of_birth) return false
     const age = Math.floor((today.getTime() - new Date(pilot.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25))
     return age >= retirementAge - 2 // Within 2 years of retirement
@@ -670,11 +670,11 @@ async function generatePlanningRosteringReport() {
   const rosterPeriodAnalysis: { [key: string]: any } = {}
   const leaveImpactAnalysis = {
     totalRequests: leaveRequests?.length || 0,
-    approvedRequests: leaveRequests?.filter(lr => lr.status === 'APPROVED').length || 0,
-    pendingRequests: leaveRequests?.filter(lr => lr.status === 'PENDING').length || 0,
-    rejectedRequests: leaveRequests?.filter(lr => lr.status === 'REJECTED').length || 0,
-    captainsOnLeave: leaveRequests?.filter(lr => lr.status === 'APPROVED' && lr.pilot?.role === 'Captain').length || 0,
-    firstOfficersOnLeave: leaveRequests?.filter(lr => lr.status === 'APPROVED' && lr.pilot?.role === 'First Officer').length || 0
+    approvedRequests: leaveRequests?.filter((lr: any) => lr.status === 'APPROVED').length || 0,
+    pendingRequests: leaveRequests?.filter((lr: any) => lr.status === 'PENDING').length || 0,
+    rejectedRequests: leaveRequests?.filter((lr: any) => lr.status === 'REJECTED').length || 0,
+    captainsOnLeave: leaveRequests?.filter((lr: any) => lr.status === 'APPROVED' && lr.pilot?.role === 'Captain').length || 0,
+    firstOfficersOnLeave: leaveRequests?.filter((lr: any) => lr.status === 'APPROVED' && lr.pilot?.role === 'First Officer').length || 0
   }
 
   // Group leave requests by roster period
