@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   try {
+    const supabaseAdmin = getSupabaseAdmin()
+
     // Use Promise.allSettled to handle partial failures gracefully
     const [pilotResult, certificationResult, checkTypesResult, complianceResult] = await Promise.allSettled([
       supabaseAdmin.from('pilots').select('role, captain_qualifications').eq('is_active', true),

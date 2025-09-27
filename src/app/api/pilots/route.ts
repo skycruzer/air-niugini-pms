@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 
 async function getSinglePilot(pilotId: string) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     console.log('🔍 API /pilots: Fetching pilot with ID:', pilotId)
 
@@ -111,6 +112,7 @@ async function getSinglePilot(pilotId: string) {
 }
 
 export async function PUT(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     console.log('🚀 API /pilots PUT: Starting PUT request')
 
@@ -227,6 +229,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     const { searchParams } = new URL(request.url)
     const pilotId = searchParams.get('id')

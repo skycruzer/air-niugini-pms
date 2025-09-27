@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase'
 import { getRosterPeriodFromDate } from '@/lib/roster-utils'
 import { differenceInDays } from 'date-fns'
 
 export async function GET() {
   try {
     console.log('🔍 API /leave-requests: Fetching leave requests with service role...')
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Get leave requests with pilot information using service role with retry logic
     let requests = null
@@ -97,6 +99,8 @@ export async function POST(request: Request) {
   try {
     const requestData = await request.json()
     console.log('📝 API /leave-requests: Creating new leave request...', requestData)
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Calculate roster period and days
     const startDateRoster = getRosterPeriodFromDate(new Date(requestData.start_date))
