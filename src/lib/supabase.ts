@@ -53,28 +53,9 @@ function createSupabaseAdmin() {
   })
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('❌ Admin Supabase configuration missing, using direct values')
-
-    // Use the known values directly since env vars aren't loading properly in browser
-    return createClient(
-      'https://wgdmgvonqysflwdiiols.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnZG1ndm9ucXlzZmx3ZGlpb2xzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTU4MjMyMCwiZXhwIjoyMDcxMTU4MzIwfQ.byfbMS__aOJzhhty54h7ap3XK19f9-3Wu7S-ZWWV2Cg',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        },
-        global: {
-          fetch: (url, options = {}) => {
-            return fetch(url, {
-              ...options,
-              // Add timeout and retry logic at the fetch level
-              signal: AbortSignal.timeout(15000), // 15 second timeout for production
-            })
-          }
-        }
-      }
-    )
+    console.error('❌ Critical: Missing Supabase environment variables in production')
+    console.error('❌ URL:', !!supabaseUrl, 'ServiceKey:', !!supabaseServiceKey)
+    throw new Error('Supabase configuration missing - cannot perform admin operations')
   }
 
   return createClient(supabaseUrl, supabaseServiceKey, {
@@ -87,7 +68,7 @@ function createSupabaseAdmin() {
         return fetch(url, {
           ...options,
           // Add timeout and retry logic at the fetch level
-          signal: AbortSignal.timeout(30000), // 30 second timeout
+          signal: AbortSignal.timeout(15000), // 15 second timeout for production
         })
       }
     }
