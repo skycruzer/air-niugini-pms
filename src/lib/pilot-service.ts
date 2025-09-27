@@ -136,7 +136,7 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
 
       // Get certification counts for each pilot
       const pilotsWithCerts = await Promise.all(
-        (pilots || []).map(async (pilot) => {
+        (pilots || []).map(async (pilot: any) => {
           const { data: checks, error: checksError } = await supabaseAdmin
             .from('pilot_checks')
             .select(`
@@ -152,7 +152,7 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
           // Calculate certification status
           const certifications = checks || []
           const certificationCounts = certifications.reduce(
-            (acc, check) => {
+            (acc: any, check: any) => {
               const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
               if (status.color === 'green') acc.current++
               else if (status.color === 'yellow') acc.expiring++

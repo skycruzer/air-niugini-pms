@@ -49,12 +49,12 @@ export async function GET(request: NextRequest) {
 
     // Create a map of existing certifications
     const existingChecks = new Map()
-    pilotChecks?.forEach(check => {
+    pilotChecks?.forEach((check: any) => {
       existingChecks.set(check.check_type_id, check)
     })
 
     // Combine all check types with existing certifications
-    const result = (checkTypes || []).map(checkType => {
+    const result = (checkTypes || []).map((checkType: any) => {
       const existingCheck = existingChecks.get(checkType.id)
       return {
         checkTypeId: checkType.id,
@@ -108,7 +108,7 @@ export async function PUT(request: NextRequest) {
     console.log('🔍 API /certifications PUT: Certifications to update:', certifications.length)
 
     // Convert the data format expected by the database
-    const updates = certifications.map(cert => ({
+    const updates = certifications.map((cert: any) => ({
       pilot_id: pilotId,
       check_type_id: cert.checkTypeId,
       expiry_date: cert.expiryDate || null,
