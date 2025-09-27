@@ -77,21 +77,12 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
   try {
     console.log('🔍 getAllPilots: Starting query for pilots...')
 
-    // Always use API route to ensure service role access and bypass RLS
-    console.log('🔍 getAllPilots: Using API route for all environments...')
+    // Use API route for client-side calls, direct admin client for server-side
+    if (typeof window !== 'undefined') {
+      // Client-side - use API route
+      console.log('🔍 getAllPilots: Client-side - using API route...')
 
-    // Determine the base URL for API calls
-    const baseUrl = typeof window !== 'undefined'
-      ? '' // Client-side - use relative URLs
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-
-    const apiUrl = `${baseUrl}/api/pilots`
-    console.log('🔍 getAllPilots: API URL:', apiUrl)
-
-    try {
-      const response = await fetch(apiUrl)
+      const response = await fetch('/api/pilots')
 
       console.log('🔍 getAllPilots: API response status:', response.status)
 
@@ -118,9 +109,68 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
 
       console.log('🔍 getAllPilots: API returned', result.data?.length || 0, 'pilots')
       return result.data || []
-    } catch (error) {
-      console.error('🚨 getAllPilots: API fetch error:', error)
-      throw error
+    } else {
+      // Server-side - use admin client directly
+      console.log('🔍 getAllPilots: Server-side - using admin client directly...')
+
+      const { getSupabaseAdmin } = await import('@/lib/supabase')
+      const supabaseAdmin = getSupabaseAdmin()
+
+      // Get all pilots
+      const { data: pilots, error: pilotsError } = await supabaseAdmin
+        .from('pilots')
+        .select('*')
+        .order('seniority_number', { ascending: true, nullsFirst: false })
+
+      if (pilotsError) {
+        console.error('🚨 getAllPilots: Pilots query error:', pilotsError)
+        throw pilotsError
+      }
+
+      if (!pilots || pilots.length === 0) {
+        console.log('🔍 getAllPilots: No pilots found in database')
+        return []
+      }
+
+      console.log('🔍 getAllPilots: Processing certification data for', pilots.length, 'pilots')
+
+      // Get certification counts for each pilot
+      const pilotsWithCerts = await Promise.all(
+        (pilots || []).map(async (pilot) => {
+          const { data: checks, error: checksError } = await supabaseAdmin
+            .from('pilot_checks')
+            .select(`
+              expiry_date,
+              check_types (check_code, check_description, category)
+            `)
+            .eq('pilot_id', pilot.id)
+
+          if (checksError) {
+            console.warn(`Error fetching checks for pilot ${pilot.id}:`, checksError)
+          }
+
+          // Calculate certification status
+          const certifications = checks || []
+          const certificationCounts = certifications.reduce(
+            (acc, check) => {
+              const status = getCertificationStatus(check.expiry_date ? new Date(check.expiry_date) : null)
+              if (status.color === 'green') acc.current++
+              else if (status.color === 'yellow') acc.expiring++
+              else if (status.color === 'red') acc.expired++
+              return acc
+            },
+            { current: 0, expiring: 0, expired: 0 }
+          )
+
+          return {
+            ...pilot,
+            certificationStatus: certificationCounts
+          }
+        })
+      )
+
+      console.log('🔍 getAllPilots: Successfully processed', pilotsWithCerts.length, 'pilots')
+      return pilotsWithCerts
     }
 
   } catch (error) {
@@ -322,46 +372,60 @@ export async function updatePilot(pilotId: string, pilotData: Partial<PilotFormD
         .map(([key, value]) => [key, value === '' ? null : value])
     )
 
-    // Always use API route to ensure service role access and bypass RLS
-    console.log('🔍 updatePilot: Using API route for all environments...')
+    // Use API route for client-side calls, direct admin client for server-side
+    if (typeof window !== 'undefined') {
+      // Client-side - use API route
+      console.log('🔍 updatePilot: Client-side - using API route...')
 
-    // Determine the base URL for API calls
-    const baseUrl = typeof window !== 'undefined'
-      ? '' // Client-side - use relative URLs
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-
-    const apiUrl = `${baseUrl}/api/pilots?id=${pilotId}`
-    console.log('🔍 updatePilot: API URL:', apiUrl)
-
-    const response = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cleanedData),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('🚨 updatePilot: API request failed:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
+      const response = await fetch(`/api/pilots?id=${pilotId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cleanedData),
       })
-      throw new Error(`API request failed with status ${response.status}: ${errorText}`)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('🚨 updatePilot: API request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        })
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`)
+      }
+
+      const result = await response.json()
+
+      if (!result.success) {
+        console.error('🚨 updatePilot: API returned error:', result.error)
+        throw new Error(result.error || 'Failed to update pilot')
+      }
+
+      console.log('🔍 updatePilot: Successfully updated pilot via API')
+      return result.data
+    } else {
+      // Server-side - use admin client directly
+      console.log('🔍 updatePilot: Server-side - using admin client directly...')
+
+      const { getSupabaseAdmin } = await import('@/lib/supabase')
+      const supabaseAdmin = getSupabaseAdmin()
+
+      const { data, error } = await supabaseAdmin
+        .from('pilots')
+        .update(cleanedData)
+        .eq('id', pilotId)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('🚨 updatePilot: Supabase admin error:', error)
+        throw error
+      }
+
+      console.log('🔍 updatePilot: Successfully updated pilot via admin client')
+      return data
     }
-
-    const result = await response.json()
-
-    if (!result.success) {
-      console.error('🚨 updatePilot: API returned error:', result.error)
-      throw new Error(result.error || 'Failed to update pilot')
-    }
-
-    console.log('🔍 updatePilot: Successfully updated pilot via API')
-    return result.data
   } catch (error) {
     console.error('Error updating pilot:', error)
     throw new Error(handleSupabaseError(error))
