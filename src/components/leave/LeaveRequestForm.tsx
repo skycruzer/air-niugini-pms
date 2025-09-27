@@ -19,7 +19,7 @@ const leaveRequestSchema = z.object({
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().min(1, 'End date is required'),
   request_date: z.string().min(1, 'Date of request is required'),
-  request_method: z.enum(['ORACLE', 'EMAIL', 'LEAVE_BIDS'], {
+  request_method: z.enum(['ORACLE', 'EMAIL', 'LEAVE_BIDS', 'SYSTEM'], {
     message: 'Please select how you were advised'
   }),
   reason: z.string().optional(),
