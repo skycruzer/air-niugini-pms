@@ -11,19 +11,19 @@ export async function GET(request: NextRequest) {
   try {
     switch (reportType) {
       case 'fleet-compliance':
-        return await generateFleetComplianceReport()
+        return await generateFleetComplianceReport(supabaseAdmin)
       case 'risk-assessment':
-        return await generateRiskAssessmentReport()
+        return await generateRiskAssessmentReport(supabaseAdmin)
       case 'pilot-summary':
-        return await generatePilotSummaryReport()
+        return await generatePilotSummaryReport(supabaseAdmin)
       case 'certification-forecast':
-        return await generateCertificationForecastReport()
+        return await generateCertificationForecastReport(supabaseAdmin)
       case 'fleet-analytics':
-        return await generateFleetAnalyticsReport()
+        return await generateFleetAnalyticsReport(supabaseAdmin)
       case 'operational-readiness':
-        return await generateOperationalReadinessReport()
+        return await generateOperationalReadinessReport(supabaseAdmin)
       case 'planning-rostering':
-        return await generatePlanningRosteringReport()
+        return await generatePlanningRosteringReport(supabaseAdmin)
       default:
         return NextResponse.json({
           success: false,
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function generateFleetComplianceReport() {
+async function generateFleetComplianceReport(supabaseAdmin: any) {
   // Get all pilots with their certifications
   const { data: pilots, error: pilotsError } = await supabaseAdmin
     .from('pilots')
@@ -149,7 +149,7 @@ async function generateFleetComplianceReport() {
   })
 }
 
-async function generateRiskAssessmentReport() {
+async function generateRiskAssessmentReport(supabaseAdmin: any) {
   // Get pilots with expired or expiring certifications
   const { data: expiredData, error: expiredError } = await supabaseAdmin
     .from('pilot_checks')
@@ -234,7 +234,7 @@ async function generateRiskAssessmentReport() {
   })
 }
 
-async function generatePilotSummaryReport() {
+async function generatePilotSummaryReport(supabaseAdmin: any) {
   // Get comprehensive pilot data
   const { data: pilots, error } = await supabaseAdmin
     .from('pilots')
@@ -305,7 +305,7 @@ async function generatePilotSummaryReport() {
   })
 }
 
-async function generateCertificationForecastReport() {
+async function generateCertificationForecastReport(supabaseAdmin: any) {
   // Get certifications expiring in the next 6 months
   const sixMonthsFromNow = new Date()
   sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
@@ -371,7 +371,7 @@ async function generateCertificationForecastReport() {
   })
 }
 
-async function generateFleetAnalyticsReport() {
+async function generateFleetAnalyticsReport(supabaseAdmin: any) {
   // Comprehensive analytics
   const { data: analytics } = await supabaseAdmin.rpc('get_fleet_analytics')
 
@@ -422,7 +422,7 @@ async function generateFleetAnalyticsReport() {
   })
 }
 
-async function generateOperationalReadinessReport() {
+async function generateOperationalReadinessReport(supabaseAdmin: any) {
   // Get current leave requests and pilot availability
   const { data: leaveRequests } = await supabaseAdmin
     .from('leave_requests')
@@ -499,7 +499,7 @@ function calculateAverageSeniority(pilots: any[]): number {
     : 0
 }
 
-async function generatePlanningRosteringReport() {
+async function generatePlanningRosteringReport(supabaseAdmin: any) {
   const today = new Date()
 
   // Get system settings for pilot requirements
