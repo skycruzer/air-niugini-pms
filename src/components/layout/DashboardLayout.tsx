@@ -45,7 +45,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       description: 'Manage leave requests',
       submenu: [
         { name: 'Leave Requests', href: '/dashboard/leave', description: 'Manage requests' },
-        { name: 'Leave Calendar', href: '/dashboard/leave/calendar', description: 'Visual leave timeline' }
+        { name: 'Leave Calendar', href: '/dashboard/leave/calendar', description: 'Visual leave timeline' },
+        { name: 'Roster Planning', href: '/dashboard/leave/roster-planning', description: 'Future roster leave planning' }
       ]
     },
     { name: 'Reports', href: '/dashboard/reports', icon: '📊', description: 'Fleet reports', requiresPermission: 'reports' },
