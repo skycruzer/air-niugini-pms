@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin, handleSupabaseError, Pilot, PilotCheck, CheckType } from './supabase'
+import { supabase, getSupabaseAdmin, handleSupabaseError, Pilot, PilotCheck, CheckType } from './supabase'
 import { getCertificationStatus } from './certification-utils'
 import { calculatePilotsRetirement, getPilotsNearingRetirement, type PilotWithRetirement } from './retirement-utils'
 
@@ -480,7 +480,7 @@ export async function deletePilot(pilotId: string): Promise<void> {
     console.log('🗑️ deletePilot: Starting cascading deletion for pilot:', pilotId)
 
     // Use admin client for service-level deletion
-    const adminClient = supabaseAdmin
+    const adminClient = getSupabaseAdmin()
 
     // Step 1: Delete related leave requests
     console.log('🗑️ deletePilot: Deleting leave requests...')
@@ -914,8 +914,9 @@ export async function getDashboardStats() {
 // Get pilots nearing retirement (< 5 years)
 export async function getPilotsNearingRetirementForDashboard(): Promise<PilotWithRetirement[]> {
   try {
-    // Get pilots with date_of_birth
-    const { data: pilots, error } = await supabaseAdmin
+    // Get pilots with date_of_birth using the proper client
+    const client = typeof window !== 'undefined' ? supabase : getSupabaseAdmin()
+    const { data: pilots, error } = await client
       .from('pilots')
       .select('id, first_name, last_name, date_of_birth, is_active')
       .eq('is_active', true)

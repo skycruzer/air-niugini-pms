@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { invalidateCache, CACHE_INVALIDATION_PATTERNS } from '@/lib/cache-service'
 
+// Mark this route as dynamic
+export const dynamic = 'force-dynamic'
+
 async function getSinglePilot(pilotId: string) {
   const supabaseAdmin = getSupabaseAdmin()
   try {

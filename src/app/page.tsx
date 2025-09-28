@@ -1,5 +1,8 @@
 import { differenceInDays, addDays, format } from 'date-fns'
 
+// Mark this page as dynamic since it fetches dashboard stats
+export const dynamic = 'force-dynamic'
+
 // Roster calculation functions
 const ROSTER_DURATION = 28
 const KNOWN_ROSTER = {

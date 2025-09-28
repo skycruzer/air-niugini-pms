@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   poweredByHeader: false,
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false, // Disable to fix 'critters' module error in production builds
     optimizePackageImports: ['lucide-react', '@tanstack/react-query']
   },
   typescript: {
