@@ -129,3 +129,82 @@ export async function POST(request: Request) {
     )
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const requestData = await request.json()
+    console.log('🔄 API /leave-requests: Updating leave request...', requestData)
+
+    const supabaseAdmin = getSupabaseAdmin()
+    const { id, status, reviewer_comments } = requestData
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Leave request ID is required' },
+        { status: 400 }
+      )
+    }
+
+    if (!['APPROVED', 'DENIED'].includes(status)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid status. Must be APPROVED or DENIED' },
+        { status: 400 }
+      )
+    }
+
+    // Update the leave request
+    const { data, error } = await supabaseAdmin
+      .from('leave_requests')
+      .update({
+        status,
+        reviewer_comments,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select(`
+        *,
+        pilots:pilot_id (
+          first_name,
+          middle_name,
+          last_name,
+          employee_id
+        )
+      `)
+      .single()
+
+    if (error) {
+      console.error('🚨 API /leave-requests: Error updating request:', error)
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      )
+    }
+
+    // Transform the response data
+    const pilot = data.pilots
+    const responseData = {
+      ...data,
+      pilot_name: pilot
+        ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+        : 'Unknown Pilot',
+      employee_id: pilot?.employee_id || 'N/A',
+      reviewer_name: null,
+      pilots: undefined // Remove the nested object from response
+    }
+
+    console.log(`✅ API /leave-requests: ${status} leave request:`, responseData.id)
+
+    return NextResponse.json({
+      success: true,
+      data: responseData
+    })
+  } catch (error) {
+    console.error('🚨 API /leave-requests: Fatal error updating request:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+export const dynamic = 'force-dynamic'

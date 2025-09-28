@@ -252,42 +252,32 @@ export async function updateLeaveRequestStatus(
   reviewComments?: string
 ): Promise<LeaveRequest> {
   try {
-    const { data, error } = await supabase
-      .from('leave_requests')
-      .update({
+    console.log('🔄 Updating leave request status via API...', { requestId, status })
+
+    const response = await fetch('/api/leave-requests', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: requestId,
         status,
         reviewed_by: reviewedBy,
-        reviewed_at: new Date().toISOString(),
-        review_comments: reviewComments
-      })
-      .eq('id', requestId)
-      .select(`
-        *,
-        pilots (
-          first_name,
-          middle_name,
-          last_name,
-          employee_id
-        ),
-        reviewer:an_users!reviewed_by (
-          name
-        )
-      `)
-      .single()
+        reviewer_comments: reviewComments
+      }),
+    })
 
-    if (error) throw error
+    const result = await response.json()
 
-    return {
-      ...data,
-      pilot_name: data.pilots
-        ? `${data.pilots.first_name} ${data.pilots.middle_name ? data.pilots.middle_name + ' ' : ''}${data.pilots.last_name}`
-        : 'Unknown Pilot',
-      employee_id: data.pilots?.employee_id || 'N/A',
-      reviewer_name: data.reviewer?.name || null
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to update leave request status')
     }
+
+    console.log('✅ Leave request status updated successfully:', result.data.id)
+    return result.data
   } catch (error) {
     console.error('Error updating leave request status:', error)
-    throw new Error(handleSupabaseError(error))
+    throw new Error(error instanceof Error ? error.message : 'Failed to update leave request status')
   }
 }
 
