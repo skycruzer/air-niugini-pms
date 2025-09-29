@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { Users, Upload, CheckCircle, AlertTriangle, ArrowLeft, Search, Filter } from 'lucide-react'
+import DashboardLayout from '@/components/layout/DashboardLayout'
 
 const bulkUpdateSchema = z.object({
   checkTypeId: z.string().min(1, 'Check type is required'),
@@ -158,19 +159,22 @@ export default function BulkUpdatePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading pilots and check types...</p>
+      <DashboardLayout>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading pilots and check types...</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     )
   }
 
   const uniqueRoles = [...new Set(pilots.map(p => p.role))].sort()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -395,5 +399,6 @@ export default function BulkUpdatePage() {
         </form>
       </div>
     </div>
+    </DashboardLayout>
   )
 }
