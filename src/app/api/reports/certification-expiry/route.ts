@@ -3,6 +3,7 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement } from 'react'
 import { format, addDays } from 'date-fns'
 import { getRosterPeriodFromDate } from '@/lib/roster-utils'
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service'
 import {
   createCertificationExpiryReportDocument,
   createCertificationExpiryReportData,
@@ -36,71 +37,10 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 Generating report for timeframe: ${timeframeDays} days`)
 
-    // Fetch expiring certifications
+    // Fetch expiring certifications using the service function (direct call, no HTTP)
     console.log(`📋 Fetching expiring certifications for ${timeframeDays} days...`)
 
-    // Use the correct server URL based on environment
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_APP_URL ||
-        (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://air-niugini-pms.vercel.app')
-
-    const response = await fetch(`${baseUrl}/api/expiring-certifications?daysAhead=${timeframeDays}`)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch expiring certifications: ${response.status} ${response.statusText}`)
-    }
-
-    const result = await response.json()
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch expiring certifications')
-    }
-
-    const rawCertifications = result.data || []
-
-    // Add roster period information to each certification
-    const certifications = rawCertifications.map((cert: any) => {
-      try {
-        // Validate expiry date
-        const expiryDate = new Date(cert.expiry_date)
-        if (isNaN(expiryDate.getTime())) {
-          console.warn(`Invalid expiry date for certification: ${cert.expiry_date}`)
-          return {
-            ...cert,
-            expiry_roster_period: 'Unknown',
-            expiry_roster_display: 'Invalid Date'
-          }
-        }
-
-        const rosterPeriod = getRosterPeriodFromDate(expiryDate)
-
-        // Validate dates before formatting
-        let rosterDisplay
-        try {
-          if (rosterPeriod.startDate && rosterPeriod.endDate &&
-              !isNaN(rosterPeriod.startDate.getTime()) && !isNaN(rosterPeriod.endDate.getTime())) {
-            rosterDisplay = `${rosterPeriod.code} (${format(rosterPeriod.startDate, 'MMM dd')} - ${format(rosterPeriod.endDate, 'MMM dd, yyyy')})`
-          } else {
-            rosterDisplay = rosterPeriod.code
-          }
-        } catch (error) {
-          console.warn('Date formatting error for roster period:', error)
-          rosterDisplay = rosterPeriod.code
-        }
-
-        return {
-          ...cert,
-          expiry_roster_period: rosterPeriod.code,
-          expiry_roster_display: rosterDisplay
-        }
-      } catch (error) {
-        console.warn(`Error processing certification with expiry date ${cert.expiry_date}:`, error)
-        return {
-          ...cert,
-          expiry_roster_period: 'Unknown',
-          expiry_roster_display: 'Error Processing Date'
-        }
-      }
-    })
+    const certifications = await getExpiringCertifications(timeframeDays)
 
     console.log(`✅ Found ${certifications.length} expiring certifications`)
 
