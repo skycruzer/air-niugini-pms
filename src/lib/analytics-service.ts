@@ -128,10 +128,18 @@ class AnalyticsService {
         utilization: certificationAnalytics.complianceRate, // Use compliance rate as utilization metric
         availability,
         readiness,
+        operationalMetrics: {
+          totalFlightHours: 0,
+          averageUtilization: 0,
+          maintenanceHours: 0,
+          groundTime: 0
+        },
         pilotAvailability: {
           available: availablePilots,
+          onDuty: 0,
           onLeave: currentLeaveRequests,
-          total: totalPilots
+          training: 0,
+          medical: 0
         },
         complianceStatus: {
           fullyCompliant: compliantPilots,

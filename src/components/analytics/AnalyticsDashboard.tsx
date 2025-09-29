@@ -515,7 +515,7 @@ export function AnalyticsDashboard() {
             <div className="flex items-start space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-medium text-red-800">{certificationData.expired} Pilots with Expired Certifications</h4>
+                <h4 className="font-medium text-red-800">{certificationData.expired} Expired Certifications</h4>
                 <p className="text-sm text-red-600 mt-1">Immediate action required for compliance</p>
               </div>
               <span className="text-xs text-red-600">2 hours ago</span>

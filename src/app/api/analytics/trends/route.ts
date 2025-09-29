@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
         .select('id, role, commencement_date, is_active')
         .lte('commencement_date', monthEnd.toISOString().split('T')[0])
 
-      const activePilots = pilotsInMonth?.filter(p => p.is_active) || []
-      const captains = activePilots.filter(p => p.role === 'Captain')
-      const firstOfficers = activePilots.filter(p => p.role === 'First Officer')
+      const activePilots = pilotsInMonth?.filter((p: any) => p.is_active) || []
+      const captains = activePilots.filter((p: any) => p.role === 'Captain')
+      const firstOfficers = activePilots.filter((p: any) => p.role === 'First Officer')
 
       pilotTrends.push({
         total: activePilots.length,
@@ -54,19 +54,19 @@ export async function GET(request: NextRequest) {
         .select('id, expiry_date')
 
       const certs = certsInMonth || []
-      const validAtMonth = certs.filter(c => {
+      const validAtMonth = certs.filter((c: any) => {
         if (!c.expiry_date) return false
         const expiryDate = new Date(c.expiry_date)
         return expiryDate >= monthEnd
       })
 
-      const expiredAtMonth = certs.filter(c => {
+      const expiredAtMonth = certs.filter((c: any) => {
         if (!c.expiry_date) return true
         const expiryDate = new Date(c.expiry_date)
         return expiryDate < monthEnd
       })
 
-      const expiringNextMonth = certs.filter(c => {
+      const expiringNextMonth = certs.filter((c: any) => {
         if (!c.expiry_date) return false
         const expiryDate = new Date(c.expiry_date)
         const nextMonth = new Date(monthEnd)
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
         .lte('created_at', monthEnd.toISOString())
 
       const requests = leaveInMonth || []
-      const approved = requests.filter(r => r.status === 'APPROVED')
+      const approved = requests.filter((r: any) => r.status === 'APPROVED')
       const approvalRate = requests.length > 0 ? Math.round((approved.length / requests.length) * 100) : 0
 
       leaveTrends.push({
