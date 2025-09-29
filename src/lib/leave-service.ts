@@ -1,4 +1,4 @@
-import { supabase, handleSupabaseError } from './supabase'
+import { supabase, getSupabaseAdmin, handleSupabaseError } from './supabase'
 import { getCurrentRosterPeriod, getRosterPeriodFromDate } from './roster-utils'
 
 export interface LeaveRequest {
@@ -467,6 +467,49 @@ export async function getLeaveRequestsByRosterPeriod(rosterPeriod: string): Prom
     }))
   } catch (error) {
     console.error('Error fetching leave requests by roster period:', error)
+    throw new Error(handleSupabaseError(error))
+  }
+}
+
+// Get leave requests for a specific roster period (Admin version - bypasses RLS)
+export async function getLeaveRequestsByRosterPeriodAdmin(rosterPeriod: string): Promise<LeaveRequest[]> {
+  try {
+    console.log(`🔧 Admin query: Fetching leave requests for ${rosterPeriod}...`)
+
+    const { data: requests, error } = await getSupabaseAdmin()
+      .from('leave_requests')
+      .select(`
+        *,
+        pilots (
+          first_name,
+          middle_name,
+          last_name,
+          employee_id
+        ),
+        reviewer:an_users!reviewed_by (
+          name
+        )
+      `)
+      .eq('roster_period', rosterPeriod)
+      .order('start_date', { ascending: true })
+
+    if (error) {
+      console.error('❌ Admin query error:', error)
+      throw error
+    }
+
+    console.log(`✅ Admin query: Found ${requests?.length || 0} leave requests`)
+
+    return (requests || []).map((request: any) => ({
+      ...request,
+      pilot_name: request.pilots
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        : 'Unknown Pilot',
+      employee_id: request.pilots?.employee_id || 'N/A',
+      reviewer_name: request.reviewer?.name || null
+    }))
+  } catch (error) {
+    console.error('Error fetching leave requests by roster period (admin):', error)
     throw new Error(handleSupabaseError(error))
   }
 }

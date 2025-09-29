@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createElement } from 'react'
-import { getLeaveRequestsByRosterPeriod } from '@/lib/leave-service'
+import { getLeaveRequestsByRosterPeriodAdmin } from '@/lib/leave-service'
 import { getRosterPeriodFromDate, getFutureRosterPeriods } from '@/lib/roster-utils'
 import {
   createRosterLeaveReportDocument,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch leave requests for the roster period
     console.log(`📋 Fetching leave requests for ${rosterPeriod}...`)
-    const leaveRequests = await getLeaveRequestsByRosterPeriod(rosterPeriod)
+    const leaveRequests = await getLeaveRequestsByRosterPeriodAdmin(rosterPeriod)
 
     console.log(`✅ Found ${leaveRequests.length} leave requests`)
 

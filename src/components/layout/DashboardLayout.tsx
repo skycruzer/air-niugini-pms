@@ -35,7 +35,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       submenu: [
         { name: 'Certification List', href: '/dashboard/certifications', description: 'Manage certifications' },
         { name: 'Bulk Updates', href: '/dashboard/certifications/bulk', description: 'Mass certification updates' },
-        { name: 'Expiry Calendar', href: '/dashboard/certifications/calendar', description: 'Visual expiry timeline' }
+        { name: 'Expiry Calendar', href: '/dashboard/certifications/calendar', description: 'Visual expiry timeline' },
+        { name: 'Expiry Planning', href: '/dashboard/certifications/expiry-planning', description: 'Plan certification renewals' }
       ]
     },
     {

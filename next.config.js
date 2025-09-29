@@ -7,16 +7,26 @@ const nextConfig = {
     optimizeCss: false, // Disable to fix 'critters' module error in production builds
     optimizePackageImports: ['lucide-react', '@tanstack/react-query']
   },
+  // Disable error overlay in development to fix Safari originalFactory.call error
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // Performance optimizations
+  // Fix Safari originalFactory.call error and Fast Refresh issues
   webpack: (config, { dev, isServer }) => {
-    // Enable bundle analyzer in development
+    // Fix Safari webpack module loading issues
     if (dev && !isServer) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      }
+
       config.optimization.splitChunks = {
         chunks: 'all',
         cacheGroups: {

@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { RosterPeriodSelector } from '@/components/leave/RosterPeriodSelector'
 import { getLeaveRequestsByRosterPeriod, LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service'
 import { permissions } from '@/lib/auth-utils'
@@ -22,7 +24,7 @@ interface RosterPlanningPageState {
 }
 
 export default function RosterPlanningPage() {
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   const [state, setState] = useState<RosterPlanningPageState>({
     selectedRosterPeriod: null,
     leaveRequests: [],
@@ -31,7 +33,28 @@ export default function RosterPlanningPage() {
     error: null
   })
 
-  // Check permissions
+  // Show loading while authentication is initializing
+  if (authLoading) {
+    return (
+      <div className="p-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E4002B]"></div>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">Loading...</h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>Checking authentication and permissions...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Check permissions after authentication is complete
   if (!user || !permissions.canViewReports(user)) {
     return (
       <div className="p-6">
@@ -44,6 +67,9 @@ export default function RosterPlanningPage() {
               <h3 className="text-sm font-medium text-red-800">Access Denied</h3>
               <div className="mt-2 text-sm text-red-700">
                 <p>You don't have permission to access roster planning features.</p>
+                {user && (
+                  <p className="mt-1">Current role: {user.role}. Required: admin or manager.</p>
+                )}
               </div>
             </div>
           </div>
@@ -218,8 +244,8 @@ Air Niugini B767 Fleet Operations`)
       // Create mailto link
       const mailtoLink = `mailto:${recipients}?subject=${subject}&body=${body}`
 
-      // Open email client
-      window.open(mailtoLink, '_self')
+      // Open email client - use window.location.href for better compatibility
+      window.location.href = mailtoLink
 
       // Note: The PDF can't be automatically attached via mailto
       // Instead, we'll also trigger a download so they can manually attach it
@@ -307,7 +333,9 @@ Recipients: ${recipients.split(',').join(', ')}`)
   }, {} as Record<string, LeaveRequest[]>)
 
   return (
-    <div className="p-6 space-y-6">
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="p-6 space-y-6">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between">
@@ -526,6 +554,8 @@ Recipients: ${recipients.split(',').join(', ')}`)
           <span>Roster Leave Planning Module</span>
         </div>
       </div>
-    </div>
+        </div>
+      </DashboardLayout>
+    </ProtectedRoute>
   )
 }
