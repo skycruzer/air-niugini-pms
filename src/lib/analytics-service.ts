@@ -7,9 +7,6 @@
  * @since 2025-09-27
  */
 
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { cacheService } from '@/lib/cache-service'
-import { differenceInYears, differenceInDays, format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 import type {
   PilotAnalytics,
   CertificationAnalytics,
@@ -26,9 +23,9 @@ import type {
 
 /**
  * Enhanced Analytics Service with comprehensive data processing
+ * Uses API routes for data fetching to avoid client-side admin usage
  */
 class AnalyticsService {
-  private readonly supabaseAdmin = getSupabaseAdmin()
 
   /**
    * Get comprehensive pilot analytics for charts and KPIs
@@ -37,110 +34,17 @@ class AnalyticsService {
     try {
       console.log('📊 Analytics Service: Getting pilot analytics...')
 
-      // Get base pilot data with additional calculations
-      const { data: pilots, error } = await this.supabaseAdmin
-        .from('pilots')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          rank,
-          contract_type,
-          commencement_date,
-          date_of_birth,
-          is_active,
-          captain_qualifications,
-          updated_at
-        `)
-
-      if (error) throw error
-
-      const activePilots = pilots?.filter((p: any) => p.is_active === true) || []
-      const today = new Date()
-
-      // Calculate age distribution
-      const ageDistribution = {
-        under30: 0,
-        age30to40: 0,
-        age40to50: 0,
-        age50to60: 0,
-        over60: 0
+      const response = await fetch('/api/analytics/pilot')
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pilot analytics: ${response.statusText}`)
       }
 
-      // Calculate seniority distribution
-      const seniorityDistribution = {
-        junior: 0,    // 0-5 years
-        mid: 0,       // 5-15 years
-        senior: 0     // 15+ years
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get pilot analytics')
       }
 
-      // Calculate retirement planning
-      const retirementPlanning = {
-        retiringIn1Year: 0,
-        retiringIn2Years: 0,
-        retiringIn5Years: 0
-      }
-
-      // Count role distribution
-      let captains = 0
-      let firstOfficers = 0
-      let trainingCaptains = 0
-      let examiners = 0
-      let lineCaptains = 0
-
-      activePilots.forEach((pilot: any) => {
-        // Age analysis
-        if (pilot.date_of_birth) {
-          const age = differenceInYears(today, new Date(pilot.date_of_birth))
-          if (age < 30) ageDistribution.under30++
-          else if (age < 40) ageDistribution.age30to40++
-          else if (age < 50) ageDistribution.age40to50++
-          else if (age < 60) ageDistribution.age50to60++
-          else ageDistribution.over60++
-
-          // Retirement planning (assuming retirement at 65)
-          const yearsToRetirement = 65 - age
-          if (yearsToRetirement <= 1) retirementPlanning.retiringIn1Year++
-          else if (yearsToRetirement <= 2) retirementPlanning.retiringIn2Years++
-          else if (yearsToRetirement <= 5) retirementPlanning.retiringIn5Years++
-        }
-
-        // Seniority analysis
-        if (pilot.commencement_date) {
-          const yearsOfService = differenceInYears(today, new Date(pilot.commencement_date))
-          if (yearsOfService < 5) seniorityDistribution.junior++
-          else if (yearsOfService < 15) seniorityDistribution.mid++
-          else seniorityDistribution.senior++
-        }
-
-        // Role distribution
-        if (pilot.rank === 'Captain') {
-          captains++
-
-          // Check for special qualifications
-          const qualifications = pilot.captain_qualifications || {}
-          if (qualifications.line_captain) lineCaptains++
-          if (qualifications.training_captain) trainingCaptains++
-          if (qualifications.examiner) examiners++
-        } else if (pilot.rank === 'First Officer') {
-          firstOfficers++
-        }
-      })
-
-      return {
-        total: pilots?.length || 0,
-        active: activePilots.length,
-        inactive: (pilots?.length || 0) - activePilots.length,
-        captains,
-        firstOfficers,
-        trainingCaptains,
-        examiners,
-        lineCaptains,
-        ageDistribution,
-        seniorityDistribution,
-        retirementPlanning
-      }
-
+      return result.data
     } catch (error) {
       console.error('❌ Analytics Service: Error getting pilot analytics:', error)
       throw error
@@ -154,145 +58,17 @@ class AnalyticsService {
     try {
       console.log('📋 Analytics Service: Getting certification analytics...')
 
-      // Get certification data with check types
-      const { data: certifications, error } = await this.supabaseAdmin
-        .from('pilot_checks')
-        .select(`
-          id,
-          pilot_id,
-          check_type_id,
-          expiry_date,
-          status,
-          check_types (
-            id,
-            name,
-            category,
-            required_for_captains,
-            required_for_first_officers
-          )
-        `)
-
-      if (error) throw error
-
-      const today = new Date()
-      const certs = certifications || []
-
-      // Calculate status distribution
-      let current = 0
-      let expiring = 0
-      let expired = 0
-
-      // Expiry timeline
-      const expiryTimeline = {
-        next7Days: 0,
-        next14Days: 0,
-        next30Days: 0,
-        next60Days: 0,
-        next90Days: 0
+      const response = await fetch('/api/analytics/certification')
+      if (!response.ok) {
+        throw new Error(`Failed to fetch certification analytics: ${response.statusText}`)
       }
 
-      // Category breakdown
-      const categoryMap = new Map<string, {
-        total: number
-        current: number
-        expiring: number
-        expired: number
-      }>()
-
-      // Check type distribution
-      const checkTypeMap = new Map<string, {
-        count: number
-        pilotsAffected: Set<string>
-        expiryDates: Date[]
-      }>()
-
-      certs.forEach((cert: any) => {
-        const expiryDate = cert.expiry_date ? new Date(cert.expiry_date) : null
-        const checkType = cert.check_types?.name || 'Unknown'
-        const category = cert.check_types?.category || 'General'
-
-        // Initialize category if not exists
-        if (!categoryMap.has(category)) {
-          categoryMap.set(category, { total: 0, current: 0, expiring: 0, expired: 0 })
-        }
-        const categoryStats = categoryMap.get(category)!
-
-        // Initialize check type if not exists
-        if (!checkTypeMap.has(checkType)) {
-          checkTypeMap.set(checkType, {
-            count: 0,
-            pilotsAffected: new Set(),
-            expiryDates: []
-          })
-        }
-        const checkTypeStats = checkTypeMap.get(checkType)!
-
-        categoryStats.total++
-        checkTypeStats.count++
-        checkTypeStats.pilotsAffected.add(cert.pilot_id)
-
-        if (expiryDate) {
-          checkTypeStats.expiryDates.push(expiryDate)
-          const daysToExpiry = differenceInDays(expiryDate, today)
-
-          // Status classification
-          if (daysToExpiry < 0) {
-            expired++
-            categoryStats.expired++
-          } else if (daysToExpiry <= 30) {
-            expiring++
-            categoryStats.expiring++
-          } else {
-            current++
-            categoryStats.current++
-          }
-
-          // Timeline classification
-          if (daysToExpiry >= 0 && daysToExpiry <= 7) expiryTimeline.next7Days++
-          if (daysToExpiry >= 0 && daysToExpiry <= 14) expiryTimeline.next14Days++
-          if (daysToExpiry >= 0 && daysToExpiry <= 30) expiryTimeline.next30Days++
-          if (daysToExpiry >= 0 && daysToExpiry <= 60) expiryTimeline.next60Days++
-          if (daysToExpiry >= 0 && daysToExpiry <= 90) expiryTimeline.next90Days++
-        } else {
-          // No expiry date - treat as expired
-          expired++
-          categoryStats.expired++
-        }
-      })
-
-      // Convert maps to arrays
-      const categoryBreakdown = Array.from(categoryMap.entries()).map(([category, stats]) => ({
-        category,
-        ...stats
-      }))
-
-      const checkTypeDistribution = Array.from(checkTypeMap.entries()).map(([checkType, stats]) => {
-        const averageDaysToExpiry = stats.expiryDates.length > 0
-          ? stats.expiryDates.reduce((sum, date) => sum + differenceInDays(date, today), 0) / stats.expiryDates.length
-          : 0
-
-        return {
-          checkType,
-          count: stats.count,
-          pilotsAffected: stats.pilotsAffected.size,
-          averageDaysToExpiry: Math.round(averageDaysToExpiry)
-        }
-      })
-
-      const total = current + expiring + expired
-      const complianceRate = total > 0 ? Math.round((current / total) * 100) : 100
-
-      return {
-        total,
-        current,
-        expiring,
-        expired,
-        complianceRate,
-        expiryTimeline,
-        categoryBreakdown,
-        checkTypeDistribution
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get certification analytics')
       }
 
+      return result.data
     } catch (error) {
       console.error('❌ Analytics Service: Error getting certification analytics:', error)
       throw error
@@ -306,106 +82,17 @@ class AnalyticsService {
     try {
       console.log('📅 Analytics Service: Getting leave analytics...')
 
-      const { data: leaveRequests, error } = await this.supabaseAdmin
-        .from('leave_requests')
-        .select(`
-          id,
-          pilot_name,
-          request_type,
-          status,
-          start_date,
-          end_date,
-          created_at,
-          approved_at,
-          denied_at
-        `)
-
-      if (error) throw error
-
-      const requests = leaveRequests || []
-      const today = new Date()
-      const thisMonth = startOfMonth(today)
-      const lastMonth = startOfMonth(subMonths(today, 1))
-
-      // Basic counts
-      const totalRequests = requests.length
-      const pending = requests.filter((r: any) => r.status === 'PENDING').length
-      const approved = requests.filter((r: any) => r.status === 'APPROVED').length
-      const denied = requests.filter((r: any) => r.status === 'DENIED').length
-
-      // Monthly counts
-      const thisMonthRequests = requests.filter((r: any) =>
-        new Date(r.created_at) >= thisMonth
-      ).length
-
-      const lastMonthRequests = requests.filter((r: any) => {
-        const createdAt = new Date(r.created_at)
-        return createdAt >= lastMonth && createdAt < thisMonth
-      }).length
-
-      // Type breakdown
-      const typeBreakdown = {
-        RDO: requests.filter((r: any) => r.request_type === 'RDO').length,
-        WDO: requests.filter((r: any) => r.request_type === 'WDO').length,
-        Annual: requests.filter((r: any) => r.request_type === 'Annual').length,
-        Sick: requests.filter((r: any) => r.request_type === 'Sick').length,
-        Emergency: requests.filter((r: any) => r.request_type === 'Emergency').length
+      const response = await fetch('/api/analytics/leave')
+      if (!response.ok) {
+        throw new Error(`Failed to fetch leave analytics: ${response.statusText}`)
       }
 
-      // Monthly trends (last 12 months)
-      const monthlyRequests = []
-      for (let i = 11; i >= 0; i--) {
-        const monthStart = startOfMonth(subMonths(today, i))
-        const monthEnd = endOfMonth(monthStart)
-        const monthName = format(monthStart, 'MMM yyyy')
-
-        const monthRequests = requests.filter((r: any) => {
-          const createdAt = new Date(r.created_at)
-          return createdAt >= monthStart && createdAt <= monthEnd
-        })
-
-        monthlyRequests.push({
-          month: monthName,
-          total: monthRequests.length,
-          approved: monthRequests.filter((r: any) => r.status === 'APPROVED').length,
-          denied: monthRequests.filter((r: any) => r.status === 'DENIED').length
-        })
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get leave analytics')
       }
 
-      // Seasonal patterns (quarters)
-      const seasonalPattern = [
-        {
-          quarter: 'Q1',
-          averageRequests: Math.round(monthlyRequests.slice(0, 3).reduce((sum, m) => sum + m.total, 0) / 3)
-        },
-        {
-          quarter: 'Q2',
-          averageRequests: Math.round(monthlyRequests.slice(3, 6).reduce((sum, m) => sum + m.total, 0) / 3)
-        },
-        {
-          quarter: 'Q3',
-          averageRequests: Math.round(monthlyRequests.slice(6, 9).reduce((sum, m) => sum + m.total, 0) / 3)
-        },
-        {
-          quarter: 'Q4',
-          averageRequests: Math.round(monthlyRequests.slice(9, 12).reduce((sum, m) => sum + m.total, 0) / 3)
-        }
-      ]
-
-      return {
-        totalRequests,
-        pending,
-        approved,
-        denied,
-        thisMonth: thisMonthRequests,
-        lastMonth: lastMonthRequests,
-        trends: {
-          monthlyRequests,
-          seasonalPattern
-        },
-        typeBreakdown
-      }
-
+      return result.data
     } catch (error) {
       console.error('❌ Analytics Service: Error getting leave analytics:', error)
       throw error
@@ -472,48 +159,17 @@ class AnalyticsService {
     try {
       console.log('📈 Analytics Service: Getting trend analytics...')
 
-      const periods = []
-      const today = new Date()
-
-      // Generate periods (last N months)
-      for (let i = months - 1; i >= 0; i--) {
-        const monthStart = startOfMonth(subMonths(today, i))
-        periods.push(format(monthStart, 'MMM yyyy'))
+      const response = await fetch(`/api/analytics/trends?months=${months}`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch trend analytics: ${response.statusText}`)
       }
 
-      // For now, generate simulated trend data
-      // In production, this would query historical data
-      const pilots = {
-        total: this.generateTrendData(27, periods.length, 0.5, 2),
-        captains: this.generateTrendData(15, periods.length, 0.3, 1),
-        firstOfficers: this.generateTrendData(12, periods.length, 0.4, 1)
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get trend analytics')
       }
 
-      const certifications = {
-        total: this.generateTrendData(531, periods.length, 1, 10),
-        expired: this.generateTrendData(8, periods.length, -0.2, 2),
-        expiring: this.generateTrendData(15, periods.length, 0.1, 3),
-        complianceRate: this.generateTrendData(95, periods.length, 0.1, 2)
-      }
-
-      const leave = {
-        requests: this.generateTrendData(12, periods.length, 0.2, 3),
-        approvalRate: this.generateTrendData(85, periods.length, 0.05, 5)
-      }
-
-      const performance = {
-        responseTime: this.generateTrendData(150, periods.length, -0.1, 20),
-        systemUptime: this.generateTrendData(99.5, periods.length, 0.01, 0.5)
-      }
-
-      return {
-        periods,
-        pilots,
-        certifications,
-        leave,
-        performance
-      }
-
+      return result.data
     } catch (error) {
       console.error('❌ Analytics Service: Error getting trend analytics:', error)
       throw error
