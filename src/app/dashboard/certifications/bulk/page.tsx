@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { Users, Upload, CheckCircle, AlertTriangle, ArrowLeft, Search, Filter } from 'lucide-react'
-import DashboardLayout from '@/components/layout/DashboardLayout'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
 
 const bulkUpdateSchema = z.object({
   checkTypeId: z.string().min(1, 'Check type is required'),
