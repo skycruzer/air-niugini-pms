@@ -116,33 +116,28 @@ class AnalyticsService {
       const compliantPilots = Math.round((certificationAnalytics.complianceRate / 100) * totalPilots)
       const pilotsOnLeave = leaveAnalytics.approved + leaveAnalytics.pending
 
-      // Fleet metrics (simulated based on pilot data)
-      const utilization = Math.min(95, Math.round(75 + (compliantPilots / totalPilots) * 20))
+      // Fleet readiness metrics based on real pilot and certification data
       const availability = Math.round(((totalPilots - pilotsOnLeave) / totalPilots) * 100)
       const readiness = Math.round((certificationAnalytics.complianceRate + availability) / 2)
 
+      // Calculate real pilot status breakdown from leave data
+      const currentLeaveRequests = leaveAnalytics.approved
+      const availablePilots = totalPilots - currentLeaveRequests
+
       return {
-        utilization,
+        utilization: certificationAnalytics.complianceRate, // Use compliance rate as utilization metric
         availability,
         readiness,
-        operationalMetrics: {
-          totalFlightHours: 8450, // Simulated
-          averageUtilization: utilization,
-          maintenanceHours: 120, // Simulated
-          groundTime: 24 - Math.round(utilization * 0.24) // Simulated
-        },
         pilotAvailability: {
-          available: totalPilots - pilotsOnLeave,
-          onDuty: Math.round(totalPilots * 0.7), // Simulated
-          onLeave: pilotsOnLeave,
-          training: Math.round(totalPilots * 0.1), // Simulated
-          medical: Math.round(totalPilots * 0.02) // Simulated
+          available: availablePilots,
+          onLeave: currentLeaveRequests,
+          total: totalPilots
         },
         complianceStatus: {
           fullyCompliant: compliantPilots,
-          minorIssues: Math.round(certificationAnalytics.expiring * 0.6),
-          majorIssues: Math.round(certificationAnalytics.expired * 0.8),
-          grounded: Math.max(0, certificationAnalytics.expired - Math.round(certificationAnalytics.expired * 0.8))
+          minorIssues: certificationAnalytics.expiring,
+          majorIssues: certificationAnalytics.expired,
+          grounded: certificationAnalytics.expired // Pilots with expired certs are grounded
         }
       }
 
@@ -266,23 +261,6 @@ class AnalyticsService {
     }
   }
 
-  /**
-   * Helper method to generate realistic trend data
-   */
-  private generateTrendData(baseValue: number, periods: number, trendRate: number, variance: number): number[] {
-    const data = []
-    let currentValue = baseValue
-
-    for (let i = 0; i < periods; i++) {
-      // Add trend and random variance
-      const trend = currentValue * trendRate * 0.01
-      const randomVariance = (Math.random() - 0.5) * variance * 2
-      currentValue = Math.max(0, currentValue + trend + randomVariance)
-      data.push(Math.round(currentValue * 100) / 100)
-    }
-
-    return data
-  }
 
   /**
    * Execute custom analytics query
