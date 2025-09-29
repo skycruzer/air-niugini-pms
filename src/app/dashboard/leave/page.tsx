@@ -124,12 +124,12 @@ export default function LeaveRequestsPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                 <span className="text-2xl block mb-2">🏠</span>
                 <p className="font-bold text-lg">{stats.byType.RDO}</p>
-                <p className="text-xs text-gray-600">RDO Requests</p>
+                <p className="text-xs text-gray-600">RDO Request</p>
               </div>
               <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                 <span className="text-2xl block mb-2">🌴</span>
                 <p className="font-bold text-lg">{stats.byType.SDO}</p>
-                <p className="text-xs text-gray-600">WDO Requests</p>
+                <p className="text-xs text-gray-600">WDO Request</p>
               </div>
               <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                 <span className="text-2xl block mb-2">🏖️</span>
