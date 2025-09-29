@@ -282,7 +282,7 @@ export default async function HomePage() {
               </div>
               <h3 className="text-heading-small text-gray-900 mb-4">Leave Management</h3>
               <p className="text-body-medium text-gray-600 leading-relaxed mb-6">
-                Intelligent RDO, WDO, and annual leave management integrated with 28-day roster periods and approval workflows.
+                Intelligent RDO requests, WDO requests, and annual leave management integrated with 28-day roster periods and approval workflows.
               </p>
             </div>
 

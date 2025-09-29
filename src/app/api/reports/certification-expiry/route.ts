@@ -40,9 +40,27 @@ export async function POST(request: NextRequest) {
     // Fetch expiring certifications using the service function (direct call, no HTTP)
     console.log(`📋 Fetching expiring certifications for ${timeframeDays} days...`)
 
-    const certifications = await getExpiringCertifications(timeframeDays)
+    const serviceData = await getExpiringCertifications(timeframeDays)
 
-    console.log(`✅ Found ${certifications.length} expiring certifications`)
+    console.log(`✅ Found ${serviceData.length} expiring certifications`)
+
+    // Transform service data to match PDF interface format
+    const certifications = serviceData.map((cert: any) => ({
+      id: cert.id || 'unknown',
+      pilot_id: cert.id || 'unknown',
+      check_type_id: cert.id || 'unknown',
+      expiry_date: cert.expiryDate instanceof Date ? cert.expiryDate.toISOString().split('T')[0] : String(cert.expiryDate),
+      days_until_expiry: cert.status?.daysUntilExpiry || 0,
+      pilot_name: cert.pilotName || 'Unknown',
+      employee_id: cert.employeeId || 'N/A',
+      check_type_name: cert.checkDescription || 'Unknown',
+      check_category: cert.category || 'Unknown',
+      is_expired: (cert.status?.daysUntilExpiry || 0) < 0,
+      expiry_roster_period: cert.expiry_roster_period || 'Unknown',
+      expiry_roster_display: cert.expiry_roster_display || 'Unknown'
+    }))
+
+    console.log(`🔄 Transformed ${certifications.length} certifications for PDF generation`)
 
     // Create report data
     const reportData = createCertificationExpiryReportData(
@@ -53,11 +71,23 @@ export async function POST(request: NextRequest) {
 
     // Generate PDF
     console.log('🔄 Generating PDF document...')
-    const pdfBuffer = await renderToBuffer(
-      createCertificationExpiryReportDocument(reportData)
-    )
 
-    console.log('✅ PDF generated successfully')
+    let pdfBuffer: Buffer
+    try {
+      const pdfDocumentElement = createCertificationExpiryReportDocument(reportData)
+      console.log('📄 PDF document created, rendering to buffer...')
+
+      pdfBuffer = await renderToBuffer(pdfDocumentElement)
+      console.log('✅ PDF buffer generated successfully, size:', pdfBuffer.length, 'bytes')
+
+      if (pdfBuffer.length === 0) {
+        throw new Error('PDF buffer is empty')
+      }
+
+    } catch (pdfError: any) {
+      console.error('❌ PDF generation error:', pdfError)
+      throw new Error(`PDF generation failed: ${pdfError?.message || 'Unknown error'}`)
+    }
 
     // Generate filename
     const filename = generateCertificationExpiryReportFilename(timeframeDays)

@@ -162,6 +162,36 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
     }
   }
 
+  const getSubmissionMethodIcon = (method: string | undefined) => {
+    switch (method) {
+      case 'EMAIL':
+        return '📧'
+      case 'ORACLE':
+        return '🖥️'
+      case 'LEAVE_BIDS':
+        return '📊'
+      case 'SYSTEM':
+        return '⚙️'
+      default:
+        return '❓'
+    }
+  }
+
+  const getSubmissionMethodLabel = (method: string | undefined) => {
+    switch (method) {
+      case 'EMAIL':
+        return 'Email'
+      case 'ORACLE':
+        return 'Oracle'
+      case 'LEAVE_BIDS':
+        return 'Leave Bids'
+      case 'SYSTEM':
+        return 'System'
+      default:
+        return 'Unknown'
+    }
+  }
+
   const calculateDays = (startDate: string, endDate: string) => {
     return differenceInDays(new Date(endDate), new Date(startDate)) + 1
   }
@@ -241,7 +271,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Roster Period</p>
                 <p className="font-medium text-[#E4002B]">{request.roster_period}</p>
@@ -255,6 +285,13 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Duration</p>
                 <p className="font-medium">{calculateDays(request.start_date, request.end_date)} day{calculateDays(request.start_date, request.end_date) !== 1 ? 's' : ''}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Submitted Via</p>
+                <p className="font-medium flex items-center">
+                  <span className="mr-1">{getSubmissionMethodIcon(request.request_method)}</span>
+                  {getSubmissionMethodLabel(request.request_method)}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Requested</p>

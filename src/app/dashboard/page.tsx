@@ -642,7 +642,7 @@ export default function DashboardPage() {
 
               <QuickAction
                 title="Leave Management"
-                description="Process RDO/WDO requests"
+                description="Process RDO requests, WDO requests"
                 icon="📅"
                 href="/dashboard/leave"
                 color="purple"

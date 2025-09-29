@@ -508,7 +508,7 @@ export default function ReportsPage() {
                     {REPORT_TYPES.find(r => r.id === selectedReport)?.title}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    Generated on {new Date((reportData as any).generatedAt).toLocaleString()}
+                    Generated on {new Date((reportData as any).metadata?.generatedAt || (reportData as any).generatedAt || new Date()).toLocaleString()}
                   </p>
                 </div>
                 <div className="flex space-x-2">
@@ -756,6 +756,128 @@ export default function ReportsPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Fleet Management Report */}
+            {selectedReport === 'fleet-management' && (reportData as any).rosterAnalysis && (
+              <div className="space-y-6">
+                {/* Roster Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="card-aviation text-center">
+                    <div className="text-2xl font-bold text-blue-600">{(reportData as any).rosterAnalysis.totalPilots}</div>
+                    <div className="text-sm text-gray-600">Total Pilots</div>
+                  </div>
+                  <div className="card-aviation text-center">
+                    <div className="text-2xl font-bold text-green-600">{(reportData as any).rosterAnalysis.captains}</div>
+                    <div className="text-sm text-gray-600">Captains</div>
+                  </div>
+                  <div className="card-aviation text-center">
+                    <div className="text-2xl font-bold text-purple-600">{(reportData as any).rosterAnalysis.firstOfficers}</div>
+                    <div className="text-sm text-gray-600">First Officers</div>
+                  </div>
+                  <div className="card-aviation text-center">
+                    <div className="text-2xl font-bold text-indigo-600">{(reportData as any).rosterAnalysis.averageAge && !isNaN((reportData as any).rosterAnalysis.averageAge) ? Math.round((reportData as any).rosterAnalysis.averageAge) : 'N/A'}</div>
+                    <div className="text-sm text-gray-600">Average Age</div>
+                  </div>
+                </div>
+
+                {/* Captain Qualifications */}
+                {(reportData as any).captainQualifications && (reportData as any).captainQualifications.length > 0 && (
+                  <div className="card-aviation">
+                    <h3 className="font-semibold text-gray-900 mb-4">Captain Qualifications Summary</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {(reportData as any).captainQualifications.slice(0, 6).map((qual: any, index: number) => (
+                        <div key={index} className="bg-gray-50 rounded-lg p-3">
+                          <div className="font-medium text-gray-900">{qual.pilot?.first_name} {qual.pilot?.last_name}</div>
+                          <div className="text-sm text-gray-600">Employee ID: {qual.pilot?.employee_id}</div>
+                          <div className="text-xs text-blue-600 mt-1">
+                            {qual.qualifications?.join(', ') || 'Standard Captain'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {(reportData as any).captainQualifications.length > 6 && (
+                      <div className="text-center text-gray-600 text-sm mt-4">
+                        Showing first 6 captains. Download full report for complete data.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Operational Readiness */}
+                {(reportData as any).operationalReadiness && (
+                  <div className="card-aviation">
+                    <h3 className="font-semibold text-gray-900 mb-4">Operational Readiness</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          {(reportData as any).operationalReadiness.totalPilots > 0 ? Math.round(((reportData as any).operationalReadiness.availablePilots / (reportData as any).operationalReadiness.totalPilots) * 100) : 0}%
+                        </div>
+                        <div className="text-sm text-gray-600">Availability Rate</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-yellow-600">{(reportData as any).operationalReadiness.pilotsOnLeave || 0}</div>
+                        <div className="text-sm text-gray-600">On Leave</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{(reportData as any).operationalReadiness.pendingLeaveRequests || 0}</div>
+                        <div className="text-sm text-gray-600">Pending Requests</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Upcoming Retirements */}
+                {(reportData as any).upcomingRetirements && (reportData as any).upcomingRetirements.length > 0 && (
+                  <div className="card-aviation">
+                    <h3 className="font-semibold text-gray-900 mb-4">Upcoming Retirements ({(reportData as any).upcomingRetirements.length})</h3>
+                    <div className="space-y-2">
+                      {(reportData as any).upcomingRetirements.slice(0, 5).map((retirement: any, index: number) => (
+                        <div key={index} className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-medium text-yellow-800">
+                                {retirement.pilot?.first_name} {retirement.pilot?.last_name}
+                              </div>
+                              <div className="text-sm text-yellow-600">
+                                {retirement.pilot?.employee_id} • {retirement.pilot?.role}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm text-yellow-800">
+                                {retirement.yearsToRetirement} years remaining
+                              </div>
+                              <div className="text-xs text-yellow-600">
+                                Retirement: {new Date(retirement.retirementDate).getFullYear()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {(reportData as any).upcomingRetirements.length > 5 && (
+                      <div className="text-center text-gray-600 text-sm mt-4">
+                        Showing first 5 upcoming retirements. Download full report for complete data.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {(reportData as any).recommendations && (reportData as any).recommendations.length > 0 && (
+                  <div className="card-aviation">
+                    <h3 className="font-semibold text-gray-900 mb-4">Strategic Recommendations</h3>
+                    <ul className="space-y-2">
+                      {(reportData as any).recommendations.map((recommendation: string, index: number) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <span className="text-air-niugini-gold mt-1">•</span>
+                          <span className="text-gray-700">{recommendation}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 

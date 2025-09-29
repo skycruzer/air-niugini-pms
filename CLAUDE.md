@@ -60,11 +60,11 @@ npx playwright test --ui               # Run with Playwright UI
 
 **Production Tables** (Active Live Data):
 - `pilots` (27 records) - Main pilot information with seniority tracking
-- `pilot_checks` (531+ records) - Certification tracking with expiry dates
-- `check_types` (38 records) - Aviation certification types across 8 categories
+- `pilot_checks` (556+ records) - Certification tracking with expiry dates
+- `check_types` (34+ records) - Aviation certification types across 8 categories
 - `users` (mapped to `an_users`) - System authentication (admin/manager roles)
-- `leave_requests` - Leave management tied to 28-day roster periods
-- `settings` - System configuration
+- `leave_requests` (11+ records) - Leave management tied to 28-day roster periods
+- `settings` (3 records) - System configuration
 - `contract_types` - Pilot contract classifications
 
 **Legacy Development Tables** (Historical):
@@ -165,7 +165,16 @@ src/
 │   └── AuthContext.tsx      # Authentication state management
 ├── lib/                     # Core business logic & services
 │   ├── supabase.ts          # Database client & type definitions
+│   ├── supabase-admin.ts    # Admin client wrapper for service operations
 │   ├── pilot-service.ts     # Pilot CRUD operations
+│   ├── pilot-service-client.ts # Client-side pilot operations
+│   ├── expiring-certifications-service.ts # Certification expiry logic
+│   ├── analytics-service.ts # Analytics data processing
+│   ├── dashboard-service.ts # Dashboard statistics
+│   ├── leave-service.ts     # Leave request operations
+│   ├── settings-service.ts  # System settings management
+│   ├── cache-service.ts     # Performance caching layer
+│   ├── pdf-data-service.ts  # PDF report data preparation
 │   ├── auth-utils.ts        # Permission & role management
 │   ├── roster-utils.ts      # 28-day period calculations
 │   └── certification-utils.ts # Status logic & validation
@@ -174,29 +183,52 @@ src/
     └── pdf-reports.ts       # PDF generation types
 ```
 
-### Data Service Layer Pattern
+### Service Layer Architecture
 
-**Critical Pattern**: Always use production tables with consistent service layer:
+**Critical Pattern**: Use dedicated service functions for all data operations to ensure consistency and reusability between API routes and internal calls:
 
 ```typescript
-// ✅ Correct - Service layer using production tables
-import { supabase } from '@/lib/supabase'
+// ✅ Correct - Service layer pattern with reusable functions
+// src/lib/expiring-certifications-service.ts
+import { getSupabaseAdmin } from '@/lib/supabase'
 
-export class PilotService {
-  async getAllPilots() {
-    const { data, error } = await supabase
-      .from('pilots')  // Production table with 27 records
-      .select('*')
-      .order('seniority_number')
+export async function getExpiringCertifications(daysAhead: number = 60) {
+  const supabaseAdmin = getSupabaseAdmin()
 
-    if (error) throw error
-    return data
-  }
+  const { data, error } = await supabaseAdmin
+    .from('pilot_checks')
+    .select(`
+      id, expiry_date,
+      pilots!inner (id, first_name, last_name, employee_id),
+      check_types!inner (id, check_code, check_description, category)
+    `)
+    .not('expiry_date', 'is', null)
+    .gte('expiry_date', today.toISOString().split('T')[0])
+    .lte('expiry_date', futureDate.toISOString().split('T')[0])
+    .order('expiry_date', { ascending: true })
+
+  // Transform and return processed data with status calculations
+  return processedData
 }
 
-// ❌ Incorrect - Direct use of legacy tables
-const { data } = await supabase.from('an_pilots').select('*') // Only 5 legacy records
+// API routes use service functions
+// src/app/api/expiring-certifications/route.ts
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service'
+
+export async function GET(request: NextRequest) {
+  const result = await getExpiringCertifications(daysAhead)
+  return NextResponse.json({ success: true, data: result })
+}
+
+// ❌ Incorrect - Direct database calls in API routes
+const { data } = await supabase.from('pilot_checks').select('*')
 ```
+
+**Service Layer Benefits**:
+- Reusable between API routes and server-side operations
+- Avoids inter-API HTTP calls in production
+- Centralized business logic and data transformations
+- Consistent error handling and logging
 
 ### Air Niugini Branding Standards
 
@@ -394,22 +426,56 @@ const { register, handleSubmit, formState: { errors } } = useForm({
 
 1. **Database Changes**: Use migration scripts in root directory
 2. **Feature Development**: Follow component → service → integration pattern
-3. **Testing**: Run Playwright tests before deployment
-4. **Code Quality**: Use ESLint and TypeScript strict mode
-5. **Deployment**: Verify production build succeeds
+3. **Local Testing**: Always test functionality locally before deployment
+4. **Build Verification**: Run `npm run build` to ensure production build succeeds
+5. **Testing**: Run Playwright tests before deployment
+6. **Code Quality**: Use ESLint and TypeScript strict mode
+7. **Deployment**: Git push triggers automatic Vercel deployment
+
+## Production Deployment & Troubleshooting
+
+### Critical Production Patterns
+
+**Service Layer for Production Stability**:
+```typescript
+// ✅ Correct - Direct service calls avoid production HTTP issues
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service'
+
+export async function POST(request: NextRequest) {
+  // Direct service call - works in all environments
+  const certifications = await getExpiringCertifications(timeframeDays)
+  return processData(certifications)
+}
+
+// ❌ Incorrect - Inter-API HTTP calls fail in production
+const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certifications`)
+```
+
+**Common Production Issues & Solutions**:
+1. **401 Unauthorized**: Usually environment variable corruption - check for trailing newlines
+2. **ECONNREFUSED**: Avoid localhost/inter-API calls - use service layer instead
+3. **Build Failures**: Run local testing and build verification before deployment
+4. **PDF Generation**: Use service layer for data fetching, not HTTP requests
+
+**Environment Variable Management**:
+- Never include trailing newlines or spaces in production environment variables
+- Use `getSupabaseAdmin()` for server-side operations requiring elevated privileges
+- Test both local and production environments before considering deployment complete
 
 ## Current Feature Status
 
 ✅ **Production Ready**:
 - Complete authentication system with role-based permissions
-- Dashboard with real-time statistics (27 pilots, 531+ certifications)
+- Dashboard with real-time statistics (27 pilots, 556+ certifications)
 - Pilot CRUD operations with comprehensive validation
-- Certification tracking with expiration monitoring
+- Certification tracking with expiration monitoring and bulk updates
 - Seniority calculations and management
 - Air Niugini branded UI with consistent design system
 - Comprehensive E2E testing suite
-- PDF report generation capabilities
+- PDF report generation for certification expiry and roster leave
 - Analytics dashboard with charts and metrics
+- Service layer architecture for production stability
+- Email notifications and automated reporting
 
 🚧 **Active Development**:
 - Advanced leave request management
@@ -419,11 +485,13 @@ const { register, handleSubmit, formState: { errors } } = useForm({
 ## Important Notes
 
 - **Keep Focus**: This is a pilot certification and leave management tool, not a full ERP system
-- **Data Integrity**: Always verify operations against live production data (27 pilots, 531+ certifications)
+- **Data Integrity**: Always verify operations against live production data (27 pilots, 556+ certifications)
 - **Air Niugini Standards**: Maintain consistent branding and aviation industry terminology
 - **Performance**: System handles real production load with optimized queries and caching
 - **Testing**: Comprehensive test coverage ensures reliability for critical aviation operations
 - **Security**: Role-based access control and RLS policies protect sensitive pilot data
+- **Production Stability**: Service layer architecture prevents inter-API call issues in production
+- **Environment Management**: Critical to maintain clean environment variables without trailing characters
 
 ---
 

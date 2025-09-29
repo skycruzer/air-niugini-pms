@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { pdfReportDataService } from '@/lib/pdf-data-service'
 
 export async function GET(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin()
@@ -16,6 +17,8 @@ export async function GET(request: NextRequest) {
         return await generateRiskAssessmentReport(supabaseAdmin)
       case 'pilot-summary':
         return await generatePilotSummaryReport(supabaseAdmin)
+      case 'fleet-management':
+        return await generateFleetManagementReport(supabaseAdmin)
       case 'certification-forecast':
         return await generateCertificationForecastReport(supabaseAdmin)
       case 'fleet-analytics':
@@ -915,4 +918,25 @@ function generateTrainingPriority(periodData: any): Array<{category: string, pri
     const priorityOrder: { [key: string]: number } = { 'CRITICAL': 4, 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 }
     return priorityOrder[b.priority] - priorityOrder[a.priority]
   })
+}
+
+async function generateFleetManagementReport(supabaseAdmin: any) {
+  try {
+    // Use the existing PDF data service which has comprehensive fleet management logic
+    const reportData = await pdfReportDataService.generateFleetManagementReportData(
+      'fleet-management',
+      'Air Niugini PMS'
+    )
+
+    console.log(`✅ API /reports: Fleet management report generated`)
+
+    return NextResponse.json({
+      success: true,
+      data: reportData,
+      type: 'fleet-management'
+    })
+  } catch (error) {
+    console.error('❌ Fleet management report generation failed:', error)
+    throw error
+  }
 }

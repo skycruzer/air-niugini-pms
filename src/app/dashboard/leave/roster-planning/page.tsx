@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { RosterPeriodSelector } from '@/components/leave/RosterPeriodSelector'
-import { getLeaveRequestsByRosterPeriod, LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service'
+import { LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service'
 import { permissions } from '@/lib/auth-utils'
 import { format, parseISO } from 'date-fns'
 
@@ -82,7 +82,20 @@ export default function RosterPlanningPage() {
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
-      const requests = await getLeaveRequestsByRosterPeriod(rosterPeriod)
+      console.log(`🔍 Frontend: Loading leave requests for ${rosterPeriod}`)
+
+      const response = await fetch(`/api/leave-requests/roster-period?period=${encodeURIComponent(rosterPeriod)}`)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch leave requests')
+      }
+
+      const requests = result.data || []
+      console.log(`✅ Frontend: Loaded ${requests.length} leave requests for ${rosterPeriod}`)
 
       // Calculate statistics
       const stats: LeaveStats = {
@@ -91,7 +104,7 @@ export default function RosterPlanningPage() {
         byStatus: {}
       }
 
-      requests.forEach(request => {
+      requests.forEach((request: LeaveRequest) => {
         // Count by type
         stats.byType[request.request_type] = (stats.byType[request.request_type] || 0) + 1
 
@@ -302,6 +315,36 @@ Recipients: ${recipients.split(',').join(', ')}`)
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getSubmissionMethodIcon = (method: string | undefined) => {
+    switch (method) {
+      case 'EMAIL':
+        return '📧'
+      case 'ORACLE':
+        return '🖥️'
+      case 'LEAVE_BIDS':
+        return '📊'
+      case 'SYSTEM':
+        return '⚙️'
+      default:
+        return '❓'
+    }
+  }
+
+  const getSubmissionMethodLabel = (method: string | undefined) => {
+    switch (method) {
+      case 'EMAIL':
+        return 'Email'
+      case 'ORACLE':
+        return 'Oracle'
+      case 'LEAVE_BIDS':
+        return 'Leave Bids'
+      case 'SYSTEM':
+        return 'System'
+      default:
+        return 'Unknown'
     }
   }
 
@@ -528,7 +571,10 @@ Recipients: ${recipients.split(',').join(', ')}`)
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {request.request_method || 'N/A'}
+                              <div className="flex items-center">
+                                <span className="mr-1">{getSubmissionMethodIcon(request.request_method)}</span>
+                                <span>{getSubmissionMethodLabel(request.request_method)}</span>
+                              </div>
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                               {request.reason || '-'}

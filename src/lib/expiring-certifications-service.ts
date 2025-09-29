@@ -25,15 +25,19 @@ export async function getExpiringCertifications(daysAhead: number = 60) {
   try {
     console.log('🔍 Service: Fetching certifications expiring in next', daysAhead, 'days')
 
-    // Calculate date threshold
+    // Calculate date threshold - include expired certifications (30 days back)
     const today = new Date()
     const futureDate = new Date()
     futureDate.setDate(today.getDate() + daysAhead)
 
+    // Look back 365 days to include all expired certifications for planning purposes
+    const pastDate = new Date()
+    pastDate.setDate(today.getDate() - 365)
+
     // Get expiring certifications using a direct query
     console.log('📋 Database query filters:', {
       notNull: 'expiry_date IS NOT NULL',
-      gte: `expiry_date >= '${today.toISOString().split('T')[0]}'`,
+      gte: `expiry_date >= '${pastDate.toISOString().split('T')[0]}'`,
       lte: `expiry_date <= '${futureDate.toISOString().split('T')[0]}'`
     })
 
@@ -57,12 +61,18 @@ export async function getExpiringCertifications(daysAhead: number = 60) {
         )
       `)
       .not('expiry_date', 'is', null)
-      .gte('expiry_date', today.toISOString().split('T')[0])
+      .gte('expiry_date', pastDate.toISOString().split('T')[0])
       .lte('expiry_date', futureDate.toISOString().split('T')[0])
       .order('expiry_date', { ascending: true })
 
     if (error) {
       console.error('🚨 Service: Database error:', error)
+      console.error('🚨 Service: Database error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
       throw new Error(`Database error: ${error.message}`)
     }
 

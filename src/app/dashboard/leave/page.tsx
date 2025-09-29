@@ -55,7 +55,7 @@ export default function LeaveRequestsPage() {
                   Leave Request Management
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Manage RDO, SDO, and annual leave requests within 28-day roster periods
+                  Manage RDO requests, WDO requests, and annual leave requests within 28-day roster periods
                 </p>
               </div>
               {permissions.canCreate(user) && (
@@ -129,7 +129,7 @@ export default function LeaveRequestsPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                 <span className="text-2xl block mb-2">🌴</span>
                 <p className="font-bold text-lg">{stats.byType.SDO}</p>
-                <p className="text-xs text-gray-600">SDO Requests</p>
+                <p className="text-xs text-gray-600">WDO Requests</p>
               </div>
               <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                 <span className="text-2xl block mb-2">🏖️</span>

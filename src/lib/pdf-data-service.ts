@@ -9,6 +9,7 @@
 
 import { getSupabaseAdmin } from './supabase'
 import { settingsService } from './settings-service'
+import { getExpiringCertifications } from './expiring-certifications-service'
 import { differenceInDays, differenceInYears, format, addYears } from 'date-fns'
 import {
   ComplianceReportData,
@@ -88,7 +89,7 @@ export class PDFReportDataService {
       const complianceByCategory = this.calculateComplianceByCategory(checksData, checkTypesData)
       const pilotComplianceStatus = this.calculatePilotComplianceStatus(pilotsData, checksData, checkTypesData)
 
-      const { expiredCertifications, expiringCertifications } = this.categorizeExpiringCertifications(
+      const { expiredCertifications, expiringCertifications } = await this.categorizeExpiringCertifications(
         checksData,
         pilotsData,
         checkTypesData
@@ -468,7 +469,56 @@ export class PDFReportDataService {
     })
   }
 
-  private categorizeExpiringCertifications(checks: any[], pilots: any[], checkTypes: any[]) {
+  private async categorizeExpiringCertifications(checks: any[], pilots: any[], checkTypes: any[]) {
+    try {
+      // Use the working expiring certifications service instead of manual calculation
+      const expiringData = await getExpiringCertifications(60)
+
+      const now = new Date()
+
+      // Categorize into expired and expiring
+      const expiredCertifications = expiringData
+        .filter((cert: any) => new Date(cert.expiryDate) <= now)
+        .map((cert: any) => ({
+          pilot: cert.pilotName || 'Unknown',
+          employeeId: cert.employeeId || 'Unknown',
+          checkType: cert.checkDescription || 'Unknown',
+          category: cert.category || 'Other',
+          expiryDate: cert.expiryDate.toISOString(),
+          daysOverdue: Math.abs(differenceInDays(now, cert.expiryDate)),
+          riskLevel: Math.abs(differenceInDays(now, cert.expiryDate)) > 30 ? 'CRITICAL' :
+                    Math.abs(differenceInDays(now, cert.expiryDate)) > 14 ? 'HIGH' : 'MEDIUM',
+          rosterPeriod: cert.expiry_roster_period
+        }))
+
+      const expiringCertifications = expiringData
+        .filter((cert: any) => {
+          const daysUntil = differenceInDays(cert.expiryDate, now)
+          return daysUntil > 0 && daysUntil <= 60
+        })
+        .map((cert: any) => {
+          const daysUntilExpiry = differenceInDays(cert.expiryDate, now)
+          return {
+            pilot: cert.pilotName || 'Unknown',
+            employeeId: cert.employeeId || 'Unknown',
+            checkType: cert.checkDescription || 'Unknown',
+            category: cert.category || 'Other',
+            expiryDate: cert.expiryDate.toISOString(),
+            daysUntilExpiry,
+            urgencyLevel: daysUntilExpiry <= 7 ? 'URGENT' : daysUntilExpiry <= 14 ? 'HIGH' : 'MEDIUM',
+            rosterPeriod: cert.expiry_roster_period
+          }
+        })
+
+      return { expiredCertifications, expiringCertifications }
+    } catch (error) {
+      console.error('Error fetching expiring certifications:', error)
+      // Fallback to original method if service fails
+      return this.categorizeExpiringCertificationsFallback(checks, pilots, checkTypes)
+    }
+  }
+
+  private categorizeExpiringCertificationsFallback(checks: any[], pilots: any[], checkTypes: any[]) {
     const now = new Date()
 
     const expiredCertifications = checks

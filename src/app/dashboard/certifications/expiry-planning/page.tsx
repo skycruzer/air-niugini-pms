@@ -159,26 +159,54 @@ export default function CertificationExpiryPlanningPage() {
         throw new Error(errorData.error || 'Failed to generate PDF report')
       }
 
-      // Get the PDF blob
+      // Get the PDF blob and ensure it's treated as PDF
       const pdfBlob = await response.blob()
+
+      // Verify we got a PDF blob
+      if (pdfBlob.type !== 'application/pdf') {
+        console.warn('⚠️ Response is not a PDF:', pdfBlob.type)
+      }
 
       // Extract filename from response headers
       const contentDisposition = response.headers.get('Content-Disposition')
-      const filename = contentDisposition
+      let filename = contentDisposition
         ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
         : `Air_Niugini_Certification_Expiry_${state.selectedTimeframe}days_${new Date().toISOString().slice(0, 10)}.pdf`
 
-      // Create download link
-      const url = window.URL.createObjectURL(pdfBlob)
+      // Ensure .pdf extension
+      if (!filename.toLowerCase().endsWith('.pdf')) {
+        filename = filename + '.pdf'
+      }
+
+      console.log('📋 PDF Details:', {
+        size: pdfBlob.size,
+        type: pdfBlob.type,
+        filename: filename
+      })
+
+      // Create a properly typed PDF blob to ensure browser recognition
+      const typedPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' })
+
+      // Create download link with enhanced attributes
+      const url = window.URL.createObjectURL(typedPdfBlob)
       const link = document.createElement('a')
       link.href = url
       link.download = filename
-      document.body.appendChild(link)
-      link.click()
+      link.type = 'application/pdf'
+      link.style.display = 'none'
 
-      // Cleanup
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
+      document.body.appendChild(link)
+
+      // Add a small delay to ensure the link is ready
+      setTimeout(() => {
+        link.click()
+
+        // Cleanup after a delay
+        setTimeout(() => {
+          document.body.removeChild(link)
+          window.URL.revokeObjectURL(url)
+        }, 1000)
+      }, 100)
 
       console.log('✅ Certification expiry PDF generated and downloaded successfully')
 
@@ -219,7 +247,10 @@ export default function CertificationExpiryPlanningPage() {
       }
 
       const pdfBlob = await response.blob()
-      const pdfUrl = window.URL.createObjectURL(pdfBlob)
+
+      // Create a properly typed PDF blob to ensure browser recognition
+      const typedPdfBlob = new Blob([pdfBlob], { type: 'application/pdf' })
+      const pdfUrl = window.URL.createObjectURL(typedPdfBlob)
 
       // Prepare email content
       const timeframeLabel = timeframeOptions.find(t => t.value === state.selectedTimeframe)?.label || `${state.selectedTimeframe} days`
