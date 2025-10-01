@@ -13,7 +13,9 @@ test.describe('Air Niugini PMS Deployment Test', () => {
 
     // Verify Air Niugini branding is present
     await expect(page.locator('h1:has-text("Air Niugini")')).toBeVisible();
-    await expect(page.locator('p:has-text("Papua New Guinea\'s National Airline")').first()).toBeVisible();
+    await expect(
+      page.locator('p:has-text("Papua New Guinea\'s National Airline")').first()
+    ).toBeVisible();
 
     // Check that statistics are displayed (should show live data)
     await expect(page.locator('text=27')).toBeVisible(); // Total pilots

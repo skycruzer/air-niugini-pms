@@ -11,6 +11,7 @@ Air Niugini B767 Pilot Management System - A comprehensive pilot certification t
 ## Commands
 
 ### Development
+
 ```bash
 # Start development server
 npm run dev          # Starts on http://localhost:3001 (or 3000)
@@ -22,6 +23,7 @@ npm run lint         # Run ESLint with Next.js rules
 ```
 
 ### Database Operations
+
 ```bash
 # Core database management scripts
 node test-connection.js       # Test Supabase connection
@@ -33,6 +35,7 @@ node execute-migration.js    # Execute custom migrations
 ```
 
 ### Testing (Playwright E2E)
+
 ```bash
 # Comprehensive testing suite
 npx playwright test                    # Run all tests
@@ -44,6 +47,7 @@ npx playwright test --ui               # Run with Playwright UI
 ## Architecture Overview
 
 ### Technology Stack
+
 - **Framework**: Next.js 14.2.33 with App Router and TypeScript 5.9.2
 - **Database**: Supabase PostgreSQL (Project ID: wgdmgvonqysflwdiiols) with Row Level Security
 - **Authentication**: Supabase Auth with role-based permissions (admin/manager)
@@ -59,6 +63,7 @@ npx playwright test --ui               # Run with Playwright UI
 ### Database Architecture
 
 **Production Tables** (Active Live Data):
+
 - `pilots` (27 records) - Main pilot information with seniority tracking
 - `pilot_checks` (556+ records) - Certification tracking with expiry dates
 - `check_types` (34+ records) - Aviation certification types across 8 categories
@@ -68,6 +73,7 @@ npx playwright test --ui               # Run with Playwright UI
 - `contract_types` - Pilot contract classifications
 
 **Legacy Development Tables** (Historical):
+
 - `an_pilots`, `an_pilot_checks`, `an_check_types` - Legacy development data (limited records)
 
 **CRITICAL**: Always use production tables (`pilots`, `pilot_checks`, `check_types`) for live operations, not the `an_*` prefixed legacy tables.
@@ -75,69 +81,75 @@ npx playwright test --ui               # Run with Playwright UI
 ### Key Business Logic
 
 #### 1. Roster Period System (28-Day Cycles)
+
 ```typescript
 // Core roster calculation pattern
-const ROSTER_DURATION = 28
+const ROSTER_DURATION = 28;
 const KNOWN_ROSTER = {
   number: 11,
   year: 2025,
-  endDate: new Date('2025-10-10')
-}
+  endDate: new Date('2025-10-10'),
+};
 
 export function getCurrentRosterPeriod() {
-  const today = new Date()
-  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.endDate)
-  const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION)
+  const today = new Date();
+  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.endDate);
+  const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION);
 
   return {
     code: `RP${number}/${year}`,
     startDate: calculatedStart,
-    endDate: calculatedEnd
-  }
+    endDate: calculatedEnd,
+  };
 }
 ```
 
 #### 2. Certification Status Color Coding
+
 ```typescript
 // Aviation compliance color system
 export function getCertificationStatus(expiryDate: Date | null) {
-  if (!expiryDate) return { color: 'gray', label: 'No Date' }
+  if (!expiryDate) return { color: 'gray', label: 'No Date' };
 
-  const daysUntilExpiry = differenceInDays(expiryDate, new Date())
+  const daysUntilExpiry = differenceInDays(expiryDate, new Date());
 
   if (daysUntilExpiry < 0) {
-    return { color: 'red', label: 'Expired', className: 'bg-red-100 text-red-800' }
+    return { color: 'red', label: 'Expired', className: 'bg-red-100 text-red-800' };
   }
   if (daysUntilExpiry <= 30) {
-    return { color: 'yellow', label: 'Expiring Soon', className: 'bg-yellow-100 text-yellow-800' }
+    return { color: 'yellow', label: 'Expiring Soon', className: 'bg-yellow-100 text-yellow-800' };
   }
-  return { color: 'green', label: 'Current', className: 'bg-green-100 text-green-800' }
+  return { color: 'green', label: 'Current', className: 'bg-green-100 text-green-800' };
 }
 ```
 
 #### 3. Seniority Calculations
+
 ```typescript
 // Seniority based on commencement date (1 = most senior)
 export function calculateSeniority(pilots: Pilot[]) {
   return pilots
-    .filter(p => p.commencement_date)
-    .sort((a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime())
+    .filter((p) => p.commencement_date)
+    .sort(
+      (a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime()
+    )
     .map((pilot, index) => ({
       ...pilot,
-      seniority_number: index + 1
-    }))
+      seniority_number: index + 1,
+    }));
 }
 ```
 
 #### 4. Permission System
+
 ```typescript
 // Role-based access control pattern
 export const permissions = {
   canCreate: (user: User) => user.role === 'admin',
   canEdit: (user: User) => ['admin', 'manager'].includes(user.role),
   canDelete: (user: User) => user.role === 'admin',
-  canApprove: (user: User) => ['admin', 'manager'].includes(user.role)
-}
+  canApprove: (user: User) => ['admin', 'manager'].includes(user.role),
+};
 ```
 
 ### Project Structure
@@ -190,41 +202,44 @@ src/
 ```typescript
 // ✅ Correct - Service layer pattern with reusable functions
 // src/lib/expiring-certifications-service.ts
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 export async function getExpiringCertifications(daysAhead: number = 60) {
-  const supabaseAdmin = getSupabaseAdmin()
+  const supabaseAdmin = getSupabaseAdmin();
 
   const { data, error } = await supabaseAdmin
     .from('pilot_checks')
-    .select(`
+    .select(
+      `
       id, expiry_date,
       pilots!inner (id, first_name, last_name, employee_id),
       check_types!inner (id, check_code, check_description, category)
-    `)
+    `
+    )
     .not('expiry_date', 'is', null)
     .gte('expiry_date', today.toISOString().split('T')[0])
     .lte('expiry_date', futureDate.toISOString().split('T')[0])
-    .order('expiry_date', { ascending: true })
+    .order('expiry_date', { ascending: true });
 
   // Transform and return processed data with status calculations
-  return processedData
+  return processedData;
 }
 
 // API routes use service functions
 // src/app/api/expiring-certifications/route.ts
-import { getExpiringCertifications } from '@/lib/expiring-certifications-service'
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
 
 export async function GET(request: NextRequest) {
-  const result = await getExpiringCertifications(daysAhead)
-  return NextResponse.json({ success: true, data: result })
+  const result = await getExpiringCertifications(daysAhead);
+  return NextResponse.json({ success: true, data: result });
 }
 
 // ❌ Incorrect - Direct database calls in API routes
-const { data } = await supabase.from('pilot_checks').select('*')
+const { data } = await supabase.from('pilot_checks').select('*');
 ```
 
 **Service Layer Benefits**:
+
 - Reusable between API routes and server-side operations
 - Avoids inter-API HTTP calls in production
 - Centralized business logic and data transformations
@@ -233,15 +248,17 @@ const { data } = await supabase.from('pilot_checks').select('*')
 ### Air Niugini Branding Standards
 
 **Color Palette** (Strict Adherence Required):
+
 ```css
 /* Primary Brand Colors */
---air-niugini-red: #E4002B;    /* Headers, buttons, alerts */
---air-niugini-gold: #FFC72C;   /* Accents, highlights */
---air-niugini-black: #000000;  /* Navigation, text */
---air-niugini-white: #FFFFFF;  /* Backgrounds */
+--air-niugini-red: #e4002b; /* Headers, buttons, alerts */
+--air-niugini-gold: #ffc72c; /* Accents, highlights */
+--air-niugini-black: #000000; /* Navigation, text */
+--air-niugini-white: #ffffff; /* Backgrounds */
 ```
 
 **UI Component Standards**:
+
 ```tsx
 // ✅ Correct - Air Niugini branded components
 <button className="bg-[#E4002B] hover:bg-[#C00020] text-white">
@@ -268,41 +285,45 @@ const { data } = await supabase.from('pilot_checks').select('*')
 // ✅ Efficient - Single query with joins
 const pilotsWithChecks = await supabase
   .from('pilots')
-  .select(`
+  .select(
+    `
     *,
     pilot_checks (
       *,
       check_types (*)
     )
-  `)
-  .eq('is_active', true)
+  `
+  )
+  .eq('is_active', true);
 
 // ✅ Use database views for complex queries
 const expiringChecks = await supabase
-  .from('expiring_checks')  // Pre-computed view
+  .from('expiring_checks') // Pre-computed view
   .select('*')
-  .lte('days_until_expiry', 30)
+  .lte('days_until_expiry', 30);
 ```
 
 ### Testing Architecture
 
 **Playwright E2E Test Suite**:
+
 - `test-login.spec.js` - Authentication flow testing
 - `test-comprehensive.spec.js` - Full application workflow
 - `test-error-handling.spec.js` - Error boundary testing
 - `test-deployment.spec.js` - Production deployment validation
 
 **Test Data Management**:
+
 ```javascript
 // Production test pattern
 const testCredentials = {
   email: 'skycruzer@icloud.com',
-  password: 'mron2393'
-}
+  password: 'mron2393',
+};
 
 // Always test against live production tables
-await page.goto('http://localhost:3001/dashboard/pilots')
-await expect(page.locator('[data-testid="pilot-count"]')).toContainText('27')
+await page.goto('http://localhost:3001/dashboard/pilots');
+await expect(page.locator('[data-testid="pilot-count"]')).toContainText('27');
 ```
 
 ## Environment Configuration
@@ -321,6 +342,7 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ## Performance Configuration
 
 ### Next.js Optimizations (next.config.js)
+
 - **React Strict Mode**: Disabled for production performance
 - **SWC Minification**: Enabled for faster builds
 - **Package Import Optimization**: Lucide React, TanStack Query
@@ -329,6 +351,7 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 - **Security Headers**: X-Frame-Options, CSP, HSTS
 
 ### Database Performance
+
 - **Indexes**: Comprehensive indexing on frequently queried columns
 - **Views**: Pre-computed views for complex queries (`expiring_checks`, `pilot_checks_overview`)
 - **RLS Policies**: Row Level Security for data protection
@@ -347,6 +370,7 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ## Common Development Patterns
 
 ### Component Structure
+
 ```tsx
 interface ComponentProps {
   // Define props with TypeScript
@@ -354,69 +378,73 @@ interface ComponentProps {
 
 export function ComponentName({ props }: ComponentProps) {
   // 1. Hooks (React Query, state)
-  const { data, isLoading } = useQuery()
-  const [state, setState] = useState()
+  const { data, isLoading } = useQuery();
+  const [state, setState] = useState();
 
   // 2. Effects
-  useEffect(() => {}, [])
+  useEffect(() => {}, []);
 
   // 3. Handlers
-  const handleSubmit = async () => {}
+  const handleSubmit = async () => {};
 
   // 4. Permission checks
-  if (!permissions.canView(user)) return <Unauthorized />
+  if (!permissions.canView(user)) return <Unauthorized />;
 
   // 5. Loading states
-  if (isLoading) return <Loading />
+  if (isLoading) return <Loading />;
 
   // 6. Main render
-  return (
-    <div className="air-niugini-branded">
-      {/* Component JSX */}
-    </div>
-  )
+  return <div className="air-niugini-branded">{/* Component JSX */}</div>;
 }
 ```
 
 ### Error Handling Pattern
+
 ```typescript
 try {
-  const result = await pilotService.updatePilot(id, data)
+  const result = await pilotService.updatePilot(id, data);
   // Success handling
 } catch (error) {
-  console.error('Operation failed:', error)
+  console.error('Operation failed:', error);
   setErrors({
-    submit: 'Failed to update pilot. Please try again.'
-  })
+    submit: 'Failed to update pilot. Please try again.',
+  });
 }
 ```
 
 ### Form Validation Pattern
+
 ```typescript
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const pilotSchema = z.object({
   employee_id: z.string().min(1, 'Employee ID required'),
   first_name: z.string().min(1, 'First name required'),
-  role: z.enum(['Captain', 'First Officer'])
-})
+  role: z.enum(['Captain', 'First Officer']),
+});
 
-const { register, handleSubmit, formState: { errors } } = useForm({
-  resolver: zodResolver(pilotSchema)
-})
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm({
+  resolver: zodResolver(pilotSchema),
+});
 ```
 
 ## Performance Guidelines
 
 ### Database Best Practices
+
 - Use single queries with joins instead of multiple round trips
 - Leverage database views for complex aggregations
 - Apply proper indexing on frequently filtered columns
 - Use RLS policies for security without performance impact
 
 ### Frontend Optimization
+
 - Implement proper loading states for all async operations
 - Use React Query for server state management and caching
 - Optimize bundle size with dynamic imports for large components
@@ -437,27 +465,30 @@ const { register, handleSubmit, formState: { errors } } = useForm({
 ### Critical Production Patterns
 
 **Service Layer for Production Stability**:
+
 ```typescript
 // ✅ Correct - Direct service calls avoid production HTTP issues
-import { getExpiringCertifications } from '@/lib/expiring-certifications-service'
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
 
 export async function POST(request: NextRequest) {
   // Direct service call - works in all environments
-  const certifications = await getExpiringCertifications(timeframeDays)
-  return processData(certifications)
+  const certifications = await getExpiringCertifications(timeframeDays);
+  return processData(certifications);
 }
 
 // ❌ Incorrect - Inter-API HTTP calls fail in production
-const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certifications`)
+const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certifications`);
 ```
 
 **Common Production Issues & Solutions**:
+
 1. **401 Unauthorized**: Usually environment variable corruption - check for trailing newlines
 2. **ECONNREFUSED**: Avoid localhost/inter-API calls - use service layer instead
 3. **Build Failures**: Run local testing and build verification before deployment
 4. **PDF Generation**: Use service layer for data fetching, not HTTP requests
 
 **Environment Variable Management**:
+
 - Never include trailing newlines or spaces in production environment variables
 - Use `getSupabaseAdmin()` for server-side operations requiring elevated privileges
 - Test both local and production environments before considering deployment complete
@@ -465,6 +496,7 @@ const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certificati
 ## Current Feature Status
 
 ✅ **Production Ready**:
+
 - Complete authentication system with role-based permissions
 - Dashboard with real-time statistics (27 pilots, 556+ certifications)
 - Pilot CRUD operations with comprehensive validation
@@ -478,6 +510,7 @@ const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certificati
 - Email notifications and automated reporting
 
 🚧 **Active Development**:
+
 - Advanced leave request management
 - Calendar integration for scheduling
 - Enhanced reporting features
@@ -496,5 +529,5 @@ const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certificati
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Papua New Guinea's National Airline Fleet Operations Management*
-*Production System - Version 1.0*
+_Papua New Guinea's National Airline Fleet Operations Management_
+_Production System - Version 1.0_

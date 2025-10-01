@@ -19,7 +19,7 @@ You need to run the SQL migration manually in your Supabase SQL editor:
 
 ```sql
 -- Add seniority_number column to an_pilots table
-ALTER TABLE an_pilots 
+ALTER TABLE an_pilots
 ADD COLUMN seniority_number INTEGER;
 
 -- Add index for performance when sorting by seniority
@@ -29,9 +29,9 @@ CREATE INDEX idx_an_pilots_seniority_number ON an_pilots(seniority_number);
 COMMENT ON COLUMN an_pilots.seniority_number IS 'Pilot seniority number for ranking and benefits calculation. Lower numbers indicate higher seniority.';
 
 -- Verify the column was added successfully
-SELECT column_name, data_type, is_nullable 
-FROM information_schema.columns 
-WHERE table_name = 'an_pilots' 
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'an_pilots'
 AND column_name = 'seniority_number';
 ```
 
@@ -40,6 +40,7 @@ AND column_name = 'seniority_number';
 ### Step 2: Verify Migration Success
 
 After running the migration, you should see output similar to:
+
 ```
 column_name        | data_type | is_nullable
 seniority_number   | integer   | YES
@@ -58,15 +59,15 @@ seniority_number   | integer   | YES
 ```sql
 -- Assign seniority numbers based on commencement date (earliest = most senior)
 WITH seniority_ranking AS (
-  SELECT 
+  SELECT
     id,
     ROW_NUMBER() OVER (ORDER BY commencement_date ASC) as seniority_rank
-  FROM an_pilots 
+  FROM an_pilots
   WHERE is_active = true
 )
-UPDATE an_pilots 
+UPDATE an_pilots
 SET seniority_number = seniority_ranking.seniority_rank
-FROM seniority_ranking 
+FROM seniority_ranking
 WHERE an_pilots.id = seniority_ranking.id;
 ```
 
@@ -75,14 +76,14 @@ WHERE an_pilots.id = seniority_ranking.id;
 ```sql
 -- Get all pilots ordered by seniority (most senior first)
 SELECT employee_id, first_name, last_name, seniority_number, commencement_date
-FROM an_pilots 
+FROM an_pilots
 WHERE is_active = true
 ORDER BY seniority_number ASC NULLS LAST;
 
 -- Get top 10 most senior captains
 SELECT employee_id, first_name, last_name, seniority_number
-FROM an_pilots 
-WHERE is_active = true 
+FROM an_pilots
+WHERE is_active = true
 AND role = 'Captain'
 AND seniority_number IS NOT NULL
 ORDER BY seniority_number ASC
@@ -90,8 +91,8 @@ LIMIT 10;
 
 -- Find pilots without assigned seniority
 SELECT employee_id, first_name, last_name, commencement_date
-FROM an_pilots 
-WHERE is_active = true 
+FROM an_pilots
+WHERE is_active = true
 AND seniority_number IS NULL
 ORDER BY commencement_date ASC;
 ```
@@ -117,7 +118,7 @@ export interface Pilot {
   passport_expiry?: Date;
   date_of_birth?: Date;
   commencement_date?: Date;
-  seniority_number?: number;  // NEW FIELD
+  seniority_number?: number; // NEW FIELD
   is_active: boolean;
   created_at: Date;
   updated_at: Date;
@@ -140,7 +141,9 @@ function PilotList() {
     <div>
       {sortedPilots?.map((pilot) => (
         <div key={pilot.id} className="pilot-card">
-          <h3>{pilot.first_name} {pilot.last_name}</h3>
+          <h3>
+            {pilot.first_name} {pilot.last_name}
+          </h3>
           <p>Employee ID: {pilot.employee_id}</p>
           <p>Seniority: {pilot.seniority_number || 'Not Assigned'}</p>
           <p>Role: {pilot.role}</p>
@@ -160,13 +163,13 @@ function PilotForm() {
     defaultValues: {
       // ... other fields
       seniority_number: undefined,
-    }
+    },
   });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       {/* ... other fields */}
-      
+
       <div>
         <label htmlFor="seniority_number">Seniority Number</label>
         <input
@@ -176,7 +179,7 @@ function PilotForm() {
           placeholder="Enter seniority number (optional)"
           {...form.register('seniority_number', {
             valueAsNumber: true,
-            min: { value: 1, message: 'Seniority number must be positive' }
+            min: { value: 1, message: 'Seniority number must be positive' },
           })}
         />
         <p className="text-sm text-gray-600">
@@ -197,35 +200,35 @@ For initial setup, you can assign seniority numbers based on various criteria:
 ```sql
 -- Option 1: By commencement date (earliest = most senior)
 WITH seniority_ranking AS (
-  SELECT 
+  SELECT
     id,
     ROW_NUMBER() OVER (ORDER BY commencement_date ASC) as seniority_rank
-  FROM an_pilots 
+  FROM an_pilots
   WHERE is_active = true
 )
-UPDATE an_pilots 
+UPDATE an_pilots
 SET seniority_number = seniority_ranking.seniority_rank
-FROM seniority_ranking 
+FROM seniority_ranking
 WHERE an_pilots.id = seniority_ranking.id;
 
 -- Option 2: Separate ranking for Captains and First Officers
 WITH captain_ranking AS (
-  SELECT 
+  SELECT
     id,
     ROW_NUMBER() OVER (ORDER BY commencement_date ASC) as seniority_rank
-  FROM an_pilots 
+  FROM an_pilots
   WHERE is_active = true AND role = 'Captain'
 ),
 fo_ranking AS (
-  SELECT 
+  SELECT
     id,
     1000 + ROW_NUMBER() OVER (ORDER BY commencement_date ASC) as seniority_rank
-  FROM an_pilots 
+  FROM an_pilots
   WHERE is_active = true AND role = 'First Officer'
 )
-UPDATE an_pilots 
+UPDATE an_pilots
 SET seniority_number = COALESCE(captain_ranking.seniority_rank, fo_ranking.seniority_rank)
-FROM captain_ranking 
+FROM captain_ranking
 FULL OUTER JOIN fo_ranking ON captain_ranking.id = fo_ranking.id
 WHERE an_pilots.id = COALESCE(captain_ranking.id, fo_ranking.id);
 ```
@@ -234,7 +237,7 @@ WHERE an_pilots.id = COALESCE(captain_ranking.id, fo_ranking.id);
 
 ```sql
 -- Seniority list report
-SELECT 
+SELECT
   seniority_number,
   employee_id,
   first_name || ' ' || last_name as full_name,
@@ -242,7 +245,7 @@ SELECT
   contract_type,
   commencement_date,
   EXTRACT(YEAR FROM AGE(CURRENT_DATE, commencement_date)) as years_of_service
-FROM an_pilots 
+FROM an_pilots
 WHERE is_active = true
 ORDER BY seniority_number ASC NULLS LAST;
 ```

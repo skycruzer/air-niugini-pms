@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Scroll Area Component (Radix UI)
  * For scrollable content areas

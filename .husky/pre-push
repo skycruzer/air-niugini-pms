@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run comprehensive validation before push
+echo "🔍 Running pre-push validation..."
+
+# Type check
+echo "📝 Type checking..."
+npm run type-check || exit 1
+
+# Lint check
+echo "🔧 Running linter..."
+npm run lint || exit 1
+
+# Build check
+echo "🏗️  Checking build..."
+npm run build || exit 1
+
+# Run tests (optional - uncomment if you want to run tests before push)
+# echo "🧪 Running tests..."
+# npm run test || exit 1
+
+echo "✅ All pre-push checks passed!"

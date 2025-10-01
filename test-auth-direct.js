@@ -15,9 +15,12 @@ async function testAuth() {
   try {
     // Test Supabase Auth login
     console.log('🔍 Step 1: Testing Supabase Auth login...');
-    const { data: { user: authUser }, error: signInError } = await supabase.auth.signInWithPassword({
+    const {
+      data: { user: authUser },
+      error: signInError,
+    } = await supabase.auth.signInWithPassword({
       email: 'skycruzer@icloud.com',
-      password: 'mron2393'
+      password: 'mron2393',
     });
 
     console.log('📊 Auth Response:', {
@@ -25,7 +28,7 @@ async function testAuth() {
       userId: authUser?.id,
       email: authUser?.email,
       confirmed: authUser?.email_confirmed_at ? 'YES' : 'NO',
-      error: signInError?.message || 'None'
+      error: signInError?.message || 'None',
     });
 
     if (signInError || !authUser) {
@@ -50,7 +53,7 @@ async function testAuth() {
       userEmail: userData?.email,
       userName: userData?.name,
       userRole: userData?.role,
-      error: userError?.message || 'None'
+      error: userError?.message || 'None',
     });
 
     if (userError || !userData) {
@@ -73,13 +76,16 @@ async function testAuth() {
 
     // Test session persistence
     console.log('🔍 Step 3: Testing session persistence...');
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
 
     console.log('📊 Session Check:', {
       hasSession: !!session,
       isValid: session?.access_token ? 'YES' : 'NO',
       expiresAt: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A',
-      error: sessionError?.message || 'None'
+      error: sessionError?.message || 'None',
     });
 
     if (session) {
@@ -87,7 +93,6 @@ async function testAuth() {
     } else {
       console.log('⚠️  No active session found');
     }
-
   } catch (error) {
     console.log('🚨 AUTHENTICATION TEST FAILED');
     console.log('   Error:', error.message);

@@ -8,21 +8,21 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
   const errors = [];
   const networkRequests = [];
 
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     const type = msg.type();
     consoleMessages.push({ type, text, timestamp: new Date().toISOString() });
     console.log(`🌐 [${type.toUpperCase()}] ${text}`);
   });
 
-  page.on('pageerror', error => {
+  page.on('pageerror', (error) => {
     const errorMsg = error.message;
     errors.push({ message: errorMsg, timestamp: new Date().toISOString() });
     console.log(`🚨 [PAGE ERROR] ${errorMsg}`);
   });
 
   // Monitor network requests
-  page.on('request', request => {
+  page.on('request', (request) => {
     const url = request.url();
     const method = request.method();
     if (url.includes('auth') || url.includes('api') || url.includes('supabase')) {
@@ -30,13 +30,13 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
         method,
         url,
         timestamp: new Date().toISOString(),
-        type: 'request'
+        type: 'request',
       });
       console.log(`🌐 [REQUEST] ${method} ${url}`);
     }
   });
 
-  page.on('response', response => {
+  page.on('response', (response) => {
     const url = response.url();
     const status = response.status();
     if (url.includes('auth') || url.includes('api') || url.includes('supabase')) {
@@ -44,7 +44,7 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
         url,
         status,
         timestamp: new Date().toISOString(),
-        type: 'response'
+        type: 'response',
       });
       console.log(`🌐 [RESPONSE] ${status} ${url}`);
     }
@@ -85,7 +85,9 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
   console.log(`🌐 Current URL after login: ${currentUrl}`);
 
   // Check for any error messages on the page
-  const errorElements = await page.locator('[class*="error"], [class*="alert"], .text-red-500, .text-red-700, .text-red-800').all();
+  const errorElements = await page
+    .locator('[class*="error"], [class*="alert"], .text-red-500, .text-red-700, .text-red-800')
+    .all();
   if (errorElements.length > 0) {
     console.log('⚠️  Found potential error elements:');
     for (const element of errorElements) {
@@ -104,27 +106,30 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
     await page.waitForTimeout(3000);
 
     // Check for dashboard elements
-    const dashboardElements = await page.locator('text=Dashboard, text=27, text=556, text="Air Niugini"').all();
+    const dashboardElements = await page
+      .locator('text=Dashboard, text=27, text=556, text="Air Niugini"')
+      .all();
     console.log(`📊 Found ${dashboardElements.length} dashboard elements`);
 
     // Check for statistics
     const pageContent = await page.content();
     const has27 = pageContent.includes('27');
-    const has556 = pageContent.includes('556') || pageContent.includes('531') || pageContent.includes('568');
+    const has556 =
+      pageContent.includes('556') || pageContent.includes('531') || pageContent.includes('568');
 
     console.log(`📈 Statistics check: 27 pilots=${has27}, certifications=${has556}`);
-
   } else if (currentUrl.includes('/login')) {
     console.log('⚠️  Still on login page - authentication may have failed');
 
     // Check for loading state
-    const isLoading = await page.locator('.loading, [class*="loading"], .spinner, [class*="spinner"]').count();
+    const isLoading = await page
+      .locator('.loading, [class*="loading"], .spinner, [class*="spinner"]')
+      .count();
     console.log(`🔄 Loading elements found: ${isLoading}`);
 
     // Get visible text for debugging
     const visibleText = await page.locator('body').textContent();
     console.log('📄 Page text sample:', visibleText.substring(0, 500) + '...');
-
   } else {
     console.log(`🔍 Unexpected URL: ${currentUrl}`);
   }
@@ -156,7 +161,7 @@ test('Detailed login flow with console monitoring', async ({ page }) => {
   // Take final screenshot
   await page.screenshot({
     path: 'login-detailed-test-result.png',
-    fullPage: true
+    fullPage: true,
   });
   console.log('📸 Detailed screenshot saved');
 

@@ -1,0 +1,14 @@
+# Ignore Playwright E2E tests
+test-*.spec.js
+playwright.config.js
+
+# Ignore build and dependency directories
+node_modules/
+.next/
+out/
+coverage/
+
+# Ignore configuration files
+next.config.js
+tailwind.config.js
+postcss.config.js

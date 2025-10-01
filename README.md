@@ -26,6 +26,7 @@ npm run dev
 **Development Phase**: Phase 1 Complete → Starting Phase 2
 
 **Next Steps**:
+
 - Authentication system (Admin/Manager roles)
 - Login page with Air Niugini branding
 - Dashboard with pilot statistics
@@ -34,6 +35,7 @@ npm run dev
 ## 🛢️ Database Structure
 
 All tables are prefixed with `an_` to avoid conflicts:
+
 - `an_users` - System users (Admin/Manager)
 - `an_pilots` - Pilot information
 - `an_check_types` - Certification types (38 types)
@@ -97,21 +99,25 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ## 📋 Development Plan
 
 ### Phase 1: Foundation ✅ COMPLETE
+
 - Project setup and branding
 - Database tables and connections
 - Core utilities and landing page
 
 ### Phase 2: Authentication (In Progress)
+
 - Login system with Admin/Manager roles
 - Session management
 - Route protection
 
 ### Phase 3: Core Features (Planned)
+
 - Pilot management CRUD
 - Certification tracking with expiry alerts
 - Leave request system
 
 ### Phase 4: Advanced Features (Planned)
+
 - Reports and compliance dashboard
 - Mobile optimization
 - Testing and deployment
@@ -126,10 +132,10 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ## 👨‍💻 Developer
 
 **Maurice Rondeau** - [PIN PNG LTD](https://pinpng.com)
-*Professional software development for Papua New Guinea*
+_Professional software development for Papua New Guinea_
 
 ---
 
 **Air Niugini** - Papua New Guinea's National Airline
-*B767 Fleet Operations Management System v1.0*
-*Powered by PIN PNG LTD*
+_B767 Fleet Operations Management System v1.0_
+_Powered by PIN PNG LTD_

@@ -1,4 +1,5 @@
 # Air Niugini B767 Pilot Management System
+
 # Database Deployment Guide
 
 ## Overview
@@ -14,6 +15,7 @@ This guide provides step-by-step instructions for deploying the complete Supabas
 ## Database Schema Summary
 
 ### Tables Created
+
 - **an_users** - System users (admin/manager roles)
 - **an_pilots** - 27 Papua New Guinea B767 pilots
 - **an_check_types** - 38 aviation certification types across 8 categories
@@ -21,6 +23,7 @@ This guide provides step-by-step instructions for deploying the complete Supabas
 - **an_leave_requests** - Leave management (RDO/WDO/Annual/Sick)
 
 ### Key Features
+
 - Row Level Security (RLS) enabled on all tables
 - Comprehensive indexing for performance
 - Database views for common queries
@@ -39,6 +42,7 @@ Execute the complete migration script in Supabase SQL Editor:
 ```
 
 **What this does:**
+
 - Creates all 5 main tables with proper relationships
 - Sets up 15+ performance indexes
 - Enables Row Level Security with comprehensive policies
@@ -55,6 +59,7 @@ Execute the sample data script:
 ```
 
 **What this does:**
+
 - Inserts 3 system users (admin, 2 managers)
 - Creates 38 aviation check types across 8 categories
 - Adds 27 Papua New Guinea B767 pilots with authentic names
@@ -69,6 +74,7 @@ Execute the certifications script:
 ```
 
 **What this does:**
+
 - Generates 531 pilot certifications with realistic distribution
 - Creates varying expiry dates based on certification type
 - Includes expired (5%) and expiring soon (10%) certifications for testing
@@ -83,6 +89,7 @@ Execute the views script:
 ```
 
 **What this does:**
+
 - **an_pilot_checks_overview** - Comprehensive pilot certification view
 - **an_expiring_checks** - Focus on certifications expiring within 60 days
 - **an_fleet_compliance_summary** - High-level dashboard statistics
@@ -123,6 +130,7 @@ SELECT * FROM an_expiring_checks LIMIT 10;
 ```
 
 **Expected Results:**
+
 - 3 users (1 admin, 2 managers)
 - 27 active pilots (15 Captains, 12 First Officers)
 - 38 check types across 8 categories
@@ -132,11 +140,13 @@ SELECT * FROM an_expiring_checks LIMIT 10;
 ## Row Level Security (RLS) Policies
 
 ### User Access Control
+
 - **Admins** - Full CRUD access to all data
 - **Managers** - Read/update pilots and certifications, no user management
 - **Authenticated Users** - Read access to relevant data
 
 ### Security Features
+
 - Email-based authentication integration
 - Role-based access control
 - Audit trail with timestamps
@@ -145,11 +155,13 @@ SELECT * FROM an_expiring_checks LIMIT 10;
 ## Database Views Usage
 
 ### For Dashboard Metrics
+
 ```sql
 SELECT * FROM an_fleet_compliance_summary;
 ```
 
 ### For Certification Alerts
+
 ```sql
 SELECT * FROM an_expiring_checks
 WHERE urgency_level IN ('EXPIRED', 'CRITICAL')
@@ -157,6 +169,7 @@ ORDER BY days_remaining;
 ```
 
 ### For Monthly Planning
+
 ```sql
 SELECT * FROM an_monthly_expiry_calendar
 WHERE expiry_year = EXTRACT(YEAR FROM CURRENT_DATE)
@@ -166,6 +179,7 @@ ORDER BY expiry_month;
 ## Performance Optimization
 
 ### Indexes Created
+
 - Primary key indexes (automatic)
 - Foreign key indexes for joins
 - Expiry date indexes for status queries
@@ -173,6 +187,7 @@ ORDER BY expiry_month;
 - Partial indexes for filtered queries
 
 ### Query Optimization Tips
+
 - Use views for complex queries
 - Filter by `is_active = true` for active pilots only
 - Index on `expiry_date` supports fast status calculations
@@ -181,6 +196,7 @@ ORDER BY expiry_month;
 ## Maintenance Queries
 
 ### Update Certification Expiry
+
 ```sql
 UPDATE an_pilot_checks
 SET expiry_date = '2025-12-31', updated_at = CURRENT_TIMESTAMP
@@ -189,12 +205,14 @@ WHERE pilot_id = (SELECT id FROM an_pilots WHERE employee_id = 'PX001')
 ```
 
 ### Add New Pilot
+
 ```sql
 INSERT INTO an_pilots (employee_id, first_name, last_name, role, nationality, is_active)
 VALUES ('PX016', 'New', 'Pilot', 'First Officer', 'Papua New Guinea', true);
 ```
 
 ### Bulk Certification Update
+
 ```sql
 -- Extend all medical certificates by 1 year
 UPDATE an_pilot_checks
@@ -258,6 +276,7 @@ After successful deployment:
 ## Support
 
 For database-related issues:
+
 - Check Supabase logs for detailed error messages
 - Use the diagnostic queries above
 - Verify table relationships and constraints

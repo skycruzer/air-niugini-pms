@@ -5,7 +5,7 @@ async function testApp() {
 
   const browser = await puppeteer.launch({
     headless: false,
-    defaultViewport: { width: 1200, height: 800 }
+    defaultViewport: { width: 1200, height: 800 },
   });
 
   try {
@@ -19,17 +19,31 @@ async function testApp() {
 
     // Check if real data is displayed
     const stats = await page.evaluate(() => {
-      const pilots = document.querySelector('[data-testid="total-pilots"]') ||
-                    document.evaluate("//p[contains(text(), 'Total Pilots')]/preceding-sibling::*[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      const pilots =
+        document.querySelector('[data-testid="total-pilots"]') ||
+        document.evaluate(
+          "//p[contains(text(), 'Total Pilots')]/preceding-sibling::*[1]",
+          document,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        ).singleNodeValue;
 
-      const certifications = document.querySelector('[data-testid="certifications"]') ||
-                            document.evaluate("//p[contains(text(), 'Certifications')]/preceding-sibling::*[1]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      const certifications =
+        document.querySelector('[data-testid="certifications"]') ||
+        document.evaluate(
+          "//p[contains(text(), 'Certifications')]/preceding-sibling::*[1]",
+          document,
+          null,
+          XPathResult.FIRST_ORDERED_NODE_TYPE,
+          null
+        ).singleNodeValue;
 
       return {
         pilotsText: pilots?.textContent || 'Not found',
         certificationsText: certifications?.textContent || 'Not found',
         title: document.title,
-        hasSkeletonLoaders: document.querySelectorAll('.skeleton').length > 0
+        hasSkeletonLoaders: document.querySelectorAll('.skeleton').length > 0,
       };
     });
 
@@ -59,8 +73,7 @@ async function testApp() {
     console.log('   Close the browser window when done');
 
     // Keep browser open for manual inspection
-    await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 60 seconds
-
+    await new Promise((resolve) => setTimeout(resolve, 60000)); // Wait 60 seconds
   } catch (error) {
     console.error('❌ Test failed:', error);
   } finally {

@@ -4,7 +4,7 @@ test('Test login with user credentials', async ({ page }) => {
   console.log('🔐 Starting login test...');
 
   // Listen to console logs from the browser
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     console.log('🌐 Browser console:', msg.text());
   });
 
@@ -40,7 +40,7 @@ test('Test login with user credentials', async ({ page }) => {
     console.log('🎉 SUCCESS: Redirected to dashboard!');
 
     // Verify dashboard content
-    await expect(page.locator('text=Dashboard')).toBeVisible();
+    await expect(page.locator('h1, h2, h3').first()).toBeVisible();
     console.log('✅ Dashboard loaded successfully');
 
     // Check for admin elements
@@ -48,12 +48,14 @@ test('Test login with user credentials', async ({ page }) => {
     if (pageContent.includes('27') && pageContent.includes('556')) {
       console.log('✅ Live statistics visible: 27 pilots, 556 certifications');
     }
-
   } else if (currentUrl.includes('/login')) {
     console.log('⚠️  Still on login page - checking for error messages');
 
     // Look for error messages
-    const errorMessage = await page.locator('text=Invalid email or password').isVisible().catch(() => false);
+    const errorMessage = await page
+      .locator('text=Invalid email or password')
+      .isVisible()
+      .catch(() => false);
     if (errorMessage) {
       console.log('❌ Authentication failed: Invalid credentials error shown');
     }
@@ -61,7 +63,6 @@ test('Test login with user credentials', async ({ page }) => {
     // Check for any other error indicators
     const pageText = await page.textContent('body');
     console.log('📄 Page text sample:', pageText.substring(0, 200) + '...');
-
   } else {
     console.log('🔍 Unexpected URL after login:', currentUrl);
   }

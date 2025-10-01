@@ -4,7 +4,7 @@ test('Test error handling scenarios', async ({ page }) => {
   console.log('🔐 Testing error handling scenarios...');
 
   // Monitor console for errors
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     const type = msg.type();
     console.log(`🌐 [${type.toUpperCase()}] ${text}`);
@@ -28,7 +28,10 @@ test('Test error handling scenarios', async ({ page }) => {
     console.log('   ✅ Correctly stayed on login page');
 
     // Check for error message
-    const errorMessage = await page.locator('[class*="error"], [class*="alert"], .text-red-500, .text-red-700, .text-red-800').textContent().catch(() => '');
+    const errorMessage = await page
+      .locator('[class*="error"], [class*="alert"], .text-red-500, .text-red-700, .text-red-800')
+      .textContent()
+      .catch(() => '');
     if (errorMessage && errorMessage.includes('Invalid')) {
       console.log('   ✅ Error message displayed correctly');
     } else {
@@ -71,9 +74,12 @@ test('Test error handling scenarios', async ({ page }) => {
     // Check for key statistics
     const pageContent = await page.content();
     const has27Pilots = pageContent.includes('27');
-    const hasCertifications = pageContent.includes('556') || pageContent.includes('531') || pageContent.includes('568');
+    const hasCertifications =
+      pageContent.includes('556') || pageContent.includes('531') || pageContent.includes('568');
 
-    console.log(`   Statistics verification: 27 pilots=${has27Pilots}, certifications=${hasCertifications}`);
+    console.log(
+      `   Statistics verification: 27 pilots=${has27Pilots}, certifications=${hasCertifications}`
+    );
 
     if (has27Pilots && hasCertifications) {
       console.log('   ✅ Dashboard statistics loaded correctly');

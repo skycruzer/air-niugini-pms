@@ -14,11 +14,11 @@ const path = require('path');
   // Launch browser in headed mode so we can see it
   const browser = await chromium.launch({
     headless: false,
-    slowMo: 1000 // Slow down actions for visibility
+    slowMo: 1000, // Slow down actions for visibility
   });
 
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 }
+    viewport: { width: 1920, height: 1080 },
   });
 
   const page = await context.newPage();
@@ -35,7 +35,7 @@ const path = require('path');
     // Take screenshot of homepage
     await page.screenshot({
       path: path.join(screenshotsDir, '01-homepage.png'),
-      fullPage: true
+      fullPage: true,
     });
 
     console.log('✅ Homepage screenshot saved to screenshots/01-homepage.png');
@@ -55,7 +55,7 @@ const path = require('path');
     // Take screenshot of login page
     await page.screenshot({
       path: path.join(screenshotsDir, '02-login-page.png'),
-      fullPage: true
+      fullPage: true,
     });
 
     console.log('✅ Login page screenshot saved to screenshots/02-login-page.png');
@@ -63,10 +63,14 @@ const path = require('path');
     console.log('🔑 Step 3: Testing login with credentials');
 
     // Check if login form exists
-    const emailInput = await page.locator('input[type="email"], input[name="email"], input[placeholder*="email" i]').first();
-    const passwordInput = await page.locator('input[type="password"], input[name="password"], input[placeholder*="password" i]').first();
+    const emailInput = await page
+      .locator('input[type="email"], input[name="email"], input[placeholder*="email" i]')
+      .first();
+    const passwordInput = await page
+      .locator('input[type="password"], input[name="password"], input[placeholder*="password" i]')
+      .first();
 
-    if (await emailInput.count() > 0 && await passwordInput.count() > 0) {
+    if ((await emailInput.count()) > 0 && (await passwordInput.count()) > 0) {
       // Fill in credentials
       await emailInput.fill('skycruzer@icloud.com');
       await passwordInput.fill('mron2393');
@@ -74,15 +78,17 @@ const path = require('path');
       // Take screenshot before submitting
       await page.screenshot({
         path: path.join(screenshotsDir, '03-login-filled.png'),
-        fullPage: true
+        fullPage: true,
       });
 
       console.log('✅ Credentials filled in, screenshot saved to screenshots/03-login-filled.png');
 
       // Look for login button
-      const loginButton = await page.locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")').first();
+      const loginButton = await page
+        .locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")')
+        .first();
 
-      if (await loginButton.count() > 0) {
+      if ((await loginButton.count()) > 0) {
         await loginButton.click();
         console.log('🔄 Login button clicked, waiting for response...');
 
@@ -92,7 +98,7 @@ const path = require('path');
         // Take screenshot after login attempt
         await page.screenshot({
           path: path.join(screenshotsDir, '04-after-login.png'),
-          fullPage: true
+          fullPage: true,
         });
 
         console.log('✅ Post-login screenshot saved to screenshots/04-after-login.png');
@@ -101,7 +107,11 @@ const path = require('path');
         const currentUrl = page.url();
         console.log(`📍 Current URL after login: ${currentUrl}`);
 
-        if (currentUrl.includes('/dashboard') || currentUrl === 'http://localhost:3000/' || !currentUrl.includes('/login')) {
+        if (
+          currentUrl.includes('/dashboard') ||
+          currentUrl === 'http://localhost:3000/' ||
+          !currentUrl.includes('/login')
+        ) {
           console.log('✅ Login appears successful - redirected away from login page');
 
           console.log('🏠 Step 4: Testing dashboard and navigation');
@@ -112,7 +122,7 @@ const path = require('path');
           // Take screenshot of dashboard
           await page.screenshot({
             path: path.join(screenshotsDir, '05-dashboard.png'),
-            fullPage: true
+            fullPage: true,
           });
 
           console.log('✅ Dashboard screenshot saved to screenshots/05-dashboard.png');
@@ -128,8 +138,10 @@ const path = require('path');
           const commonNavItems = ['Pilots', 'Certifications', 'Leave', 'Reports', 'Dashboard'];
 
           for (const navItem of commonNavItems) {
-            const link = page.locator(`a:has-text("${navItem}"), button:has-text("${navItem}")`).first();
-            if (await link.count() > 0) {
+            const link = page
+              .locator(`a:has-text("${navItem}"), button:has-text("${navItem}")`)
+              .first();
+            if ((await link.count()) > 0) {
               console.log(`🔗 Found ${navItem} link, testing...`);
               await link.click();
               await page.waitForTimeout(1500);
@@ -137,18 +149,19 @@ const path = require('path');
               // Take screenshot of the page
               await page.screenshot({
                 path: path.join(screenshotsDir, `06-${navItem.toLowerCase()}-page.png`),
-                fullPage: true
+                fullPage: true,
               });
 
               console.log(`✅ ${navItem} page screenshot saved`);
             }
           }
-
         } else {
           console.log('❌ Login may have failed - still on login page or error occurred');
 
           // Check for error messages
-          const errorMessages = await page.locator('.error, [role="alert"], .text-red-500, .text-red-600, .bg-red-100').all();
+          const errorMessages = await page
+            .locator('.error, [role="alert"], .text-red-500, .text-red-600, .bg-red-100')
+            .all();
           if (errorMessages.length > 0) {
             for (let i = 0; i < errorMessages.length; i++) {
               const errorText = await errorMessages[i].textContent();
@@ -156,11 +169,9 @@ const path = require('path');
             }
           }
         }
-
       } else {
         console.log('❌ Could not find login button');
       }
-
     } else {
       console.log('❌ Could not find email or password input fields');
       console.log(`Email input count: ${await emailInput.count()}`);
@@ -178,7 +189,7 @@ const path = require('path');
     console.log(`📋 Total buttons found on page: ${allButtons.length}`);
 
     // Check for any console errors
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') {
         console.log(`🚨 Browser console error: ${msg.text()}`);
       }
@@ -187,7 +198,7 @@ const path = require('path');
     console.log('📸 Final screenshot of current state');
     await page.screenshot({
       path: path.join(screenshotsDir, '07-final-state.png'),
-      fullPage: true
+      fullPage: true,
     });
 
     console.log('✅ Test completed! Check the screenshots directory for visual results.');
@@ -198,18 +209,16 @@ const path = require('path');
 
     // Keep the process alive
     await new Promise(() => {});
-
   } catch (error) {
     console.error('❌ Error during testing:', error.message);
 
     // Take error screenshot
     await page.screenshot({
       path: path.join(screenshotsDir, 'error-state.png'),
-      fullPage: true
+      fullPage: true,
     });
 
     console.log('📸 Error screenshot saved to screenshots/error-state.png');
-
   } finally {
     // Don't close browser automatically - let user examine it
     console.log('🔍 Browser ready for manual inspection...');

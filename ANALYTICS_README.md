@@ -7,6 +7,7 @@ This enhancement adds comprehensive interactive analytics and charting capabilit
 ## 🚀 Features Implemented
 
 ### 1. Interactive Charts & Visualizations
+
 - **Certification Compliance Pie Charts** with Air Niugini brand colors (#E4002B red, #FFC72C gold)
 - **Pilot Role Distribution Charts** showing Captains, First Officers, Training Captains, and Examiners
 - **Age Distribution Analysis** with demographic insights and retirement planning
@@ -16,6 +17,7 @@ This enhancement adds comprehensive interactive analytics and charting capabilit
 - **Risk Assessment Indicators** with visual alerts
 
 ### 2. Advanced Analytics Dashboard
+
 - **Real-time Data Processing** with intelligent caching
 - **Interactive Filtering** by date range, pilot role, certification status, and contract type
 - **Trend Analysis** with historical data visualization
@@ -24,6 +26,7 @@ This enhancement adds comprehensive interactive analytics and charting capabilit
 - **Mobile-Responsive Design** optimized for all screen sizes
 
 ### 3. Export & Sharing Functionality
+
 - **Multiple Export Formats**: PNG, JPG, CSV, JSON
 - **High-Resolution Exports** with customizable quality settings
 - **Print-Optimized** layouts for official reports
@@ -32,6 +35,7 @@ This enhancement adds comprehensive interactive analytics and charting capabilit
 - **Bulk Export** capabilities for multiple charts
 
 ### 4. Enhanced User Experience
+
 - **Air Niugini Brand Integration** throughout all components
 - **Loading States** with skeleton screens
 - **Error Handling** with user-friendly messages
@@ -41,6 +45,7 @@ This enhancement adds comprehensive interactive analytics and charting capabilit
 ## 🏗️ Technical Architecture
 
 ### File Structure
+
 ```
 src/
 ├── components/
@@ -67,6 +72,7 @@ src/
 ```
 
 ### Technology Stack
+
 - **Chart.js 4.5.0** with react-chartjs-2 5.3.0 for interactive visualizations
 - **TypeScript** for type safety and enhanced developer experience
 - **TailwindCSS** for responsive styling with Air Niugini brand colors
@@ -76,13 +82,16 @@ src/
 ### Key Components
 
 #### 1. Analytics Service (`src/lib/analytics-service.ts`)
+
 - Comprehensive data processing for all analytics
 - Intelligent caching integration
 - Performance optimizations with parallel data fetching
 - Error handling and fallback mechanisms
 
 #### 2. Chart Components (`src/components/charts/ReportCharts.tsx`)
+
 Enhanced chart library with:
+
 - Air Niugini brand color schemes
 - Interactive hover and click events
 - Responsive design for mobile devices
@@ -90,6 +99,7 @@ Enhanced chart library with:
 - Accessibility features
 
 #### 3. Analytics Dashboard (`src/components/analytics/AnalyticsDashboard.tsx`)
+
 - Comprehensive filtering system
 - Real-time data refresh
 - KPI tracking with target monitoring
@@ -97,6 +107,7 @@ Enhanced chart library with:
 - Mobile-optimized layout
 
 #### 4. Export System (`src/lib/chart-export.ts`)
+
 - Multiple format support (PNG, JPG, CSV, JSON)
 - High-resolution export options
 - Print optimization
@@ -106,6 +117,7 @@ Enhanced chart library with:
 ## 📱 Mobile Responsiveness
 
 ### Responsive Design Features
+
 - **Adaptive Grid Layouts** that stack vertically on mobile
 - **Touch-Optimized** interactions for chart drilling
 - **Scalable Charts** that maintain readability on small screens
@@ -113,6 +125,7 @@ Enhanced chart library with:
 - **Swipe-Friendly** navigation between chart sections
 
 ### Breakpoints
+
 - **Desktop**: 1024px+ (full grid layout)
 - **Tablet**: 768px-1023px (2-column layout)
 - **Mobile**: Below 768px (single column, stacked layout)
@@ -120,6 +133,7 @@ Enhanced chart library with:
 ## 🎨 Air Niugini Brand Integration
 
 ### Color Scheme
+
 ```css
 Primary Red: #E4002B    /* Headers, critical alerts, primary actions */
 Gold: #FFC72C          /* Highlights, secondary actions, success states */
@@ -130,6 +144,7 @@ Info: #0EA5E9          /* Information, neutral states */
 ```
 
 ### Design Consistency
+
 - Consistent typography and spacing
 - Air Niugini logo integration
 - Professional aviation industry aesthetics
@@ -138,23 +153,28 @@ Info: #0EA5E9          /* Information, neutral states */
 ## 🚀 Getting Started
 
 ### 1. Navigation
+
 Access the analytics from the main dashboard:
+
 - **Analytics Preview**: Visible on main dashboard with key metrics
 - **Full Analytics**: Click "View Full Analytics" or navigate to `/dashboard/analytics`
 
 ### 2. Using Filters
+
 - **Date Range**: Select time periods for analysis
 - **Pilot Role**: Filter by Captain, First Officer, Training Captain, or Examiner
 - **Certification Status**: Focus on Current, Expiring, or Expired certifications
 - **Contract Type**: Filter by Permanent, Contract, or Training pilots
 
 ### 3. Exporting Charts
+
 1. Click the "Export" button on any chart
 2. Choose format: PNG, JPG, CSV, or JSON
 3. Select resolution: Low, Medium, or High
 4. Charts download automatically with branded formatting
 
 ### 4. Interactive Features
+
 - **Click on chart elements** for detailed drill-downs
 - **Hover for tooltips** with additional information
 - **Filter combinations** for specific insights
@@ -163,6 +183,7 @@ Access the analytics from the main dashboard:
 ## 📊 Available Charts & Analytics
 
 ### Pilot Analytics
+
 1. **Role Distribution Pie Chart**
    - Visual breakdown of pilot roles
    - Click to filter other charts by role
@@ -179,6 +200,7 @@ Access the analytics from the main dashboard:
    - Risk assessment integration
 
 ### Certification Analytics
+
 1. **Compliance Status Doughnut**
    - Current vs. Expiring vs. Expired
    - Real-time compliance percentage
@@ -195,6 +217,7 @@ Access the analytics from the main dashboard:
    - Filterable by category type
 
 ### Trend Analytics
+
 1. **Certification Trends Line Chart**
    - Historical compliance data
    - Trend analysis over time
@@ -206,6 +229,7 @@ Access the analytics from the main dashboard:
    - Approval rate tracking
 
 ### Fleet Analytics
+
 1. **Fleet Readiness Polar Chart**
    - Compliance status distribution
    - Overall readiness percentage
@@ -219,18 +243,21 @@ Access the analytics from the main dashboard:
 ## 🔧 Performance Optimizations
 
 ### Data Loading
+
 - **Intelligent Caching** with 5-minute refresh intervals
 - **Parallel Data Fetching** for multiple analytics
 - **Error Boundaries** with graceful fallbacks
 - **Loading Skeletons** for better UX
 
 ### Chart Rendering
+
 - **Lazy Loading** for off-screen charts
 - **Canvas Optimization** for smooth interactions
 - **Memory Management** with proper cleanup
 - **Animation Performance** optimized for 60fps
 
 ### Mobile Performance
+
 - **Reduced Animation** on low-power devices
 - **Optimized Images** for different screen densities
 - **Touch Debouncing** for responsive interactions
@@ -239,18 +266,22 @@ Access the analytics from the main dashboard:
 ## 🧪 Testing
 
 ### Test Endpoint
+
 Access the analytics test endpoint at:
+
 ```
 GET /api/analytics/test
 ```
 
 This endpoint verifies:
+
 - ✅ All analytics services are functional
 - ✅ Database connections are working
 - ✅ Data processing is accurate
 - ✅ Error handling is proper
 
 ### Manual Testing Checklist
+
 - [ ] Charts load without errors
 - [ ] Filters work correctly
 - [ ] Export functionality works
@@ -262,12 +293,14 @@ This endpoint verifies:
 ## 🚨 Error Handling
 
 ### Comprehensive Error Management
+
 - **Service-Level**: Each analytics service has try-catch blocks
 - **Component-Level**: Error boundaries for chart components
 - **User-Friendly**: Clear error messages with recovery options
 - **Logging**: Detailed console logging for debugging
 
 ### Fallback Mechanisms
+
 - **Default Data**: Sensible defaults when data is unavailable
 - **Graceful Degradation**: Core functionality remains when features fail
 - **Retry Logic**: Automatic retry for transient failures
@@ -276,6 +309,7 @@ This endpoint verifies:
 ## 🔮 Future Enhancements
 
 ### Planned Features
+
 1. **Real-time Notifications** for critical metrics
 2. **Advanced Predictive Analytics** using machine learning
 3. **Custom Dashboard Builder** for user personalization
@@ -285,6 +319,7 @@ This endpoint verifies:
 7. **AI-Powered Insights** with natural language summaries
 
 ### Performance Improvements
+
 1. **WebAssembly Charts** for faster rendering
 2. **Service Worker Caching** for offline functionality
 3. **GraphQL Integration** for optimized data fetching
@@ -296,24 +331,28 @@ This endpoint verifies:
 ### Common Issues
 
 #### Charts Not Loading
+
 1. Check browser console for errors
 2. Verify API endpoint accessibility
 3. Clear browser cache and reload
 4. Test with `/api/analytics/test` endpoint
 
 #### Export Not Working
+
 1. Ensure modern browser with Canvas support
 2. Check popup blockers
 3. Verify sufficient disk space
 4. Try different export formats
 
 #### Mobile Display Issues
+
 1. Clear mobile browser cache
 2. Ensure stable internet connection
 3. Try landscape orientation
 4. Update browser to latest version
 
 ### Performance Issues
+
 1. **Slow Loading**: Check network connection and server load
 2. **Memory Usage**: Close other tabs and restart browser
 3. **Chart Lag**: Reduce animation settings in browser
@@ -322,6 +361,7 @@ This endpoint verifies:
 ## 📞 Contact & Support
 
 For technical support or feature requests:
+
 - **Development Team**: Air Niugini IT Department
 - **System Documentation**: Available in CLAUDE.md
 - **API Documentation**: See individual service files
@@ -330,5 +370,5 @@ For technical support or feature requests:
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Enhanced Analytics Dashboard v1.0.0*
-*Papua New Guinea's National Airline Fleet Operations Management*
+_Enhanced Analytics Dashboard v1.0.0_
+_Papua New Guinea's National Airline Fleet Operations Management_

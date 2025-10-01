@@ -4,7 +4,7 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
   console.log('🚀 Starting comprehensive test...');
 
   // Listen to console logs from the browser
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     console.log('🌐 Browser console:', msg.text());
   });
 
@@ -49,7 +49,9 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
     console.log('🔄 Testing Grid/List view toggle...');
 
     // Look for the view toggle button
-    const viewToggle = page.locator('[data-testid="view-toggle"], button:has-text("Grid"), button:has-text("List"), .view-toggle');
+    const viewToggle = page.locator(
+      '[data-testid="view-toggle"], button:has-text("Grid"), button:has-text("List"), .view-toggle'
+    );
 
     try {
       await viewToggle.first().waitFor({ timeout: 5000 });
@@ -64,7 +66,6 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
       await viewToggle.first().click();
       await page.waitForTimeout(1000);
       console.log('✅ View toggle switched back successfully');
-
     } catch (error) {
       console.log('⚠️  View toggle not found, checking for pilot cards...');
     }
@@ -73,7 +74,9 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
     console.log('📋 Testing pilot data display...');
 
     // Look for pilot cards or list items
-    const pilotCards = page.locator('.pilot-card, [data-testid="pilot-card"], .grid > div, .pilot-item');
+    const pilotCards = page.locator(
+      '.pilot-card, [data-testid="pilot-card"], .grid > div, .pilot-item'
+    );
     const pilotCount = await pilotCards.count();
     console.log(`👥 Found ${pilotCount} pilot cards/items`);
 
@@ -84,7 +87,6 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
       const firstPilot = pilotCards.first();
       const pilotText = await firstPilot.textContent();
       console.log('👨‍✈️ First pilot info:', pilotText.substring(0, 100) + '...');
-
     } else {
       console.log('⚠️  No pilot cards found, checking for loading state...');
 
@@ -118,12 +120,14 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
     } catch (error) {
       console.log('⚠️  Reports page not accessible or found');
     }
-
   } else {
     console.log('❌ Login failed - still on login page');
 
     // Check for error messages
-    const errorMessage = await page.locator('text=Invalid, .error, [data-testid="error"]').isVisible().catch(() => false);
+    const errorMessage = await page
+      .locator('text=Invalid, .error, [data-testid="error"]')
+      .isVisible()
+      .catch(() => false);
     if (errorMessage) {
       console.log('❌ Error message detected on login page');
     }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="144" height="144" viewBox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="144" height="144" fill="#E4002B"/>
+
+  <!-- Circle accent -->
+  <circle cx="72" cy="72" r="50.4" fill="#FFFFFF" opacity="0.1"/>
+
+  <!-- Aircraft Icon (simplified B767) -->
+  <g transform="translate(72, 72)">
+    <!-- Fuselage -->
+    <rect x="-21.599999999999998" y="-7.2" width="43.199999999999996" height="14.4" fill="#FFFFFF" rx="2.88"/>
+
+    <!-- Wings -->
+    <rect x="-36" y="-2.88" width="72" height="5.76" fill="#FFFFFF" rx="1.44"/>
+
+    <!-- Tail -->
+    <polygon points="18.72,-7.2 21.599999999999998,-21.599999999999998 24.48,-7.2" fill="#FFC72C"/>
+  </g>
+
+  <!-- Text: AN -->
+  <text x="72" y="108" font-family="Arial, sans-serif" font-size="25.919999999999998" font-weight="bold" text-anchor="middle" fill="#FFFFFF">AN</text>
+
+  <!-- Subtitle: PMS -->
+  <text x="72" y="126.72" font-family="Arial, sans-serif" font-size="11.52" text-anchor="middle" fill="#FFC72C">PMS</text>
+</svg>
