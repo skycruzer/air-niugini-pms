@@ -1,44 +1,46 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import dynamic from 'next/dynamic'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import dynamicImport from 'next/dynamic';
 
 // Dynamic import for non-critical background elements
-const BackgroundElements = dynamic(() => import('./components/BackgroundElements'), {
+const BackgroundElements = dynamicImport(() => import('./components/BackgroundElements'), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red" />
-})
+  loading: () => (
+    <div className="absolute inset-0 bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red" />
+  ),
+});
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const router = useRouter()
-  const { login } = useAuth()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
-      const success = await login(email, password)
+      const success = await login(email, password);
       if (success) {
-        router.push('/dashboard')
+        router.push('/dashboard');
       } else {
-        setError('Invalid email or password. Please check your credentials.')
+        setError('Invalid email or password. Please check your credentials.');
       }
-    } catch (err) {
-      setError('An error occurred during login')
+    } catch {
+      setError('An error occurred during login');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red overflow-hidden">
@@ -50,12 +52,9 @@ export default function LoginPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <a
-                href="/"
-                className="btn btn-ghost text-white hover:bg-white/10 border-white/20"
-              >
+              <Link href="/" className="btn btn-ghost text-white hover:bg-white/10 border-white/20">
                 ← Back to Home
-              </a>
+              </Link>
             </div>
             <div className="flex items-center text-white">
               <div className="relative mr-4">
@@ -81,27 +80,32 @@ export default function LoginPage() {
       <main className="relative z-10 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
             {/* Left Side - Branding & Info */}
             <div className="text-center lg:text-left animate-fade-in">
               <div className="mb-8">
                 <div className="inline-flex items-center bg-white px-4 py-2 rounded-full text-sm font-bold mb-6 text-gray-900 shadow-lg">
                   🛡️ Secure Access Portal
                 </div>
-                <h2 className="text-display-medium font-black mb-4 text-white" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
+                <h2
+                  className="text-display-medium font-black mb-4 text-white"
+                  style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}
+                >
                   Welcome Back
                 </h2>
-                <p className="text-body-large text-white leading-relaxed max-w-lg font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>
+                <p
+                  className="text-body-large text-white leading-relaxed max-w-lg font-medium"
+                  style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}
+                >
                   Access your professional pilot management dashboard with secure authentication.
                   Manage certifications, leave requests, and fleet compliance with confidence.
                 </p>
               </div>
 
-              {/* Air Niugini B767 Aircraft Photo */}
+              {/* Air Niugini 50th Anniversary */}
               <div className="mb-8 flex justify-center lg:justify-start">
                 <img
-                  src="/images/air-niugini-b767-new.jpg"
-                  alt="Air Niugini Boeing 767-300ER P2-ANG 'Bulolo'"
+                  src="/images/air-niugini-50th-anniversary.jpg"
+                  alt="Air Niugini 50 Years - 1973-2023"
                   className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
                 />
               </div>
@@ -112,19 +116,34 @@ export default function LoginPage() {
                   <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
                     <span className="text-green-600">✅</span>
                   </div>
-                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Real-time certification tracking</span>
+                  <span
+                    className="text-white font-medium"
+                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}
+                  >
+                    Real-time certification tracking
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
                     <span className="text-blue-600">✅</span>
                   </div>
-                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Intelligent roster management</span>
+                  <span
+                    className="text-white font-medium"
+                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}
+                  >
+                    Intelligent roster management
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-4 shadow-lg">
                     <span className="text-purple-600">✅</span>
                   </div>
-                  <span className="text-white font-medium" style={{textShadow: '1px 1px 3px rgba(0,0,0,0.7)'}}>Comprehensive compliance monitoring</span>
+                  <span
+                    className="text-white font-medium"
+                    style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.7)' }}
+                  >
+                    Comprehensive compliance monitoring
+                  </span>
                 </div>
               </div>
             </div>
@@ -145,7 +164,6 @@ export default function LoginPage() {
                   </p>
                 </div>
 
-
                 {/* Error Message */}
                 {error && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start">
@@ -160,9 +178,7 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
                   <div>
-                    <label className="form-label">
-                      Email Address
-                    </label>
+                    <label className="form-label">Email Address</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <span className="h-5 w-5 text-gray-400">📧</span>
@@ -181,9 +197,7 @@ export default function LoginPage() {
 
                   {/* Password Field */}
                   <div>
-                    <label className="form-label">
-                      Password
-                    </label>
+                    <label className="form-label">Password</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <span className="h-5 w-5 text-gray-400">🔒</span>
@@ -221,18 +235,14 @@ export default function LoginPage() {
                         Authenticating...
                       </>
                     ) : (
-                      <>
-                        🛡️ Sign In to Dashboard
-                      </>
+                      <>🛡️ Sign In to Dashboard</>
                     )}
                   </button>
                 </form>
 
                 {/* Footer */}
                 <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                  <p className="text-xs text-gray-400">
-                    Powered by PIN Modern Technology
-                  </p>
+                  <p className="text-xs text-gray-400">Powered by PIN Modern Technology</p>
                 </div>
               </div>
             </div>
@@ -240,5 +250,5 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
