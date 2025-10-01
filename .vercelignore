@@ -1,0 +1,9 @@
+# Ignore node_modules to force fresh install
+node_modules
+
+# Ignore build artifacts
+.next
+out
+
+# Ignore local env files
+.env*.local
