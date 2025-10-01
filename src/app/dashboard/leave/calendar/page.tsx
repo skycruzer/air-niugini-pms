@@ -1,12 +1,78 @@
-'use client'
+'use client';
 
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { LeaveCalendarView } from '@/components/leave/LeaveCalendarView'
-import { Calendar, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { InteractiveRosterCalendar } from '@/components/leave/InteractiveRosterCalendar';
+import { RosterPeriodNavigator } from '@/components/leave/RosterPeriodNavigator';
+import { LeaveConflictDetector } from '@/components/leave/LeaveConflictDetector';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
+import { getCurrentRosterPeriod, RosterPeriod } from '@/lib/roster-utils';
+import { getAllLeaveRequests, updateLeaveRequest } from '@/lib/leave-service';
+import { Calendar, ArrowLeft } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import Link from 'next/link';
+import type { LeaveEvent } from '@/components/leave/InteractiveRosterCalendar';
 
 export default function LeaveCalendarPage() {
+  const { user } = useAuth();
+  const [currentRoster, setCurrentRoster] = useState<RosterPeriod>(getCurrentRosterPeriod());
+  const [leaveRequests, setLeaveRequests] = useState<LeaveEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedLeave, setSelectedLeave] = useState<LeaveEvent | null>(null);
+  const [conflictedLeaves, setConflictedLeaves] = useState<LeaveEvent[]>([]);
+
+  useEffect(() => {
+    loadLeaveRequests();
+  }, []);
+
+  const loadLeaveRequests = async () => {
+    try {
+      setLoading(true);
+      const requests = await getAllLeaveRequests();
+
+      const transformedRequests: LeaveEvent[] = requests.map((request) => ({
+        id: request.id,
+        pilotName: request.pilot_name || 'Unknown Pilot',
+        employeeId: request.employee_id || '',
+        pilotId: request.pilot_id,
+        requestType: request.request_type,
+        startDate: parseISO(request.start_date),
+        endDate: parseISO(request.end_date),
+        status: request.status,
+        daysCount: request.days_count,
+      }));
+
+      setLeaveRequests(transformedRequests);
+    } catch (error) {
+      console.error('Error loading leave requests:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDateChange = async (leaveId: string, newStartDate: Date, newEndDate: Date) => {
+    try {
+      await updateLeaveRequest(leaveId, {
+        start_date: format(newStartDate, 'yyyy-MM-dd'),
+        end_date: format(newEndDate, 'yyyy-MM-dd'),
+      });
+      await loadLeaveRequests();
+    } catch (error) {
+      console.error('Error updating leave dates:', error);
+      throw error;
+    }
+  };
+
+  const handleConflictDetected = (conflicts: LeaveEvent[]) => {
+    setConflictedLeaves(conflicts);
+  };
+
+  const handleRosterPeriodChange = (period: RosterPeriod) => {
+    setCurrentRoster(period);
+  };
+
   return (
     <ProtectedRoute>
       <DashboardLayout>
@@ -25,19 +91,50 @@ export default function LeaveCalendarPage() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                   <Calendar className="w-7 h-7 text-[#E4002B] mr-3" />
-                  Leave Calendar
+                  Interactive Leave Calendar
                 </h1>
-                <p className="text-gray-600 mt-1">
-                  View leave requests in calendar format
-                </p>
+                <p className="text-gray-600 mt-1">Drag and drop to reschedule leave requests</p>
               </div>
             </div>
           </div>
 
+          {/* Roster Period Navigator */}
+          <RosterPeriodNavigator
+            currentPeriod={currentRoster}
+            onPeriodChange={handleRosterPeriodChange}
+            showCountdown={true}
+            showTimeline={true}
+          />
+
           {/* Calendar Component */}
-          <LeaveCalendarView />
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+              <span className="ml-3 text-gray-600">Loading calendar...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <InteractiveRosterCalendar
+                  leaveRequests={leaveRequests}
+                  onDateChange={handleDateChange}
+                  onConflictDetected={handleConflictDetected}
+                  readonly={!permissions.canEdit(user)}
+                />
+              </div>
+
+              <div className="lg:col-span-1">
+                <LeaveConflictDetector
+                  leaveRequests={leaveRequests}
+                  currentLeave={selectedLeave || undefined}
+                  minimumCrew={18}
+                  allowOverride={permissions.canEdit(user)}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

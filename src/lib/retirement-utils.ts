@@ -7,24 +7,24 @@
  * @since 2025-09-27
  */
 
-import { settingsService } from './settings-service'
+import { settingsService } from './settings-service';
 
 export interface RetirementInfo {
-  retirementDate: Date
-  yearsToRetirement: number
-  monthsToRetirement: number
-  daysToRetirement: number
-  isNearingRetirement: boolean // < 5 years
-  retirementStatus: 'active' | 'nearing' | 'due_soon' | 'overdue'
-  displayText: string
+  retirementDate: Date;
+  yearsToRetirement: number;
+  monthsToRetirement: number;
+  daysToRetirement: number;
+  isNearingRetirement: boolean; // < 5 years
+  retirementStatus: 'active' | 'nearing' | 'due_soon' | 'overdue';
+  displayText: string;
 }
 
 export interface PilotWithRetirement {
-  id: string
-  first_name: string
-  last_name: string
-  date_of_birth: string | null
-  retirement: RetirementInfo | null
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string | null;
+  retirement: RetirementInfo | null;
 }
 
 /**
@@ -38,60 +38,61 @@ export function calculateRetirementInfo(
   retirementAge: number = 65
 ): RetirementInfo | null {
   if (!dateOfBirth) {
-    return null
+    return null;
   }
 
-  const birthDate = new Date(dateOfBirth)
-  const today = new Date()
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
 
   // Calculate retirement date (birthday on retirement year)
-  const retirementDate = new Date(birthDate)
-  retirementDate.setFullYear(birthDate.getFullYear() + retirementAge)
+  const retirementDate = new Date(birthDate);
+  retirementDate.setFullYear(birthDate.getFullYear() + retirementAge);
 
   // Calculate time remaining
-  const timeDiff = retirementDate.getTime() - today.getTime()
-  const daysToRetirement = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
+  const timeDiff = retirementDate.getTime() - today.getTime();
+  const daysToRetirement = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
   // More accurate years calculation using actual age vs retirement age
-  const currentAge = today.getFullYear() - birthDate.getFullYear()
-  const hasHadBirthdayThisYear = today.getMonth() > birthDate.getMonth() ||
-    (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate())
+  const currentAge = today.getFullYear() - birthDate.getFullYear();
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
 
-  const actualAge = hasHadBirthdayThisYear ? currentAge : currentAge - 1
-  const yearsToRetirement = retirementAge - actualAge
+  const actualAge = hasHadBirthdayThisYear ? currentAge : currentAge - 1;
+  const yearsToRetirement = retirementAge - actualAge;
 
   // Convert remaining days to months and days
-  const remainingDaysAfterYears = daysToRetirement - (yearsToRetirement * 365.25)
-  const monthsToRetirement = Math.floor(remainingDaysAfterYears / 30.44)
-  const finalDaysToRetirement = Math.floor(remainingDaysAfterYears - (monthsToRetirement * 30.44))
+  const remainingDaysAfterYears = daysToRetirement - yearsToRetirement * 365.25;
+  const monthsToRetirement = Math.floor(remainingDaysAfterYears / 30.44);
+  const finalDaysToRetirement = Math.floor(remainingDaysAfterYears - monthsToRetirement * 30.44);
 
   // Determine status
-  const isNearingRetirement = yearsToRetirement < 5
-  let retirementStatus: RetirementInfo['retirementStatus'] = 'active'
+  const isNearingRetirement = yearsToRetirement < 5;
+  let retirementStatus: RetirementInfo['retirementStatus'] = 'active';
 
   if (daysToRetirement < 0) {
-    retirementStatus = 'overdue'
+    retirementStatus = 'overdue';
   } else if (daysToRetirement <= 365) {
-    retirementStatus = 'due_soon'
+    retirementStatus = 'due_soon';
   } else if (isNearingRetirement) {
-    retirementStatus = 'nearing'
+    retirementStatus = 'nearing';
   }
 
   // Generate display text based on user requirements:
   // >2 years: "x years to retirement"
   // >1 year but ≤2 years: "x years and x months to retirement"
   // ≤1 year: "x months and x days to retirement"
-  let displayText = ''
+  let displayText = '';
   if (daysToRetirement < 0) {
-    displayText = `Retired ${Math.abs(Math.floor(daysToRetirement / 365.25))} year${Math.abs(Math.floor(daysToRetirement / 365.25)) !== 1 ? 's' : ''} ago`
+    displayText = `Retired ${Math.abs(Math.floor(daysToRetirement / 365.25))} year${Math.abs(Math.floor(daysToRetirement / 365.25)) !== 1 ? 's' : ''} ago`;
   } else if (yearsToRetirement > 2) {
-    displayText = `${yearsToRetirement} year${yearsToRetirement !== 1 ? 's' : ''} to retirement`
+    displayText = `${yearsToRetirement} year${yearsToRetirement !== 1 ? 's' : ''} to retirement`;
   } else if (yearsToRetirement > 1) {
     // Show years and months for >1 year but ≤2 years
-    displayText = `${yearsToRetirement} year${yearsToRetirement !== 1 ? 's' : ''} and ${monthsToRetirement} month${monthsToRetirement !== 1 ? 's' : ''} to retirement`
+    displayText = `${yearsToRetirement} year${yearsToRetirement !== 1 ? 's' : ''} and ${monthsToRetirement} month${monthsToRetirement !== 1 ? 's' : ''} to retirement`;
   } else {
     // Show months and days for ≤1 year
-    displayText = `${monthsToRetirement} month${monthsToRetirement !== 1 ? 's' : ''} and ${finalDaysToRetirement} day${finalDaysToRetirement !== 1 ? 's' : ''} to retirement`
+    displayText = `${monthsToRetirement} month${monthsToRetirement !== 1 ? 's' : ''} and ${finalDaysToRetirement} day${finalDaysToRetirement !== 1 ? 's' : ''} to retirement`;
   }
 
   return {
@@ -101,8 +102,8 @@ export function calculateRetirementInfo(
     daysToRetirement: finalDaysToRetirement,
     isNearingRetirement,
     retirementStatus,
-    displayText
-  }
+    displayText,
+  };
 }
 
 /**
@@ -111,11 +112,11 @@ export function calculateRetirementInfo(
  */
 export async function getRetirementAge(): Promise<number> {
   try {
-    const settings = await settingsService.getSettings()
-    return settings.pilot_requirements.pilot_retirement_age || 65
+    const settings = await settingsService.getSettings();
+    return settings.pilot_requirements.pilot_retirement_age || 65;
   } catch (error) {
-    console.error('Error fetching retirement age from settings:', error)
-    return 65 // Default fallback
+    console.error('Error fetching retirement age from settings:', error);
+    return 65; // Default fallback
   }
 }
 
@@ -126,15 +127,20 @@ export async function getRetirementAge(): Promise<number> {
  * @returns Promise<PilotWithRetirement[]> - Pilots with retirement calculations
  */
 export async function calculatePilotsRetirement(
-  pilots: Array<{ id: string; first_name: string; last_name: string; date_of_birth: string | null }>,
+  pilots: Array<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string | null;
+  }>,
   retirementAge?: number
 ): Promise<PilotWithRetirement[]> {
-  const effectiveRetirementAge = retirementAge || await getRetirementAge()
+  const effectiveRetirementAge = retirementAge || (await getRetirementAge());
 
-  return pilots.map(pilot => ({
+  return pilots.map((pilot) => ({
     ...pilot,
-    retirement: calculateRetirementInfo(pilot.date_of_birth, effectiveRetirementAge)
-  }))
+    retirement: calculateRetirementInfo(pilot.date_of_birth, effectiveRetirementAge),
+  }));
 }
 
 /**
@@ -145,9 +151,7 @@ export async function calculatePilotsRetirement(
 export function getPilotsNearingRetirement(
   pilotsWithRetirement: PilotWithRetirement[]
 ): PilotWithRetirement[] {
-  return pilotsWithRetirement.filter(pilot =>
-    pilot.retirement?.isNearingRetirement === true
-  )
+  return pilotsWithRetirement.filter((pilot) => pilot.retirement?.isNearingRetirement === true);
 }
 
 /**
@@ -163,24 +167,24 @@ export function getRetirementStatusColor(retirementStatus: RetirementInfo['retir
         bgClass: 'bg-red-100',
         textClass: 'text-red-800',
         badgeClass: 'bg-red-100 text-red-800',
-        iconClass: 'text-red-600'
-      }
+        iconClass: 'text-red-600',
+      };
     case 'due_soon':
       return {
         color: 'orange',
         bgClass: 'bg-orange-100',
         textClass: 'text-orange-800',
         badgeClass: 'bg-orange-100 text-orange-800',
-        iconClass: 'text-orange-600'
-      }
+        iconClass: 'text-orange-600',
+      };
     case 'nearing':
       return {
         color: 'yellow',
         bgClass: 'bg-yellow-100',
         textClass: 'text-yellow-800',
         badgeClass: 'bg-yellow-100 text-yellow-800',
-        iconClass: 'text-yellow-600'
-      }
+        iconClass: 'text-yellow-600',
+      };
     case 'active':
     default:
       return {
@@ -188,8 +192,8 @@ export function getRetirementStatusColor(retirementStatus: RetirementInfo['retir
         bgClass: 'bg-green-100',
         textClass: 'text-green-800',
         badgeClass: 'bg-green-100 text-green-800',
-        iconClass: 'text-green-600'
-      }
+        iconClass: 'text-green-600',
+      };
   }
 }
 
@@ -198,17 +202,19 @@ export function getRetirementStatusColor(retirementStatus: RetirementInfo['retir
  * @param retirementStatus - Retirement status
  * @returns String emoji icon for the status
  */
-export function getRetirementStatusIcon(retirementStatus: RetirementInfo['retirementStatus']): string {
+export function getRetirementStatusIcon(
+  retirementStatus: RetirementInfo['retirementStatus']
+): string {
   switch (retirementStatus) {
     case 'overdue':
-      return '🚫'
+      return '🚫';
     case 'due_soon':
-      return '⚠️'
+      return '⚠️';
     case 'nearing':
-      return '⏰'
+      return '⏰';
     case 'active':
     default:
-      return '✅'
+      return '✅';
   }
 }
 
@@ -221,8 +227,8 @@ export function formatRetirementDate(retirementDate: Date): string {
   return retirementDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
-  })
+    day: 'numeric',
+  });
 }
 
 /**
@@ -231,14 +237,14 @@ export function formatRetirementDate(retirementDate: Date): string {
  * @returns Number representing current age
  */
 export function calculateAge(dateOfBirth: string | Date): number {
-  const birth = new Date(dateOfBirth)
-  const today = new Date()
-  let age = today.getFullYear() - birth.getFullYear()
-  const monthDiff = today.getMonth() - birth.getMonth()
+  const birth = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
 
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--
+    age--;
   }
 
-  return age
+  return age;
 }

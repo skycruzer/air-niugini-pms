@@ -1,208 +1,228 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { format, differenceInDays } from 'date-fns'
-import { getAllLeaveRequests, getPendingLeaveRequests, deleteLeaveRequest, updateLeaveRequest, type LeaveRequest, type LeaveRequestStats } from '@/lib/leave-service'
-import { LeaveRequestForm } from './LeaveRequestForm'
-import { LeaveRequestEditModal } from './LeaveRequestEditModal'
-import { LeaveRequestReviewModal } from './LeaveRequestReviewModal'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
+import { useState, useEffect } from 'react';
+import { format, differenceInDays } from 'date-fns';
+import {
+  getAllLeaveRequests,
+  getPendingLeaveRequests,
+  deleteLeaveRequest,
+  updateLeaveRequest,
+  type LeaveRequest,
+  type LeaveRequestStats,
+} from '@/lib/leave-service';
+import { LeaveRequestForm } from './LeaveRequestForm';
+import { LeaveRequestEditModal } from './LeaveRequestEditModal';
+import { LeaveRequestReviewModal } from './LeaveRequestReviewModal';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
 
 interface LeaveRequestsListProps {
-  refreshTrigger?: number
-  filterStatus?: 'all' | 'pending' | 'approved' | 'denied'
-  onStatsUpdate?: (stats: LeaveRequestStats) => void
+  refreshTrigger?: number;
+  filterStatus?: 'all' | 'pending' | 'approved' | 'denied';
+  onStatsUpdate?: (stats: LeaveRequestStats) => void;
 }
 
-export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStatsUpdate }: LeaveRequestsListProps) {
-  const { user } = useAuth()
-  const [requests, setRequests] = useState<LeaveRequest[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null)
-  const [editingRequest, setEditingRequest] = useState<LeaveRequest | null>(null)
-  const [reviewingRequest, setReviewingRequest] = useState<LeaveRequest | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+export function LeaveRequestsList({
+  refreshTrigger,
+  filterStatus = 'all',
+  onStatsUpdate,
+}: LeaveRequestsListProps) {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<LeaveRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
+  const [editingRequest, setEditingRequest] = useState<LeaveRequest | null>(null);
+  const [reviewingRequest, setReviewingRequest] = useState<LeaveRequest | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadRequests = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      let requestsData: LeaveRequest[]
+      let requestsData: LeaveRequest[];
       if (filterStatus === 'pending') {
-        requestsData = await getPendingLeaveRequests()
+        requestsData = await getPendingLeaveRequests();
       } else {
-        requestsData = await getAllLeaveRequests()
+        requestsData = await getAllLeaveRequests();
       }
 
       // Apply client-side filtering for non-pending statuses
       if (filterStatus !== 'all' && filterStatus !== 'pending') {
-        requestsData = requestsData.filter(req => req.status === filterStatus.toUpperCase())
+        requestsData = requestsData.filter((req) => req.status === filterStatus.toUpperCase());
       }
 
-      setRequests(requestsData)
+      setRequests(requestsData);
 
       // Calculate stats for parent component
       if (onStatsUpdate) {
         const stats = requestsData.reduce(
           (acc, request) => {
-            acc.total++
-            if (request.status === 'PENDING') acc.pending++
-            else if (request.status === 'APPROVED') acc.approved++
-            else if (request.status === 'DENIED') acc.denied++
+            acc.total++;
+            if (request.status === 'PENDING') acc.pending++;
+            else if (request.status === 'APPROVED') acc.approved++;
+            else if (request.status === 'DENIED') acc.denied++;
 
-            acc.byType[request.request_type as keyof typeof acc.byType]++
-            return acc
+            acc.byType[request.request_type as keyof typeof acc.byType]++;
+            return acc;
           },
           {
             total: 0,
             pending: 0,
             approved: 0,
             denied: 0,
-            byType: { RDO: 0, SDO: 0, ANNUAL: 0, SICK: 0, LSL: 0, LWOP: 0, MATERNITY: 0, COMPASSIONATE: 0 }
+            byType: {
+              RDO: 0,
+              SDO: 0,
+              ANNUAL: 0,
+              SICK: 0,
+              LSL: 0,
+              LWOP: 0,
+              MATERNITY: 0,
+              COMPASSIONATE: 0,
+            },
           }
-        )
-        onStatsUpdate(stats)
+        );
+        onStatsUpdate(stats);
       }
     } catch (error) {
-      console.error('Error loading leave requests:', error)
-      setError(error instanceof Error ? error.message : 'Failed to load leave requests')
+      console.error('Error loading leave requests:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load leave requests');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadRequests()
-  }, [refreshTrigger, filterStatus])
+    loadRequests();
+  }, [refreshTrigger, filterStatus]);
 
   const handleRequestUpdate = (updatedRequest: LeaveRequest) => {
-    setRequests(prevRequests =>
-      prevRequests.map(req => req.id === updatedRequest.id ? updatedRequest : req)
-    )
-    setSelectedRequest(null)
+    setRequests((prevRequests) =>
+      prevRequests.map((req) => (req.id === updatedRequest.id ? updatedRequest : req))
+    );
+    setSelectedRequest(null);
     // Reload to get fresh stats
-    loadRequests()
-  }
+    loadRequests();
+  };
 
   const handleEditSuccess = () => {
-    setEditingRequest(null)
-    loadRequests() // Refresh the list and stats
-  }
+    setEditingRequest(null);
+    loadRequests(); // Refresh the list and stats
+  };
 
   const handleReviewSuccess = (updatedRequest: LeaveRequest) => {
-    setReviewingRequest(null)
-    loadRequests() // Refresh the list and stats
-  }
+    setReviewingRequest(null);
+    loadRequests(); // Refresh the list and stats
+  };
 
   const handleDeleteRequest = async (requestId: string) => {
-    if (!confirm('Are you sure you want to delete this leave request?')) return
+    if (!confirm('Are you sure you want to delete this leave request?')) return;
 
     try {
-      setDeletingId(requestId)
-      await deleteLeaveRequest(requestId)
-      setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId))
-      loadRequests() // Refresh stats
+      setDeletingId(requestId);
+      await deleteLeaveRequest(requestId);
+      setRequests((prevRequests) => prevRequests.filter((req) => req.id !== requestId));
+      loadRequests(); // Refresh stats
     } catch (error) {
-      console.error('Error deleting leave request:', error)
-      setError(error instanceof Error ? error.message : 'Failed to delete leave request')
+      console.error('Error deleting leave request:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete leave request');
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'APPROVED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'DENIED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return '⏳'
+        return '⏳';
       case 'APPROVED':
-        return '✅'
+        return '✅';
       case 'DENIED':
-        return '❌'
+        return '❌';
       default:
-        return '❓'
+        return '❓';
     }
-  }
+  };
 
   const getLeaveTypeIcon = (type: string) => {
     switch (type) {
       case 'RDO':
-        return '🏠'
+        return '🏠';
       case 'SDO':
-        return '🌴'
+        return '🌴';
       case 'ANNUAL':
-        return '🏖️'
+        return '🏖️';
       case 'SICK':
-        return '🏥'
+        return '🏥';
       case 'LSL':
-        return '🎓'
+        return '🎓';
       case 'LWOP':
-        return '💼'
+        return '💼';
       case 'MATERNITY':
-        return '👶'
+        return '👶';
       case 'COMPASSIONATE':
-        return '💙'
+        return '💙';
       default:
-        return '📋'
+        return '📋';
     }
-  }
+  };
 
   const getSubmissionMethodIcon = (method: string | undefined) => {
     switch (method) {
       case 'EMAIL':
-        return '📧'
+        return '📧';
       case 'ORACLE':
-        return '🖥️'
+        return '🖥️';
       case 'LEAVE_BIDS':
-        return '📊'
+        return '📊';
       case 'SYSTEM':
-        return '⚙️'
+        return '⚙️';
       default:
-        return '❓'
+        return '❓';
     }
-  }
+  };
 
   const getSubmissionMethodLabel = (method: string | undefined) => {
     switch (method) {
       case 'EMAIL':
-        return 'Email'
+        return 'Email';
       case 'ORACLE':
-        return 'Oracle'
+        return 'Oracle';
       case 'LEAVE_BIDS':
-        return 'Leave Bids'
+        return 'Leave Bids';
       case 'SYSTEM':
-        return 'System'
+        return 'System';
       default:
-        return 'Unknown'
+        return 'Unknown';
     }
-  }
+  };
 
   const calculateDays = (startDate: string, endDate: string) => {
-    return differenceInDays(new Date(endDate), new Date(startDate)) + 1
-  }
+    return differenceInDays(new Date(endDate), new Date(startDate)) + 1;
+  };
 
   const canDeleteRequest = (request: LeaveRequest) => {
-    return request.status === 'PENDING' && permissions.canDelete(user)
-  }
+    return request.status === 'PENDING' && permissions.canDelete(user);
+  };
 
   const canEditRequest = (request: LeaveRequest) => {
-    return request.status === 'PENDING' && permissions.canEdit(user)
-  }
+    return request.status === 'PENDING' && permissions.canEdit(user);
+  };
 
   if (loading) {
     return (
@@ -210,7 +230,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
         <p className="text-gray-600 mt-2">Loading leave requests...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -230,7 +250,7 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (requests.length === 0) {
@@ -241,17 +261,19 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
         <p className="text-gray-600">
           {filterStatus === 'pending'
             ? 'No pending requests require review.'
-            : 'No leave requests have been submitted yet.'
-          }
+            : 'No leave requests have been submitted yet.'}
         </p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-4">
       {requests.map((request) => (
-        <div key={request.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div
+          key={request.id}
+          className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+        >
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -264,7 +286,9 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}
+                >
                   <span className="mr-1">{getStatusIcon(request.status)}</span>
                   {request.status}
                 </span>
@@ -279,12 +303,16 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Dates</p>
                 <p className="font-medium">
-                  {format(new Date(request.start_date), 'dd MMM')} - {format(new Date(request.end_date), 'dd MMM yyyy')}
+                  {format(new Date(request.start_date), 'dd MMM')} -{' '}
+                  {format(new Date(request.end_date), 'dd MMM yyyy')}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Duration</p>
-                <p className="font-medium">{calculateDays(request.start_date, request.end_date)} day{calculateDays(request.start_date, request.end_date) !== 1 ? 's' : ''}</p>
+                <p className="font-medium">
+                  {calculateDays(request.start_date, request.end_date)} day
+                  {calculateDays(request.start_date, request.end_date) !== 1 ? 's' : ''}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Submitted Via</p>
@@ -308,7 +336,9 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
 
             {request.review_comments && (
               <div className="mb-4">
-                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Review Comments</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                  Review Comments
+                </p>
                 <p className="text-sm bg-gray-50 rounded-lg p-2">{request.review_comments}</p>
               </div>
             )}
@@ -317,7 +347,8 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
               <div className="text-xs text-gray-500">
                 {request.reviewed_by && request.reviewed_at && (
                   <>
-                    Reviewed by {request.reviewer_name || 'Unknown'} on {format(new Date(request.reviewed_at), 'dd MMM yyyy HH:mm')}
+                    Reviewed by {request.reviewer_name || 'Unknown'} on{' '}
+                    {format(new Date(request.reviewed_at), 'dd MMM yyyy HH:mm')}
                   </>
                 )}
               </div>
@@ -377,5 +408,5 @@ export function LeaveRequestsList({ refreshTrigger, filterStatus = 'all', onStat
         />
       )}
     </div>
-  )
+  );
 }

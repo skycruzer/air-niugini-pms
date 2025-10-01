@@ -1,31 +1,41 @@
-'use client'
+'use client';
 
-export type SortField = 'name' | 'employee_id' | 'role' | 'seniority_number' | 'is_active' | 'certificationStatus'
-export type SortDirection = 'asc' | 'desc'
+export type SortField =
+  | 'name'
+  | 'employee_id'
+  | 'role'
+  | 'seniority_number'
+  | 'is_active'
+  | 'certificationStatus';
+export type SortDirection = 'asc' | 'desc';
 
 interface PilotListHeaderProps {
-  sortField?: SortField
-  sortDirection?: SortDirection
-  onSort?: (field: SortField) => void
+  sortField?: SortField;
+  sortDirection?: SortDirection;
+  onSort?: (field: SortField) => void;
 }
 
 export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListHeaderProps) {
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <span className="text-gray-300 ml-1" aria-hidden="true">⚪</span>
+      return (
+        <span className="text-gray-300 ml-1" aria-hidden="true">
+          ⚪
+        </span>
+      );
     }
     return (
       <span className="text-[#E4002B] ml-1" aria-hidden="true">
         {sortDirection === 'asc' ? '▲' : '▼'}
       </span>
-    )
-  }
+    );
+  };
 
   const handleSort = (field: SortField) => {
     if (onSort) {
-      onSort(field)
+      onSort(field);
     }
-  }
+  };
 
   return (
     <>
@@ -143,5 +153,5 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
         </div>
       </div>
     </>
-  )
+  );
 }

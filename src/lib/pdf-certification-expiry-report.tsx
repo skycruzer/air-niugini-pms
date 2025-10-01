@@ -7,15 +7,9 @@
  * @since 2025-09-28
  */
 
-import React from 'react'
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet
-} from '@react-pdf/renderer'
-import { format, parseISO } from 'date-fns'
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { format, parseISO } from 'date-fns';
 import {
   PDFHeader,
   PDFFooter,
@@ -24,54 +18,54 @@ import {
   Section,
   AlertBox,
   pdfStyles,
-  airNiuginiStyles
-} from './pdf-components'
-import { PDFReportMetadata } from '@/types/pdf-reports'
+  airNiuginiStyles,
+} from './pdf-components';
+import { PDFReportMetadata } from '@/types/pdf-reports';
 
 // =============================================================================
 // TYPES AND INTERFACES
 // =============================================================================
 
 export interface CertificationExpiryReportData {
-  timeframeDays: number
-  expiringCertifications: ExpiringCertification[]
-  generatedBy: string
-  generatedAt: Date
+  timeframeDays: number;
+  expiringCertifications: ExpiringCertification[];
+  generatedBy: string;
+  generatedAt: Date;
 }
 
 interface ExpiringCertification {
-  id: string
-  pilot_id: string
-  check_type_id: string
-  expiry_date: string
-  days_until_expiry: number
-  pilot_name: string
-  employee_id: string
-  check_type_name: string
-  check_category: string
-  is_expired: boolean
-  expiry_roster_period: string
-  expiry_roster_display: string
+  id: string;
+  pilot_id: string;
+  check_type_id: string;
+  expiry_date: string;
+  days_until_expiry: number;
+  pilot_name: string;
+  employee_id: string;
+  check_type_name: string;
+  check_category: string;
+  is_expired: boolean;
+  expiry_roster_period: string;
+  expiry_roster_display: string;
 }
 
 interface CertificationsByCategory {
-  [key: string]: ExpiringCertification[]
+  [key: string]: ExpiringCertification[];
 }
 
 interface CertificationStatistics {
-  totalCertifications: number
-  totalPilots: number
+  totalCertifications: number;
+  totalPilots: number;
   byStatus: {
-    expired: number
-    expiring_soon: number
-    upcoming: number
-  }
+    expired: number;
+    expiring_soon: number;
+    upcoming: number;
+  };
   byCategory: {
-    [key: string]: number
-  }
+    [key: string]: number;
+  };
   byRosterPeriod: {
-    [key: string]: number
-  }
+    [key: string]: number;
+  };
 }
 
 // =============================================================================
@@ -81,47 +75,54 @@ interface CertificationStatistics {
 /**
  * Calculate comprehensive certification statistics
  */
-function calculateCertificationStatistics(certifications: ExpiringCertification[]): CertificationStatistics {
-  const stats: CertificationStatistics = {
-    totalCertifications: certifications.length,
-    totalPilots: new Set(certifications.map(c => c.pilot_id)).size,
-    byStatus: { expired: 0, expiring_soon: 0, upcoming: 0 },
-    byCategory: {},
-    byRosterPeriod: {}
-  }
+function calculateCertificationStatistics(
+  certifications: ExpiringCertification[]
+): CertificationStatistics {
+  const byStatus = { expired: 0, expiring_soon: 0, upcoming: 0 };
+  const byCategory: { [key: string]: number } = {};
+  const byRosterPeriod: { [key: string]: number } = {};
 
-  certifications.forEach(cert => {
+  certifications.forEach((cert) => {
     // By status
     if (cert.days_until_expiry < 0) {
-      stats.byStatus.expired++
+      byStatus.expired++;
     } else if (cert.days_until_expiry <= 30) {
-      stats.byStatus.expiring_soon++
+      byStatus.expiring_soon++;
     } else {
-      stats.byStatus.upcoming++
+      byStatus.upcoming++;
     }
 
     // By category
-    stats.byCategory[cert.check_category] = (stats.byCategory[cert.check_category] || 0) + 1
+    byCategory[cert.check_category] = (byCategory[cert.check_category] || 0) + 1;
 
     // By roster period
-    stats.byRosterPeriod[cert.expiry_roster_period] = (stats.byRosterPeriod[cert.expiry_roster_period] || 0) + 1
-  })
+    byRosterPeriod[cert.expiry_roster_period] =
+      (byRosterPeriod[cert.expiry_roster_period] || 0) + 1;
+  });
 
-  return stats
+  return {
+    totalCertifications: certifications.length,
+    totalPilots: new Set(certifications.map((c) => c.pilot_id)).size,
+    byStatus,
+    byCategory,
+    byRosterPeriod,
+  };
 }
 
 /**
  * Group certifications by category
  */
-function groupCertificationsByCategory(certifications: ExpiringCertification[]): CertificationsByCategory {
+function groupCertificationsByCategory(
+  certifications: ExpiringCertification[]
+): CertificationsByCategory {
   return certifications.reduce((groups, cert) => {
-    const category = cert.check_category
+    const category = cert.check_category;
     if (!groups[category]) {
-      groups[category] = []
+      groups[category] = [];
     }
-    groups[category].push(cert)
-    return groups
-  }, {} as CertificationsByCategory)
+    groups[category].push(cert);
+    return groups;
+  }, {} as CertificationsByCategory);
 }
 
 /**
@@ -129,10 +130,10 @@ function groupCertificationsByCategory(certifications: ExpiringCertification[]):
  */
 function formatExpiryDate(dateString: string): string {
   try {
-    const date = parseISO(dateString)
-    return format(date, 'dd MMM yyyy')
+    const date = parseISO(dateString);
+    return format(date, 'dd MMM yyyy');
   } catch (error) {
-    return dateString
+    return dateString;
   }
 }
 
@@ -141,11 +142,11 @@ function formatExpiryDate(dateString: string): string {
  */
 function getStatusInfo(daysUntilExpiry: number) {
   if (daysUntilExpiry < 0) {
-    return { label: 'EXPIRED', color: airNiuginiStyles.colors.status.expired }
+    return { label: 'EXPIRED', color: airNiuginiStyles.colors.status.expired };
   } else if (daysUntilExpiry <= 30) {
-    return { label: 'EXPIRING SOON', color: airNiuginiStyles.colors.status.expiring }
+    return { label: 'EXPIRING SOON', color: airNiuginiStyles.colors.status.expiring };
   } else {
-    return { label: 'UPCOMING', color: airNiuginiStyles.colors.status.current }
+    return { label: 'UPCOMING', color: airNiuginiStyles.colors.status.current };
   }
 }
 
@@ -153,41 +154,54 @@ function getStatusInfo(daysUntilExpiry: number) {
  * Analyze training priorities and recommendations
  */
 function analyzeTrainingPriorities(certifications: ExpiringCertification[]): string[] {
-  const priorities: string[] = []
+  const priorities: string[] = [];
 
   // Count expired certifications
-  const expired = certifications.filter(c => c.days_until_expiry < 0)
+  const expired = certifications.filter((c) => c.days_until_expiry < 0);
   if (expired.length > 0) {
-    priorities.push(`${expired.length} certifications are already expired and require immediate attention`)
+    priorities.push(
+      `${expired.length} certifications are already expired and require immediate attention`
+    );
   }
 
   // Count critical (≤14 days)
-  const critical = certifications.filter(c => c.days_until_expiry >= 0 && c.days_until_expiry <= 14)
+  const critical = certifications.filter(
+    (c) => c.days_until_expiry >= 0 && c.days_until_expiry <= 14
+  );
   if (critical.length > 0) {
-    priorities.push(`${critical.length} certifications expire within 14 days - urgent training required`)
+    priorities.push(
+      `${critical.length} certifications expire within 14 days - urgent training required`
+    );
   }
 
   // Count by roster period for planning
-  const rosterCounts = certifications.reduce((counts, cert) => {
-    counts[cert.expiry_roster_period] = (counts[cert.expiry_roster_period] || 0) + 1
-    return counts
-  }, {} as Record<string, number>)
+  const rosterCounts = certifications.reduce(
+    (counts, cert) => {
+      counts[cert.expiry_roster_period] = (counts[cert.expiry_roster_period] || 0) + 1;
+      return counts;
+    },
+    {} as Record<string, number>
+  );
 
-  const heavyRosters = Object.entries(rosterCounts).filter(([_, count]) => count >= 5)
+  const heavyRosters = Object.entries(rosterCounts).filter(([_, count]) => count >= 5);
   if (heavyRosters.length > 0) {
-    priorities.push(`High training load in roster periods: ${heavyRosters.map(([roster, count]) => `${roster} (${count} certs)`).join(', ')}`)
+    priorities.push(
+      `High training load in roster periods: ${heavyRosters.map(([roster, count]) => `${roster} (${count} certs)`).join(', ')}`
+    );
   }
 
   // Category-specific recommendations
-  const categoryGroups = groupCertificationsByCategory(certifications)
+  const categoryGroups = groupCertificationsByCategory(certifications);
   Object.entries(categoryGroups).forEach(([category, certs]) => {
-    const urgent = certs.filter(c => c.days_until_expiry <= 30).length
+    const urgent = certs.filter((c) => c.days_until_expiry <= 30).length;
     if (urgent >= 3) {
-      priorities.push(`${category} category has ${urgent} certifications requiring training within 30 days`)
+      priorities.push(
+        `${category} category has ${urgent} certifications requiring training within 30 days`
+      );
     }
-  })
+  });
 
-  return priorities
+  return priorities;
 }
 
 // =============================================================================
@@ -256,7 +270,7 @@ const certificationExpiryStyles = StyleSheet.create({
     color: airNiuginiStyles.colors.gray.dark,
     textAlign: 'center',
   },
-})
+});
 
 // =============================================================================
 // PDF REPORT COMPONENTS
@@ -266,8 +280,8 @@ const certificationExpiryStyles = StyleSheet.create({
  * Executive Summary Section
  */
 interface ExecutiveSummaryProps {
-  timeframeDays: number
-  statistics: CertificationStatistics
+  timeframeDays: number;
+  statistics: CertificationStatistics;
 }
 
 const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ timeframeDays, statistics }) => (
@@ -277,13 +291,18 @@ const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ timeframeDays, stat
         Certification Expiry Analysis - Next {timeframeDays} Days
       </Text>
 
-      <Text style={[{ fontSize: airNiuginiStyles.fonts.sizes.body, marginBottom: 8, lineHeight: 1.4 }]}>
-        Analysis Period: {format(new Date(), 'dd MMM yyyy')} - {format(new Date(Date.now() + timeframeDays * 24 * 60 * 60 * 1000), 'dd MMM yyyy')}
+      <Text
+        style={[{ fontSize: airNiuginiStyles.fonts.sizes.body, marginBottom: 8, lineHeight: 1.4 }]}
+      >
+        Analysis Period: {format(new Date(), 'dd MMM yyyy')} -{' '}
+        {format(new Date(Date.now() + timeframeDays * 24 * 60 * 60 * 1000), 'dd MMM yyyy')}
       </Text>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
         <View style={certificationExpiryStyles.metricCard}>
-          <Text style={certificationExpiryStyles.metricNumber}>{statistics.totalCertifications}</Text>
+          <Text style={certificationExpiryStyles.metricNumber}>
+            {statistics.totalCertifications}
+          </Text>
           <Text style={certificationExpiryStyles.metricLabel}>Total Expiring</Text>
         </View>
 
@@ -293,29 +312,35 @@ const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ timeframeDays, stat
         </View>
 
         <View style={certificationExpiryStyles.metricCard}>
-          <Text style={[certificationExpiryStyles.metricNumber, { color: '#DC2626' }]}>{statistics.byStatus.expired}</Text>
+          <Text style={[certificationExpiryStyles.metricNumber, { color: '#DC2626' }]}>
+            {statistics.byStatus.expired}
+          </Text>
           <Text style={certificationExpiryStyles.metricLabel}>Expired</Text>
         </View>
 
         <View style={certificationExpiryStyles.metricCard}>
-          <Text style={[certificationExpiryStyles.metricNumber, { color: '#D97706' }]}>{statistics.byStatus.expiring_soon}</Text>
+          <Text style={[certificationExpiryStyles.metricNumber, { color: '#D97706' }]}>
+            {statistics.byStatus.expiring_soon}
+          </Text>
           <Text style={certificationExpiryStyles.metricLabel}>Expiring Soon</Text>
         </View>
 
         <View style={certificationExpiryStyles.metricCard}>
-          <Text style={[certificationExpiryStyles.metricNumber, { color: '#059669' }]}>{statistics.byStatus.upcoming}</Text>
+          <Text style={[certificationExpiryStyles.metricNumber, { color: '#059669' }]}>
+            {statistics.byStatus.upcoming}
+          </Text>
           <Text style={certificationExpiryStyles.metricLabel}>Upcoming</Text>
         </View>
       </View>
     </View>
   </Section>
-)
+);
 
 /**
  * Training Priorities Section
  */
 interface TrainingPrioritiesProps {
-  priorities: string[]
+  priorities: string[];
 }
 
 const TrainingPriorities: React.FC<TrainingPrioritiesProps> = ({ priorities }) => (
@@ -326,7 +351,9 @@ const TrainingPriorities: React.FC<TrainingPrioritiesProps> = ({ priorities }) =
       </AlertBox>
     ) : (
       <AlertBox type="warning" title="Training Action Required">
-        <Text style={{ marginBottom: 6 }}>The following training priorities require attention:</Text>
+        <Text style={{ marginBottom: 6 }}>
+          The following training priorities require attention:
+        </Text>
         {priorities.map((priority, index) => (
           <Text key={index} style={certificationExpiryStyles.priorityItem}>
             • {priority}
@@ -335,19 +362,19 @@ const TrainingPriorities: React.FC<TrainingPrioritiesProps> = ({ priorities }) =
       </AlertBox>
     )}
   </Section>
-)
+);
 
 /**
  * Roster Period Breakdown
  */
 interface RosterBreakdownProps {
-  statistics: CertificationStatistics
+  statistics: CertificationStatistics;
 }
 
 const RosterBreakdown: React.FC<RosterBreakdownProps> = ({ statistics }) => {
   const rosterStats = Object.entries(statistics.byRosterPeriod)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([period, count]) => ({ label: period, value: count }))
+    .map(([period, count]) => ({ label: period, value: count }));
 
   return (
     <Section title="Roster Period Planning">
@@ -356,23 +383,27 @@ const RosterBreakdown: React.FC<RosterBreakdownProps> = ({ statistics }) => {
       </Text>
       <SummaryStats stats={rosterStats} />
     </Section>
-  )
-}
+  );
+};
 
 /**
  * Certification Table Section
  */
 interface CertificationTableProps {
-  certifications: ExpiringCertification[]
-  title: string
-  category: string
+  certifications: ExpiringCertification[];
+  title: string;
+  category: string;
 }
 
-const CertificationTable: React.FC<CertificationTableProps> = ({ certifications, title, category }) => {
+const CertificationTable: React.FC<CertificationTableProps> = ({
+  certifications,
+  title,
+  category,
+}) => {
   const tableData = certifications
     .sort((a, b) => a.days_until_expiry - b.days_until_expiry)
-    .map(cert => {
-      const statusInfo = getStatusInfo(cert.days_until_expiry)
+    .map((cert) => {
+      const statusInfo = getStatusInfo(cert.days_until_expiry);
       return [
         cert.pilot_name || 'Unknown',
         cert.employee_id || 'N/A',
@@ -382,22 +413,33 @@ const CertificationTable: React.FC<CertificationTableProps> = ({ certifications,
         cert.days_until_expiry < 0
           ? `${Math.abs(cert.days_until_expiry)} days overdue`
           : `${cert.days_until_expiry} days`,
-        statusInfo.label
-      ]
-    })
+        statusInfo.label,
+      ];
+    });
 
   return (
-    <Section title={title} subtitle={`${certifications.length} certification${certifications.length !== 1 ? 's' : ''} - ${category} category`}>
+    <Section
+      title={title}
+      subtitle={`${certifications.length} certification${certifications.length !== 1 ? 's' : ''} - ${category} category`}
+    >
       <PDFTable
-        headers={['Pilot Name', 'Employee ID', 'Check Type', 'Expiry Date', 'Roster Period', 'Days Until Expiry', 'Status']}
+        headers={[
+          'Pilot Name',
+          'Employee ID',
+          'Check Type',
+          'Expiry Date',
+          'Roster Period',
+          'Days Until Expiry',
+          'Status',
+        ]}
         data={tableData}
         columnWidths={['15%', '10%', '18%', '12%', '10%', '12%', '13%']}
         statusColumn={6}
         highlightColumn={0}
       />
     </Section>
-  )
-}
+  );
+};
 
 // =============================================================================
 // MAIN PDF DOCUMENT
@@ -407,7 +449,7 @@ const CertificationTable: React.FC<CertificationTableProps> = ({ certifications,
  * Create certification expiry report PDF document
  */
 export function createCertificationExpiryReportDocument(data: CertificationExpiryReportData) {
-  const { timeframeDays, expiringCertifications, generatedBy, generatedAt } = data
+  const { timeframeDays, expiringCertifications, generatedBy, generatedAt } = data;
 
   const metadata: PDFReportMetadata = {
     reportType: 'certification-expiry-planning',
@@ -418,14 +460,14 @@ export function createCertificationExpiryReportDocument(data: CertificationExpir
     generatedAt: generatedAt.toISOString(),
     generatedBy,
     rosterPeriod: `${timeframeDays}-day planning window`,
-    reportPeriod: `${format(new Date(), 'dd MMM yyyy')} - ${format(new Date(Date.now() + timeframeDays * 24 * 60 * 60 * 1000), 'dd MMM yyyy')}`
-  }
+    reportPeriod: `${format(new Date(), 'dd MMM yyyy')} - ${format(new Date(Date.now() + timeframeDays * 24 * 60 * 60 * 1000), 'dd MMM yyyy')}`,
+  };
 
-  const statistics = calculateCertificationStatistics(expiringCertifications)
-  const groupedCertifications = groupCertificationsByCategory(expiringCertifications)
-  const priorities = analyzeTrainingPriorities(expiringCertifications)
+  const statistics = calculateCertificationStatistics(expiringCertifications);
+  const groupedCertifications = groupCertificationsByCategory(expiringCertifications);
+  const priorities = analyzeTrainingPriorities(expiringCertifications);
 
-  const totalPages = 1 + Object.keys(groupedCertifications).length
+  const totalPages = 1 + Object.keys(groupedCertifications).length;
 
   return (
     <Document
@@ -464,13 +506,13 @@ export function createCertificationExpiryReportDocument(data: CertificationExpir
         </Page>
       ))}
     </Document>
-  )
+  );
 }
 
 /**
  * Certification Expiry PDF Report Document (for backwards compatibility)
  */
-export const CertificationExpiryReportDocument = createCertificationExpiryReportDocument
+export const CertificationExpiryReportDocument = createCertificationExpiryReportDocument;
 
 // =============================================================================
 // EXPORT UTILITIES
@@ -480,8 +522,8 @@ export const CertificationExpiryReportDocument = createCertificationExpiryReport
  * Generate PDF filename for the certification expiry report
  */
 export function generateCertificationExpiryReportFilename(timeframeDays: number): string {
-  const timestamp = format(new Date(), 'yyyyMMdd_HHmm')
-  return `Air_Niugini_Certification_Expiry_${timeframeDays}days_${timestamp}.pdf`
+  const timestamp = format(new Date(), 'yyyyMMdd_HHmm');
+  return `Air_Niugini_Certification_Expiry_${timeframeDays}days_${timestamp}.pdf`;
 }
 
 /**
@@ -496,6 +538,6 @@ export function createCertificationExpiryReportData(
     timeframeDays,
     expiringCertifications,
     generatedBy,
-    generatedAt: new Date()
-  }
+    generatedAt: new Date(),
+  };
 }

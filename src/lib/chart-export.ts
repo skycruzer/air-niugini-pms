@@ -7,7 +7,7 @@
  * @since 2025-09-27
  */
 
-import type { ExportOptions } from '@/types/analytics'
+import type { ExportOptions } from '@/types/analytics';
 
 /**
  * Export a chart as an image
@@ -16,53 +16,55 @@ import type { ExportOptions } from '@/types/analytics'
  */
 export async function exportChart(chartRef: any, options: ExportOptions): Promise<void> {
   if (!chartRef?.current) {
-    throw new Error('Chart reference is not available')
+    throw new Error('Chart reference is not available');
   }
 
-  const chart = chartRef.current
-  const canvas = chart.canvas
+  const chart = chartRef.current;
+  const canvas = chart.canvas;
 
   try {
     // Create a new canvas for export with higher quality
-    const exportCanvas = document.createElement('canvas')
-    const context = exportCanvas.getContext('2d')
+    const exportCanvas = document.createElement('canvas');
+    const context = exportCanvas.getContext('2d');
 
     if (!context) {
-      throw new Error('Failed to get canvas context')
+      throw new Error('Failed to get canvas context');
     }
 
     // Set dimensions based on resolution
-    const scaleFactor = getScaleFactor(options.resolution)
-    const originalWidth = canvas.width
-    const originalHeight = canvas.height
+    const scaleFactor = getScaleFactor(options.resolution);
+    const originalWidth = canvas.width;
+    const originalHeight = canvas.height;
 
-    exportCanvas.width = originalWidth * scaleFactor
-    exportCanvas.height = originalHeight * scaleFactor
+    exportCanvas.width = originalWidth * scaleFactor;
+    exportCanvas.height = originalHeight * scaleFactor;
 
     // Scale context for high resolution
-    context.scale(scaleFactor, scaleFactor)
+    context.scale(scaleFactor, scaleFactor);
 
     // Set background color
     if (options.backgroundColor && options.backgroundColor !== 'transparent') {
-      context.fillStyle = options.backgroundColor
-      context.fillRect(0, 0, originalWidth, originalHeight)
+      context.fillStyle = options.backgroundColor;
+      context.fillRect(0, 0, originalWidth, originalHeight);
     }
 
     // Draw the chart
-    context.drawImage(canvas, 0, 0, originalWidth, originalHeight)
+    context.drawImage(canvas, 0, 0, originalWidth, originalHeight);
 
     // Add title and subtitle if requested
     if (options.includeTitle || options.includeSubtitle) {
-      addTitleToCanvas(context, options, originalWidth)
+      addTitleToCanvas(context, options, originalWidth);
     }
 
     // Convert to desired format and download
-    const dataURL = exportCanvas.toDataURL(`image/${options.format}`, getQuality(options.resolution))
-    await downloadImage(dataURL, options)
-
+    const dataURL = exportCanvas.toDataURL(
+      `image/${options.format}`,
+      getQuality(options.resolution)
+    );
+    await downloadImage(dataURL, options);
   } catch (error) {
-    console.error('Error exporting chart:', error)
-    throw new Error('Failed to export chart')
+    console.error('Error exporting chart:', error);
+    throw new Error('Failed to export chart');
   }
 }
 
@@ -79,7 +81,7 @@ export async function exportChartsAsPDF(
 ): Promise<void> {
   // This would require a PDF library like jsPDF
   // For now, we'll implement a basic version that exports individual images
-  console.log('PDF export functionality - would require jsPDF integration')
+  console.log('PDF export functionality - would require jsPDF integration');
 
   // Export each chart individually as a fallback
   for (let i = 0; i < chartRefs.length; i++) {
@@ -91,10 +93,10 @@ export async function exportChartsAsPDF(
         includeSubtitle: true,
         backgroundColor: '#ffffff',
         filename: `${reportTitle}-chart-${i + 1}.png`,
-        ...options
-      }
+        ...options,
+      };
 
-      await exportChart(chartRefs[i], chartOptions)
+      await exportChart(chartRefs[i], chartOptions);
     }
   }
 }
@@ -106,11 +108,11 @@ export async function exportChartsAsPDF(
  */
 export function exportChartDataAsCSV(chartData: any, filename: string): void {
   try {
-    const csvContent = convertChartDataToCSV(chartData)
-    downloadCSV(csvContent, filename)
+    const csvContent = convertChartDataToCSV(chartData);
+    downloadCSV(csvContent, filename);
   } catch (error) {
-    console.error('Error exporting chart data as CSV:', error)
-    throw new Error('Failed to export chart data')
+    console.error('Error exporting chart data as CSV:', error);
+    throw new Error('Failed to export chart data');
   }
 }
 
@@ -121,11 +123,11 @@ export function exportChartDataAsCSV(chartData: any, filename: string): void {
  */
 export function exportChartDataAsJSON(chartData: any, filename: string): void {
   try {
-    const jsonContent = JSON.stringify(chartData, null, 2)
-    downloadJSON(jsonContent, filename)
+    const jsonContent = JSON.stringify(chartData, null, 2);
+    downloadJSON(jsonContent, filename);
   } catch (error) {
-    console.error('Error exporting chart data as JSON:', error)
-    throw new Error('Failed to export chart data')
+    console.error('Error exporting chart data as JSON:', error);
+    throw new Error('Failed to export chart data');
   }
 }
 
@@ -136,18 +138,18 @@ export function exportChartDataAsJSON(chartData: any, filename: string): void {
  */
 export async function bulkExportCharts(
   charts: Array<{
-    ref: any
-    title: string
-    subtitle?: string
+    ref: any;
+    title: string;
+    subtitle?: string;
   }>,
   baseFilename: string
 ): Promise<void> {
-  const timestamp = new Date().toISOString().slice(0, 10)
+  const timestamp = new Date().toISOString().slice(0, 10);
 
   for (let i = 0; i < charts.length; i++) {
-    const chart = charts[i]
+    const chart = charts[i];
 
-    if (!chart.ref?.current) continue
+    if (!chart || !chart.ref?.current) continue;
 
     const options: ExportOptions = {
       format: 'png',
@@ -155,15 +157,15 @@ export async function bulkExportCharts(
       includeTitle: true,
       includeSubtitle: !!chart.subtitle,
       backgroundColor: '#ffffff',
-      filename: `${baseFilename}-${chart.title.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.png`
-    }
+      filename: `${baseFilename}-${chart.title.toLowerCase().replace(/\s+/g, '-')}-${timestamp}.png`,
+    };
 
     try {
-      await exportChart(chart.ref, options)
+      await exportChart(chart.ref, options);
       // Add small delay to prevent browser blocking
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
-      console.error(`Failed to export chart: ${chart.title}`, error)
+      console.error(`Failed to export chart: ${chart.title}`, error);
     }
   }
 }
@@ -174,27 +176,25 @@ export async function bulkExportCharts(
  */
 export async function copyChartToClipboard(chartRef: any): Promise<void> {
   if (!chartRef?.current) {
-    throw new Error('Chart reference is not available')
+    throw new Error('Chart reference is not available');
   }
 
   try {
-    const canvas = chartRef.current.canvas
+    const canvas = chartRef.current.canvas;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob(resolve, 'image/png', 1.0)
-    })
+      canvas.toBlob(resolve, 'image/png', 1.0);
+    });
 
     if (!blob) {
-      throw new Error('Failed to create image blob')
+      throw new Error('Failed to create image blob');
     }
 
-    await navigator.clipboard.write([
-      new ClipboardItem({ 'image/png': blob })
-    ])
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
 
-    console.log('Chart copied to clipboard successfully')
+    console.log('Chart copied to clipboard successfully');
   } catch (error) {
-    console.error('Error copying chart to clipboard:', error)
-    throw new Error('Failed to copy chart to clipboard')
+    console.error('Error copying chart to clipboard:', error);
+    throw new Error('Failed to copy chart to clipboard');
   }
 }
 
@@ -203,26 +203,26 @@ export async function copyChartToClipboard(chartRef: any): Promise<void> {
 function getScaleFactor(resolution: 'low' | 'medium' | 'high'): number {
   switch (resolution) {
     case 'low':
-      return 1
+      return 1;
     case 'medium':
-      return 2
+      return 2;
     case 'high':
-      return 3
+      return 3;
     default:
-      return 2
+      return 2;
   }
 }
 
 function getQuality(resolution: 'low' | 'medium' | 'high'): number {
   switch (resolution) {
     case 'low':
-      return 0.6
+      return 0.6;
     case 'medium':
-      return 0.8
+      return 0.8;
     case 'high':
-      return 1.0
+      return 1.0;
     default:
-      return 0.8
+      return 0.8;
   }
 }
 
@@ -231,90 +231,90 @@ function addTitleToCanvas(
   options: ExportOptions,
   canvasWidth: number
 ): void {
-  const titleText = options.filename?.replace(/\.(png|jpg|jpeg|svg)$/i, '') || 'Chart Export'
-  const padding = 20
-  let yPosition = padding
+  const titleText = options.filename?.replace(/\.(png|jpg|jpeg|svg)$/i, '') || 'Chart Export';
+  const padding = 20;
+  let yPosition = padding;
 
-  context.save()
+  context.save();
 
   if (options.includeTitle) {
-    context.font = 'bold 24px system-ui, -apple-system, sans-serif'
-    context.fillStyle = '#1f2937'
-    context.textAlign = 'center'
-    context.fillText(titleText, canvasWidth / 2, yPosition + 24)
-    yPosition += 40
+    context.font = 'bold 24px system-ui, -apple-system, sans-serif';
+    context.fillStyle = '#1f2937';
+    context.textAlign = 'center';
+    context.fillText(titleText, canvasWidth / 2, yPosition + 24);
+    yPosition += 40;
   }
 
   if (options.includeSubtitle) {
-    const subtitle = `Generated on ${new Date().toLocaleDateString()}`
-    context.font = '16px system-ui, -apple-system, sans-serif'
-    context.fillStyle = '#6b7280'
-    context.textAlign = 'center'
-    context.fillText(subtitle, canvasWidth / 2, yPosition + 16)
+    const subtitle = `Generated on ${new Date().toLocaleDateString()}`;
+    context.font = '16px system-ui, -apple-system, sans-serif';
+    context.fillStyle = '#6b7280';
+    context.textAlign = 'center';
+    context.fillText(subtitle, canvasWidth / 2, yPosition + 16);
   }
 
-  context.restore()
+  context.restore();
 }
 
 async function downloadImage(dataURL: string, options: ExportOptions): Promise<void> {
-  const link = document.createElement('a')
-  link.download = options.filename || `chart-${Date.now()}.${options.format}`
-  link.href = dataURL
+  const link = document.createElement('a');
+  link.download = options.filename || `chart-${Date.now()}.${options.format}`;
+  link.href = dataURL;
 
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   // Small delay to ensure download starts
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 function convertChartDataToCSV(chartData: any): string {
-  const lines: string[] = []
+  const lines: string[] = [];
 
   // Header row
-  const headers = ['Label', ...chartData.datasets.map((dataset: any) => dataset.label)]
-  lines.push(headers.join(','))
+  const headers = ['Label', ...chartData.datasets.map((dataset: any) => dataset.label)];
+  lines.push(headers.join(','));
 
   // Data rows
   chartData.labels.forEach((label: string, index: number) => {
     const row = [
       `"${label}"`,
-      ...chartData.datasets.map((dataset: any) => dataset.data[index] || 0)
-    ]
-    lines.push(row.join(','))
-  })
+      ...chartData.datasets.map((dataset: any) => dataset.data[index] || 0),
+    ];
+    lines.push(row.join(','));
+  });
 
-  return lines.join('\n')
+  return lines.join('\n');
 }
 
 function downloadCSV(content: string, filename: string): void {
-  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
 
   if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', filename.endsWith('.csv') ? filename : `${filename}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename.endsWith('.csv') ? filename : `${filename}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 
 function downloadJSON(content: string, filename: string): void {
-  const blob = new Blob([content], { type: 'application/json;charset=utf-8;' })
-  const link = document.createElement('a')
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8;' });
+  const link = document.createElement('a');
 
   if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', filename.endsWith('.json') ? filename : `${filename}.json`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename.endsWith('.json') ? filename : `${filename}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 
@@ -325,16 +325,16 @@ function downloadJSON(content: string, filename: string): void {
  */
 export function printChart(chartRef: any, title: string): void {
   if (!chartRef?.current) {
-    console.error('Chart reference is not available')
-    return
+    console.error('Chart reference is not available');
+    return;
   }
 
-  const canvas = chartRef.current.canvas
-  const printWindow = window.open('', '_blank')
+  const canvas = chartRef.current.canvas;
+  const printWindow = window.open('', '_blank');
 
   if (!printWindow) {
-    console.error('Failed to open print window')
-    return
+    console.error('Failed to open print window');
+    return;
   }
 
   const printContent = `
@@ -399,16 +399,16 @@ export function printChart(chartRef: any, title: string): void {
       </div>
     </body>
     </html>
-  `
+  `;
 
-  printWindow.document.write(printContent)
-  printWindow.document.close()
+  printWindow.document.write(printContent);
+  printWindow.document.close();
 
   // Wait for image to load before printing
   setTimeout(() => {
-    printWindow.print()
-    printWindow.close()
-  }, 1000)
+    printWindow.print();
+    printWindow.close();
+  }, 1000);
 }
 
 /**
@@ -418,34 +418,34 @@ export function printChart(chartRef: any, title: string): void {
  */
 export async function shareChart(chartRef: any, title: string): Promise<void> {
   if (!navigator.share) {
-    throw new Error('Web Share API is not supported in this browser')
+    throw new Error('Web Share API is not supported in this browser');
   }
 
   if (!chartRef?.current) {
-    throw new Error('Chart reference is not available')
+    throw new Error('Chart reference is not available');
   }
 
   try {
-    const canvas = chartRef.current.canvas
+    const canvas = chartRef.current.canvas;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob(resolve, 'image/png', 1.0)
-    })
+      canvas.toBlob(resolve, 'image/png', 1.0);
+    });
 
     if (!blob) {
-      throw new Error('Failed to create image blob')
+      throw new Error('Failed to create image blob');
     }
 
-    const file = new File([blob], `${title}.png`, { type: 'image/png' })
+    const file = new File([blob], `${title}.png`, { type: 'image/png' });
 
     await navigator.share({
       title: `${title} - Air Niugini B767 PMS`,
       text: 'Analytics chart from Air Niugini B767 Pilot Management System',
-      files: [file]
-    })
+      files: [file],
+    });
 
-    console.log('Chart shared successfully')
+    console.log('Chart shared successfully');
   } catch (error) {
-    console.error('Error sharing chart:', error)
-    throw new Error('Failed to share chart')
+    console.error('Error sharing chart:', error);
+    throw new Error('Failed to share chart');
   }
 }

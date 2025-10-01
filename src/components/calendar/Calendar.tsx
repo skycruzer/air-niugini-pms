@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { format, addMonths, subMonths } from 'date-fns'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { type CalendarDay, CalendarEvent, generateCalendarMonth } from '@/lib/calendar-utils'
+import { useState } from 'react';
+import { format, addMonths, subMonths } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { type CalendarDay, CalendarEvent, generateCalendarMonth } from '@/lib/calendar-utils';
 
 interface CalendarProps {
-  events?: CalendarEvent[]
-  onDateClick?: (date: Date, events: CalendarEvent[]) => void
-  onEventClick?: (event: CalendarEvent) => void
-  showRosterBoundaries?: boolean
-  className?: string
-  eventProcessor?: (calendarDays: CalendarDay[]) => CalendarDay[]
+  events?: CalendarEvent[];
+  onDateClick?: (date: Date, events: CalendarEvent[]) => void;
+  onEventClick?: (event: CalendarEvent) => void;
+  showRosterBoundaries?: boolean;
+  className?: string;
+  eventProcessor?: (calendarDays: CalendarDay[]) => CalendarDay[];
 }
 
 export function Calendar({
@@ -20,44 +20,36 @@ export function Calendar({
   onEventClick,
   showRosterBoundaries = true,
   className = '',
-  eventProcessor
+  eventProcessor,
 }: CalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1))
-  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1))
+  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
-  const year = currentDate.getFullYear()
-  const month = currentDate.getMonth()
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
 
-  let calendarDays = generateCalendarMonth(year, month)
+  let calendarDays = generateCalendarMonth(year, month);
 
   // Apply custom event processor if provided
   if (eventProcessor) {
-    calendarDays = eventProcessor(calendarDays)
+    calendarDays = eventProcessor(calendarDays);
   }
 
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border ${className}`}>
       {/* Calendar Header */}
       <div className="flex items-center justify-between p-4 border-b">
-        <button
-          onClick={prevMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
+        <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        <h2 className="text-lg font-semibold text-gray-900">
-          {format(currentDate, 'MMMM yyyy')}
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">{format(currentDate, 'MMMM yyyy')}</h2>
 
-        <button
-          onClick={nextMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
+        <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
@@ -66,7 +58,7 @@ export function Calendar({
       <div className="p-4">
         {/* Week Headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {weekDays.map(day => (
+          {weekDays.map((day) => (
             <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
               {day}
             </div>
@@ -87,22 +79,26 @@ export function Calendar({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 interface CalendarDayProps {
-  day: CalendarDay
-  onDateClick?: (date: Date, events: CalendarEvent[]) => void
-  onEventClick?: (event: CalendarEvent) => void
-  showRosterBoundaries?: boolean
+  day: CalendarDay;
+  onDateClick?: (date: Date, events: CalendarEvent[]) => void;
+  onEventClick?: (event: CalendarEvent) => void;
+  showRosterBoundaries?: boolean;
 }
 
 function CalendarDay({ day, onDateClick, onEventClick, showRosterBoundaries }: CalendarDayProps) {
-  const isRosterStart = day.events.some(e => e.type === 'roster-boundary' && e.title.includes('Starts'))
-  const isRosterEnd = day.events.some(e => e.type === 'roster-boundary' && e.title.includes('Ends'))
+  const isRosterStart = day.events.some(
+    (e) => e.type === 'roster-boundary' && e.title.includes('Starts')
+  );
+  const isRosterEnd = day.events.some(
+    (e) => e.type === 'roster-boundary' && e.title.includes('Ends')
+  );
 
-  const leaveEvents = day.events.filter(e => e.type === 'leave')
-  const certEvents = day.events.filter(e => e.type === 'certification')
+  const leaveEvents = day.events.filter((e) => e.type === 'leave');
+  const certEvents = day.events.filter((e) => e.type === 'certification');
 
   return (
     <div
@@ -122,22 +118,20 @@ function CalendarDay({ day, onDateClick, onEventClick, showRosterBoundaries }: C
 
       {/* Roster Period Indicator */}
       {showRosterBoundaries && day.rosterPeriod && format(day.date, 'd') === '1' && (
-        <div className="text-xs text-gray-500 mb-1">
-          {day.rosterPeriod.code}
-        </div>
+        <div className="text-xs text-gray-500 mb-1">{day.rosterPeriod.code}</div>
       )}
 
       {/* Events */}
       <div className="space-y-1">
         {/* Leave Events */}
-        {leaveEvents.slice(0, 2).map(event => (
+        {leaveEvents.slice(0, 2).map((event) => (
           <div
             key={event.id}
             className="text-xs px-1 py-0.5 rounded text-white truncate cursor-pointer"
             style={{ backgroundColor: event.color }}
             onClick={(e) => {
-              e.stopPropagation()
-              onEventClick?.(event)
+              e.stopPropagation();
+              onEventClick?.(event);
             }}
           >
             {event.title}
@@ -145,14 +139,14 @@ function CalendarDay({ day, onDateClick, onEventClick, showRosterBoundaries }: C
         ))}
 
         {/* Certification Events */}
-        {certEvents.slice(0, 2).map(event => (
+        {certEvents.slice(0, 2).map((event) => (
           <div
             key={event.id}
             className="text-xs px-1 py-0.5 rounded text-white truncate cursor-pointer"
             style={{ backgroundColor: event.color }}
             onClick={(e) => {
-              e.stopPropagation()
-              onEventClick?.(event)
+              e.stopPropagation();
+              onEventClick?.(event);
             }}
           >
             {event.title}
@@ -160,14 +154,14 @@ function CalendarDay({ day, onDateClick, onEventClick, showRosterBoundaries }: C
         ))}
 
         {/* More events indicator */}
-        {(leaveEvents.length + certEvents.length) > 2 && (
+        {leaveEvents.length + certEvents.length > 2 && (
           <div className="text-xs text-gray-500">
-            +{(leaveEvents.length + certEvents.length) - 2} more
+            +{leaveEvents.length + certEvents.length - 2} more
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default Calendar
+export default Calendar;

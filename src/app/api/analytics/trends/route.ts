@@ -1,153 +1,160 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
+import { NextRequest, NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('📈 API /analytics/trends: Getting trend analytics from real Supabase data...')
+    console.log('📈 API /analytics/trends: Getting trend analytics from real Supabase data...');
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const { searchParams } = new URL(request.url)
-    const months = parseInt(searchParams.get('months') || '12')
+    const supabaseAdmin = getSupabaseAdmin();
+    const { searchParams } = new URL(request.url);
+    const months = parseInt(searchParams.get('months') || '12');
 
-    const periods = []
-    const today = new Date()
+    const periods = [];
+    const today = new Date();
 
     // Generate periods (last N months)
     for (let i = months - 1; i >= 0; i--) {
-      const monthStart = startOfMonth(subMonths(today, i))
-      periods.push(format(monthStart, 'MMM yyyy'))
+      const monthStart = startOfMonth(subMonths(today, i));
+      periods.push(format(monthStart, 'MMM yyyy'));
     }
 
     // Get real pilot data over time periods
-    const pilotTrends = []
+    const pilotTrends = [];
     for (let i = months - 1; i >= 0; i--) {
-      const monthStart = startOfMonth(subMonths(today, i))
-      const monthEnd = endOfMonth(monthStart)
+      const monthStart = startOfMonth(subMonths(today, i));
+      const monthEnd = endOfMonth(monthStart);
 
       // Count active pilots as of each month
       const { data: pilotsInMonth } = await supabaseAdmin
         .from('pilots')
         .select('id, role, commencement_date, is_active')
-        .lte('commencement_date', monthEnd.toISOString().split('T')[0])
+        .lte('commencement_date', monthEnd.toISOString().split('T')[0]);
 
-      const activePilots = pilotsInMonth?.filter((p: any) => p.is_active) || []
-      const captains = activePilots.filter((p: any) => p.role === 'Captain')
-      const firstOfficers = activePilots.filter((p: any) => p.role === 'First Officer')
+      const activePilots = pilotsInMonth?.filter((p: any) => p.is_active) || [];
+      const captains = activePilots.filter((p: any) => p.role === 'Captain');
+      const firstOfficers = activePilots.filter((p: any) => p.role === 'First Officer');
 
       pilotTrends.push({
         total: activePilots.length,
         captains: captains.length,
-        firstOfficers: firstOfficers.length
-      })
+        firstOfficers: firstOfficers.length,
+      });
     }
 
     // Get real certification trends over time
-    const certificationTrends = []
+    const certificationTrends = [];
     for (let i = months - 1; i >= 0; i--) {
-      const monthStart = startOfMonth(subMonths(today, i))
-      const monthEnd = endOfMonth(monthStart)
+      const monthStart = startOfMonth(subMonths(today, i));
+      const monthEnd = endOfMonth(monthStart);
 
       // Count certifications as of each month
       const { data: certsInMonth } = await supabaseAdmin
         .from('pilot_checks')
-        .select('id, expiry_date')
+        .select('id, expiry_date');
 
-      const certs = certsInMonth || []
+      const certs = certsInMonth || [];
       const validAtMonth = certs.filter((c: any) => {
-        if (!c.expiry_date) return false
-        const expiryDate = new Date(c.expiry_date)
-        return expiryDate >= monthEnd
-      })
+        if (!c.expiry_date) return false;
+        const expiryDate = new Date(c.expiry_date);
+        return expiryDate >= monthEnd;
+      });
 
       const expiredAtMonth = certs.filter((c: any) => {
-        if (!c.expiry_date) return true
-        const expiryDate = new Date(c.expiry_date)
-        return expiryDate < monthEnd
-      })
+        if (!c.expiry_date) return true;
+        const expiryDate = new Date(c.expiry_date);
+        return expiryDate < monthEnd;
+      });
 
       const expiringNextMonth = certs.filter((c: any) => {
-        if (!c.expiry_date) return false
-        const expiryDate = new Date(c.expiry_date)
-        const nextMonth = new Date(monthEnd)
-        nextMonth.setMonth(nextMonth.getMonth() + 1)
-        return expiryDate >= monthEnd && expiryDate <= nextMonth
-      })
+        if (!c.expiry_date) return false;
+        const expiryDate = new Date(c.expiry_date);
+        const nextMonth = new Date(monthEnd);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        return expiryDate >= monthEnd && expiryDate <= nextMonth;
+      });
 
-      const complianceRate = certs.length > 0 ? Math.round((validAtMonth.length / certs.length) * 100) : 100
+      const complianceRate =
+        certs.length > 0 ? Math.round((validAtMonth.length / certs.length) * 100) : 100;
 
       certificationTrends.push({
         total: certs.length,
         expired: expiredAtMonth.length,
         expiring: expiringNextMonth.length,
-        complianceRate
-      })
+        complianceRate,
+      });
     }
 
     // Get real leave request trends over time
-    const leaveTrends = []
+    const leaveTrends = [];
     for (let i = months - 1; i >= 0; i--) {
-      const monthStart = startOfMonth(subMonths(today, i))
-      const monthEnd = endOfMonth(monthStart)
+      const monthStart = startOfMonth(subMonths(today, i));
+      const monthEnd = endOfMonth(monthStart);
 
       // Count leave requests in each month
       const { data: leaveInMonth } = await supabaseAdmin
         .from('leave_requests')
         .select('id, status, created_at')
         .gte('created_at', monthStart.toISOString())
-        .lte('created_at', monthEnd.toISOString())
+        .lte('created_at', monthEnd.toISOString());
 
-      const requests = leaveInMonth || []
-      const approved = requests.filter((r: any) => r.status === 'APPROVED')
-      const approvalRate = requests.length > 0 ? Math.round((approved.length / requests.length) * 100) : 0
+      const requests = leaveInMonth || [];
+      const approved = requests.filter((r: any) => r.status === 'APPROVED');
+      const approvalRate =
+        requests.length > 0 ? Math.round((approved.length / requests.length) * 100) : 0;
 
       leaveTrends.push({
         requests: requests.length,
-        approvalRate
-      })
+        approvalRate,
+      });
     }
 
     // Extract trend arrays
     const pilots = {
-      total: pilotTrends.map(t => t.total),
-      captains: pilotTrends.map(t => t.captains),
-      firstOfficers: pilotTrends.map(t => t.firstOfficers)
-    }
+      total: pilotTrends.map((t) => t.total),
+      captains: pilotTrends.map((t) => t.captains),
+      firstOfficers: pilotTrends.map((t) => t.firstOfficers),
+    };
 
     const certifications = {
-      total: certificationTrends.map(t => t.total),
-      expired: certificationTrends.map(t => t.expired),
-      expiring: certificationTrends.map(t => t.expiring),
-      complianceRate: certificationTrends.map(t => t.complianceRate)
-    }
+      total: certificationTrends.map((t) => t.total),
+      expired: certificationTrends.map((t) => t.expired),
+      expiring: certificationTrends.map((t) => t.expiring),
+      complianceRate: certificationTrends.map((t) => t.complianceRate),
+    };
 
     const leave = {
-      requests: leaveTrends.map(t => t.requests),
-      approvalRate: leaveTrends.map(t => t.approvalRate)
-    }
+      requests: leaveTrends.map((t) => t.requests),
+      approvalRate: leaveTrends.map((t) => t.approvalRate),
+    };
 
     // System performance metrics (these can remain calculated as they're not stored historically)
     const performance = {
-      responseTime: Array(periods.length).fill(null).map(() => Math.round(120 + Math.random() * 60)), // 120-180ms range
-      systemUptime: Array(periods.length).fill(null).map(() => Math.round((99.2 + Math.random() * 0.7) * 100) / 100) // 99.2-99.9% range
-    }
+      responseTime: Array(periods.length)
+        .fill(null)
+        .map(() => Math.round(120 + Math.random() * 60)), // 120-180ms range
+      systemUptime: Array(periods.length)
+        .fill(null)
+        .map(() => Math.round((99.2 + Math.random() * 0.7) * 100) / 100), // 99.2-99.9% range
+    };
 
     const result = {
       periods,
       pilots,
       certifications,
       leave,
-      performance
-    }
+      performance,
+    };
 
-    console.log('✅ API /analytics/trends: Successfully retrieved real trend analytics')
-    return NextResponse.json({ success: true, data: result })
-
+    console.log('✅ API /analytics/trends: Successfully retrieved real trend analytics');
+    return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('❌ API /analytics/trends: Error:', error)
+    console.error('❌ API /analytics/trends: Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to get trend analytics' },
       { status: 500 }
-    )
+    );
   }
 }

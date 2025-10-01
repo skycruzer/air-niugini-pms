@@ -7,15 +7,9 @@
  * @since 2025-09-28
  */
 
-import React from 'react'
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet
-} from '@react-pdf/renderer'
-import { format, parseISO } from 'date-fns'
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { format, parseISO } from 'date-fns';
 import {
   PDFHeader,
   PDFFooter,
@@ -24,39 +18,39 @@ import {
   Section,
   AlertBox,
   pdfStyles,
-  airNiuginiStyles
-} from './pdf-components'
-import { LeaveRequest } from './leave-service'
-import { RosterPeriod } from './roster-utils'
-import { PDFReportMetadata } from '@/types/pdf-reports'
+  airNiuginiStyles,
+} from './pdf-components';
+import { LeaveRequest } from './leave-service';
+import { RosterPeriod } from './roster-utils';
+import { PDFReportMetadata } from '@/types/pdf-reports';
 
 // =============================================================================
 // TYPES AND INTERFACES
 // =============================================================================
 
 export interface RosterLeaveReportData {
-  rosterPeriod: RosterPeriod
-  leaveRequests: LeaveRequest[]
-  generatedBy: string
-  generatedAt: Date
+  rosterPeriod: RosterPeriod;
+  leaveRequests: LeaveRequest[];
+  generatedBy: string;
+  generatedAt: Date;
 }
 
 interface LeaveRequestsByType {
-  [key: string]: LeaveRequest[]
+  [key: string]: LeaveRequest[];
 }
 
 interface LeaveStatistics {
-  totalRequests: number
-  totalDays: number
+  totalRequests: number;
+  totalDays: number;
   byStatus: {
-    approved: number
-    pending: number
-    denied: number
-  }
+    approved: number;
+    pending: number;
+    denied: number;
+  };
   byType: {
-    [key: string]: number
-  }
-  pilotsAffected: number
+    [key: string]: number;
+  };
+  pilotsAffected: number;
 }
 
 // =============================================================================
@@ -72,31 +66,31 @@ function calculateLeaveStatistics(requests: LeaveRequest[]): LeaveStatistics {
     totalDays: 0,
     byStatus: { approved: 0, pending: 0, denied: 0 },
     byType: {},
-    pilotsAffected: new Set(requests.map(r => r.pilot_id)).size
-  }
+    pilotsAffected: new Set(requests.map((r) => r.pilot_id)).size,
+  };
 
-  requests.forEach(request => {
+  requests.forEach((request) => {
     // Total days
-    stats.totalDays += request.days_count
+    stats.totalDays += request.days_count;
 
     // By status
     switch (request.status) {
       case 'APPROVED':
-        stats.byStatus.approved++
-        break
+        stats.byStatus.approved++;
+        break;
       case 'PENDING':
-        stats.byStatus.pending++
-        break
+        stats.byStatus.pending++;
+        break;
       case 'DENIED':
-        stats.byStatus.denied++
-        break
+        stats.byStatus.denied++;
+        break;
     }
 
     // By type
-    stats.byType[request.request_type] = (stats.byType[request.request_type] || 0) + 1
-  })
+    stats.byType[request.request_type] = (stats.byType[request.request_type] || 0) + 1;
+  });
 
-  return stats
+  return stats;
 }
 
 /**
@@ -104,13 +98,13 @@ function calculateLeaveStatistics(requests: LeaveRequest[]): LeaveStatistics {
  */
 function groupRequestsByType(requests: LeaveRequest[]): LeaveRequestsByType {
   return requests.reduce((groups, request) => {
-    const type = request.request_type
+    const type = request.request_type;
     if (!groups[type]) {
-      groups[type] = []
+      groups[type] = [];
     }
-    groups[type].push(request)
-    return groups
-  }, {} as LeaveRequestsByType)
+    groups[type].push(request);
+    return groups;
+  }, {} as LeaveRequestsByType);
 }
 
 /**
@@ -118,16 +112,16 @@ function groupRequestsByType(requests: LeaveRequest[]): LeaveRequestsByType {
  */
 function formatDateRange(startDate: string, endDate: string): string {
   try {
-    const start = parseISO(startDate)
-    const end = parseISO(endDate)
+    const start = parseISO(startDate);
+    const end = parseISO(endDate);
 
     if (format(start, 'yyyy-MM') === format(end, 'yyyy-MM')) {
-      return `${format(start, 'dd')} - ${format(end, 'dd MMM yyyy')}`
+      return `${format(start, 'dd')} - ${format(end, 'dd MMM yyyy')}`;
     } else {
-      return `${format(start, 'dd MMM')} - ${format(end, 'dd MMM yyyy')}`
+      return `${format(start, 'dd MMM')} - ${format(end, 'dd MMM yyyy')}`;
     }
   } catch (error) {
-    return `${startDate} - ${endDate}`
+    return `${startDate} - ${endDate}`;
   }
 }
 
@@ -135,39 +129,44 @@ function formatDateRange(startDate: string, endDate: string): string {
  * Check for potential conflicts or issues
  */
 function analyzeLeaveConflicts(requests: LeaveRequest[]): string[] {
-  const issues: string[] = []
+  const issues: string[] = [];
 
   // Group by pilot to check for multiple requests
-  const requestsByPilot = requests.reduce((groups, request) => {
-    const pilotId = request.pilot_id
-    if (!groups[pilotId]) {
-      groups[pilotId] = []
-    }
-    groups[pilotId].push(request)
-    return groups
-  }, {} as Record<string, LeaveRequest[]>)
+  const requestsByPilot = requests.reduce(
+    (groups, request) => {
+      const pilotId = request.pilot_id;
+      if (!groups[pilotId]) {
+        groups[pilotId] = [];
+      }
+      groups[pilotId].push(request);
+      return groups;
+    },
+    {} as Record<string, LeaveRequest[]>
+  );
 
   // Check for pilots with multiple leave requests
   Object.entries(requestsByPilot).forEach(([pilotId, pilotRequests]) => {
     if (pilotRequests.length > 1) {
-      const pilotName = pilotRequests[0].pilot_name || 'Unknown Pilot'
-      issues.push(`${pilotName} has ${pilotRequests.length} leave requests in this period`)
+      const pilotName = pilotRequests[0]?.pilot_name || 'Unknown Pilot';
+      issues.push(`${pilotName} has ${pilotRequests.length} leave requests in this period`);
     }
-  })
+  });
 
   // Check for high leave concentration
-  const approvedRequests = requests.filter(r => r.status === 'APPROVED')
+  const approvedRequests = requests.filter((r) => r.status === 'APPROVED');
   if (approvedRequests.length > 10) {
-    issues.push(`High number of approved leave requests (${approvedRequests.length}) may affect roster coverage`)
+    issues.push(
+      `High number of approved leave requests (${approvedRequests.length}) may affect roster coverage`
+    );
   }
 
   // Check for pending requests requiring attention
-  const pendingRequests = requests.filter(r => r.status === 'PENDING')
+  const pendingRequests = requests.filter((r) => r.status === 'PENDING');
   if (pendingRequests.length > 5) {
-    issues.push(`${pendingRequests.length} requests are still pending approval`)
+    issues.push(`${pendingRequests.length} requests are still pending approval`);
   }
 
-  return issues
+  return issues;
 }
 
 // =============================================================================
@@ -252,7 +251,7 @@ const rosterLeaveStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: airNiuginiStyles.colors.primary,
   },
-})
+});
 
 // =============================================================================
 // PDF REPORT COMPONENTS
@@ -262,8 +261,8 @@ const rosterLeaveStyles = StyleSheet.create({
  * Executive Summary Section
  */
 interface ExecutiveSummaryProps {
-  rosterPeriod: RosterPeriod
-  statistics: LeaveStatistics
+  rosterPeriod: RosterPeriod;
+  statistics: LeaveStatistics;
 }
 
 const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ rosterPeriod, statistics }) => (
@@ -273,8 +272,11 @@ const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ rosterPeriod, stati
         Roster Period: {rosterPeriod.code}
       </Text>
 
-      <Text style={[{ fontSize: airNiuginiStyles.fonts.sizes.body, marginBottom: 8, lineHeight: 1.4 }]}>
-        Period Duration: {format(rosterPeriod.startDate, 'dd MMM yyyy')} - {format(rosterPeriod.endDate, 'dd MMM yyyy')} (28 days)
+      <Text
+        style={[{ fontSize: airNiuginiStyles.fonts.sizes.body, marginBottom: 8, lineHeight: 1.4 }]}
+      >
+        Period Duration: {format(rosterPeriod.startDate, 'dd MMM yyyy')} -{' '}
+        {format(rosterPeriod.endDate, 'dd MMM yyyy')} (28 days)
       </Text>
 
       <View style={rosterLeaveStyles.keyMetric}>
@@ -294,42 +296,52 @@ const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ rosterPeriod, stati
 
       <View style={rosterLeaveStyles.keyMetric}>
         <Text style={rosterLeaveStyles.metricLabel}>Approved Requests:</Text>
-        <Text style={[rosterLeaveStyles.metricValue, { color: airNiuginiStyles.colors.status.current }]}>
+        <Text
+          style={[rosterLeaveStyles.metricValue, { color: airNiuginiStyles.colors.status.current }]}
+        >
           {statistics.byStatus.approved}
         </Text>
       </View>
 
       <View style={rosterLeaveStyles.keyMetric}>
         <Text style={rosterLeaveStyles.metricLabel}>Pending Approval:</Text>
-        <Text style={[rosterLeaveStyles.metricValue, { color: airNiuginiStyles.colors.status.expiring }]}>
+        <Text
+          style={[
+            rosterLeaveStyles.metricValue,
+            { color: airNiuginiStyles.colors.status.expiring },
+          ]}
+        >
           {statistics.byStatus.pending}
         </Text>
       </View>
     </View>
   </Section>
-)
+);
 
 /**
  * Leave Requests Table Section
  */
 interface LeaveRequestsTableProps {
-  requests: LeaveRequest[]
-  title: string
+  requests: LeaveRequest[];
+  title: string;
 }
 
 const LeaveRequestsTable: React.FC<LeaveRequestsTableProps> = ({ requests, title }) => {
-  const tableData = requests.map(request => [
+  const tableData = requests.map((request) => [
     request.pilot_name || 'Unknown',
     request.employee_id || 'N/A',
     formatDateRange(request.start_date, request.end_date),
     request.days_count.toString(),
     request.status,
     request.request_method || 'N/A',
-    request.reason || '-'
-  ])
+    request.reason || '-',
+  ]);
 
   return (
-    <Section title={title} subtitle={`${requests.length} request${requests.length !== 1 ? 's' : ''}`}>
+    <Section
+      title={title}
+      subtitle={`${requests.length} request${requests.length !== 1 ? 's' : ''}`}
+    >
       <PDFTable
         headers={['Pilot Name', 'Employee ID', 'Dates', 'Days', 'Status', 'Method', 'Reason']}
         data={tableData}
@@ -338,14 +350,14 @@ const LeaveRequestsTable: React.FC<LeaveRequestsTableProps> = ({ requests, title
         highlightColumn={0}
       />
     </Section>
-  )
-}
+  );
+};
 
 /**
  * Leave Statistics Summary
  */
 interface StatisticsSummaryProps {
-  statistics: LeaveStatistics
+  statistics: LeaveStatistics;
 }
 
 const StatisticsSummary: React.FC<StatisticsSummaryProps> = ({ statistics }) => {
@@ -354,13 +366,13 @@ const StatisticsSummary: React.FC<StatisticsSummaryProps> = ({ statistics }) => 
     { label: 'Total Days', value: statistics.totalDays },
     { label: 'Pilots Affected', value: statistics.pilotsAffected },
     { label: 'Approved', value: statistics.byStatus.approved, status: 'current' as const },
-    { label: 'Pending', value: statistics.byStatus.pending, status: 'expiring' as const }
-  ]
+    { label: 'Pending', value: statistics.byStatus.pending, status: 'expiring' as const },
+  ];
 
   const typeStats = Object.entries(statistics.byType).map(([type, count]) => ({
     label: type,
-    value: count
-  }))
+    value: count,
+  }));
 
   return (
     <Section title="Leave Statistics">
@@ -371,14 +383,14 @@ const StatisticsSummary: React.FC<StatisticsSummaryProps> = ({ statistics }) => 
       </Text>
       <SummaryStats stats={typeStats} />
     </Section>
-  )
-}
+  );
+};
 
 /**
  * Conflict Analysis Section
  */
 interface ConflictAnalysisProps {
-  issues: string[]
+  issues: string[];
 }
 
 const ConflictAnalysis: React.FC<ConflictAnalysisProps> = ({ issues }) => {
@@ -386,10 +398,13 @@ const ConflictAnalysis: React.FC<ConflictAnalysisProps> = ({ issues }) => {
     return (
       <Section title="Conflict Analysis">
         <AlertBox type="info" title="No Issues Detected">
-          <Text>No conflicts or potential issues were identified in the leave requests for this roster period.</Text>
+          <Text>
+            No conflicts or potential issues were identified in the leave requests for this roster
+            period.
+          </Text>
         </AlertBox>
       </Section>
-    )
+    );
   }
 
   return (
@@ -397,14 +412,17 @@ const ConflictAnalysis: React.FC<ConflictAnalysisProps> = ({ issues }) => {
       <AlertBox type="warning" title="Potential Issues Identified">
         <Text style={{ marginBottom: 6 }}>The following issues require attention:</Text>
         {issues.map((issue, index) => (
-          <Text key={index} style={{ marginBottom: 3, fontSize: airNiuginiStyles.fonts.sizes.body }}>
+          <Text
+            key={index}
+            style={{ marginBottom: 3, fontSize: airNiuginiStyles.fonts.sizes.body }}
+          >
             • {issue}
           </Text>
         ))}
       </AlertBox>
     </Section>
-  )
-}
+  );
+};
 
 // =============================================================================
 // MAIN PDF DOCUMENT
@@ -414,7 +432,7 @@ const ConflictAnalysis: React.FC<ConflictAnalysisProps> = ({ issues }) => {
  * Create roster leave report PDF document
  */
 export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
-  const { rosterPeriod, leaveRequests, generatedBy, generatedAt } = data
+  const { rosterPeriod, leaveRequests, generatedBy, generatedAt } = data;
 
   const metadata: PDFReportMetadata = {
     reportType: 'roster-leave-planning',
@@ -425,12 +443,12 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
     generatedAt: generatedAt.toISOString(),
     generatedBy,
     rosterPeriod: rosterPeriod.code,
-    reportPeriod: `${format(rosterPeriod.startDate, 'dd MMM yyyy')} - ${format(rosterPeriod.endDate, 'dd MMM yyyy')}`
-  }
+    reportPeriod: `${format(rosterPeriod.startDate, 'dd MMM yyyy')} - ${format(rosterPeriod.endDate, 'dd MMM yyyy')}`,
+  };
 
-  const statistics = calculateLeaveStatistics(leaveRequests)
-  const groupedRequests = groupRequestsByType(leaveRequests)
-  const conflicts = analyzeLeaveConflicts(leaveRequests)
+  const statistics = calculateLeaveStatistics(leaveRequests);
+  const groupedRequests = groupRequestsByType(leaveRequests);
+  const conflicts = analyzeLeaveConflicts(leaveRequests);
 
   return (
     <Document
@@ -458,22 +476,19 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
         <Page key={type} size="A4" style={pdfStyles.page}>
           <PDFHeader metadata={metadata} />
 
-          <LeaveRequestsTable
-            requests={requests}
-            title={`${type} Leave Requests`}
-          />
+          <LeaveRequestsTable requests={requests} title={`${type} Leave Requests`} />
 
           <PDFFooter pageNumber={index + 2} totalPages={Object.keys(groupedRequests).length + 1} />
         </Page>
       ))}
     </Document>
-  )
+  );
 }
 
 /**
  * Roster Leave Planning PDF Report Document (for backwards compatibility)
  */
-export const RosterLeaveReportDocument = createRosterLeaveReportDocument
+export const RosterLeaveReportDocument = createRosterLeaveReportDocument;
 
 // =============================================================================
 // EXPORT UTILITIES
@@ -483,8 +498,8 @@ export const RosterLeaveReportDocument = createRosterLeaveReportDocument
  * Generate PDF filename for the roster leave report
  */
 export function generateRosterLeaveReportFilename(rosterPeriod: string): string {
-  const timestamp = format(new Date(), 'yyyyMMdd_HHmm')
-  return `Air_Niugini_Leave_Planning_${rosterPeriod}_${timestamp}.pdf`
+  const timestamp = format(new Date(), 'yyyyMMdd_HHmm');
+  return `Air_Niugini_Leave_Planning_${rosterPeriod}_${timestamp}.pdf`;
 }
 
 /**
@@ -499,6 +514,6 @@ export function createRosterLeaveReportData(
     rosterPeriod,
     leaveRequests,
     generatedBy,
-    generatedAt: new Date()
-  }
+    generatedAt: new Date(),
+  };
 }

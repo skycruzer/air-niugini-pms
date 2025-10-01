@@ -8,8 +8,8 @@
  * @since 2025-09-27
  */
 
-import { format } from 'date-fns'
-import { calculateRetirementInfo } from './retirement-utils'
+import { format } from 'date-fns';
+import { calculateRetirementInfo } from './retirement-utils';
 
 /**
  * Interface for pilot data used in CSV exports
@@ -39,32 +39,32 @@ import { calculateRetirementInfo } from './retirement-utils'
  * @property {number} certificationStatus.expired - Number of expired certifications
  */
 export interface PilotExportData {
-  employee_id: string
-  first_name: string
-  middle_name?: string
-  last_name: string
-  role: string
-  contract_type?: string
-  nationality?: string
-  passport_number?: string
-  passport_expiry?: string
-  date_of_birth?: string
-  commencement_date?: string
-  seniority_number?: number
-  is_active: boolean
-  age?: number
-  years_of_service?: number
+  employee_id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  role: string;
+  contract_type?: string;
+  nationality?: string;
+  passport_number?: string;
+  passport_expiry?: string;
+  date_of_birth?: string;
+  commencement_date?: string;
+  seniority_number?: number;
+  is_active: boolean;
+  age?: number;
+  years_of_service?: number;
   retirement?: {
-    retirementDate: string
-    timeToRetirement: string
-    retirementStatus: 'active' | 'nearing' | 'due_soon' | 'overdue'
-  }
+    retirementDate: string;
+    timeToRetirement: string;
+    retirementStatus: 'active' | 'nearing' | 'due_soon' | 'overdue';
+  };
   certificationStatus: {
-    total: number
-    current: number
-    expiring: number
-    expired: number
-  }
+    total: number;
+    current: number;
+    expiring: number;
+    expired: number;
+  };
 }
 
 /**
@@ -82,14 +82,14 @@ export interface PilotExportData {
  * @property {number} [days_until_expiry] - Days until expiry (negative if expired)
  */
 export interface CertificationExportData {
-  pilot_name: string
-  employee_id: string
-  check_code: string
-  check_description: string
-  category: string
-  expiry_date?: string
-  status: string
-  days_until_expiry?: number
+  pilot_name: string;
+  employee_id: string;
+  check_code: string;
+  check_description: string;
+  category: string;
+  expiry_date?: string;
+  status: string;
+  days_until_expiry?: number;
 }
 
 /**
@@ -109,24 +109,26 @@ export interface CertificationExportData {
  * // Returns: "name,role,active\nJohn Doe,Captain,true\nJane Smith,First Officer,false"
  */
 export function arrayToCSV(data: any[], filename?: string): string {
-  if (!data.length) return ''
+  if (!data.length) return '';
 
-  const headers = Object.keys(data[0])
+  const headers = Object.keys(data[0]);
   const csvContent = [
     headers.join(','),
-    ...data.map(row =>
-      headers.map(header => {
-        const value = row[header]
-        // Escape commas and quotes according to RFC 4180
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`
-        }
-        return value || ''
-      }).join(',')
-    )
-  ].join('\n')
+    ...data.map((row) =>
+      headers
+        .map((header) => {
+          const value = row[header];
+          // Escape commas and quotes according to RFC 4180
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value || '';
+        })
+        .join(',')
+    ),
+  ].join('\n');
 
-  return csvContent
+  return csvContent;
 }
 
 /**
@@ -144,20 +146,20 @@ export function arrayToCSV(data: any[], filename?: string): string {
  * @security This function only works in browser environments with user interaction
  */
 export function downloadCSV(csvContent: string, filename: string): void {
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
 
-  link.setAttribute('href', url)
-  link.setAttribute('download', filename)
-  link.style.visibility = 'hidden'
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
 
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   // Clean up the object URL to prevent memory leaks
-  URL.revokeObjectURL(url)
+  URL.revokeObjectURL(url);
 }
 
 /**
@@ -190,23 +192,23 @@ export function downloadCSV(csvContent: string, filename: string): void {
  * // Downloads: "Air-Niugini-Pilots-2025-09-27-1430.csv"
  */
 export function exportPilotsToCSV(pilots: PilotExportData[], filtered = false): void {
-  const exportData = pilots.map(pilot => ({
+  const exportData = pilots.map((pilot) => ({
     'Employee ID': pilot.employee_id,
     'First Name': pilot.first_name,
     'Middle Name': pilot.middle_name || '',
     'Last Name': pilot.last_name,
     'Full Name': `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`,
-    'Role': pilot.role,
+    Role: pilot.role,
     'Contract Type': pilot.contract_type || '',
-    'Nationality': pilot.nationality || '',
+    Nationality: pilot.nationality || '',
     'Passport Number': pilot.passport_number || '',
     'Passport Expiry': pilot.passport_expiry || '',
     'Date of Birth': pilot.date_of_birth || '',
-    'Age': pilot.age || '',
+    Age: pilot.age || '',
     'Commencement Date': pilot.commencement_date || '',
     'Years of Service': pilot.years_of_service || '',
     'Seniority Number': pilot.seniority_number || '',
-    'Status': pilot.is_active ? 'Active' : 'Inactive',
+    Status: pilot.is_active ? 'Active' : 'Inactive',
     'Retirement Date': pilot.retirement?.retirementDate || '',
     'Time to Retirement': pilot.retirement?.timeToRetirement || '',
     'Retirement Status': pilot.retirement?.retirementStatus || 'not_calculated',
@@ -214,16 +216,20 @@ export function exportPilotsToCSV(pilots: PilotExportData[], filtered = false): 
     'Current Certifications': pilot.certificationStatus.current,
     'Expiring Certifications': pilot.certificationStatus.expiring,
     'Expired Certifications': pilot.certificationStatus.expired,
-    'Certification Status': pilot.certificationStatus.expired > 0 ? 'Has Expired' :
-                           pilot.certificationStatus.expiring > 0 ? 'Has Expiring' : 'All Current'
-  }))
+    'Certification Status':
+      pilot.certificationStatus.expired > 0
+        ? 'Has Expired'
+        : pilot.certificationStatus.expiring > 0
+          ? 'Has Expiring'
+          : 'All Current',
+  }));
 
-  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm')
-  const prefix = filtered ? 'Filtered-' : ''
-  const filename = `${prefix}Air-Niugini-Pilots-${timestamp}.csv`
+  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+  const prefix = filtered ? 'Filtered-' : '';
+  const filename = `${prefix}Air-Niugini-Pilots-${timestamp}.csv`;
 
-  const csvContent = arrayToCSV(exportData)
-  downloadCSV(csvContent, filename)
+  const csvContent = arrayToCSV(exportData);
+  downloadCSV(csvContent, filename);
 }
 
 /**
@@ -257,28 +263,35 @@ export function exportPilotsToCSV(pilots: PilotExportData[], filtered = false): 
  * exportCertificationsToCSV(certifications, true);
  * // Downloads: "Filtered-Air-Niugini-Certifications-2025-09-27-1430.csv"
  */
-export function exportCertificationsToCSV(certifications: CertificationExportData[], filtered = false): void {
-  const exportData = certifications.map(cert => ({
+export function exportCertificationsToCSV(
+  certifications: CertificationExportData[],
+  filtered = false
+): void {
+  const exportData = certifications.map((cert) => ({
     'Pilot Name': cert.pilot_name,
     'Employee ID': cert.employee_id,
     'Check Code': cert.check_code,
     'Check Description': cert.check_description,
-    'Category': cert.category,
+    Category: cert.category,
     'Expiry Date': cert.expiry_date || 'Not Set',
-    'Status': cert.status,
+    Status: cert.status,
     'Days Until Expiry': cert.days_until_expiry !== undefined ? cert.days_until_expiry : 'N/A',
-    'Urgency Level': cert.days_until_expiry !== undefined
-      ? (cert.days_until_expiry < 0 ? 'Expired' :
-         cert.days_until_expiry <= 30 ? 'Urgent' : 'Current')
-      : 'No Date Set'
-  }))
+    'Urgency Level':
+      cert.days_until_expiry !== undefined
+        ? cert.days_until_expiry < 0
+          ? 'Expired'
+          : cert.days_until_expiry <= 30
+            ? 'Urgent'
+            : 'Current'
+        : 'No Date Set',
+  }));
 
-  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm')
-  const prefix = filtered ? 'Filtered-' : ''
-  const filename = `${prefix}Air-Niugini-Certifications-${timestamp}.csv`
+  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+  const prefix = filtered ? 'Filtered-' : '';
+  const filename = `${prefix}Air-Niugini-Certifications-${timestamp}.csv`;
 
-  const csvContent = arrayToCSV(exportData)
-  downloadCSV(csvContent, filename)
+  const csvContent = arrayToCSV(exportData);
+  downloadCSV(csvContent, filename);
 }
 
 /**
@@ -313,7 +326,7 @@ export function exportCertificationsToCSV(certifications: CertificationExportDat
  * // Downloads: "Air-Niugini-Leave-Requests-2025-09-27-1430.csv"
  */
 export function exportLeaveRequestsToCSV(leaveRequests: any[], filtered = false): void {
-  const exportData = leaveRequests.map(request => ({
+  const exportData = leaveRequests.map((request) => ({
     'Pilot Name': request.pilot_name,
     'Employee ID': request.employee_id,
     'Request Type': request.request_type,
@@ -321,22 +334,22 @@ export function exportLeaveRequestsToCSV(leaveRequests: any[], filtered = false)
     'Start Date': request.start_date,
     'End Date': request.end_date,
     'Days Count': request.days_count,
-    'Status': request.status,
-    'Reason': request.reason || '',
+    Status: request.status,
+    Reason: request.reason || '',
     'Request Date': request.request_date,
     'Request Method': request.request_method,
     'Is Late Request': request.is_late_request ? 'Yes' : 'No',
     'Reviewed By': request.reviewer_name || 'Pending',
     'Reviewed At': request.reviewed_at || '',
-    'Review Comments': request.review_comments || ''
-  }))
+    'Review Comments': request.review_comments || '',
+  }));
 
-  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm')
-  const prefix = filtered ? 'Filtered-' : ''
-  const filename = `${prefix}Air-Niugini-Leave-Requests-${timestamp}.csv`
+  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+  const prefix = filtered ? 'Filtered-' : '';
+  const filename = `${prefix}Air-Niugini-Leave-Requests-${timestamp}.csv`;
 
-  const csvContent = arrayToCSV(exportData)
-  downloadCSV(csvContent, filename)
+  const csvContent = arrayToCSV(exportData);
+  downloadCSV(csvContent, filename);
 }
 
 /**
@@ -353,16 +366,16 @@ export function exportLeaveRequestsToCSV(leaveRequests: any[], filtered = false)
  * @note This function accounts for whether the birthday has occurred this year
  */
 export function calculateAge(dateOfBirth: string): number {
-  const today = new Date()
-  const birthDate = new Date(dateOfBirth)
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const monthDiff = today.getMonth() - birthDate.getMonth()
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
 
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--
+    age--;
   }
 
-  return age
+  return age;
 }
 
 /**
@@ -379,16 +392,16 @@ export function calculateAge(dateOfBirth: string): number {
  * @note This function accounts for whether the anniversary has occurred this year
  */
 export function calculateYearsOfService(commencementDate: string): number {
-  const today = new Date()
-  const startDate = new Date(commencementDate)
-  let years = today.getFullYear() - startDate.getFullYear()
-  const monthDiff = today.getMonth() - startDate.getMonth()
+  const today = new Date();
+  const startDate = new Date(commencementDate);
+  let years = today.getFullYear() - startDate.getFullYear();
+  const monthDiff = today.getMonth() - startDate.getMonth();
 
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < startDate.getDate())) {
-    years--
+    years--;
   }
 
-  return Math.max(0, years)
+  return Math.max(0, years);
 }
 
 /**
@@ -421,15 +434,15 @@ export function calculateYearsOfService(commencementDate: string): number {
  * @regulatory Used for aviation compliance monitoring and audits
  */
 export function exportComplianceReport(pilots: PilotExportData[]): void {
-  const nonCompliantPilots = pilots.filter(pilot =>
-    pilot.certificationStatus.expired > 0 || pilot.certificationStatus.expiring > 0
-  )
+  const nonCompliantPilots = pilots.filter(
+    (pilot) => pilot.certificationStatus.expired > 0 || pilot.certificationStatus.expiring > 0
+  );
 
-  const exportData = nonCompliantPilots.map(pilot => ({
+  const exportData = nonCompliantPilots.map((pilot) => ({
     'Employee ID': pilot.employee_id,
     'Pilot Name': `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`,
-    'Role': pilot.role,
-    'Status': pilot.is_active ? 'Active' : 'Inactive',
+    Role: pilot.role,
+    Status: pilot.is_active ? 'Active' : 'Inactive',
     'Expired Certifications': pilot.certificationStatus.expired,
     'Expiring Certifications': pilot.certificationStatus.expiring,
     'Current Certifications': pilot.certificationStatus.current,
@@ -437,13 +450,14 @@ export function exportComplianceReport(pilots: PilotExportData[]): void {
     'Retirement Date': pilot.retirement?.retirementDate || '',
     'Time to Retirement': pilot.retirement?.timeToRetirement || '',
     'Retirement Status': pilot.retirement?.retirementStatus || 'not_calculated',
-    'Compliance Status': pilot.certificationStatus.expired > 0 ? 'NON-COMPLIANT (Expired)' : 'WARNING (Expiring Soon)',
-    'Priority': pilot.certificationStatus.expired > 0 ? 'HIGH' : 'MEDIUM'
-  }))
+    'Compliance Status':
+      pilot.certificationStatus.expired > 0 ? 'NON-COMPLIANT (Expired)' : 'WARNING (Expiring Soon)',
+    Priority: pilot.certificationStatus.expired > 0 ? 'HIGH' : 'MEDIUM',
+  }));
 
-  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm')
-  const filename = `Air-Niugini-Compliance-Report-${timestamp}.csv`
+  const timestamp = format(new Date(), 'yyyy-MM-dd-HHmm');
+  const filename = `Air-Niugini-Compliance-Report-${timestamp}.csv`;
 
-  const csvContent = arrayToCSV(exportData)
-  downloadCSV(csvContent, filename)
+  const csvContent = arrayToCSV(exportData);
+  downloadCSV(csvContent, filename);
 }

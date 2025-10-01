@@ -8,7 +8,7 @@
  * @since 2025-09-27
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Safely retrieves and validates Supabase configuration from environment variables
@@ -19,39 +19,44 @@ import { createClient } from '@supabase/supabase-js'
  * @returns {string} returns.key - Supabase anonymous public key
  */
 function getSupabaseConfig() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // Add debugging to see what's happening
   console.log('Environment check:', {
     hasUrl: !!supabaseUrl,
     hasKey: !!supabaseAnonKey,
     url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
-    key: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined'
-  })
+    key: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined',
+  });
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Critical: Missing required Supabase environment variables!')
-    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'Present' : 'Missing')
-    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'Missing')
-    throw new Error('Supabase configuration missing. Please check your environment variables.')
+    console.error('❌ Critical: Missing required Supabase environment variables!');
+    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'Present' : 'Missing');
+    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'Missing');
+    throw new Error('Supabase configuration missing. Please check your environment variables.');
   }
 
   return {
     url: supabaseUrl,
-    key: supabaseAnonKey
-  }
+    key: supabaseAnonKey,
+  };
 }
 
-// Create Supabase client with error handling
-const config = getSupabaseConfig()
+// Create Supabase client with error handling and Realtime enabled
+const config = getSupabaseConfig();
 export const supabase = createClient(config.url, config.key, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  }
-})
+    detectSessionInUrl: true,
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
 
 /**
  * Creates a Supabase admin client with service role privileges
@@ -63,79 +68,91 @@ export const supabase = createClient(config.url, config.key, {
  * @security This client bypasses Row Level Security (RLS) - use carefully
  */
 function createSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   console.log('🔧 Admin client environment check:', {
     hasUrl: !!supabaseUrl,
     hasServiceKey: !!supabaseServiceKey,
     url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
     serviceKeyLength: supabaseServiceKey ? supabaseServiceKey.length : 0,
-    serviceKeyStart: supabaseServiceKey ? supabaseServiceKey.substring(0, 20) + '...' : 'undefined'
-  })
+    serviceKeyStart: supabaseServiceKey ? supabaseServiceKey.substring(0, 20) + '...' : 'undefined',
+  });
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('❌ Critical: Missing Supabase environment variables in production')
-    console.error('❌ URL:', !!supabaseUrl, 'ServiceKey:', !!supabaseServiceKey)
-    throw new Error('Supabase configuration missing - cannot perform admin operations')
+    console.error('❌ Critical: Missing Supabase environment variables in production');
+    console.error('❌ URL:', !!supabaseUrl, 'ServiceKey:', !!supabaseServiceKey);
+    throw new Error('Supabase configuration missing - cannot perform admin operations');
   }
 
   const client = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
+      persistSession: false,
     },
     global: {
       fetch: async (url, options = {}) => {
         console.log('🌐 Supabase fetch:', {
           url: String(url).substring(0, 50) + '...',
           method: options?.method || 'GET',
-          hasAuth: !!(options?.headers as any)?.Authorization
-        })
+          hasAuth: !!(options?.headers as any)?.Authorization,
+        });
 
         try {
           // Try with a longer timeout and better error handling
-          const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
           const response = await fetch(url, {
             ...options,
-            signal: controller.signal
-          })
+            signal: controller.signal,
+          });
 
-          clearTimeout(timeoutId)
-          return response
+          clearTimeout(timeoutId);
+          return response;
         } catch (error) {
-          console.error('🚨 Fetch error:', error)
+          console.error('🚨 Fetch error:', error);
           // Re-throw the error so Supabase can handle it
-          throw error
+          throw error;
         }
-      }
-    }
-  })
+      },
+    },
+  });
 
-  console.log('✅ Admin client created successfully')
-  return client
+  console.log('✅ Admin client created successfully');
+  return client;
 }
 
 // Lazy initialization of admin client to avoid build-time errors
-let _supabaseAdmin: any = null
+let _supabaseAdmin: any = null;
 export function getSupabaseAdmin() {
   if (!_supabaseAdmin) {
-    _supabaseAdmin = createSupabaseAdmin()
+    _supabaseAdmin = createSupabaseAdmin();
   }
-  return _supabaseAdmin
+  return _supabaseAdmin;
 }
 
 // Legacy export for backward compatibility - deprecated, use getSupabaseAdmin() instead
 export const supabaseAdmin = {
-  get from() { return getSupabaseAdmin().from },
-  get auth() { return getSupabaseAdmin().auth },
-  get storage() { return getSupabaseAdmin().storage },
-  get rpc() { return getSupabaseAdmin().rpc },
-  get channel() { return getSupabaseAdmin().channel },
-  get realtime() { return getSupabaseAdmin().realtime }
-}
+  get from() {
+    return getSupabaseAdmin().from;
+  },
+  get auth() {
+    return getSupabaseAdmin().auth;
+  },
+  get storage() {
+    return getSupabaseAdmin().storage;
+  },
+  get rpc() {
+    return getSupabaseAdmin().rpc;
+  },
+  get channel() {
+    return getSupabaseAdmin().channel;
+  },
+  get realtime() {
+    return getSupabaseAdmin().realtime;
+  },
+};
 
 // =============================================================================
 // DATABASE TYPE DEFINITIONS
@@ -153,11 +170,11 @@ export const supabaseAdmin = {
  * @property {string} created_at - ISO timestamp of account creation
  */
 export interface User {
-  id: string
-  email: string
-  name: string
-  role: 'admin' | 'manager'
-  created_at: string
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'manager';
+  created_at: string;
 }
 
 /**
@@ -186,25 +203,25 @@ export interface User {
  * @property {string} [rhs_captain_expiry] - Right-hand seat captain authority expiry
  */
 export interface Pilot {
-  id: string
-  employee_id: string
-  first_name: string
-  middle_name?: string
-  last_name: string
-  role: 'Captain' | 'First Officer'
-  contract_type?: string
-  nationality?: string
-  passport_number?: string
-  passport_expiry?: string
-  date_of_birth?: string
-  commencement_date?: string
-  seniority_number?: number
-  is_active: boolean
-  created_at: string
-  updated_at?: string
-  captain_qualifications?: any[]
-  qualification_notes?: string
-  rhs_captain_expiry?: string
+  id: string;
+  employee_id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  role: 'Captain' | 'First Officer';
+  contract_type?: string;
+  nationality?: string;
+  passport_number?: string;
+  passport_expiry?: string;
+  date_of_birth?: string;
+  commencement_date?: string;
+  seniority_number?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+  captain_qualifications?: any[];
+  qualification_notes?: string;
+  rhs_captain_expiry?: string;
 }
 
 /**
@@ -219,11 +236,11 @@ export interface Pilot {
  * @property {string} created_at - Record creation timestamp
  */
 export interface CheckType {
-  id: string
-  check_code: string
-  check_description: string
-  category?: string
-  created_at: string
+  id: string;
+  check_code: string;
+  check_description: string;
+  category?: string;
+  created_at: string;
 }
 
 /**
@@ -241,15 +258,15 @@ export interface CheckType {
  * @property {CheckType} [check_type] - Related check type record (when joined)
  */
 export interface PilotCheck {
-  id: string
-  pilot_id: string
-  check_type_id: string
-  expiry_date?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  pilot_id: string;
+  check_type_id: string;
+  expiry_date?: string;
+  created_at: string;
+  updated_at: string;
   // Relations
-  pilot?: Pilot
-  check_type?: CheckType
+  pilot?: Pilot;
+  check_type?: CheckType;
 }
 
 /**
@@ -273,21 +290,21 @@ export interface PilotCheck {
  * @property {User} [reviewer] - Related reviewer record (when joined)
  */
 export interface LeaveRequest {
-  id: string
-  pilot_id: string
-  request_type: 'RDO' | 'WDO' | 'ANNUAL' | 'SICK'
-  roster_period: string
-  start_date: string
-  end_date: string
-  days_count: number
-  status: 'PENDING' | 'APPROVED' | 'DENIED'
-  reason?: string
-  created_at: string
-  reviewed_by?: string
-  reviewed_at?: string
+  id: string;
+  pilot_id: string;
+  request_type: 'RDO' | 'WDO' | 'ANNUAL' | 'SICK';
+  roster_period: string;
+  start_date: string;
+  end_date: string;
+  days_count: number;
+  status: 'PENDING' | 'APPROVED' | 'DENIED';
+  reason?: string;
+  created_at: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
   // Relations
-  pilot?: Pilot
-  reviewer?: User
+  pilot?: Pilot;
+  reviewer?: User;
 }
 
 // =============================================================================
@@ -309,6 +326,6 @@ export interface LeaveRequest {
  * }
  */
 export const handleSupabaseError = (error: any) => {
-  console.error('Supabase error:', error)
-  return error.message || 'An unexpected error occurred'
-}
+  console.error('Supabase error:', error);
+  return error.message || 'An unexpected error occurred';
+};

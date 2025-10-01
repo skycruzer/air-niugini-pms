@@ -1,71 +1,88 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { format, differenceInDays, isAfter, isBefore } from 'date-fns'
-import { getAllPilots } from '@/lib/pilot-service'
-import { createLeaveRequest, checkLeaveConflicts, type LeaveRequestFormData, type LeaveRequest } from '@/lib/leave-service'
-import { getCurrentRosterPeriod, getAffectedRosterPeriods } from '@/lib/roster-utils'
-import { useAuth } from '@/contexts/AuthContext'
-import { ModalSheet } from '@/components/ui/ModalSheet'
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { format, differenceInDays, isAfter, isBefore } from 'date-fns';
+import { getAllPilots } from '@/lib/pilot-service';
+import {
+  createLeaveRequest,
+  checkLeaveConflicts,
+  type LeaveRequestFormData,
+  type LeaveRequest,
+} from '@/lib/leave-service';
+import { getCurrentRosterPeriod, getAffectedRosterPeriods } from '@/lib/roster-utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { ModalSheet } from '@/components/ui/ModalSheet';
 
-const leaveRequestSchema = z.object({
-  pilot_id: z.string().min(1, 'Please select a pilot'),
-  request_type: z.enum(['RDO', 'SDO', 'ANNUAL', 'SICK', 'LSL', 'LWOP', 'MATERNITY', 'COMPASSIONATE'], {
-    message: 'Please select a leave type'
-  }),
-  start_date: z.string().min(1, 'Start date is required'),
-  end_date: z.string().min(1, 'End date is required'),
-  request_date: z.string().min(1, 'Date of request is required'),
-  request_method: z.enum(['ORACLE', 'EMAIL', 'LEAVE_BIDS', 'SYSTEM'], {
-    message: 'Please select how you were advised'
-  }),
-  reason: z.string().optional(),
-  is_late_request: z.boolean().optional()
-}).refine((data) => {
-  const startDate = new Date(data.start_date)
-  const endDate = new Date(data.end_date)
-  return !isAfter(startDate, endDate)
-}, {
-  message: 'End date must be after or equal to start date',
-  path: ['end_date']
-}).refine((data) => {
-  const requestDate = new Date(data.request_date)
-  const startDate = new Date(data.start_date)
-  return !isAfter(requestDate, startDate)
-}, {
-  message: 'Request date cannot be after start date',
-  path: ['request_date']
-})
+const leaveRequestSchema = z
+  .object({
+    pilot_id: z.string().min(1, 'Please select a pilot'),
+    request_type: z.enum(
+      ['RDO', 'SDO', 'ANNUAL', 'SICK', 'LSL', 'LWOP', 'MATERNITY', 'COMPASSIONATE'],
+      {
+        message: 'Please select a leave type',
+      }
+    ),
+    start_date: z.string().min(1, 'Start date is required'),
+    end_date: z.string().min(1, 'End date is required'),
+    request_date: z.string().min(1, 'Date of request is required'),
+    request_method: z.enum(['ORACLE', 'EMAIL', 'LEAVE_BIDS', 'SYSTEM'], {
+      message: 'Please select how you were advised',
+    }),
+    reason: z.string().optional(),
+    is_late_request: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      const startDate = new Date(data.start_date);
+      const endDate = new Date(data.end_date);
+      return !isAfter(startDate, endDate);
+    },
+    {
+      message: 'End date must be after or equal to start date',
+      path: ['end_date'],
+    }
+  )
+  .refine(
+    (data) => {
+      const requestDate = new Date(data.request_date);
+      const startDate = new Date(data.start_date);
+      return !isAfter(requestDate, startDate);
+    },
+    {
+      message: 'Request date cannot be after start date',
+      path: ['request_date'],
+    }
+  );
 
 interface LeaveRequestModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: (request: LeaveRequest) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (request: LeaveRequest) => void;
 }
 
 interface Pilot {
-  id: string
-  employee_id: string
-  first_name: string
-  middle_name?: string
-  last_name: string
-  role: string
-  is_active: boolean
-  seniority_number?: number
-  commencement_date?: Date
+  id: string;
+  employee_id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  role: string;
+  is_active: boolean;
+  seniority_number?: number;
+  commencement_date?: Date;
 }
 
 export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestModalProps) {
-  const { user } = useAuth()
-  const [pilots, setPilots] = useState<Pilot[]>([])
-  const [loading, setLoading] = useState(false)
-  const [conflicts, setConflicts] = useState<LeaveRequest[]>([])
-  const [checkingConflicts, setCheckingConflicts] = useState(false)
-  const [affectedRosterPeriods, setAffectedRosterPeriods] = useState<any[]>([])
-  const currentRoster = getCurrentRosterPeriod()
+  const { user } = useAuth();
+  const [pilots, setPilots] = useState<Pilot[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [conflicts, setConflicts] = useState<LeaveRequest[]>([]);
+  const [checkingConflicts, setCheckingConflicts] = useState(false);
+  const [affectedRosterPeriods, setAffectedRosterPeriods] = useState<any[]>([]);
+  const currentRoster = getCurrentRosterPeriod();
 
   const {
     register,
@@ -75,7 +92,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
     setValue,
     formState: { errors },
     setError,
-    clearErrors
+    clearErrors,
   } = useForm<LeaveRequestFormData>({
     resolver: zodResolver(leaveRequestSchema),
     defaultValues: {
@@ -86,35 +103,37 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
       request_date: format(new Date(), 'yyyy-MM-dd'),
       request_method: 'EMAIL',
       reason: '',
-      is_late_request: false
-    }
-  })
+      is_late_request: false,
+    },
+  });
 
-  const pilotId = watch('pilot_id')
-  const startDate = watch('start_date')
-  const endDate = watch('end_date')
+  const pilotId = watch('pilot_id');
+  const startDate = watch('start_date');
+  const endDate = watch('end_date');
 
   // Load pilots on component mount
   useEffect(() => {
     const loadPilots = async () => {
       try {
-        const pilotsData = await getAllPilots()
+        const pilotsData = await getAllPilots();
         const transformedPilots = pilotsData
-          .filter(p => p.is_active)
-          .map(pilot => ({
+          .filter((p) => p.is_active)
+          .map((pilot) => ({
             ...pilot,
-            commencement_date: pilot.commencement_date ? new Date(pilot.commencement_date) : undefined
-          }))
-        setPilots(transformedPilots)
+            commencement_date: pilot.commencement_date
+              ? new Date(pilot.commencement_date)
+              : undefined,
+          }));
+        setPilots(transformedPilots);
       } catch (error) {
-        console.error('Error loading pilots:', error)
+        console.error('Error loading pilots:', error);
       }
-    }
+    };
 
     if (isOpen) {
-      loadPilots()
+      loadPilots();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -127,164 +146,159 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
         request_date: format(new Date(), 'yyyy-MM-dd'),
         request_method: 'EMAIL',
         reason: '',
-        is_late_request: false
-      })
-      setConflicts([])
-      setAffectedRosterPeriods([])
+        is_late_request: false,
+      });
+      setConflicts([]);
+      setAffectedRosterPeriods([]);
     }
-  }, [isOpen, reset])
+  }, [isOpen, reset]);
 
   // Check for conflicts and update roster periods when pilot or dates change
   useEffect(() => {
     const checkConflicts = async () => {
       if (!pilotId || !startDate || !endDate) {
-        setConflicts([])
-        setAffectedRosterPeriods([])
-        setCheckingConflicts(false)
-        return
+        setConflicts([]);
+        setAffectedRosterPeriods([]);
+        setCheckingConflicts(false);
+        return;
       }
 
-      setCheckingConflicts(true)
+      setCheckingConflicts(true);
 
       // Calculate affected roster periods
       try {
-        const periods = getAffectedRosterPeriods(new Date(startDate), new Date(endDate))
-        setAffectedRosterPeriods(periods)
+        const periods = getAffectedRosterPeriods(new Date(startDate), new Date(endDate));
+        setAffectedRosterPeriods(periods);
       } catch (error) {
-        console.error('Error calculating roster periods:', error)
-        setAffectedRosterPeriods([])
+        console.error('Error calculating roster periods:', error);
+        setAffectedRosterPeriods([]);
       }
 
       try {
-        const conflictingRequests = await checkLeaveConflicts(pilotId, startDate, endDate)
-        setConflicts(conflictingRequests)
+        const conflictingRequests = await checkLeaveConflicts(pilotId, startDate, endDate);
+        setConflicts(conflictingRequests);
 
         if (conflictingRequests.length > 0) {
           setError('start_date', {
             type: 'manual',
-            message: `Conflicts with existing leave requests`
-          })
+            message: `Conflicts with existing leave requests`,
+          });
         } else {
-          clearErrors(['start_date', 'end_date'])
+          clearErrors(['start_date', 'end_date']);
         }
       } catch (error) {
-        console.error('Error checking conflicts:', error)
+        console.error('Error checking conflicts:', error);
       } finally {
-        setCheckingConflicts(false)
+        setCheckingConflicts(false);
       }
-    }
+    };
 
-    const timeoutId = setTimeout(checkConflicts, 500)
-    return () => clearTimeout(timeoutId)
-  }, [pilotId, startDate, endDate, setError, clearErrors])
+    const timeoutId = setTimeout(checkConflicts, 500);
+    return () => clearTimeout(timeoutId);
+  }, [pilotId, startDate, endDate, setError, clearErrors]);
 
   const onSubmit = async (data: LeaveRequestFormData) => {
-    if (!user) return
+    if (!user) return;
 
     // Final conflict check
     if (conflicts.length > 0) {
       setError('start_date', {
         type: 'manual',
-        message: 'Please resolve conflicts before submitting'
-      })
-      return
+        message: 'Please resolve conflicts before submitting',
+      });
+      return;
     }
 
     // Validate dates are within reasonable bounds
-    const startDate = new Date(data.start_date)
-    const endDate = new Date(data.end_date)
-    const today = new Date()
+    const startDate = new Date(data.start_date);
+    const endDate = new Date(data.end_date);
+    const today = new Date();
 
     if (isBefore(endDate, today)) {
       setError('end_date', {
         type: 'manual',
-        message: 'Cannot request leave for past dates'
-      })
-      return
+        message: 'Cannot request leave for past dates',
+      });
+      return;
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       // Check if request is late and add flag
-      const isLate = checkIsLateRequest(data.request_date, data.start_date, data.request_type)
+      const isLate = checkIsLateRequest(data.request_date, data.start_date, data.request_type);
       const requestData = {
         ...data,
-        is_late_request: isLate
-      }
+        is_late_request: isLate,
+      };
 
-      const result = await createLeaveRequest(requestData)
-      onSuccess(result)
-      onClose()
+      const result = await createLeaveRequest(requestData);
+      onSuccess(result);
+      onClose();
     } catch (error) {
-      console.error('Error creating leave request:', error)
+      console.error('Error creating leave request:', error);
       setError('root', {
         type: 'manual',
-        message: error instanceof Error ? error.message : 'Failed to create leave request'
-      })
+        message: error instanceof Error ? error.message : 'Failed to create leave request',
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const calculateDays = () => {
-    const startDate = watch('start_date')
-    const endDate = watch('end_date')
+    const startDate = watch('start_date');
+    const endDate = watch('end_date');
 
-    if (!startDate || !endDate) return 0
+    if (!startDate || !endDate) return 0;
 
-    const start = new Date(startDate)
-    const end = new Date(endDate)
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    if (isAfter(start, end)) return 0
+    if (isAfter(start, end)) return 0;
 
-    return differenceInDays(end, start) + 1
-  }
+    return differenceInDays(end, start) + 1;
+  };
 
   // Check if request is late (requires 21 days advance notice except for compassionate leave)
   const checkIsLateRequest = (requestDate: string, startDate: string, requestType: string) => {
     if (requestType === 'COMPASSIONATE') {
-      return false
+      return false;
     }
 
-    const requestDateTime = new Date(requestDate)
-    const startDateTime = new Date(startDate)
-    const daysAdvance = differenceInDays(startDateTime, requestDateTime)
+    const requestDateTime = new Date(requestDate);
+    const startDateTime = new Date(startDate);
+    const daysAdvance = differenceInDays(startDateTime, requestDateTime);
 
-    return daysAdvance < 21
-  }
+    return daysAdvance < 21;
+  };
 
   // Get late request warning message
   const getLateRequestInfo = () => {
-    const requestDate = watch('request_date')
-    const startDate = watch('start_date')
-    const requestType = watch('request_type')
+    const requestDate = watch('request_date');
+    const startDate = watch('start_date');
+    const requestType = watch('request_type');
 
-    if (!requestDate || !startDate || !requestType) return null
+    if (!requestDate || !startDate || !requestType) return null;
 
-    const isLate = checkIsLateRequest(requestDate, startDate, requestType)
+    const isLate = checkIsLateRequest(requestDate, startDate, requestType);
 
     if (isLate && requestType !== 'COMPASSIONATE') {
-      const daysAdvance = differenceInDays(new Date(startDate), new Date(requestDate))
+      const daysAdvance = differenceInDays(new Date(startDate), new Date(requestDate));
       return {
         isLate: true,
         daysAdvance,
-        message: `This request is considered LATE (${daysAdvance} days advance notice). Minimum 21 days required except for compassionate leave.`
-      }
+        message: `This request is considered LATE (${daysAdvance} days advance notice). Minimum 21 days required except for compassionate leave.`,
+      };
     }
 
-    return null
-  }
+    return null;
+  };
 
-  const selectedPilot = pilots.find(p => p.id === watch('pilot_id'))
+  const selectedPilot = pilots.find((p) => p.id === watch('pilot_id'));
 
   return (
-    <ModalSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title="New Leave Request"
-      size="xl"
-    >
+    <ModalSheet isOpen={isOpen} onClose={onClose} title="New Leave Request" size="xl">
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
         {/* Current Roster Info */}
         <div className="bg-[#E4002B]/5 border border-[#E4002B]/20 rounded-lg p-4">
@@ -302,7 +316,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
               <div className="text-right">
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Request affects</p>
                 <p className="font-medium text-blue-600">
-                  {affectedRosterPeriods.map(p => p.code).join(', ')}
+                  {affectedRosterPeriods.map((p) => p.code).join(', ')}
                 </p>
               </div>
             )}
@@ -321,7 +335,8 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             <option value="">Select a pilot...</option>
             {pilots.map((pilot) => (
               <option key={pilot.id} value={pilot.id}>
-                {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}{pilot.last_name} - {pilot.employee_id} ({pilot.role})
+                {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}
+                {pilot.last_name} - {pilot.employee_id} ({pilot.role})
                 {pilot.seniority_number && ` - Seniority #${pilot.seniority_number}`}
               </option>
             ))}
@@ -352,7 +367,11 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
                   <div>
                     <span className="font-medium text-blue-700">Service:</span>
                     <p className="text-blue-900">
-                      {Math.floor(differenceInDays(new Date(), new Date(selectedPilot.commencement_date)) / 365)} years
+                      {Math.floor(
+                        differenceInDays(new Date(), new Date(selectedPilot.commencement_date)) /
+                          365
+                      )}{' '}
+                      years
                     </p>
                   </div>
                 )}
@@ -374,8 +393,18 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
               { value: 'SICK', label: 'Sick', description: 'Sick Leave', icon: '🏥' },
               { value: 'LSL', label: 'LSL', description: 'Long Service Leave', icon: '🎖️' },
               { value: 'LWOP', label: 'LWOP', description: 'Leave Without Pay', icon: '📋' },
-              { value: 'MATERNITY', label: 'Maternity', description: 'Maternity Leave', icon: '🤱' },
-              { value: 'COMPASSIONATE', label: 'Compassionate', description: 'Compassionate Leave', icon: '💝' }
+              {
+                value: 'MATERNITY',
+                label: 'Maternity',
+                description: 'Maternity Leave',
+                icon: '🤱',
+              },
+              {
+                value: 'COMPASSIONATE',
+                label: 'Compassionate',
+                description: 'Compassionate Leave',
+                icon: '💝',
+              },
             ].map((type) => (
               <label key={type.value} className="relative">
                 <input
@@ -414,9 +443,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             {errors.request_date && (
               <p className="text-red-600 text-sm mt-1">{errors.request_date.message}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              When did you make this request?
-            </p>
+            <p className="text-xs text-gray-500 mt-1">When did you make this request?</p>
           </div>
 
           <div>
@@ -435,9 +462,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             {errors.request_method && (
               <p className="text-red-600 text-sm mt-1">{errors.request_method.message}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              How were you advised about this leave?
-            </p>
+            <p className="text-xs text-gray-500 mt-1">How were you advised about this leave?</p>
           </div>
         </div>
 
@@ -492,7 +517,8 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
                     <div key={period.code} className="text-sm text-purple-700">
                       <span className="font-medium">{period.code}</span>
                       <span className="ml-2">
-                        ({format(period.startDate, 'dd MMM')} - {format(period.endDate, 'dd MMM yyyy')})
+                        ({format(period.startDate, 'dd MMM')} -{' '}
+                        {format(period.endDate, 'dd MMM yyyy')})
                       </span>
                     </div>
                   ))}
@@ -507,8 +533,8 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
 
             {/* Late Request Warning */}
             {(() => {
-              const lateInfo = getLateRequestInfo()
-              if (!lateInfo?.isLate) return null
+              const lateInfo = getLateRequestInfo();
+              if (!lateInfo?.isLate) return null;
 
               return (
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
@@ -523,7 +549,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
                     </div>
                   </div>
                 </div>
-              )
+              );
             })()}
           </div>
         )}
@@ -546,7 +572,8 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
                 <div key={conflict.id} className="text-sm text-red-700">
                   <span className="font-medium">{conflict.request_type}</span>
                   <span className="mx-2">•</span>
-                  {format(new Date(conflict.start_date), 'dd MMM')} - {format(new Date(conflict.end_date), 'dd MMM yyyy')}
+                  {format(new Date(conflict.start_date), 'dd MMM')} -{' '}
+                  {format(new Date(conflict.end_date), 'dd MMM yyyy')}
                   <span className="mx-2">•</span>
                   <span className="capitalize">{conflict.status.toLowerCase()}</span>
                 </div>
@@ -557,9 +584,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
 
         {/* Reason */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Reason (Optional)
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Reason (Optional)</label>
           <textarea
             {...register('reason')}
             rows={3}
@@ -604,5 +629,5 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
         </div>
       </form>
     </ModalSheet>
-  )
+  );
 }

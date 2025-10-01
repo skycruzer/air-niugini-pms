@@ -4,12 +4,12 @@
  * Should be called once during application bootstrap to pre-load frequently accessed data.
  */
 
-import { cacheService } from '@/lib/cache-service'
+import { cacheService } from '@/lib/cache-service';
 
 /**
  * Global flag to ensure cache warm-up runs only once
  */
-let isWarmUpComplete = false
+let isWarmUpComplete = false;
 
 /**
  * Initialize cache warm-up for optimal application performance
@@ -20,26 +20,25 @@ let isWarmUpComplete = false
 export function initializeCacheWarmUp(): void {
   // Prevent multiple warm-up attempts
   if (isWarmUpComplete) {
-    console.log('🔥 Cache already warmed up, skipping...')
-    return
+    console.log('🔥 Cache already warmed up, skipping...');
+    return;
   }
 
   // Run cache warm-up in background without blocking UI
   setTimeout(async () => {
     try {
-      console.log('🚀 Starting non-blocking cache warm-up process...')
+      console.log('🚀 Starting non-blocking cache warm-up process...');
 
       // Warm up the cache with frequently accessed data
-      await cacheService.warmUp()
+      await cacheService.warmUp();
 
-      isWarmUpComplete = true
-      console.log('✅ Background cache warm-up completed successfully')
-
+      isWarmUpComplete = true;
+      console.log('✅ Background cache warm-up completed successfully');
     } catch (error) {
-      console.warn('⚠️ Background cache warm-up failed, but application will continue:', error)
+      console.warn('⚠️ Background cache warm-up failed, but application will continue:', error);
       // Don't throw error - application should work without cache
     }
-  }, 100) // Small delay to ensure UI renders first
+  }, 100); // Small delay to ensure UI renders first
 }
 
 /**
@@ -49,7 +48,7 @@ export function initializeCacheWarmUp(): void {
  * @returns {object} Current cache statistics
  */
 export function getCacheStats(): object {
-  return cacheService.getStats()
+  return cacheService.getStats();
 }
 
 /**
@@ -60,18 +59,17 @@ export function getCacheStats(): object {
  */
 export async function refreshCache(): Promise<void> {
   try {
-    console.log('🔄 Manual cache refresh initiated...')
+    console.log('🔄 Manual cache refresh initiated...');
 
     // Clear existing cache
-    cacheService.invalidateAll()
+    cacheService.invalidateAll();
 
     // Warm up with fresh data
-    await cacheService.warmUp()
+    await cacheService.warmUp();
 
-    console.log('✅ Manual cache refresh completed')
-
+    console.log('✅ Manual cache refresh completed');
   } catch (error) {
-    console.error('❌ Manual cache refresh failed:', error)
-    throw error
+    console.error('❌ Manual cache refresh failed:', error);
+    throw error;
   }
 }

@@ -1,23 +1,25 @@
-import { differenceInDays, addDays, format } from 'date-fns'
+import { differenceInDays, addDays, format } from 'date-fns';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 // Mark this page as dynamic since it fetches dashboard stats
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Roster calculation functions
-const ROSTER_DURATION = 28
+const ROSTER_DURATION = 28;
 const KNOWN_ROSTER = {
   number: 11,
   year: 2025,
-  endDate: new Date('2025-10-10')
-}
+  endDate: new Date('2025-10-10'),
+};
 
 function getCurrentRosterPeriod() {
-  const today = new Date()
+  const today = new Date();
 
   // Check if we're still in the known roster period
   if (today <= KNOWN_ROSTER.endDate) {
-    const knownStartDate = addDays(KNOWN_ROSTER.endDate, -ROSTER_DURATION + 1)
-    const daysRemaining = Math.max(0, differenceInDays(KNOWN_ROSTER.endDate, today))
+    const knownStartDate = addDays(KNOWN_ROSTER.endDate, -ROSTER_DURATION + 1);
+    const daysRemaining = Math.max(0, differenceInDays(KNOWN_ROSTER.endDate, today));
 
     return {
       code: `RP${KNOWN_ROSTER.number}/${KNOWN_ROSTER.year}`,
@@ -25,27 +27,27 @@ function getCurrentRosterPeriod() {
       year: KNOWN_ROSTER.year,
       startDate: knownStartDate,
       endDate: KNOWN_ROSTER.endDate,
-      daysRemaining
-    }
+      daysRemaining,
+    };
   }
 
   // Calculate for periods after the known roster
-  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.endDate)
-  const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION)
+  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.endDate);
+  const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION);
 
   // Calculate current roster number
-  let totalPeriods = KNOWN_ROSTER.number + periodsPassed + 1
-  let year = KNOWN_ROSTER.year
+  let totalPeriods = KNOWN_ROSTER.number + periodsPassed + 1;
+  let year = KNOWN_ROSTER.year;
 
   // Handle year transitions (13 periods per year)
   while (totalPeriods > 13) {
-    year += 1
-    totalPeriods -= 13
+    year += 1;
+    totalPeriods -= 13;
   }
 
-  const startDate = addDays(KNOWN_ROSTER.endDate, periodsPassed * ROSTER_DURATION + 1)
-  const endDate = addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION)
-  const daysRemaining = Math.max(0, differenceInDays(endDate, today))
+  const startDate = addDays(KNOWN_ROSTER.endDate, periodsPassed * ROSTER_DURATION + 1);
+  const endDate = addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION);
+  const daysRemaining = Math.max(0, differenceInDays(endDate, today));
 
   return {
     code: `RP${totalPeriods}/${year}`,
@@ -53,48 +55,65 @@ function getCurrentRosterPeriod() {
     year: year,
     startDate,
     endDate,
-    daysRemaining
-  }
+    daysRemaining,
+  };
 }
 
 async function getDashboardStats() {
   try {
-    // Use Vercel's automatic URL or fallback to localhost for development
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3004}`
+    const supabaseAdmin = getSupabaseAdmin();
 
-    console.log('🔍 Dashboard stats fetch URL:', baseUrl)
-    const response = await fetch(`${baseUrl}/api/dashboard/stats`, {
-      cache: 'no-store',
-      // Add timeout to prevent hanging
-      signal: AbortSignal.timeout(10000)
-    })
+    // Get pilot counts
+    const { data: pilots, error: pilotsError } = await supabaseAdmin
+      .from('pilots')
+      .select('role, is_active')
+      .eq('is_active', true);
 
-    if (response.ok) {
-      const data = await response.json()
-      return data
-    } else {
-      console.warn('Dashboard stats API returned:', response.status, response.statusText)
+    // Get certification count
+    const { count: certCount, error: certError } = await supabaseAdmin
+      .from('pilot_checks')
+      .select('*', { count: 'exact', head: true });
+
+    // Get check types count
+    const { count: checkTypesCount, error: checkTypesError } = await supabaseAdmin
+      .from('check_types')
+      .select('*', { count: 'exact', head: true });
+
+    if (pilotsError || certError || checkTypesError) {
+      console.warn('Database query error, using fallback data');
+      throw new Error('Database query failed');
     }
-  } catch (error) {
-    console.warn('Dashboard stats fetch failed, using fallback data:', error)
-  }
 
-  // Always return fallback data to ensure page renders - updated to match real database
-  return {
-    totalPilots: 27,        // Real count from database
-    captains: 22,           // Updated based on current data
-    firstOfficers: 5,       // Updated based on current data
-    certifications: 568,    // Real count from database
-    checkTypes: 34,         // Real count from database (was 38, now 34)
-    compliance: 95          // Updated based on real calculation
+    const totalPilots = pilots?.length || 0;
+    const captains = pilots?.filter((p: { role: string }) => p.role === 'Captain').length || 0;
+    const firstOfficers = pilots?.filter((p: { role: string }) => p.role === 'First Officer').length || 0;
+
+    return {
+      totalPilots,
+      captains,
+      firstOfficers,
+      certifications: certCount || 0,
+      checkTypes: checkTypesCount || 0,
+      compliance: 95,
+    };
+  } catch (error) {
+    console.warn('Dashboard stats fetch failed, using fallback data:', error);
+
+    // Always return fallback data to ensure page renders
+    return {
+      totalPilots: 27,
+      captains: 22,
+      firstOfficers: 5,
+      certifications: 568,
+      checkTypes: 34,
+      compliance: 95,
+    };
   }
 }
 
 export default async function HomePage() {
-  const stats = await getDashboardStats()
-  const currentRoster = getCurrentRosterPeriod()
+  const stats = await getDashboardStats();
+  const currentRoster = getCurrentRosterPeriod();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50">
@@ -102,7 +121,6 @@ export default async function HomePage() {
       <header className="aviation-header relative overflow-hidden">
         <div className="relative container mx-auto px-4 py-16 lg:py-24">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-
             {/* Brand & Title */}
             <div className="flex-1 text-center lg:text-left animate-fade-in">
               <div className="flex items-center justify-center lg:justify-start mb-6">
@@ -117,9 +135,7 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="ml-6">
-                  <h1 className="text-display-medium text-white font-black">
-                    Air Niugini
-                  </h1>
+                  <h1 className="text-display-medium text-white font-black">Air Niugini</h1>
                   <p className="text-body-large text-blue-100 mt-1">
                     Papua New Guinea's National Airline
                   </p>
@@ -131,8 +147,8 @@ export default async function HomePage() {
                   Professional Pilot Management System
                 </h2>
                 <p className="text-body-large text-blue-100 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                  Advanced B767 fleet operations management with comprehensive pilot certification tracking,
-                  intelligent leave management, and real-time compliance monitoring.
+                  Advanced B767 fleet operations management with comprehensive pilot certification
+                  tracking, intelligent leave management, and real-time compliance monitoring.
                 </p>
               </div>
 
@@ -141,7 +157,10 @@ export default async function HomePage() {
                 <a href="/login" className="btn btn-primary btn-lg group">
                   Access Dashboard
                 </a>
-                <a href="#features" className="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-aviation-navy">
+                <a
+                  href="#features"
+                  className="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-aviation-navy"
+                >
                   Learn More
                 </a>
               </div>
@@ -152,8 +171,8 @@ export default async function HomePage() {
               {/* B767 Hero Image */}
               <div className="mb-6">
                 <img
-                  src="/images/air-niugini-b767-new.jpg"
-                  alt="Air Niugini Boeing 767-300ER P2-ANG 'Bulolo'"
+                  src="/images/air-niugini-50th-anniversary.jpg"
+                  alt="Air Niugini 50 Years - 1973-2023"
                   className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
                 />
               </div>
@@ -171,7 +190,9 @@ export default async function HomePage() {
                     <p className="text-2xl font-bold text-gray-900">{stats.totalPilots}</p>
                     <p className="text-xs text-gray-600 font-medium">Total Pilots</p>
                     {stats.captains > 0 && (
-                      <p className="text-xs text-gray-500 mt-1">{stats.captains} Captains, {stats.firstOfficers} F/Os</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {stats.captains} Captains, {stats.firstOfficers} F/Os
+                      </p>
                     )}
                   </div>
 
@@ -217,11 +238,10 @@ export default async function HomePage() {
                   </div>
                   <h2 className="text-heading-medium">Current Roster Period</h2>
                 </div>
-                <p className="text-display-small font-bold">
-                  {currentRoster.code}
-                </p>
+                <p className="text-display-small font-bold">{currentRoster.code}</p>
                 <p className="text-body-medium text-red-100 mt-1">
-                  {format(currentRoster.startDate, 'MMMM d')} - {format(currentRoster.endDate, 'MMMM d, yyyy')}
+                  {format(currentRoster.startDate, 'MMMM d')} -{' '}
+                  {format(currentRoster.endDate, 'MMMM d, yyyy')}
                 </p>
               </div>
 
@@ -262,7 +282,8 @@ export default async function HomePage() {
               </div>
               <h3 className="text-heading-small text-gray-900 mb-4">Pilot Management</h3>
               <p className="text-body-medium text-gray-600 leading-relaxed mb-6">
-                Comprehensive pilot database with role management, contract tracking, and detailed profile management for B767 fleet crew.
+                Comprehensive pilot database with role management, contract tracking, and detailed
+                profile management for B767 fleet crew.
               </p>
             </div>
 
@@ -272,7 +293,8 @@ export default async function HomePage() {
               </div>
               <h3 className="text-heading-small text-gray-900 mb-4">Certification Tracking</h3>
               <p className="text-body-medium text-gray-600 leading-relaxed mb-6">
-                Monitor 38 different check types with intelligent expiry alerts, visual compliance indicators, and automated renewal tracking.
+                Monitor 38 different check types with intelligent expiry alerts, visual compliance
+                indicators, and automated renewal tracking.
               </p>
             </div>
 
@@ -282,7 +304,8 @@ export default async function HomePage() {
               </div>
               <h3 className="text-heading-small text-gray-900 mb-4">Leave Management</h3>
               <p className="text-body-medium text-gray-600 leading-relaxed mb-6">
-                Intelligent RDO requests, WDO requests, and annual leave management integrated with 28-day roster periods and approval workflows.
+                Intelligent RDO requests, WDO requests, and annual leave management integrated with
+                28-day roster periods and approval workflows.
               </p>
             </div>
 
@@ -292,7 +315,8 @@ export default async function HomePage() {
               </div>
               <h3 className="text-heading-small text-gray-900 mb-4">Compliance Dashboard</h3>
               <p className="text-body-medium text-gray-600 leading-relaxed mb-6">
-                Real-time compliance monitoring with color-coded alerts, detailed reporting, and proactive notification system.
+                Real-time compliance monitoring with color-coded alerts, detailed reporting, and
+                proactive notification system.
               </p>
             </div>
           </div>
@@ -303,7 +327,9 @@ export default async function HomePage() {
           <div className="card-aviation">
             <div className="text-center mb-8">
               <h3 className="text-heading-medium text-gray-900 mb-2">System Status</h3>
-              <p className="text-body-medium text-gray-600">All systems operational and ready for use</p>
+              <p className="text-body-medium text-gray-600">
+                All systems operational and ready for use
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -359,7 +385,10 @@ export default async function HomePage() {
                 Secure Access Required
               </h4>
               <div className="text-sm text-blue-800 text-center">
-                <p>Please sign in with your authorized Air Niugini credentials to access the pilot management system.</p>
+                <p>
+                  Please sign in with your authorized Air Niugini credentials to access the pilot
+                  management system.
+                </p>
               </div>
             </div>
           </div>
@@ -399,5 +428,5 @@ export default async function HomePage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

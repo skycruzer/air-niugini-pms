@@ -1,51 +1,51 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
 import {
   getPilotById,
   getPilotCertificationsWithAllTypes,
-  updatePilotCertifications
-} from '@/lib/pilot-service-client'
-import { format } from 'date-fns'
-import { getCategoryIcon } from '@/lib/certification-utils'
+  updatePilotCertifications,
+} from '@/lib/pilot-service-client';
+import { format } from 'date-fns';
+import { getCategoryIcon } from '@/lib/certification-utils';
 
 interface CertificationData {
-  checkTypeId: string
-  checkCode: string
-  checkDescription: string
-  category: string
-  expiryDate: string | null
+  checkTypeId: string;
+  checkCode: string;
+  checkDescription: string;
+  category: string;
+  expiryDate: string | null;
   status: {
-    color: string
-    label: string
-    className: string
-  }
-  hasData: boolean
+    color: string;
+    label: string;
+    className: string;
+  };
+  hasData: boolean;
 }
 
 interface FormData {
-  [checkTypeId: string]: string // date string or empty
+  [checkTypeId: string]: string; // date string or empty
 }
 
 interface FormErrors {
-  [key: string]: string
+  [key: string]: string;
 }
 
 function CertificationRow({
   cert,
   value,
   onChange,
-  error
+  error,
 }: {
-  cert: CertificationData
-  value: string
-  onChange: (checkTypeId: string, value: string) => void
-  error?: string
+  cert: CertificationData;
+  value: string;
+  onChange: (checkTypeId: string, value: string) => void;
+  error?: string;
 }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-4 border-b border-gray-100 last:border-b-0">
@@ -62,7 +62,9 @@ function CertificationRow({
 
       {/* Current Status */}
       <div className="md:col-span-2">
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${cert.status.className}`}>
+        <span
+          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${cert.status.className}`}
+        >
           {cert.status.color === 'red' && <span className="mr-1">⚠️</span>}
           {cert.status.color === 'yellow' && <span className="mr-1">⏰</span>}
           {cert.status.color === 'green' && <span className="mr-1">✅</span>}
@@ -86,9 +88,7 @@ function CertificationRow({
             error ? 'border-red-300' : 'border-gray-300'
           }`}
         />
-        {error && (
-          <p className="mt-1 text-xs text-red-600">{error}</p>
-        )}
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>
 
       {/* Clear Button */}
@@ -105,148 +105,157 @@ function CertificationRow({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default function PilotCertificationsPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const [pilot, setPilot] = useState<any>(null)
-  const [certifications, setCertifications] = useState<CertificationData[]>([])
-  const [formData, setFormData] = useState<FormData>({})
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const params = useParams();
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const [pilot, setPilot] = useState<any>(null);
+  const [certifications, setCertifications] = useState<CertificationData[]>([]);
+  const [formData, setFormData] = useState<FormData>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const pilotId = params.id as string
+  const pilotId = params.id as string;
 
   useEffect(() => {
     console.log('🔍 Certification Page: Effect starting...', {
       pilotId,
       user: !!user,
       authLoading,
-      canEdit: user ? permissions.canEdit(user) : 'checking...'
-    })
+      canEdit: user ? permissions.canEdit(user) : 'checking...',
+    });
 
     // Wait for auth to finish loading
     if (authLoading) {
-      console.log('🔍 Certification Page: Auth still loading, waiting...')
-      return
+      console.log('🔍 Certification Page: Auth still loading, waiting...');
+      return;
     }
 
     if (!permissions.canEdit(user)) {
-      console.log('🚨 Certification Page: User does not have edit permissions, redirecting...', { user })
-      router.push('/dashboard/pilots')
-      return
+      console.log('🚨 Certification Page: User does not have edit permissions, redirecting...', {
+        user,
+      });
+      router.push('/dashboard/pilots');
+      return;
     }
 
     const fetchData = async () => {
       try {
-        console.log('🔍 Certification Page: Starting data fetch...')
-        setLoading(true)
+        console.log('🔍 Certification Page: Starting data fetch...');
+        setLoading(true);
 
         const [pilotData, certData] = await Promise.all([
           getPilotById(pilotId),
-          getPilotCertificationsWithAllTypes(pilotId)
-        ])
+          getPilotCertificationsWithAllTypes(pilotId),
+        ]);
 
         console.log('🔍 Certification Page: Data received:', {
           pilotData: !!pilotData,
           pilotName: pilotData ? `${pilotData.first_name} ${pilotData.last_name}` : 'null',
-          certDataLength: certData?.length || 0
-        })
+          certDataLength: certData?.length || 0,
+        });
 
         if (!pilotData) {
-          console.log('🚨 Certification Page: No pilot data received, redirecting...')
-          router.push('/dashboard/pilots')
-          return
+          console.log('🚨 Certification Page: No pilot data received, redirecting...');
+          router.push('/dashboard/pilots');
+          return;
         }
 
-        setPilot(pilotData)
-        setCertifications(certData)
+        setPilot(pilotData);
+        setCertifications(certData);
 
         // Initialize form data with existing expiry dates
-        console.log('🔍 Certification Page: Initializing form data...')
-        const initialFormData: FormData = {}
+        console.log('🔍 Certification Page: Initializing form data...');
+        const initialFormData: FormData = {};
         certData.forEach((cert: CertificationData) => {
           try {
             initialFormData[cert.checkTypeId] = cert.expiryDate
               ? format(new Date(cert.expiryDate), 'yyyy-MM-dd')
-              : ''
+              : '';
           } catch (dateError) {
-            console.error('🚨 Certification Page: Date format error for cert:', cert.checkCode, dateError)
-            initialFormData[cert.checkTypeId] = ''
+            console.error(
+              '🚨 Certification Page: Date format error for cert:',
+              cert.checkCode,
+              dateError
+            );
+            initialFormData[cert.checkTypeId] = '';
           }
-        })
-        setFormData(initialFormData)
-        console.log('🔍 Certification Page: Form data initialized with', Object.keys(initialFormData).length, 'fields')
-
+        });
+        setFormData(initialFormData);
+        console.log(
+          '🔍 Certification Page: Form data initialized with',
+          Object.keys(initialFormData).length,
+          'fields'
+        );
       } catch (error) {
-        console.error('🚨 Certification Page: Error fetching data:', error)
-        router.push('/dashboard/pilots')
+        console.error('🚨 Certification Page: Error fetching data:', error);
+        router.push('/dashboard/pilots');
       } finally {
-        console.log('🔍 Certification Page: Setting loading to false')
-        setLoading(false)
+        console.log('🔍 Certification Page: Setting loading to false');
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [pilotId, user, router, authLoading])
+    fetchData();
+  }, [pilotId, user, router, authLoading]);
 
   const handleDateChange = (checkTypeId: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [checkTypeId]: value
-    }))
+      [checkTypeId]: value,
+    }));
 
     // Clear any existing error
     if (errors[checkTypeId]) {
-      setErrors(prev => ({ ...prev, [checkTypeId]: '' }))
+      setErrors((prev) => ({ ...prev, [checkTypeId]: '' }));
     }
-  }
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-    const today = new Date()
+    const newErrors: FormErrors = {};
+    const today = new Date();
 
     Object.entries(formData).forEach(([checkTypeId, dateValue]) => {
       if (dateValue) {
-        const date = new Date(dateValue)
+        const date = new Date(dateValue);
         if (date < today) {
-          const cert = certifications.find(c => c.checkTypeId === checkTypeId)
-          newErrors[checkTypeId] = `${cert?.checkCode} expiry date cannot be in the past`
+          const cert = certifications.find((c) => c.checkTypeId === checkTypeId);
+          newErrors[checkTypeId] = `${cert?.checkCode} expiry date cannot be in the past`;
         }
       }
-    })
+    });
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('🔧 DEBUG: handleSubmit called!', { saving, formData })
-    e.preventDefault()
+    console.log('🔧 DEBUG: handleSubmit called!', { saving, formData });
+    e.preventDefault();
 
     if (saving) {
-      console.log('🔧 DEBUG: Already saving, returning early')
-      return
+      console.log('🔧 DEBUG: Already saving, returning early');
+      return;
     }
 
-    const isValid = validateForm()
-    if (!isValid) return
+    const isValid = validateForm();
+    if (!isValid) return;
 
     try {
-      setSaving(true)
-      setErrors({})
+      setSaving(true);
+      setErrors({});
 
       // Convert form data to the format expected by the API
       const updates = Object.entries(formData).map(([checkTypeId, expiryDate]) => ({
         checkTypeId,
-        expiryDate: expiryDate || null
-      }))
+        expiryDate: expiryDate || null,
+      }));
 
-      console.log('🔍 Certification Page: Submitting updates:', updates.length, 'items')
+      console.log('🔍 Certification Page: Submitting updates:', updates.length, 'items');
 
       // Use API route to bypass RLS in development mode
       if (process.env.NODE_ENV === 'development') {
@@ -256,31 +265,31 @@ export default function PilotCertificationsPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            certifications: updates
-          })
-        })
+            certifications: updates,
+          }),
+        });
 
-        const result = await response.json()
+        const result = await response.json();
 
         if (!result.success) {
-          throw new Error(result.error || 'Failed to update certifications')
+          throw new Error(result.error || 'Failed to update certifications');
         }
 
-        console.log('🔍 Certification Page: API update successful')
+        console.log('🔍 Certification Page: API update successful');
       } else {
         // Production mode - use service directly
-        await updatePilotCertifications(pilotId, updates)
+        await updatePilotCertifications(pilotId, updates);
       }
 
       // Redirect back to pilot detail page
-      router.push(`/dashboard/pilots/${pilotId}`)
+      router.push(`/dashboard/pilots/${pilotId}`);
     } catch (error) {
-      console.error('Error updating certifications:', error)
-      setErrors({ submit: 'Failed to update certifications. Please try again.' })
+      console.error('Error updating certifications:', error);
+      setErrors({ submit: 'Failed to update certifications. Please try again.' });
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   if (!permissions.canEdit(user)) {
     return (
@@ -290,12 +299,14 @@ export default function PilotCertificationsPage() {
             <div className="text-center py-12">
               <span className="text-6xl block mb-4">🚫</span>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
-              <p className="text-gray-600 mb-4">You don't have permission to manage certifications.</p>
+              <p className="text-gray-600 mb-4">
+                You don't have permission to manage certifications.
+              </p>
             </div>
           </div>
         </DashboardLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   if (loading) {
@@ -310,7 +321,7 @@ export default function PilotCertificationsPage() {
           </div>
         </DashboardLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   if (!pilot) {
@@ -333,18 +344,21 @@ export default function PilotCertificationsPage() {
           </div>
         </DashboardLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
-  const categorizedCertifications = certifications.reduce((acc, cert) => {
-    if (!acc[cert.category]) {
-      acc[cert.category] = []
-    }
-    acc[cert.category].push(cert)
-    return acc
-  }, {} as Record<string, CertificationData[]>)
+  const categorizedCertifications = certifications.reduce(
+    (acc, cert) => {
+      if (!acc[cert.category]) {
+        acc[cert.category] = [];
+      }
+      acc[cert.category]!.push(cert);
+      return acc;
+    },
+    {} as Record<string, CertificationData[]>
+  );
 
-  const categories = Object.keys(categorizedCertifications).sort()
+  const categories = Object.keys(categorizedCertifications).sort();
 
   return (
     <ProtectedRoute>
@@ -365,7 +379,8 @@ export default function PilotCertificationsPage() {
                   Manage Certifications
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}{pilot.last_name}
+                  {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}
+                  {pilot.last_name}
                   <span className="ml-2 text-sm">({pilot.employee_id})</span>
                 </p>
               </div>
@@ -387,24 +402,25 @@ export default function PilotCertificationsPage() {
                 <div>
                   <h4 className="text-sm font-medium text-blue-800">Certification Management</h4>
                   <p className="text-sm text-blue-700 mt-1">
-                    Set expiry dates for each certification type. Leave blank to indicate no certification recorded.
-                    Dates cannot be set in the past.
+                    Set expiry dates for each certification type. Leave blank to indicate no
+                    certification recorded. Dates cannot be set in the past.
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Certifications by Category */}
-            {categories.map(category => (
-              <div key={category} className="mb-8 bg-white rounded-lg border border-gray-200 shadow-sm">
+            {categories.map((category) => (
+              <div
+                key={category}
+                className="mb-8 bg-white rounded-lg border border-gray-200 shadow-sm"
+              >
                 <div className="px-6 py-4 border-b border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                    <span className="mr-2">
-                      {getCategoryIcon(category)}
-                    </span>
+                    <span className="mr-2">{getCategoryIcon(category)}</span>
                     {category} Certifications
                     <span className="ml-2 text-sm text-gray-500">
-                      ({categorizedCertifications[category].length} items)
+                      ({categorizedCertifications[category]?.length ?? 0} items)
                     </span>
                   </h3>
                 </div>
@@ -421,7 +437,7 @@ export default function PilotCertificationsPage() {
 
                   {/* Certification Rows */}
                   <div>
-                    {categorizedCertifications[category].map(cert => (
+                    {categorizedCertifications[category]?.map((cert) => (
                       <CertificationRow
                         key={cert.checkTypeId}
                         cert={cert}
@@ -470,5 +486,5 @@ export default function PilotCertificationsPage() {
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

@@ -1,40 +1,65 @@
-'use client'
+'use client';
 
-import { useEffect, useState, ReactNode } from 'react'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { useAuth } from '@/contexts/AuthContext'
-import { getCurrentRosterPeriod, formatRosterPeriod, getFutureRosterPeriods, getNextRosterCountdown, formatCountdown, type RosterCountdown } from '@/lib/roster-utils'
-import { permissions } from '@/lib/auth-utils'
-import { getPilotStats, getAllCheckTypes, getExpiringCertifications, getPilotsWithExpiredCertifications, getDashboardStats, getFleetUtilization, getRecentActivity } from '@/lib/pilot-service-client'
-import { getLeaveRequestStats } from '@/lib/leave-service'
-import { RetirementReportModal } from '@/components/reports/RetirementReportModal'
+import { useEffect, useState, ReactNode } from 'react';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  getCurrentRosterPeriod,
+  formatRosterPeriod,
+  getFutureRosterPeriods,
+  getNextRosterCountdown,
+  formatCountdown,
+  type RosterCountdown,
+} from '@/lib/roster-utils';
+import { permissions } from '@/lib/auth-utils';
+import {
+  getPilotStats,
+  getAllCheckTypes,
+  getExpiringCertifications,
+  getPilotsWithExpiredCertifications,
+  getDashboardStats,
+  getFleetUtilization,
+  getRecentActivity,
+} from '@/lib/pilot-service-client';
+import { getLeaveRequestStats } from '@/lib/leave-service';
+import { LazyRetirementReportModal } from '@/components/lazy';
+import { LazyLoader } from '@/components/ui/LazyLoader';
 // Using emojis and custom SVGs instead of Lucide React icons
 
 interface StatCardProps {
-  title: string
-  value: string | number
-  subtitle?: string | ReactNode
-  icon: string
-  color?: 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'indigo'
+  title: string;
+  value: string | number;
+  subtitle?: string | ReactNode;
+  icon: string;
+  color?: 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'indigo';
   trend?: {
-    value: number
-    direction: 'up' | 'down'
-    label?: string
-  }
-  animate?: boolean
-  onClick?: () => void
+    value: number;
+    direction: 'up' | 'down';
+    label?: string;
+  };
+  animate?: boolean;
+  onClick?: () => void;
 }
 
-function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate = false, onClick }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  color = 'blue',
+  trend,
+  animate = false,
+  onClick,
+}: StatCardProps) {
   const colorClasses = {
     red: 'from-red-500 to-red-600',
     yellow: 'from-amber-500 to-amber-600',
     green: 'from-green-500 to-green-600',
     blue: 'from-blue-500 to-blue-600',
     purple: 'from-purple-500 to-purple-600',
-    indigo: 'from-indigo-500 to-indigo-600'
-  }
+    indigo: 'from-indigo-500 to-indigo-600',
+  };
 
   const backgroundClasses = {
     red: 'from-red-500/10 to-red-600/20 border-2 border-red-200',
@@ -42,8 +67,8 @@ function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate
     green: 'from-green-500/10 to-green-600/20 border-2 border-green-200',
     blue: 'from-blue-500/10 to-blue-600/20 border-2 border-blue-200',
     purple: 'from-purple-500/10 to-purple-600/20 border-2 border-purple-200',
-    indigo: 'from-indigo-500/10 to-indigo-600/20 border-2 border-indigo-200'
-  }
+    indigo: 'from-indigo-500/10 to-indigo-600/20 border-2 border-indigo-200',
+  };
 
   return (
     <div
@@ -60,25 +85,31 @@ function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate
       <div className="relative z-10">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <p className="text-caption text-gray-700 font-semibold mb-1 uppercase tracking-wider">{title}</p>
+            <p className="text-caption text-gray-700 font-semibold mb-1 uppercase tracking-wider">
+              {title}
+            </p>
             <p className="text-display-small font-black text-gray-900 mb-1">{value}</p>
             {subtitle && (
               <div className="text-body-small text-gray-700 font-medium">{subtitle}</div>
             )}
           </div>
 
-          <div className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform border border-white`}>
+          <div
+            className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform border border-white`}
+          >
             <span className="text-3xl filter drop-shadow-sm">{icon}</span>
           </div>
         </div>
 
         {trend && (
           <div className="flex items-center">
-            <div className={`flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${
-              trend.direction === 'up'
-                ? 'bg-green-500/20 text-green-800 border border-green-300'
-                : 'bg-red-500/20 text-red-800 border border-red-300'
-            }`}>
+            <div
+              className={`flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${
+                trend.direction === 'up'
+                  ? 'bg-green-500/20 text-green-800 border border-green-300'
+                  : 'bg-red-500/20 text-red-800 border border-red-300'
+              }`}
+            >
               <span className="mr-1">{trend.direction === 'up' ? '📈' : '📉'}</span>
               {trend.value}%
             </div>
@@ -89,16 +120,16 @@ function StatCard({ title, value, subtitle, icon, color = 'blue', trend, animate
         )}
       </div>
     </div>
-  )
+  );
 }
 
 interface QuickActionProps {
-  title: string
-  description: string
-  icon: string
-  href: string
-  color: 'blue' | 'green' | 'purple' | 'amber' | 'indigo'
-  badge?: string
+  title: string;
+  description: string;
+  icon: string;
+  href: string;
+  color: 'blue' | 'green' | 'purple' | 'amber' | 'indigo';
+  badge?: string;
 }
 
 function QuickAction({ title, description, icon, href, color, badge }: QuickActionProps) {
@@ -107,8 +138,8 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
     green: 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
     purple: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
     amber: 'from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700',
-    indigo: 'from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700'
-  }
+    indigo: 'from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700',
+  };
 
   return (
     <a
@@ -116,87 +147,107 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
       className="card group relative overflow-hidden border-2 border-gray-200 bg-white hover:shadow-2xl hover:border-blue-300 transition-all duration-300"
     >
       <div className="flex items-center">
-        <div className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform shadow-lg`}>
+        <div
+          className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform shadow-lg`}
+        >
           <span className="text-3xl">{icon}</span>
         </div>
         <div className="flex-1">
           <div className="flex items-center">
-            <h3 className="text-heading-small text-gray-900 font-semibold group-hover:text-gray-800">{title}</h3>
-            {badge && (
-              <span className="ml-2 aviation-badge text-xs">{badge}</span>
-            )}
+            <h3 className="text-heading-small text-gray-900 font-semibold group-hover:text-gray-800">
+              {title}
+            </h3>
+            {badge && <span className="ml-2 aviation-badge text-xs">{badge}</span>}
           </div>
-          <p className="text-body-small text-gray-700 group-hover:text-gray-800 mt-1 font-medium">{description}</p>
+          <p className="text-body-small text-gray-700 group-hover:text-gray-800 mt-1 font-medium">
+            {description}
+          </p>
         </div>
-        <span className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all">➡️</span>
+        <span className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all">
+          ➡️
+        </span>
       </div>
 
       {/* Hover effect background */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
     </a>
-  )
+  );
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth()
-  const [currentRoster, setCurrentRoster] = useState<any>(null)
-  const [futureRosters, setFutureRosters] = useState<any[]>([])
-  const [pilotStats, setPilotStats] = useState<any>(null)
-  const [checkTypes, setCheckTypes] = useState<any[]>([])
-  const [expiringCerts, setExpiringCerts] = useState<any[]>([])
-  const [expiredPilots, setExpiredPilots] = useState<any[]>([])
-  const [dashboardStats, setDashboardStats] = useState<any>(null)
-  const [leaveStats, setLeaveStats] = useState<any>(null)
-  const [fleetStats, setFleetStats] = useState<any>(null)
-  const [recentActivity, setRecentActivity] = useState<any[]>([])
-  const [retirementData, setRetirementData] = useState<any>(null)
-  const [showRetirementModal, setShowRetirementModal] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [rosterCountdown, setRosterCountdown] = useState<RosterCountdown | null>(null)
+  const { user } = useAuth();
+  const [currentRoster, setCurrentRoster] = useState<any>(null);
+  const [futureRosters, setFutureRosters] = useState<any[]>([]);
+  const [pilotStats, setPilotStats] = useState<any>(null);
+  const [checkTypes, setCheckTypes] = useState<any[]>([]);
+  const [expiringCerts, setExpiringCerts] = useState<any[]>([]);
+  const [expiredPilots, setExpiredPilots] = useState<any[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [leaveStats, setLeaveStats] = useState<any>(null);
+  const [fleetStats, setFleetStats] = useState<any>(null);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [retirementData, setRetirementData] = useState<any>(null);
+  const [showRetirementModal, setShowRetirementModal] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [rosterCountdown, setRosterCountdown] = useState<RosterCountdown | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         // Load roster period data
-        const roster = getCurrentRosterPeriod()
-        setCurrentRoster(roster)
+        const roster = getCurrentRosterPeriod();
+        setCurrentRoster(roster);
 
         // Load future roster periods (12 months ahead)
-        const futureRosterPeriods = getFutureRosterPeriods(12)
-        setFutureRosters(futureRosterPeriods)
+        const futureRosterPeriods = getFutureRosterPeriods(12);
+        setFutureRosters(futureRosterPeriods);
 
         // Load countdown to next roster period
-        const countdown = getNextRosterCountdown()
-        setRosterCountdown(countdown)
+        const countdown = getNextRosterCountdown();
+        setRosterCountdown(countdown);
 
         // Load all live data - use API endpoints for better reliability
-        const [apiStatsResponse, types, expiring, expired, leave, fleet, activity, retirement] = await Promise.all([
-          fetch(`${window.location.origin}/api/dashboard/stats`)
-            .then(res => {
-              if (!res.ok) throw new Error(`HTTP ${res.status}`)
-              return res.json()
-            })
-            .catch(err => {
-              console.error('API fetch failed:', err)
-              return { totalPilots: 0, captains: 0, firstOfficers: 0, trainingCaptains: 0, examiners: 0, nearingRetirement: 0, certifications: 0, compliance: 95 }
-            }),
-          getAllCheckTypes(),
-          getExpiringCertifications(30), // Next 30 days
-          getPilotsWithExpiredCertifications(),
-          getLeaveRequestStats(),
-          getFleetUtilization(),
-          getRecentActivity(),
-          fetch(`${window.location.origin}/api/retirement`)
-            .then(res => {
-              if (!res.ok) throw new Error(`HTTP ${res.status}`)
-              return res.json()
-            })
-            .then(result => result.success ? result.data : { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] })
-            .catch(err => {
-              console.error('Retirement API fetch failed:', err)
-              return { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] }
-            })
-        ])
+        const [apiStatsResponse, types, expiring, expired, leave, fleet, activity, retirement] =
+          await Promise.all([
+            fetch(`${window.location.origin}/api/dashboard/stats`)
+              .then((res) => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+              })
+              .catch((err) => {
+                console.error('API fetch failed:', err);
+                return {
+                  totalPilots: 0,
+                  captains: 0,
+                  firstOfficers: 0,
+                  trainingCaptains: 0,
+                  examiners: 0,
+                  nearingRetirement: 0,
+                  certifications: 0,
+                  compliance: 95,
+                };
+              }),
+            getAllCheckTypes(),
+            getExpiringCertifications(30), // Next 30 days
+            getPilotsWithExpiredCertifications(),
+            getLeaveRequestStats(),
+            getFleetUtilization(),
+            getRecentActivity(),
+            fetch(`${window.location.origin}/api/retirement`)
+              .then((res) => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+              })
+              .then((result) =>
+                result.success
+                  ? result.data
+                  : { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] }
+              )
+              .catch((err) => {
+                console.error('Retirement API fetch failed:', err);
+                return { nearingRetirement: 0, dueSoon: 0, overdue: 0, pilots: [] };
+              }),
+          ]);
 
         setPilotStats({
           total: apiStatsResponse.totalPilots || 0,
@@ -205,46 +256,46 @@ export default function DashboardPage() {
           trainingCaptains: apiStatsResponse.trainingCaptains || 0,
           examiners: apiStatsResponse.examiners || 0,
           active: apiStatsResponse.totalPilots || 0,
-          inactive: 0
-        })
-        setCheckTypes(types)
-        setExpiringCerts(expiring)
-        setExpiredPilots(expired)
+          inactive: 0,
+        });
+        setCheckTypes(types);
+        setExpiringCerts(expiring);
+        setExpiredPilots(expired);
         setDashboardStats({
           certifications: {
             total: apiStatsResponse.certifications || 0,
-            compliance: apiStatsResponse.compliance || 95
-          }
-        })
-        setLeaveStats(leave)
-        setFleetStats(fleet)
-        setRecentActivity(activity)
-        setRetirementData(retirement)
+            compliance: apiStatsResponse.compliance || 95,
+          },
+        });
+        setLeaveStats(leave);
+        setFleetStats(fleet);
+        setRecentActivity(activity);
+        setRetirementData(retirement);
       } catch (error) {
-        console.error('Error loading dashboard data:', error)
+        console.error('Error loading dashboard data:', error);
       } finally {
-        setIsLoaded(true)
+        setIsLoaded(true);
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   // Update countdown every minute
   useEffect(() => {
     const updateCountdown = () => {
-      const countdown = getNextRosterCountdown()
-      setRosterCountdown(countdown)
-    }
+      const countdown = getNextRosterCountdown();
+      setRosterCountdown(countdown);
+    };
 
     // Update immediately
-    updateCountdown()
+    updateCountdown();
 
     // Then update every minute
-    const interval = setInterval(updateCountdown, 60000)
+    const interval = setInterval(updateCountdown, 60000);
 
-    return () => clearInterval(interval)
-  }, [currentRoster])
+    return () => clearInterval(interval);
+  }, [currentRoster]);
 
   // Use real stats from Supabase
   const stats = pilotStats || {
@@ -254,43 +305,43 @@ export default function DashboardPage() {
     firstOfficers: 0,
     trainingCaptains: 0,
     examiners: 0,
-    inactive: 0
-  }
+    inactive: 0,
+  };
 
   // Use real dashboard statistics from Supabase
-  const totalCertifications = dashboardStats?.certifications?.total || 0
-  const expiringCount = expiringCerts.length
-  const expiredCount = expiredPilots.reduce((sum, pilot) => sum + (pilot.expired_count || 0), 0)
-  const complianceRate = dashboardStats?.certifications?.compliance || 95
+  const totalCertifications = dashboardStats?.certifications?.total || 0;
+  const expiringCount = expiringCerts.length;
+  const expiredCount = expiredPilots.reduce((sum, pilot) => sum + (pilot.expired_count || 0), 0);
+  const complianceRate = dashboardStats?.certifications?.compliance || 95;
 
   const currentTime = new Date().toLocaleTimeString('en-US', {
     hour12: false,
     hour: '2-digit',
-    minute: '2-digit'
-  })
+    minute: '2-digit',
+  });
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
-  })
+    day: 'numeric',
+  });
 
   // Helper function to format time ago
   const formatTimeAgo = (timestamp: Date) => {
-    const now = new Date()
-    const diffMs = now.getTime() - timestamp.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMinutes = Math.floor(diffMs / (1000 * 60))
+    const now = new Date();
+    const diffMs = now.getTime() - timestamp.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
 
     if (diffHours >= 1) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     } else if (diffMinutes >= 1) {
-      return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`
+      return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
     } else {
-      return 'Just now'
+      return 'Just now';
     }
-  }
+  };
 
   return (
     <ProtectedRoute>
@@ -304,8 +355,12 @@ export default function DashboardPage() {
                   Welcome back, {user?.name}
                 </h1>
                 <div className="flex items-center text-sm md:text-base text-gray-600">
-                  <span className="mr-2" aria-hidden="true">🌏</span>
-                  <span className="mobile-text lg:text-body-medium">Air Niugini B767 Fleet Operations Dashboard</span>
+                  <span className="mr-2" aria-hidden="true">
+                    🌏
+                  </span>
+                  <span className="mobile-text lg:text-body-medium">
+                    Air Niugini B767 Fleet Operations Dashboard
+                  </span>
                 </div>
                 <p className="text-xs md:text-sm text-gray-500 mt-1">
                   {currentDate} • {currentTime} (Port Moresby Time)
@@ -340,20 +395,20 @@ export default function DashboardPage() {
                         <h2 className="text-heading-medium">Active Operations</h2>
                       </div>
                     </div>
-                    <p className="text-display-small font-black mb-2">
-                      {currentRoster.code}
-                    </p>
+                    <p className="text-display-small font-black mb-2">{currentRoster.code}</p>
                     <p className="text-body-medium text-red-100">
                       {currentRoster.startDate?.toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
-                        year: 'numeric'
-                      })} - {currentRoster.endDate?.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                      })}{' '}
+                      -{' '}
+                      {currentRoster.endDate?.toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
-                        year: 'numeric'
+                        year: 'numeric',
                       })}
                     </p>
                   </div>
@@ -366,9 +421,7 @@ export default function DashboardPage() {
                         <p className="text-5xl lg:text-6xl font-black text-white mb-1">
                           {currentRoster?.daysRemaining || 0}
                         </p>
-                        <p className="text-caption text-red-200">
-                          of 28 total days
-                        </p>
+                        <p className="text-caption text-red-200">of 28 total days</p>
                       </div>
                     </div>
                   </div>
@@ -377,14 +430,17 @@ export default function DashboardPage() {
             </div>
           )}
 
-
           {/* Future Roster Periods Scrolling Section */}
           {isLoaded && futureRosters.length > 0 && (
             <div className="mb-8 animate-fade-in">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-heading-medium text-gray-900 mb-1">Upcoming Roster Periods</h3>
-                  <p className="text-body-medium text-gray-600">Next 12 months scheduling overview</p>
+                  <h3 className="text-heading-medium text-gray-900 mb-1">
+                    Upcoming Roster Periods
+                  </h3>
+                  <p className="text-body-medium text-gray-600">
+                    Next 12 months scheduling overview
+                  </p>
                 </div>
                 <div className="flex items-center text-body-small text-gray-500">
                   <span className="mr-1">📅</span>
@@ -396,14 +452,19 @@ export default function DashboardPage() {
               <div className="relative">
                 <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
                   {futureRosters.map((roster, index) => {
-                    const isCurrentRoster = roster.code === currentRoster?.code
-                    const isNextRoster = !isCurrentRoster && index === 1 // Next roster after current
-                    const monthYear = roster.startDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-                    const startDay = roster.startDate?.toLocaleDateString('en-US', { day: 'numeric' })
-                    const endDay = roster.endDate?.toLocaleDateString('en-US', { day: 'numeric' })
+                    const isCurrentRoster = roster.code === currentRoster?.code;
+                    const isNextRoster = !isCurrentRoster && index === 1; // Next roster after current
+                    const monthYear = roster.startDate?.toLocaleDateString('en-US', {
+                      month: 'short',
+                      year: 'numeric',
+                    });
+                    const startDay = roster.startDate?.toLocaleDateString('en-US', {
+                      day: 'numeric',
+                    });
+                    const endDay = roster.endDate?.toLocaleDateString('en-US', { day: 'numeric' });
 
                     // Get countdown for next roster
-                    const countdown = isNextRoster && rosterCountdown ? rosterCountdown : null
+                    const countdown = isNextRoster && rosterCountdown ? rosterCountdown : null;
 
                     return (
                       <div
@@ -412,18 +473,20 @@ export default function DashboardPage() {
                           isCurrentRoster
                             ? 'bg-gradient-to-br from-[#E4002B]/10 to-[#E4002B]/20 border-[#E4002B] shadow-lg'
                             : index < 3
-                            ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300'
-                            : 'bg-white border-gray-200 hover:border-gray-300'
+                              ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300'
+                              : 'bg-white border-gray-200 hover:border-gray-300'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <div className={`text-sm font-semibold px-2 py-1 rounded-full ${
-                            isCurrentRoster
-                              ? 'bg-[#E4002B] text-white'
-                              : index < 3
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-gray-500 text-white'
-                          }`}>
+                          <div
+                            className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                              isCurrentRoster
+                                ? 'bg-[#E4002B] text-white'
+                                : index < 3
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-gray-500 text-white'
+                            }`}
+                          >
                             {roster.code}
                           </div>
                           {isCurrentRoster && (
@@ -437,22 +500,35 @@ export default function DashboardPage() {
                           <div className="text-gray-700">
                             <p className="text-xs text-gray-500 mb-1">Duration</p>
                             <p className="font-medium text-sm">
-                              {roster.startDate?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {roster.endDate?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {roster.startDate?.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}{' '}
+                              -{' '}
+                              {roster.endDate?.toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
                             </p>
                           </div>
 
-                          <div className={`flex items-center text-xs ${
-                            isCurrentRoster ? 'text-[#E4002B]' : isNextRoster ? 'text-blue-600' : 'text-gray-600'
-                          }`}>
+                          <div
+                            className={`flex items-center text-xs ${
+                              isCurrentRoster
+                                ? 'text-[#E4002B]'
+                                : isNextRoster
+                                  ? 'text-blue-600'
+                                  : 'text-gray-600'
+                            }`}
+                          >
                             <span className="mr-1">📊</span>
-                            {countdown ? (
-                              // Show precise countdown for next roster
-                              formatCountdown(countdown)
-                            ) : roster.daysRemaining > 0 ? (
-                              `${roster.daysRemaining} days left`
-                            ) : (
-                              `Starts in ${Math.abs(roster.daysRemaining)} days`
-                            )}
+                            {countdown
+                              ? // Show precise countdown for next roster
+                                formatCountdown(countdown)
+                              : roster.daysRemaining > 0
+                                ? `${roster.daysRemaining} days left`
+                                : `Starts in ${Math.abs(roster.daysRemaining)} days`}
                           </div>
 
                           {index < 3 && (
@@ -470,7 +546,7 @@ export default function DashboardPage() {
                               <div
                                 className="bg-[#E4002B] h-full transition-all duration-500"
                                 style={{
-                                  width: `${Math.max(0, Math.min(100, ((28 - roster.daysRemaining) / 28) * 100))}%`
+                                  width: `${Math.max(0, Math.min(100, ((28 - roster.daysRemaining) / 28) * 100))}%`,
                                 }}
                               />
                             </div>
@@ -480,7 +556,7 @@ export default function DashboardPage() {
                           </div>
                         )}
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
@@ -492,7 +568,8 @@ export default function DashboardPage() {
               {/* Help text */}
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-500">
-                  💡 Scroll horizontally to view more periods • Planning horizon extends 12 months ahead
+                  💡 Scroll horizontally to view more periods • Planning horizon extends 12 months
+                  ahead
                 </p>
               </div>
             </div>
@@ -502,74 +579,90 @@ export default function DashboardPage() {
           <section className="mb-6 md:mb-8">
             <h2 className="sr-only">Key Fleet Metrics</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
-            <StatCard
-              title="Total Pilots"
-              value={stats.total}
-              subtitle={
-                <div className="space-y-1">
-                  <div>• {stats.captains} Captains</div>
-                  <div>• {stats.firstOfficers} First Officers</div>
-                  <div className="border-t border-gray-300 my-2 pt-1">
-                    <div>• {stats.trainingCaptains} Training Captains (TRI)</div>
-                    <div>• {stats.examiners} Examiners (TRE)</div>
+              <StatCard
+                title="Total Pilots"
+                value={stats.total}
+                subtitle={
+                  <div className="space-y-1">
+                    <div>• {stats.captains} Captains</div>
+                    <div>• {stats.firstOfficers} First Officers</div>
+                    <div className="border-t border-gray-300 my-2 pt-1">
+                      <div>• {stats.trainingCaptains} Training Captains (TRI)</div>
+                      <div>• {stats.examiners} Examiners (TRE)</div>
+                    </div>
                   </div>
-                </div>
-              }
-              icon="👨‍✈️"
-              color="blue"
-              trend={{ value: Math.abs(dashboardStats?.trends?.pilots || 2.1), direction: (dashboardStats?.trends?.pilots || 2.1) >= 0 ? 'up' : 'down', label: 'vs last period' }}
-              animate
-            />
+                }
+                icon="👨‍✈️"
+                color="blue"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.pilots || 2.1),
+                  direction: (dashboardStats?.trends?.pilots || 2.1) >= 0 ? 'up' : 'down',
+                  label: 'vs last period',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Certifications"
-              value={totalCertifications}
-              subtitle={`${checkTypes.length} check types tracked`}
-              icon="🛡️"
-              color="green"
-              trend={{ value: Math.abs(dashboardStats?.trends?.certifications || 1.8), direction: (dashboardStats?.trends?.certifications || 1.8) >= 0 ? 'up' : 'down', label: 'compliance rate' }}
-              animate
-            />
+              <StatCard
+                title="Certifications"
+                value={totalCertifications}
+                subtitle={`${checkTypes.length} check types tracked`}
+                icon="🛡️"
+                color="green"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.certifications || 1.8),
+                  direction: (dashboardStats?.trends?.certifications || 1.8) >= 0 ? 'up' : 'down',
+                  label: 'compliance rate',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Expiring Soon"
-              value={expiringCount}
-              subtitle="Next 30 days"
-              icon="⏰"
-              color="yellow"
-              trend={{ value: Math.abs(dashboardStats?.trends?.expiring || 12.5), direction: (dashboardStats?.trends?.expiring || -12.5) >= 0 ? 'up' : 'down', label: 'from last month' }}
-              animate
-            />
+              <StatCard
+                title="Expiring Soon"
+                value={expiringCount}
+                subtitle="Next 30 days"
+                icon="⏰"
+                color="yellow"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.expiring || 12.5),
+                  direction: (dashboardStats?.trends?.expiring || -12.5) >= 0 ? 'up' : 'down',
+                  label: 'from last month',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Expired"
-              value={expiredCount}
-              subtitle="Requires immediate attention"
-              icon="⚠️"
-              color="red"
-              trend={{ value: Math.abs(dashboardStats?.trends?.expired || 8.3), direction: (dashboardStats?.trends?.expired || -8.3) >= 0 ? 'up' : 'down', label: 'improvement' }}
-              animate
-            />
+              <StatCard
+                title="Expired"
+                value={expiredCount}
+                subtitle="Requires immediate attention"
+                icon="⚠️"
+                color="red"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.expired || 8.3),
+                  direction: (dashboardStats?.trends?.expired || -8.3) >= 0 ? 'up' : 'down',
+                  label: 'improvement',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Nearing Retirement"
-              value={retirementData?.nearingRetirement || 0}
-              subtitle={
-                <div className="space-y-1">
-                  <div>Within 5 years</div>
-                  {retirementData?.dueSoon > 0 && (
-                    <div className="text-orange-600">• {retirementData.dueSoon} due soon</div>
-                  )}
-                  {retirementData?.overdue > 0 && (
-                    <div className="text-red-600">• {retirementData.overdue} overdue</div>
-                  )}
-                </div>
-              }
-              icon="⏰"
-              color="purple"
-              animate
-              onClick={() => setShowRetirementModal(true)}
-            />
+              <StatCard
+                title="Nearing Retirement"
+                value={retirementData?.nearingRetirement || 0}
+                subtitle={
+                  <div className="space-y-1">
+                    <div>Within 5 years</div>
+                    {retirementData?.dueSoon > 0 && (
+                      <div className="text-orange-600">• {retirementData.dueSoon} due soon</div>
+                    )}
+                    {retirementData?.overdue > 0 && (
+                      <div className="text-red-600">• {retirementData.overdue} overdue</div>
+                    )}
+                  </div>
+                }
+                icon="⏰"
+                color="purple"
+                animate
+                onClick={() => setShowRetirementModal(true)}
+              />
             </div>
           </section>
 
@@ -577,34 +670,42 @@ export default function DashboardPage() {
           <section className="mb-6 md:mb-8">
             <h2 className="sr-only">Fleet Performance Metrics</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <StatCard
-              title="Compliance Rate"
-              value={`${complianceRate}%`}
-              subtitle="Overall fleet compliance"
-              icon="🎯"
-              color="indigo"
-              trend={{ value: Math.abs(dashboardStats?.trends?.compliance || 2.1), direction: (dashboardStats?.trends?.compliance || 2.1) >= 0 ? 'up' : 'down', label: 'this quarter' }}
-              animate
-            />
+              <StatCard
+                title="Compliance Rate"
+                value={`${complianceRate}%`}
+                subtitle="Overall fleet compliance"
+                icon="🎯"
+                color="indigo"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.compliance || 2.1),
+                  direction: (dashboardStats?.trends?.compliance || 2.1) >= 0 ? 'up' : 'down',
+                  label: 'this quarter',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Fleet Utilization"
-              value={`${fleetStats?.utilization || 78}%`}
-              subtitle="Active aircraft operations"
-              icon="📊"
-              color="purple"
-              trend={{ value: Math.abs(dashboardStats?.trends?.utilization || 5.4), direction: (dashboardStats?.trends?.utilization || 5.4) >= 0 ? 'up' : 'down', label: 'efficiency gain' }}
-              animate
-            />
+              <StatCard
+                title="Fleet Utilization"
+                value={`${fleetStats?.utilization || 78}%`}
+                subtitle="Active aircraft operations"
+                icon="📊"
+                color="purple"
+                trend={{
+                  value: Math.abs(dashboardStats?.trends?.utilization || 5.4),
+                  direction: (dashboardStats?.trends?.utilization || 5.4) >= 0 ? 'up' : 'down',
+                  label: 'efficiency gain',
+                }}
+                animate
+              />
 
-            <StatCard
-              title="Leave Requests"
-              value={leaveStats?.pending || 0}
-              subtitle={`${leaveStats?.approved || 0} approved • ${leaveStats?.denied || 0} denied`}
-              icon="📅"
-              color="blue"
-              animate
-            />
+              <StatCard
+                title="Leave Requests"
+                value={leaveStats?.pending || 0}
+                subtitle={`${leaveStats?.approved || 0} approved • ${leaveStats?.denied || 0} denied`}
+                icon="📅"
+                color="blue"
+                animate
+              />
             </div>
           </section>
 
@@ -612,11 +713,17 @@ export default function DashboardPage() {
           <section className="mb-6 md:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 md:mb-6">
               <div className="mb-3 sm:mb-0">
-                <h3 className="text-lg md:text-xl lg:text-heading-medium text-gray-900 mb-1">Quick Actions</h3>
-                <p className="text-sm md:text-base lg:text-body-medium text-gray-600">Access frequently used features</p>
+                <h3 className="text-lg md:text-xl lg:text-heading-medium text-gray-900 mb-1">
+                  Quick Actions
+                </h3>
+                <p className="text-sm md:text-base lg:text-body-medium text-gray-600">
+                  Access frequently used features
+                </p>
               </div>
               <div className="flex items-center text-xs md:text-sm text-gray-500">
-                <span className="mr-1" aria-hidden="true">⭐</span>
+                <span className="mr-1" aria-hidden="true">
+                  ⭐
+                </span>
                 <span>Personalized for {user?.role}</span>
               </div>
             </div>
@@ -667,7 +774,9 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-heading-medium text-gray-900">Advanced Analytics</h3>
-                <p className="text-body-medium text-gray-600">Interactive charts and detailed insights</p>
+                <p className="text-body-medium text-gray-600">
+                  Interactive charts and detailed insights
+                </p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="flex items-center text-body-small text-gray-500">
@@ -720,18 +829,26 @@ export default function DashboardPage() {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Compliance Rate</span>
-                    <span className={`text-lg font-bold ${
-                      complianceRate >= 95 ? 'text-green-600' :
-                      complianceRate >= 85 ? 'text-amber-600' : 'text-red-600'
-                    }`}>
+                    <span
+                      className={`text-lg font-bold ${
+                        complianceRate >= 95
+                          ? 'text-green-600'
+                          : complianceRate >= 85
+                            ? 'text-amber-600'
+                            : 'text-red-600'
+                      }`}
+                    >
                       {complianceRate}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-500 ${
-                        complianceRate >= 95 ? 'bg-green-500' :
-                        complianceRate >= 85 ? 'bg-amber-500' : 'bg-red-500'
+                        complianceRate >= 95
+                          ? 'bg-green-500'
+                          : complianceRate >= 85
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
                       }`}
                       style={{ width: `${complianceRate}%` }}
                     ></div>
@@ -765,7 +882,9 @@ export default function DashboardPage() {
                       <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
                       <span className="text-sm text-gray-700">Training Captains</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{stats.trainingCaptains}</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {stats.trainingCaptains}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -793,7 +912,9 @@ export default function DashboardPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-700">Utilization</span>
-                      <span className="text-sm font-medium text-gray-900">{fleetStats?.utilization || 78}%</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {fleetStats?.utilization || 78}%
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -811,8 +932,11 @@ export default function DashboardPage() {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all duration-500 ${
-                          complianceRate >= 95 ? 'bg-green-500' :
-                          complianceRate >= 85 ? 'bg-amber-500' : 'bg-red-500'
+                          complianceRate >= 95
+                            ? 'bg-green-500'
+                            : complianceRate >= 85
+                              ? 'bg-amber-500'
+                              : 'bg-red-500'
                         }`}
                         style={{ width: `${complianceRate}%` }}
                       ></div>
@@ -829,7 +953,9 @@ export default function DashboardPage() {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-[#E4002B] h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.round((complianceRate + (fleetStats?.utilization || 78)) / 2)}%` }}
+                        style={{
+                          width: `${Math.round((complianceRate + (fleetStats?.utilization || 78)) / 2)}%`,
+                        }}
                       ></div>
                     </div>
                   </div>
@@ -845,7 +971,9 @@ export default function DashboardPage() {
                     🚀 Enhanced Analytics Available
                   </h4>
                   <p className="text-gray-700">
-                    Access interactive charts, trend analysis, retirement planning, risk assessments, and comprehensive fleet insights with our advanced analytics dashboard.
+                    Access interactive charts, trend analysis, retirement planning, risk
+                    assessments, and comprehensive fleet insights with our advanced analytics
+                    dashboard.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-3">
                     <span className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border">
@@ -950,43 +1078,60 @@ export default function DashboardPage() {
                       amber: 'bg-amber-50 border-amber-200',
                       blue: 'bg-blue-50 border-blue-200',
                       green: 'bg-green-50 border-green-200',
-                      red: 'bg-red-50 border-red-200'
-                    }
+                      red: 'bg-red-50 border-red-200',
+                    };
                     const dotColors = {
                       amber: 'bg-amber-500',
                       blue: 'bg-blue-500',
                       green: 'bg-green-500',
-                      red: 'bg-red-500'
-                    }
+                      red: 'bg-red-500',
+                    };
                     const textColors = {
                       amber: 'text-amber-900',
                       blue: 'text-blue-900',
                       green: 'text-green-900',
-                      red: 'text-red-900'
-                    }
+                      red: 'text-red-900',
+                    };
                     const subtextColors = {
                       amber: 'text-amber-700',
                       blue: 'text-blue-700',
                       green: 'text-green-700',
-                      red: 'text-red-700'
-                    }
+                      red: 'text-red-700',
+                    };
                     const timeColors = {
                       amber: 'text-amber-600',
                       blue: 'text-blue-600',
                       green: 'text-green-600',
-                      red: 'text-red-600'
-                    }
+                      red: 'text-red-600',
+                    };
 
                     return (
-                      <div key={activity.id} className={`flex items-start p-3 rounded-xl border ${colorClasses[activity.color as keyof typeof colorClasses]}`}>
-                        <div className={`w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${dotColors[activity.color as keyof typeof dotColors]}`}></div>
+                      <div
+                        key={activity.id}
+                        className={`flex items-start p-3 rounded-xl border ${colorClasses[activity.color as keyof typeof colorClasses]}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${dotColors[activity.color as keyof typeof dotColors]}`}
+                        ></div>
                         <div className="flex-1">
-                          <p className={`text-sm font-medium ${textColors[activity.color as keyof typeof textColors]}`}>{activity.title}</p>
-                          <p className={`text-xs mt-1 ${subtextColors[activity.color as keyof typeof subtextColors]}`}>{activity.description}</p>
-                          <p className={`text-xs mt-1 ${timeColors[activity.color as keyof typeof timeColors]}`}>{formatTimeAgo(activity.timestamp)}</p>
+                          <p
+                            className={`text-sm font-medium ${textColors[activity.color as keyof typeof textColors]}`}
+                          >
+                            {activity.title}
+                          </p>
+                          <p
+                            className={`text-xs mt-1 ${subtextColors[activity.color as keyof typeof subtextColors]}`}
+                          >
+                            {activity.description}
+                          </p>
+                          <p
+                            className={`text-xs mt-1 ${timeColors[activity.color as keyof typeof timeColors]}`}
+                          >
+                            {formatTimeAgo(activity.timestamp)}
+                          </p>
                         </div>
                       </div>
-                    )
+                    );
                   })
                 ) : (
                   <div className="flex items-center justify-center p-6 text-gray-500">
@@ -1008,12 +1153,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Retirement Report Modal */}
-        <RetirementReportModal
-          isOpen={showRetirementModal}
-          onClose={() => setShowRetirementModal(false)}
-        />
+        {/* Retirement Report Modal - Lazy Loaded */}
+        {showRetirementModal && (
+          <LazyLoader type="modal">
+            <LazyRetirementReportModal
+              isOpen={showRetirementModal}
+              onClose={() => setShowRetirementModal(false)}
+            />
+          </LazyLoader>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+
+/**
+ * Custom Analytics API Route
+ *
+ * POST /api/analytics/custom
+ * Body: {
+ *   metrics: string[];
+ *   groupBy?: string;
+ *   filters?: any[];
+ *   dateRange?: { start: string; end: string };
+ * }
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { metrics, groupBy, filters, dateRange } = body;
+
+    if (!metrics || metrics.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'At least one metric is required' },
+        { status: 400 }
+      );
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // Build custom analytics query
+    const analyticsData: any = {
+      metrics: {},
+      groupedData: [],
+    };
+
+    // Calculate requested metrics
+    for (const metric of metrics) {
+      switch (metric) {
+        case 'total_pilots':
+          const { count: pilotCount } = await supabaseAdmin
+            .from('pilots')
+            .select('*', { count: 'exact', head: true });
+          analyticsData.metrics.total_pilots = pilotCount || 0;
+          break;
+
+        case 'total_certifications':
+          const { count: certCount } = await supabaseAdmin
+            .from('pilot_checks')
+            .select('*', { count: 'exact', head: true });
+          analyticsData.metrics.total_certifications = certCount || 0;
+          break;
+
+        case 'compliance_rate':
+          const { data: allChecks } = await supabaseAdmin
+            .from('pilot_checks')
+            .select('expiry_date');
+
+          const today = new Date();
+          const currentCount = allChecks?.filter((c: { expiry_date: string | null }) => {
+            const expiryDate = new Date(c.expiry_date || '');
+            return expiryDate >= today;
+          }).length || 0;
+
+          const rate = allChecks ? (currentCount / allChecks.length) * 100 : 0;
+          analyticsData.metrics.compliance_rate = Math.round(rate * 10) / 10;
+          break;
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: analyticsData,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Custom analytics error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to generate custom analytics' },
+      { status: 500 }
+    );
+  }
+}

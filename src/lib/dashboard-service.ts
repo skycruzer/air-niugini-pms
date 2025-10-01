@@ -8,9 +8,9 @@
  * @since 2025-09-27
  */
 
-import { cacheService } from '@/lib/cache-service'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { getPilotsNearingRetirementForDashboard } from '@/lib/pilot-service'
+import { cacheService } from '@/lib/cache-service';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { getPilotsNearingRetirementForDashboard } from '@/lib/pilot-service';
 
 /**
  * Interface for comprehensive dashboard metrics
@@ -18,41 +18,41 @@ import { getPilotsNearingRetirementForDashboard } from '@/lib/pilot-service'
  */
 export interface DashboardMetrics {
   pilots: {
-    total: number
-    active: number
-    captains: number
-    firstOfficers: number
-    trainingCaptains: number
-    examiners: number
-  }
+    total: number;
+    active: number;
+    captains: number;
+    firstOfficers: number;
+    trainingCaptains: number;
+    examiners: number;
+  };
   certifications: {
-    total: number
-    current: number
-    expiring: number
-    expired: number
-    complianceRate: number
-  }
+    total: number;
+    current: number;
+    expiring: number;
+    expired: number;
+    complianceRate: number;
+  };
   leave: {
-    pending: number
-    approved: number
-    denied: number
-    totalThisMonth: number
-  }
+    pending: number;
+    approved: number;
+    denied: number;
+    totalThisMonth: number;
+  };
   alerts: {
-    criticalExpired: number
-    expiringThisWeek: number
-    missingCertifications: number
-  }
+    criticalExpired: number;
+    expiringThisWeek: number;
+    missingCertifications: number;
+  };
   retirement: {
-    nearingRetirement: number
-    dueSoon: number
-    overdue: number
-  }
+    nearingRetirement: number;
+    dueSoon: number;
+    overdue: number;
+  };
   performance: {
-    queryTime: number
-    cacheHit: boolean
-    lastUpdated: string
-  }
+    queryTime: number;
+    cacheHit: boolean;
+    lastUpdated: string;
+  };
 }
 
 /**
@@ -60,28 +60,28 @@ export interface DashboardMetrics {
  * Combines caching, database optimization, and intelligent query strategies
  */
 class DashboardService {
-  private readonly supabaseAdmin = getSupabaseAdmin()
+  private readonly supabaseAdmin = getSupabaseAdmin();
 
   /**
    * Get comprehensive dashboard metrics with intelligent caching
    * @returns {Promise<DashboardMetrics>} Complete dashboard metrics
    */
   async getDashboardMetrics(): Promise<DashboardMetrics> {
-    const startTime = Date.now()
+    const startTime = Date.now();
 
     try {
       // Try cache first for maximum performance
-      const cachedStats = await cacheService.getPilotStats()
-      const cacheHit = !!cachedStats
+      const cachedStats = await cacheService.getPilotStats();
+      const cacheHit = !!cachedStats;
 
       // Get additional metrics not covered by basic cache
       const [leaveMetrics, alertMetrics, retirementMetrics] = await Promise.all([
         this.getLeaveMetrics(),
         this.getAlertMetrics(),
-        this.getRetirementMetrics()
-      ])
+        this.getRetirementMetrics(),
+      ]);
 
-      const queryTime = Date.now() - startTime
+      const queryTime = Date.now() - startTime;
 
       return {
         pilots: {
@@ -90,7 +90,7 @@ class DashboardService {
           captains: cachedStats.captains,
           firstOfficers: cachedStats.firstOfficers,
           trainingCaptains: 0, // TODO: Enhance cache to include specialized qualifications
-          examiners: 0 // TODO: Enhance cache to include specialized qualifications
+          examiners: 0, // TODO: Enhance cache to include specialized qualifications
         },
         certifications: {
           total: cachedStats.totalCertifications,
@@ -101,7 +101,7 @@ class DashboardService {
             cachedStats.totalCertifications > 0
               ? (cachedStats.certificationStatus.current / cachedStats.totalCertifications) * 100
               : 95
-          )
+          ),
         },
         leave: leaveMetrics,
         alerts: alertMetrics,
@@ -109,12 +109,12 @@ class DashboardService {
         performance: {
           queryTime,
           cacheHit,
-          lastUpdated: cachedStats.lastUpdated
-        }
-      }
+          lastUpdated: cachedStats.lastUpdated,
+        },
+      };
     } catch (error) {
-      console.error('❌ Dashboard Service: Error getting metrics:', error)
-      throw error
+      console.error('❌ Dashboard Service: Error getting metrics:', error);
+      throw error;
     }
   }
 
@@ -123,35 +123,35 @@ class DashboardService {
    * @returns {Promise<object>} Leave metrics summary
    */
   private async getLeaveMetrics(): Promise<{
-    pending: number
-    approved: number
-    denied: number
-    totalThisMonth: number
+    pending: number;
+    approved: number;
+    denied: number;
+    totalThisMonth: number;
   }> {
     try {
       // Use database indexes for optimal performance
       const { data: leaveStats, error } = await this.supabaseAdmin
         .from('leave_requests')
-        .select('status, created_at')
+        .select('status, created_at');
 
-      if (error) throw error
+      if (error) throw error;
 
-      const stats = leaveStats || []
-      const currentMonth = new Date().getMonth()
-      const currentYear = new Date().getFullYear()
+      const stats = leaveStats || [];
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
 
       return {
         pending: stats.filter((req: any) => req.status === 'PENDING').length,
         approved: stats.filter((req: any) => req.status === 'APPROVED').length,
         denied: stats.filter((req: any) => req.status === 'DENIED').length,
         totalThisMonth: stats.filter((req: any) => {
-          const reqDate = new Date(req.created_at)
-          return reqDate.getMonth() === currentMonth && reqDate.getFullYear() === currentYear
-        }).length
-      }
+          const reqDate = new Date(req.created_at);
+          return reqDate.getMonth() === currentMonth && reqDate.getFullYear() === currentYear;
+        }).length,
+      };
     } catch (error) {
-      console.error('❌ Dashboard Service: Error getting leave metrics:', error)
-      return { pending: 0, approved: 0, denied: 0, totalThisMonth: 0 }
+      console.error('❌ Dashboard Service: Error getting leave metrics:', error);
+      return { pending: 0, approved: 0, denied: 0, totalThisMonth: 0 };
     }
   }
 
@@ -160,48 +160,48 @@ class DashboardService {
    * @returns {Promise<object>} Alert metrics summary
    */
   private async getAlertMetrics(): Promise<{
-    criticalExpired: number
-    expiringThisWeek: number
-    missingCertifications: number
+    criticalExpired: number;
+    expiringThisWeek: number;
+    missingCertifications: number;
   }> {
     try {
-      const today = new Date()
-      const oneWeekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+      const today = new Date();
+      const oneWeekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
 
       // Use database indexes for expiry date range queries
       const { data: expiringChecks, error } = await this.supabaseAdmin
         .from('pilot_checks')
         .select('expiry_date')
-        .not('expiry_date', 'is', null)
+        .not('expiry_date', 'is', null);
 
-      if (error) throw error
+      if (error) throw error;
 
-      const checks = expiringChecks || []
+      const checks = expiringChecks || [];
 
-      let criticalExpired = 0
-      let expiringThisWeek = 0
+      let criticalExpired = 0;
+      let expiringThisWeek = 0;
 
       checks.forEach((check: any) => {
-        const expiryDate = new Date(check.expiry_date)
+        const expiryDate = new Date(check.expiry_date);
 
         if (expiryDate < today) {
-          criticalExpired++
+          criticalExpired++;
         } else if (expiryDate <= oneWeekFromNow) {
-          expiringThisWeek++
+          expiringThisWeek++;
         }
-      })
+      });
 
       // TODO: Calculate missing certifications based on required vs existing
-      const missingCertifications = 0
+      const missingCertifications = 0;
 
       return {
         criticalExpired,
         expiringThisWeek,
-        missingCertifications
-      }
+        missingCertifications,
+      };
     } catch (error) {
-      console.error('❌ Dashboard Service: Error getting alert metrics:', error)
-      return { criticalExpired: 0, expiringThisWeek: 0, missingCertifications: 0 }
+      console.error('❌ Dashboard Service: Error getting alert metrics:', error);
+      return { criticalExpired: 0, expiringThisWeek: 0, missingCertifications: 0 };
     }
   }
 
@@ -210,39 +210,39 @@ class DashboardService {
    * @returns {Promise<object>} Retirement metrics summary
    */
   private async getRetirementMetrics(): Promise<{
-    nearingRetirement: number
-    dueSoon: number
-    overdue: number
+    nearingRetirement: number;
+    dueSoon: number;
+    overdue: number;
   }> {
     try {
       // Get pilots nearing retirement using existing service function
-      const nearingRetirement = await getPilotsNearingRetirementForDashboard()
+      const nearingRetirement = await getPilotsNearingRetirementForDashboard();
 
       // Count pilots by retirement status
-      let dueSoon = 0
-      let overdue = 0
+      let dueSoon = 0;
+      let overdue = 0;
 
-      nearingRetirement.forEach(pilot => {
+      nearingRetirement.forEach((pilot) => {
         if (pilot.retirement) {
           switch (pilot.retirement.retirementStatus) {
             case 'due_soon':
-              dueSoon++
-              break
+              dueSoon++;
+              break;
             case 'overdue':
-              overdue++
-              break
+              overdue++;
+              break;
           }
         }
-      })
+      });
 
       return {
         nearingRetirement: nearingRetirement.length,
         dueSoon,
-        overdue
-      }
+        overdue,
+      };
     } catch (error) {
-      console.error('❌ Dashboard Service: Error getting retirement metrics:', error)
-      return { nearingRetirement: 0, dueSoon: 0, overdue: 0 }
+      console.error('❌ Dashboard Service: Error getting retirement metrics:', error);
+      return { nearingRetirement: 0, dueSoon: 0, overdue: 0 };
     }
   }
 
@@ -251,30 +251,32 @@ class DashboardService {
    * @returns {Promise<object>} Trend data for various metrics
    */
   async getTrendAnalysis(): Promise<{
-    pilots: { change: number, period: string }
-    certifications: { change: number, period: string }
-    compliance: { change: number, period: string }
+    pilots: { change: number; period: string };
+    certifications: { change: number; period: string };
+    compliance: { change: number; period: string };
   }> {
     // TODO: Implement historical trend tracking
     // For now, return simulated positive trends
     return {
       pilots: { change: 2.1, period: 'vs last period' },
       certifications: { change: 1.8, period: 'compliance rate' },
-      compliance: { change: 2.1, period: 'this quarter' }
-    }
+      compliance: { change: 2.1, period: 'this quarter' },
+    };
   }
 
   /**
    * Get real-time fleet activity for dashboard
    * @returns {Promise<Array>} Recent activity events
    */
-  async getRecentActivity(): Promise<Array<{
-    id: string
-    title: string
-    description: string
-    timestamp: Date
-    color: 'amber' | 'blue' | 'green' | 'red'
-  }>> {
+  async getRecentActivity(): Promise<
+    Array<{
+      id: string;
+      title: string;
+      description: string;
+      timestamp: Date;
+      color: 'amber' | 'blue' | 'green' | 'red';
+    }>
+  > {
     try {
       // Get recent pilot updates and leave requests for activity feed
       const [recentPilotUpdates, recentLeaveRequests] = await Promise.all([
@@ -289,10 +291,10 @@ class DashboardService {
           .from('leave_requests')
           .select('id, pilot_name, request_type, status, created_at')
           .order('created_at', { ascending: false })
-          .limit(3)
-      ])
+          .limit(3),
+      ]);
 
-      const activity: Array<any> = []
+      const activity: Array<any> = [];
 
       // Add pilot update activities
       if (recentPilotUpdates.data) {
@@ -302,35 +304,32 @@ class DashboardService {
             title: 'Pilot Record Updated',
             description: `${pilot.first_name} ${pilot.last_name} profile updated`,
             timestamp: new Date(pilot.updated_at),
-            color: 'blue'
-          })
-        })
+            color: 'blue',
+          });
+        });
       }
 
       // Add leave request activities
       if (recentLeaveRequests.data) {
         recentLeaveRequests.data.forEach((request: any, index: number) => {
-          const color = request.status === 'APPROVED' ? 'green' :
-                       request.status === 'DENIED' ? 'red' : 'amber'
+          const color =
+            request.status === 'APPROVED' ? 'green' : request.status === 'DENIED' ? 'red' : 'amber';
 
           activity.push({
             id: `leave-${request.id}`,
             title: `${request.request_type} Request ${request.status}`,
             description: `${request.pilot_name} - ${request.request_type} request`,
             timestamp: new Date(request.created_at),
-            color
-          })
-        })
+            color,
+          });
+        });
       }
 
       // Sort by timestamp and return most recent
-      return activity
-        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-        .slice(0, 5)
-
+      return activity.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 5);
     } catch (error) {
-      console.error('❌ Dashboard Service: Error getting recent activity:', error)
-      return []
+      console.error('❌ Dashboard Service: Error getting recent activity:', error);
+      return [];
     }
   }
 
@@ -340,31 +339,31 @@ class DashboardService {
    */
   async refreshDashboardCache(): Promise<void> {
     try {
-      console.log('🔄 Dashboard Service: Manual cache refresh initiated')
+      console.log('🔄 Dashboard Service: Manual cache refresh initiated');
 
       // Invalidate relevant cache entries
-      cacheService.invalidate('pilot_stats')
+      cacheService.invalidate('pilot_stats');
 
       // Pre-warm cache with fresh data
-      await cacheService.getPilotStats()
+      await cacheService.getPilotStats();
 
-      console.log('✅ Dashboard Service: Cache refresh completed')
+      console.log('✅ Dashboard Service: Cache refresh completed');
     } catch (error) {
-      console.error('❌ Dashboard Service: Cache refresh failed:', error)
-      throw error
+      console.error('❌ Dashboard Service: Cache refresh failed:', error);
+      throw error;
     }
   }
 }
 
 // Export singleton instance
-export const dashboardService = new DashboardService()
+export const dashboardService = new DashboardService();
 
 /**
  * Convenience function for getting dashboard metrics
  * @returns {Promise<DashboardMetrics>} Dashboard metrics
  */
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
-  return dashboardService.getDashboardMetrics()
+  return dashboardService.getDashboardMetrics();
 }
 
 /**
@@ -372,7 +371,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
  * @returns {Promise<Array>} Recent activity events
  */
 export async function getRecentActivity(): Promise<Array<any>> {
-  return dashboardService.getRecentActivity()
+  return dashboardService.getRecentActivity();
 }
 
 /**
@@ -380,5 +379,5 @@ export async function getRecentActivity(): Promise<Array<any>> {
  * @returns {Promise<void>} Resolves when refresh is complete
  */
 export async function refreshDashboardCache(): Promise<void> {
-  return dashboardService.refreshDashboardCache()
+  return dashboardService.refreshDashboardCache();
 }

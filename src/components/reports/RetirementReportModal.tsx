@@ -1,68 +1,73 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { ModalSheet } from '@/components/ui/ModalSheet'
-import { formatRetirementDate, getRetirementStatusColor, type PilotWithRetirement } from '@/lib/retirement-utils'
-import { Printer, Download, Eye, Calendar, User, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { ModalSheet } from '@/components/ui/ModalSheet';
+import {
+  formatRetirementDate,
+  getRetirementStatusColor,
+  type PilotWithRetirement,
+} from '@/lib/retirement-utils';
+import { Printer, Download, Eye, Calendar, User, Clock } from 'lucide-react';
 
 interface RetirementReportModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 interface RetirementData {
-  nearingRetirement: number
-  dueSoon: number
-  overdue: number
-  pilots: PilotWithRetirement[]
+  nearingRetirement: number;
+  dueSoon: number;
+  overdue: number;
+  pilots: PilotWithRetirement[];
 }
 
 export function RetirementReportModal({ isOpen, onClose }: RetirementReportModalProps) {
-  const [data, setData] = useState<RetirementData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = useState<RetirementData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      fetchRetirementData()
+      fetchRetirementData();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const fetchRetirementData = async () => {
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
-      const response = await fetch('/api/retirement')
+      const response = await fetch('/api/retirement');
       if (!response.ok) {
-        throw new Error('Failed to fetch retirement data')
+        throw new Error('Failed to fetch retirement data');
       }
 
-      const result = await response.json()
-      setData(result.data)
+      const result = await response.json();
+      setData(result.data);
     } catch (error) {
-      console.error('Error fetching retirement data:', error)
-      setError('Failed to load retirement data')
+      console.error('Error fetching retirement data:', error);
+      setError('Failed to load retirement data');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   const handleExportPDF = () => {
     // For now, use browser print to PDF functionality
     // In the future, this could be enhanced with a dedicated PDF library
-    window.print()
-  }
+    window.print();
+  };
 
-  const sortedPilots = data?.pilots?.sort((a, b) => {
-    const aYears = a.retirement?.yearsToRetirement ?? Infinity
-    const bYears = b.retirement?.yearsToRetirement ?? Infinity
-    return aYears - bYears
-  }) || []
+  const sortedPilots =
+    data?.pilots?.sort((a, b) => {
+      const aYears = a.retirement?.yearsToRetirement ?? Infinity;
+      const bYears = b.retirement?.yearsToRetirement ?? Infinity;
+      return aYears - bYears;
+    }) || [];
 
   return (
     <ModalSheet isOpen={isOpen} onClose={onClose} title="Retirement Planning Report" size="xl">
@@ -72,10 +77,11 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Pilot Retirement Report</h2>
             <p className="text-gray-600 mt-1">
-              Generated on {new Date().toLocaleDateString('en-US', {
+              Generated on{' '}
+              {new Date().toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
               })}
             </p>
           </div>
@@ -113,7 +119,11 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
             <div className="flex items-center">
               <div className="text-red-600">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <p className="ml-3 text-red-700">{error}</p>
@@ -190,7 +200,9 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {sortedPilots.map((pilot) => {
-                        const statusColor = pilot.retirement ? getRetirementStatusColor(pilot.retirement.retirementStatus) : null
+                        const statusColor = pilot.retirement
+                          ? getRetirementStatusColor(pilot.retirement.retirementStatus)
+                          : null;
 
                         return (
                           <tr key={pilot.id} className="hover:bg-gray-50">
@@ -200,20 +212,26 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {pilot.retirement ? formatRetirementDate(pilot.retirement.retirementDate) : 'N/A'}
+                              {pilot.retirement
+                                ? formatRetirementDate(pilot.retirement.retirementDate)
+                                : 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {pilot.retirement?.displayText || 'N/A'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               {statusColor && (
-                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor.badgeClass}`}>
-                                  {pilot.retirement?.retirementStatus.replace('_', ' ').toUpperCase()}
+                                <span
+                                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor.badgeClass}`}
+                                >
+                                  {pilot.retirement?.retirementStatus
+                                    .replace('_', ' ')
+                                    .toUpperCase()}
                                 </span>
                               )}
                             </td>
                           </tr>
-                        )
+                        );
                       })}
                     </tbody>
                   </table>
@@ -223,21 +241,31 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
               <div className="text-center py-12">
                 <Eye className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">No pilots currently nearing retirement</p>
-                <p className="text-sm text-gray-500 mt-1">All pilots have more than 5 years until retirement</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  All pilots have more than 5 years until retirement
+                </p>
               </div>
             )}
 
             {/* Footer */}
             <div className="border-t border-gray-200 pt-6">
               <div className="text-sm text-gray-500 space-y-2">
-                <p><strong>Note:</strong> This report includes pilots within 5 years of retirement age (65).</p>
-                <p><strong>Succession Planning:</strong> Consider training and development plans for pilots nearing retirement.</p>
-                <p><strong>Generated by:</strong> Air Niugini B767 Pilot Management System</p>
+                <p>
+                  <strong>Note:</strong> This report includes pilots within 5 years of retirement
+                  age (65).
+                </p>
+                <p>
+                  <strong>Succession Planning:</strong> Consider training and development plans for
+                  pilots nearing retirement.
+                </p>
+                <p>
+                  <strong>Generated by:</strong> Air Niugini B767 Pilot Management System
+                </p>
               </div>
             </div>
           </>
         )}
       </div>
     </ModalSheet>
-  )
+  );
 }

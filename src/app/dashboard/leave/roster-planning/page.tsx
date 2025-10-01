@@ -1,37 +1,37 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { RosterPeriodSelector } from '@/components/leave/RosterPeriodSelector'
-import { LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service'
-import { permissions } from '@/lib/auth-utils'
-import { format, parseISO } from 'date-fns'
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { RosterPeriodSelector } from '@/components/leave/RosterPeriodSelector';
+import { LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service';
+import { permissions } from '@/lib/auth-utils';
+import { format, parseISO } from 'date-fns';
 
 interface LeaveStats {
-  totalRequests: number
-  byType: Record<string, number>
-  byStatus: Record<string, number>
+  totalRequests: number;
+  byType: Record<string, number>;
+  byStatus: Record<string, number>;
 }
 
 interface RosterPlanningPageState {
-  selectedRosterPeriod: string | null
-  leaveRequests: LeaveRequest[]
-  stats: LeaveStats | null
-  isLoading: boolean
-  error: string | null
+  selectedRosterPeriod: string | null;
+  leaveRequests: LeaveRequest[];
+  stats: LeaveStats | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export default function RosterPlanningPage() {
-  const { user, isLoading: authLoading } = useAuth()
+  const { user, isLoading: authLoading } = useAuth();
   const [state, setState] = useState<RosterPlanningPageState>({
     selectedRosterPeriod: null,
     leaveRequests: [],
     stats: null,
     isLoading: false,
-    error: null
-  })
+    error: null,
+  });
 
   // Show loading while authentication is initializing
   if (authLoading) {
@@ -51,7 +51,7 @@ export default function RosterPlanningPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   // Check permissions after authentication is complete
@@ -75,73 +75,75 @@ export default function RosterPlanningPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   const loadLeaveRequestsForPeriod = async (rosterPeriod: string) => {
-    setState(prev => ({ ...prev, isLoading: true, error: null }))
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      console.log(`🔍 Frontend: Loading leave requests for ${rosterPeriod}`)
+      console.log(`🔍 Frontend: Loading leave requests for ${rosterPeriod}`);
 
-      const response = await fetch(`/api/leave-requests/roster-period?period=${encodeURIComponent(rosterPeriod)}`)
+      const response = await fetch(
+        `/api/leave-requests/roster-period?period=${encodeURIComponent(rosterPeriod)}`
+      );
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json()
+      const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch leave requests')
+        throw new Error(result.error || 'Failed to fetch leave requests');
       }
 
-      const requests = result.data || []
-      console.log(`✅ Frontend: Loaded ${requests.length} leave requests for ${rosterPeriod}`)
+      const requests = result.data || [];
+      console.log(`✅ Frontend: Loaded ${requests.length} leave requests for ${rosterPeriod}`);
 
       // Calculate statistics
       const stats: LeaveStats = {
         totalRequests: requests.length,
         byType: {},
-        byStatus: {}
-      }
+        byStatus: {},
+      };
 
       requests.forEach((request: LeaveRequest) => {
         // Count by type
-        stats.byType[request.request_type] = (stats.byType[request.request_type] || 0) + 1
+        stats.byType[request.request_type] = (stats.byType[request.request_type] || 0) + 1;
 
         // Count by status
-        stats.byStatus[request.status] = (stats.byStatus[request.status] || 0) + 1
-      })
+        stats.byStatus[request.status] = (stats.byStatus[request.status] || 0) + 1;
+      });
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         leaveRequests: requests,
         stats,
-        isLoading: false
-      }))
+        isLoading: false,
+      }));
     } catch (error) {
-      console.error('Error loading leave requests:', error)
-      setState(prev => ({
+      console.error('Error loading leave requests:', error);
+      setState((prev) => ({
         ...prev,
         error: 'Failed to load leave requests for the selected roster period',
-        isLoading: false
-      }))
+        isLoading: false,
+      }));
     }
-  }
+  };
 
   const handlePeriodChange = (rosterPeriod: string) => {
-    setState(prev => ({ ...prev, selectedRosterPeriod: rosterPeriod }))
+    setState((prev) => ({ ...prev, selectedRosterPeriod: rosterPeriod }));
     if (rosterPeriod) {
-      loadLeaveRequestsForPeriod(rosterPeriod)
+      loadLeaveRequestsForPeriod(rosterPeriod);
     }
-  }
+  };
 
   const handleGeneratePDF = async () => {
-    if (!state.selectedRosterPeriod || !user?.name) return
+    if (!state.selectedRosterPeriod || !user?.name) return;
 
     try {
-      setState(prev => ({ ...prev, isLoading: true }))
+      setState((prev) => ({ ...prev, isLoading: true }));
 
-      console.log('🎯 Starting PDF generation for roster period:', state.selectedRosterPeriod)
+      console.log('🎯 Starting PDF generation for roster period:', state.selectedRosterPeriod);
 
       const response = await fetch('/api/reports/roster-leave', {
         method: 'POST',
@@ -150,56 +152,56 @@ export default function RosterPlanningPage() {
         },
         body: JSON.stringify({
           rosterPeriod: state.selectedRosterPeriod,
-          generatedBy: user.name
+          generatedBy: user.name,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate PDF report')
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate PDF report');
       }
 
       // Get the PDF blob
-      const pdfBlob = await response.blob()
+      const pdfBlob = await response.blob();
 
       // Extract filename from response headers
-      const contentDisposition = response.headers.get('Content-Disposition')
+      const contentDisposition = response.headers.get('Content-Disposition');
       const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
-        : `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`
+        ? (contentDisposition.split('filename=')[1]?.replace(/"/g, '') ??
+          `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`)
+        : `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
 
       // Create download link
-      const url = window.URL.createObjectURL(pdfBlob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
 
       // Cleanup
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
-      console.log('✅ PDF generated and downloaded successfully')
-
+      console.log('✅ PDF generated and downloaded successfully');
     } catch (error) {
-      console.error('❌ Error generating PDF:', error)
-      setState(prev => ({
+      console.error('❌ Error generating PDF:', error);
+      setState((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to generate PDF report'
-      }))
+        error: error instanceof Error ? error.message : 'Failed to generate PDF report',
+      }));
     } finally {
-      setState(prev => ({ ...prev, isLoading: false }))
+      setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }
+  };
 
   const handleEmailToPlanner = async () => {
-    if (!state.selectedRosterPeriod || !user?.name) return
+    if (!state.selectedRosterPeriod || !user?.name) return;
 
     try {
-      setState(prev => ({ ...prev, isLoading: true }))
+      setState((prev) => ({ ...prev, isLoading: true }));
 
-      console.log('📧 Preparing email for roster period:', state.selectedRosterPeriod)
+      console.log('📧 Preparing email for roster period:', state.selectedRosterPeriod);
 
       // Generate the PDF first
       const response = await fetch('/api/reports/roster-leave', {
@@ -209,20 +211,22 @@ export default function RosterPlanningPage() {
         },
         body: JSON.stringify({
           rosterPeriod: state.selectedRosterPeriod,
-          generatedBy: user.name
+          generatedBy: user.name,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate PDF report')
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate PDF report');
       }
 
-      const pdfBlob = await response.blob()
-      const pdfUrl = window.URL.createObjectURL(pdfBlob)
+      const pdfBlob = await response.blob();
+      const pdfUrl = window.URL.createObjectURL(pdfBlob);
 
       // Prepare email content
-      const subject = encodeURIComponent(`Air Niugini B767 Leave Planning - ${state.selectedRosterPeriod}`)
+      const subject = encodeURIComponent(
+        `Air Niugini B767 Leave Planning - ${state.selectedRosterPeriod}`
+      );
       const body = encodeURIComponent(`Dear Roster Planning Team,
 
 Please find attached the leave planning report for roster period ${state.selectedRosterPeriod}.
@@ -245,29 +249,29 @@ Generated by: ${user.name}
 Generated on: ${new Date().toLocaleString()}
 
 Best regards,
-Air Niugini B767 Fleet Operations`)
+Air Niugini B767 Fleet Operations`);
 
       // Recipients - you can customize these email addresses
       const recipients = [
         'roster.planning@airniugini.com.pg',
         'fleet.operations@airniugini.com.pg',
-        'pilot.management@airniugini.com.pg'
-      ].join(',')
+        'pilot.management@airniugini.com.pg',
+      ].join(',');
 
       // Create mailto link
-      const mailtoLink = `mailto:${recipients}?subject=${subject}&body=${body}`
+      const mailtoLink = `mailto:${recipients}?subject=${subject}&body=${body}`;
 
       // Open email client - use window.location.href for better compatibility
-      window.location.href = mailtoLink
+      window.location.href = mailtoLink;
 
       // Note: The PDF can't be automatically attached via mailto
       // Instead, we'll also trigger a download so they can manually attach it
-      const link = document.createElement('a')
-      link.href = pdfUrl
-      link.download = `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
       // Show user instruction
       alert(`Email template opened in your default email client.
@@ -275,333 +279,354 @@ Air Niugini B767 Fleet Operations`)
 The PDF report has also been downloaded to your computer.
 Please manually attach the downloaded PDF file to your email before sending.
 
-Recipients: ${recipients.split(',').join(', ')}`)
+Recipients: ${recipients.split(',').join(', ')}`);
 
-      window.URL.revokeObjectURL(pdfUrl)
+      window.URL.revokeObjectURL(pdfUrl);
 
-      console.log('✅ Email prepared and PDF downloaded for manual attachment')
-
+      console.log('✅ Email prepared and PDF downloaded for manual attachment');
     } catch (error) {
-      console.error('❌ Error preparing email:', error)
-      setState(prev => ({
+      console.error('❌ Error preparing email:', error);
+      setState((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Failed to prepare email'
-      }))
+        error: error instanceof Error ? error.message : 'Failed to prepare email',
+      }));
     } finally {
-      setState(prev => ({ ...prev, isLoading: false }))
+      setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }
+  };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'DENIED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getTypeBadgeClass = (type: string) => {
     switch (type) {
       case 'RDO':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800';
       case 'ANNUAL':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-purple-100 text-purple-800';
       case 'SICK':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getSubmissionMethodIcon = (method: string | undefined) => {
     switch (method) {
       case 'EMAIL':
-        return '📧'
+        return '📧';
       case 'ORACLE':
-        return '🖥️'
+        return '🖥️';
       case 'LEAVE_BIDS':
-        return '📊'
+        return '📊';
       case 'SYSTEM':
-        return '⚙️'
+        return '⚙️';
       default:
-        return '❓'
+        return '❓';
     }
-  }
+  };
 
   const getSubmissionMethodLabel = (method: string | undefined) => {
     switch (method) {
       case 'EMAIL':
-        return 'Email'
+        return 'Email';
       case 'ORACLE':
-        return 'Oracle'
+        return 'Oracle';
       case 'LEAVE_BIDS':
-        return 'Leave Bids'
+        return 'Leave Bids';
       case 'SYSTEM':
-        return 'System'
+        return 'System';
       default:
-        return 'Unknown'
+        return 'Unknown';
     }
-  }
+  };
 
   const formatDateRange = (startDate: string, endDate: string) => {
     try {
-      const start = parseISO(startDate)
-      const end = parseISO(endDate)
+      const start = parseISO(startDate);
+      const end = parseISO(endDate);
 
       if (format(start, 'yyyy-MM') === format(end, 'yyyy-MM')) {
         // Same month
-        return `${format(start, 'MMM dd')} - ${format(end, 'dd, yyyy')}`
+        return `${format(start, 'MMM dd')} - ${format(end, 'dd, yyyy')}`;
       } else {
         // Different months
-        return `${format(start, 'MMM dd')} - ${format(end, 'MMM dd, yyyy')}`
+        return `${format(start, 'MMM dd')} - ${format(end, 'MMM dd, yyyy')}`;
       }
     } catch (error) {
-      return `${startDate} - ${endDate}`
+      return `${startDate} - ${endDate}`;
     }
-  }
+  };
 
   // Group leave requests by type
-  const groupedRequests = state.leaveRequests.reduce((groups, request) => {
-    const type = request.request_type
-    if (!groups[type]) {
-      groups[type] = []
-    }
-    groups[type].push(request)
-    return groups
-  }, {} as Record<string, LeaveRequest[]>)
+  const groupedRequests = state.leaveRequests.reduce(
+    (groups, request) => {
+      const type = request.request_type;
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(request);
+      return groups;
+    },
+    {} as Record<string, LeaveRequest[]>
+  );
 
   return (
     <ProtectedRoute>
       <DashboardLayout>
         <div className="p-6 space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#E4002B] rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">📋</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Roster Leave Planning</h1>
-              <p className="text-gray-600">Manage and review leave requests for future roster periods</p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handleEmailToPlanner}
-              disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
-              className="px-4 py-2 bg-[#FFC72C] text-gray-900 rounded-lg hover:bg-[#FFB800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-            >
-              <span>📧</span>
-              <span>Email to Planners</span>
-            </button>
-
-            <button
-              onClick={handleGeneratePDF}
-              disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
-              className="px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-            >
-              <span>📄</span>
-              <span>Generate PDF Report</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Roster Period Selection */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Roster Period</h2>
-        <RosterPeriodSelector
-          selectedPeriod={state.selectedRosterPeriod}
-          onPeriodChange={handlePeriodChange}
-          monthsAhead={12}
-          className="max-w-md"
-        />
-      </div>
-
-      {/* Statistics Overview */}
-      {state.stats && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Leave Requests Overview</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-[#E4002B]">{state.stats.totalRequests}</div>
-              <div className="text-sm text-gray-600">Total Requests</div>
-            </div>
-
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-green-600">{state.stats.byStatus.APPROVED || 0}</div>
-              <div className="text-sm text-gray-600">Approved</div>
-            </div>
-
-            <div className="bg-yellow-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-yellow-600">{state.stats.byStatus.PENDING || 0}</div>
-              <div className="text-sm text-gray-600">Pending</div>
-            </div>
-
-            <div className="bg-red-50 rounded-lg p-4">
-              <div className="text-2xl font-bold text-red-600">{state.stats.byStatus.DENIED || 0}</div>
-              <div className="text-sm text-gray-600">Denied</div>
-            </div>
-          </div>
-
-          {/* Leave Type Breakdown */}
-          <div>
-            <h3 className="text-md font-medium text-gray-900 mb-3">Requests by Type</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
-              {Object.entries(state.stats.byType).map(([type, count]) => (
-                <div key={type} className="bg-gray-50 rounded p-2 text-center">
-                  <div className="text-lg font-bold text-gray-900">{count}</div>
-                  <div className="text-xs text-gray-600">{type}</div>
+          {/* Page Header */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-[#E4002B] rounded-lg flex items-center justify-center">
+                  <span className="text-white text-xl">📋</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Roster Leave Planning</h1>
+                  <p className="text-gray-600">
+                    Manage and review leave requests for future roster periods
+                  </p>
+                </div>
+              </div>
 
-      {/* Loading State */}
-      {state.isLoading && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
-            <span className="ml-3 text-gray-600">Loading leave requests...</span>
-          </div>
-        </div>
-      )}
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={handleEmailToPlanner}
+                  disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
+                  className="px-4 py-2 bg-[#FFC72C] text-gray-900 rounded-lg hover:bg-[#FFB800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                >
+                  <span>📧</span>
+                  <span>Email to Planners</span>
+                </button>
 
-      {/* Error State */}
-      {state.error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <span className="text-red-400 text-xl">❌</span>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{state.error}</p>
+                <button
+                  onClick={handleGeneratePDF}
+                  disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
+                  className="px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                >
+                  <span>📄</span>
+                  <span>Generate PDF Report</span>
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Leave Requests Display */}
-      {state.selectedRosterPeriod && !state.isLoading && !state.error && (
-        <>
-          {state.leaveRequests.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
-              <div className="text-center">
-                <span className="text-6xl text-gray-300">📅</span>
-                <h3 className="mt-4 text-lg font-medium text-gray-900">No Leave Requests</h3>
-                <p className="mt-2 text-gray-600">
-                  No leave requests found for roster period {state.selectedRosterPeriod}
-                </p>
+          {/* Roster Period Selection */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Roster Period</h2>
+            <RosterPeriodSelector
+              selectedPeriod={state.selectedRosterPeriod}
+              onPeriodChange={handlePeriodChange}
+              monthsAhead={12}
+              className="max-w-md"
+            />
+          </div>
+
+          {/* Statistics Overview */}
+          {state.stats && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Leave Requests Overview</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-[#E4002B]">
+                    {state.stats.totalRequests}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Requests</div>
+                </div>
+
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-green-600">
+                    {state.stats.byStatus.APPROVED || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">Approved</div>
+                </div>
+
+                <div className="bg-yellow-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {state.stats.byStatus.PENDING || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">Pending</div>
+                </div>
+
+                <div className="bg-red-50 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-red-600">
+                    {state.stats.byStatus.DENIED || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">Denied</div>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {Object.entries(groupedRequests).map(([type, requests]) => (
-                <div key={type} className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-3 ${getTypeBadgeClass(type)}`}>
-                          {type}
-                        </span>
-                        {requests.length} Request{requests.length !== 1 ? 's' : ''}
-                      </h3>
+
+              {/* Leave Type Breakdown */}
+              <div>
+                <h3 className="text-md font-medium text-gray-900 mb-3">Requests by Type</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+                  {Object.entries(state.stats.byType).map(([type, count]) => (
+                    <div key={type} className="bg-gray-50 rounded p-2 text-center">
+                      <div className="text-lg font-bold text-gray-900">{count}</div>
+                      <div className="text-xs text-gray-600">{type}</div>
                     </div>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Pilot
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Dates
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Days
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Method
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Reason
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {requests.map((request) => (
-                          <tr key={request.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">
-                                  {request.pilot_name || 'Unknown Pilot'}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {request.employee_id || 'N/A'}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {formatDateRange(request.start_date, request.end_date)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {request.days_count}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(request.status)}`}>
-                                {request.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex items-center">
-                                <span className="mr-1">{getSubmissionMethodIcon(request.request_method)}</span>
-                                <span>{getSubmissionMethodLabel(request.request_method)}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                              {request.reason || '-'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           )}
-        </>
-      )}
 
-      {/* Air Niugini Footer */}
-      <div className="text-center text-sm text-gray-500 mt-8 pt-6 border-t border-gray-200">
-        <div className="flex items-center justify-center space-x-2">
-          <span>✈️</span>
-          <span>Air Niugini B767 Pilot Management System</span>
-          <span>•</span>
-          <span>Roster Leave Planning Module</span>
-        </div>
-      </div>
+          {/* Loading State */}
+          {state.isLoading && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <span className="ml-3 text-gray-600">Loading leave requests...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {state.error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <span className="text-red-400 text-xl">❌</span>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{state.error}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Leave Requests Display */}
+          {state.selectedRosterPeriod && !state.isLoading && !state.error && (
+            <>
+              {state.leaveRequests.length === 0 ? (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
+                  <div className="text-center">
+                    <span className="text-6xl text-gray-300">📅</span>
+                    <h3 className="mt-4 text-lg font-medium text-gray-900">No Leave Requests</h3>
+                    <p className="mt-2 text-gray-600">
+                      No leave requests found for roster period {state.selectedRosterPeriod}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {Object.entries(groupedRequests).map(([type, requests]) => (
+                    <div
+                      key={type}
+                      className="bg-white rounded-lg shadow-sm border border-gray-200"
+                    >
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-3 ${getTypeBadgeClass(type)}`}
+                            >
+                              {type}
+                            </span>
+                            {requests.length} Request{requests.length !== 1 ? 's' : ''}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pilot
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Dates
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Days
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Method
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Reason
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {requests.map((request) => (
+                              <tr key={request.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div>
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {request.pilot_name || 'Unknown Pilot'}
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                      {request.employee_id || 'N/A'}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {formatDateRange(request.start_date, request.end_date)}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {request.days_count}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span
+                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(request.status)}`}
+                                  >
+                                    {request.status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  <div className="flex items-center">
+                                    <span className="mr-1">
+                                      {getSubmissionMethodIcon(request.request_method)}
+                                    </span>
+                                    <span>{getSubmissionMethodLabel(request.request_method)}</span>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                                  {request.reason || '-'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Air Niugini Footer */}
+          <div className="text-center text-sm text-gray-500 mt-8 pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-center space-x-2">
+              <span>✈️</span>
+              <span>Air Niugini B767 Pilot Management System</span>
+              <span>•</span>
+              <span>Roster Leave Planning Module</span>
+            </div>
+          </div>
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

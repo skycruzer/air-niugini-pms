@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { getCertificationStatus } from '@/lib/certification-utils'
+import { NextRequest, NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { getCertificationStatus } from '@/lib/certification-utils';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 API /certifications/calendar: Fetching certification calendar data')
+    console.log('🔍 API /certifications/calendar: Fetching certification calendar data');
 
     // Get all pilot certifications with expiry dates for calendar display
     const { data: certifications, error } = await getSupabaseAdmin()
       .from('pilot_checks')
-      .select(`
+      .select(
+        `
         *,
         pilots!inner (
           employee_id,
@@ -20,19 +21,21 @@ export async function GET(request: NextRequest) {
           check_code,
           check_description
         )
-      `)
+      `
+      )
       .not('expiry_date', 'is', null)
-      .order('expiry_date', { ascending: true })
+      .order('expiry_date', { ascending: true });
 
     if (error) {
-      console.error('🚨 API /certifications/calendar: Database error:', error)
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
-      )
+      console.error('🚨 API /certifications/calendar: Database error:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    console.log('🔍 API /certifications/calendar: Found', certifications?.length || 0, 'certifications with expiry dates')
+    console.log(
+      '🔍 API /certifications/calendar: Found',
+      certifications?.length || 0,
+      'certifications with expiry dates'
+    );
 
     // Transform data for calendar display
     const result = (certifications || []).map((cert: any) => ({
@@ -41,20 +44,21 @@ export async function GET(request: NextRequest) {
       check_code: cert.check_types.check_code,
       check_description: cert.check_types.check_description,
       expiry_date: cert.expiry_date,
-      status: getCertificationStatus(cert.expiry_date ? new Date(cert.expiry_date) : null)
-    }))
+      status: getCertificationStatus(cert.expiry_date ? new Date(cert.expiry_date) : null),
+    }));
 
-    console.log('🔍 API /certifications/calendar: Returning', result.length, 'certification calendar items')
+    console.log(
+      '🔍 API /certifications/calendar: Returning',
+      result.length,
+      'certification calendar items'
+    );
 
     return NextResponse.json({
       success: true,
-      data: result
-    })
+      data: result,
+    });
   } catch (error) {
-    console.error('🚨 API /certifications/calendar: Fatal error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('🚨 API /certifications/calendar: Fatal error:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

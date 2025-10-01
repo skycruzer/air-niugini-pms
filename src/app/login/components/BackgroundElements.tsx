@@ -11,5 +11,5 @@ export default function BackgroundElements() {
         <span className="text-white text-[100px] transform rotate-45 block">⚡</span>
       </div>
     </div>
-  )
+  );
 }

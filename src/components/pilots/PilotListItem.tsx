@@ -1,35 +1,48 @@
-'use client'
+'use client';
 
-import { PilotWithCertifications } from '@/lib/pilot-service-client'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
+import { PilotWithCertifications } from '@/lib/pilot-service-client';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
 
 interface PilotListItemProps {
-  pilot: PilotWithCertifications
-  onView: (id: string) => void
-  onEdit: (id: string) => void
+  pilot: PilotWithCertifications;
+  onView: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
 export function PilotListItem({ pilot, onView, onEdit }: PilotListItemProps) {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
-  const statusColor = pilot.certificationStatus.expired > 0
-    ? 'text-red-600'
-    : pilot.certificationStatus.expiring > 0
-    ? 'text-yellow-600'
-    : 'text-green-600'
+  const statusColor =
+    pilot.certificationStatus.expired > 0
+      ? 'text-red-600'
+      : pilot.certificationStatus.expiring > 0
+        ? 'text-yellow-600'
+        : 'text-green-600';
 
-  const statusIcon = pilot.certificationStatus.expired > 0
-    ? <span className="text-red-600" aria-label="Has expired certifications">⚠️</span>
-    : pilot.certificationStatus.expiring > 0
-    ? <span className="text-yellow-600" aria-label="Has expiring certifications">⏰</span>
-    : <span className="text-green-600" aria-label="All certifications current">✅</span>
+  const statusIcon =
+    pilot.certificationStatus.expired > 0 ? (
+      <span className="text-red-600" aria-label="Has expired certifications">
+        ⚠️
+      </span>
+    ) : pilot.certificationStatus.expiring > 0 ? (
+      <span className="text-yellow-600" aria-label="Has expiring certifications">
+        ⏰
+      </span>
+    ) : (
+      <span className="text-green-600" aria-label="All certifications current">
+        ✅
+      </span>
+    );
 
-  const statusBadge = pilot.certificationStatus.expired > 0
-    ? <span className="status-expired">Expired</span>
-    : pilot.certificationStatus.expiring > 0
-    ? <span className="status-expiring">Expiring</span>
-    : <span className="status-current">Current</span>
+  const statusBadge =
+    pilot.certificationStatus.expired > 0 ? (
+      <span className="status-expired">Expired</span>
+    ) : pilot.certificationStatus.expiring > 0 ? (
+      <span className="status-expiring">Expiring</span>
+    ) : (
+      <span className="status-current">Current</span>
+    );
 
   return (
     <div
@@ -45,12 +58,18 @@ export function PilotListItem({ pilot, onView, onEdit }: PilotListItemProps) {
             <div className="flex items-center space-x-2">
               {/* Avatar Placeholder */}
               <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 flex-shrink-0">
-                <span className="text-lg" aria-hidden="true">👨‍✈️</span>
+                <span className="text-lg" aria-hidden="true">
+                  👨‍✈️
+                </span>
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="mobile-subheading text-gray-900 truncate" id={`pilot-${pilot.id}-name`}>
-                  {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}{pilot.last_name}
+                <h3
+                  className="mobile-subheading text-gray-900 truncate"
+                  id={`pilot-${pilot.id}-name`}
+                >
+                  {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}
+                  {pilot.last_name}
                 </h3>
                 <p className="text-sm text-gray-500">{pilot.employee_id}</p>
               </div>
@@ -145,14 +164,17 @@ export function PilotListItem({ pilot, onView, onEdit }: PilotListItemProps) {
         {/* Photo */}
         <div className="flex items-center justify-center">
           <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
-            <span className="text-lg" aria-hidden="true">👨‍✈️</span>
+            <span className="text-lg" aria-hidden="true">
+              👨‍✈️
+            </span>
           </div>
         </div>
 
         {/* Name */}
         <div className="col-span-2">
           <h3 className="font-semibold text-gray-900 truncate" id={`pilot-${pilot.id}-name`}>
-            {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}{pilot.last_name}
+            {pilot.first_name} {pilot.middle_name && `${pilot.middle_name} `}
+            {pilot.last_name}
           </h3>
           <p className="text-sm text-gray-500">{pilot.employee_id}</p>
         </div>
@@ -160,9 +182,7 @@ export function PilotListItem({ pilot, onView, onEdit }: PilotListItemProps) {
         {/* Role */}
         <div>
           <span className="text-sm text-gray-900">{pilot.role}</span>
-          {pilot.contract_type && (
-            <p className="text-xs text-gray-500">{pilot.contract_type}</p>
-          )}
+          {pilot.contract_type && <p className="text-xs text-gray-500">{pilot.contract_type}</p>}
         </div>
 
         {/* Seniority */}
@@ -215,5 +235,5 @@ export function PilotListItem({ pilot, onView, onEdit }: PilotListItemProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

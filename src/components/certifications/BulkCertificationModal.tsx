@@ -1,138 +1,149 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { ModalSheet } from '@/components/ui/ModalSheet'
-import { Users, Upload, CheckCircle, AlertTriangle } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ModalSheet } from '@/components/ui/ModalSheet';
+import { Users, Upload, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const bulkUpdateSchema = z.object({
   checkTypeId: z.string().min(1, 'Check type is required'),
   newExpiryDate: z.string().min(1, 'Expiry date is required'),
-  selectedPilots: z.array(z.string()).min(1, 'At least one pilot must be selected')
-})
+  selectedPilots: z.array(z.string()).min(1, 'At least one pilot must be selected'),
+});
 
-type BulkUpdateData = z.infer<typeof bulkUpdateSchema>
+type BulkUpdateData = z.infer<typeof bulkUpdateSchema>;
 
 interface Pilot {
-  id: string
-  employee_id: string
-  first_name: string
-  last_name: string
-  role: string
-  is_active: boolean
+  id: string;
+  employee_id: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  is_active: boolean;
 }
 
 interface CheckType {
-  id: string
-  check_code: string
-  check_description: string
-  category: string
+  id: string;
+  check_code: string;
+  check_description: string;
+  category: string;
 }
 
 interface BulkCertificationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function BulkCertificationModal({ isOpen, onClose, onSuccess }: BulkCertificationModalProps) {
-  const [pilots, setPilots] = useState<Pilot[]>([])
-  const [checkTypes, setCheckTypes] = useState<CheckType[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedPilots, setSelectedPilots] = useState<string[]>([])
-  const [selectAll, setSelectAll] = useState(false)
-  const [updateResults, setUpdateResults] = useState<any>(null)
-  const [submitting, setSubmitting] = useState(false)
+export function BulkCertificationModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: BulkCertificationModalProps) {
+  const [pilots, setPilots] = useState<Pilot[]>([]);
+  const [checkTypes, setCheckTypes] = useState<CheckType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPilots, setSelectedPilots] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [updateResults, setUpdateResults] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<BulkUpdateData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<BulkUpdateData>({
     resolver: zodResolver(bulkUpdateSchema),
     defaultValues: {
-      selectedPilots: []
-    }
-  })
+      selectedPilots: [],
+    },
+  });
 
   useEffect(() => {
     if (isOpen) {
-      fetchData()
+      fetchData();
     } else {
       // Reset form and state when modal closes
-      reset()
-      setSelectedPilots([])
-      setSelectAll(false)
-      setUpdateResults(null)
-      setError(null)
+      reset();
+      setSelectedPilots([]);
+      setSelectAll(false);
+      setUpdateResults(null);
+      setError(null);
     }
-  }, [isOpen, reset])
+  }, [isOpen, reset]);
 
   useEffect(() => {
-    setValue('selectedPilots', selectedPilots)
-  }, [selectedPilots, setValue])
+    setValue('selectedPilots', selectedPilots);
+  }, [selectedPilots, setValue]);
 
   const fetchData = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // Fetch pilots and check types in parallel
       const [pilotsResponse, checkTypesResponse] = await Promise.all([
         fetch('/api/pilots'),
-        fetch('/api/check-types')
-      ])
+        fetch('/api/check-types'),
+      ]);
 
       if (!pilotsResponse.ok) {
-        throw new Error('Failed to fetch pilots')
+        throw new Error('Failed to fetch pilots');
       }
       if (!checkTypesResponse.ok) {
-        throw new Error('Failed to fetch check types')
+        throw new Error('Failed to fetch check types');
       }
 
       const [pilotsResult, checkTypesResult] = await Promise.all([
         pilotsResponse.json(),
-        checkTypesResponse.json()
-      ])
+        checkTypesResponse.json(),
+      ]);
 
       if (pilotsResult.success) {
-        const activePilots = pilotsResult.data.filter((pilot: Pilot) => pilot.is_active)
-        setPilots(activePilots)
+        const activePilots = pilotsResult.data.filter((pilot: Pilot) => pilot.is_active);
+        setPilots(activePilots);
       }
 
       if (checkTypesResult.success) {
-        setCheckTypes(checkTypesResult.data)
+        setCheckTypes(checkTypesResult.data);
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
-      setError('Failed to load data')
+      console.error('Error fetching data:', error);
+      setError('Failed to load data');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedPilots([])
+      setSelectedPilots([]);
     } else {
-      setSelectedPilots(pilots.map(p => p.id))
+      setSelectedPilots(pilots.map((p) => p.id));
     }
-    setSelectAll(!selectAll)
-  }
+    setSelectAll(!selectAll);
+  };
 
   const handlePilotSelect = (pilotId: string) => {
-    setSelectedPilots(prev => {
+    setSelectedPilots((prev) => {
       if (prev.includes(pilotId)) {
-        return prev.filter(id => id !== pilotId)
+        return prev.filter((id) => id !== pilotId);
       } else {
-        return [...prev, pilotId]
+        return [...prev, pilotId];
       }
-    })
-  }
+    });
+  };
 
   const onSubmit = async (data: BulkUpdateData) => {
     try {
-      setSubmitting(true)
-      setError(null)
+      setSubmitting(true);
+      setError(null);
 
       const response = await fetch('/api/certifications/bulk-update', {
         method: 'POST',
@@ -141,33 +152,33 @@ export function BulkCertificationModal({ isOpen, onClose, onSuccess }: BulkCerti
         },
         body: JSON.stringify({
           ...data,
-          selectedPilots
+          selectedPilots,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to update certifications')
+        throw new Error('Failed to update certifications');
       }
 
-      const result = await response.json()
-      setUpdateResults(result)
+      const result = await response.json();
+      setUpdateResults(result);
 
       // Reset form and selections
-      setSelectedPilots([])
-      setSelectAll(false)
-      reset()
+      setSelectedPilots([]);
+      setSelectAll(false);
+      reset();
 
       // Call success callback if provided
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error updating certifications:', error)
-      setError('Failed to update certifications')
+      console.error('Error updating certifications:', error);
+      setError('Failed to update certifications');
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <ModalSheet isOpen={isOpen} onClose={onClose} title="Bulk Certification Update" size="xl">
@@ -325,5 +336,5 @@ export function BulkCertificationModal({ isOpen, onClose, onSuccess }: BulkCerti
         )}
       </div>
     </ModalSheet>
-  )
+  );
 }

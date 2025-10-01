@@ -1,22 +1,27 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
-import { settingsService, type SettingsData, type AlertThresholds, type PilotRequirements } from '@/lib/settings-service'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
+import {
+  settingsService,
+  type SettingsData,
+  type AlertThresholds,
+  type PilotRequirements,
+} from '@/lib/settings-service';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 const alertThresholdsSchema = z.object({
   critical_days: z.number().min(1).max(30),
   urgent_days: z.number().min(1).max(60),
   warning_30_days: z.number().min(1).max(90),
   warning_60_days: z.number().min(1).max(120),
-  early_warning_90_days: z.number().min(1).max(180)
-})
+  early_warning_90_days: z.number().min(1).max(180),
+});
 
 const pilotRequirementsSchema = z.object({
   pilot_retirement_age: z.number().min(60).max(70),
@@ -26,27 +31,27 @@ const pilotRequirementsSchema = z.object({
   minimum_captains_per_hull: z.number().min(1).max(30),
   minimum_first_officers_per_hull: z.number().min(1).max(30),
   training_captains_per_pilots: z.number().min(1).max(50),
-  examiners_per_pilots: z.number().min(1).max(50)
-})
+  examiners_per_pilots: z.number().min(1).max(50),
+});
 
 const appTitleSchema = z.object({
-  app_title: z.string().min(1).max(100)
-})
+  app_title: z.string().min(1).max(100),
+});
 
 export default function SettingsPage() {
-  const { user } = useAuth()
-  const [settings, setSettings] = useState<SettingsData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'general' | 'alerts' | 'requirements'>('general')
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { user } = useAuth();
+  const [settings, setSettings] = useState<SettingsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'general' | 'alerts' | 'requirements'>('general');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Form for app title
   const appTitleForm = useForm({
     resolver: zodResolver(appTitleSchema),
-    defaultValues: { app_title: '' }
-  })
+    defaultValues: { app_title: '' },
+  });
 
   // Form for alert thresholds
   const alertsForm = useForm({
@@ -56,9 +61,9 @@ export default function SettingsPage() {
       urgent_days: 14,
       warning_30_days: 30,
       warning_60_days: 60,
-      early_warning_90_days: 90
-    }
-  })
+      early_warning_90_days: 90,
+    },
+  });
 
   // Form for pilot requirements
   const requirementsForm = useForm({
@@ -71,105 +76,109 @@ export default function SettingsPage() {
       minimum_captains_per_hull: 10,
       minimum_first_officers_per_hull: 10,
       training_captains_per_pilots: 11,
-      examiners_per_pilots: 11
-    }
-  })
+      examiners_per_pilots: 11,
+    },
+  });
 
   useEffect(() => {
-    loadSettings()
-  }, [])
+    loadSettings();
+  }, []);
 
   const loadSettings = async () => {
     try {
-      setLoading(true)
-      const data = await settingsService.getSettings()
-      setSettings(data)
+      setLoading(true);
+      const data = await settingsService.getSettings();
+      setSettings(data);
 
       // Update forms with loaded data
-      appTitleForm.reset({ app_title: data.app_title })
-      alertsForm.reset(data.alert_thresholds)
-      requirementsForm.reset(data.pilot_requirements)
+      appTitleForm.reset({ app_title: data.app_title });
+      alertsForm.reset(data.alert_thresholds);
+      requirementsForm.reset(data.pilot_requirements);
     } catch (error) {
-      console.error('Error loading settings:', error)
-      setErrorMessage('Failed to load settings')
+      console.error('Error loading settings:', error);
+      setErrorMessage('Failed to load settings');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const showMessage = (message: string, isError = false) => {
     if (isError) {
-      setErrorMessage(message)
-      setSuccessMessage(null)
+      setErrorMessage(message);
+      setSuccessMessage(null);
     } else {
-      setSuccessMessage(message)
-      setErrorMessage(null)
+      setSuccessMessage(message);
+      setErrorMessage(null);
     }
     setTimeout(() => {
-      setSuccessMessage(null)
-      setErrorMessage(null)
-    }, 3000)
-  }
+      setSuccessMessage(null);
+      setErrorMessage(null);
+    }, 3000);
+  };
 
   const onSubmitAppTitle = async (data: { app_title: string }) => {
     try {
-      setSaving('app_title')
-      await settingsService.updateAppTitle(data.app_title)
-      setSettings(prev => prev ? { ...prev, app_title: data.app_title } : null)
-      showMessage('App title updated successfully')
+      setSaving('app_title');
+      await settingsService.updateAppTitle(data.app_title);
+      setSettings((prev) => (prev ? { ...prev, app_title: data.app_title } : null));
+      showMessage('App title updated successfully');
     } catch (error) {
-      console.error('Error updating app title:', error)
-      showMessage('Failed to update app title', true)
+      console.error('Error updating app title:', error);
+      showMessage('Failed to update app title', true);
     } finally {
-      setSaving(null)
+      setSaving(null);
     }
-  }
+  };
 
   const onSubmitAlerts = async (data: AlertThresholds) => {
     try {
-      setSaving('alerts')
-      await settingsService.updateAlertThresholds(data)
-      setSettings(prev => prev ? { ...prev, alert_thresholds: data } : null)
-      showMessage('Alert thresholds updated successfully')
+      setSaving('alerts');
+      await settingsService.updateAlertThresholds(data);
+      setSettings((prev) => (prev ? { ...prev, alert_thresholds: data } : null));
+      showMessage('Alert thresholds updated successfully');
     } catch (error) {
-      console.error('Error updating alert thresholds:', error)
-      showMessage('Failed to update alert thresholds', true)
+      console.error('Error updating alert thresholds:', error);
+      showMessage('Failed to update alert thresholds', true);
     } finally {
-      setSaving(null)
+      setSaving(null);
     }
-  }
+  };
 
   const onSubmitRequirements = async (data: PilotRequirements) => {
     try {
-      setSaving('requirements')
-      await settingsService.updatePilotRequirements(data)
-      setSettings(prev => prev ? { ...prev, pilot_requirements: data } : null)
-      showMessage('Pilot requirements updated successfully')
+      setSaving('requirements');
+      await settingsService.updatePilotRequirements(data);
+      setSettings((prev) => (prev ? { ...prev, pilot_requirements: data } : null));
+      showMessage('Pilot requirements updated successfully');
     } catch (error) {
-      console.error('Error updating pilot requirements:', error)
-      showMessage('Failed to update pilot requirements', true)
+      console.error('Error updating pilot requirements:', error);
+      showMessage('Failed to update pilot requirements', true);
     } finally {
-      setSaving(null)
+      setSaving(null);
     }
-  }
+  };
 
   const resetToDefaults = async () => {
-    if (!confirm('Are you sure you want to reset all settings to default values? This cannot be undone.')) {
-      return
+    if (
+      !confirm(
+        'Are you sure you want to reset all settings to default values? This cannot be undone.'
+      )
+    ) {
+      return;
     }
 
     try {
-      setSaving('reset')
-      await settingsService.resetToDefaults()
-      await loadSettings()
-      showMessage('Settings reset to defaults successfully')
+      setSaving('reset');
+      await settingsService.resetToDefaults();
+      await loadSettings();
+      showMessage('Settings reset to defaults successfully');
     } catch (error) {
-      console.error('Error resetting settings:', error)
-      showMessage('Failed to reset settings', true)
+      console.error('Error resetting settings:', error);
+      showMessage('Failed to reset settings', true);
     } finally {
-      setSaving(null)
+      setSaving(null);
     }
-  }
+  };
 
   if (!permissions.canManageSettings(user)) {
     return (
@@ -182,13 +191,14 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Access Denied</h2>
               <p className="text-gray-600">
-                You don't have permission to access system settings. Only administrators can modify system configuration.
+                You don't have permission to access system settings. Only administrators can modify
+                system configuration.
               </p>
             </div>
           </div>
         </DashboardLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   return (
@@ -284,13 +294,18 @@ export default function SettingsPage() {
                       <span className="mr-2">🎛️</span>
                       General Settings
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">Configure basic application settings</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Configure basic application settings
+                    </p>
                   </div>
 
                   <form onSubmit={appTitleForm.handleSubmit(onSubmitAppTitle)} className="p-6">
                     <div className="space-y-6">
                       <div>
-                        <label htmlFor="app_title" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="app_title"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Application Title
                         </label>
                         <input
@@ -341,13 +356,18 @@ export default function SettingsPage() {
                       <span className="mr-2">🚨</span>
                       Alert Thresholds
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">Configure certification expiry alert thresholds</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Configure certification expiry alert thresholds
+                    </p>
                   </div>
 
                   <form onSubmit={alertsForm.handleSubmit(onSubmitAlerts)} className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="critical_days" className="block text-sm font-medium text-red-700 mb-2">
+                        <label
+                          htmlFor="critical_days"
+                          className="block text-sm font-medium text-red-700 mb-2"
+                        >
                           Critical Alert (Red)
                         </label>
                         <div className="flex items-center space-x-2">
@@ -369,7 +389,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="urgent_days" className="block text-sm font-medium text-orange-700 mb-2">
+                        <label
+                          htmlFor="urgent_days"
+                          className="block text-sm font-medium text-orange-700 mb-2"
+                        >
                           Urgent Alert (Orange)
                         </label>
                         <div className="flex items-center space-x-2">
@@ -391,7 +414,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="warning_30_days" className="block text-sm font-medium text-yellow-700 mb-2">
+                        <label
+                          htmlFor="warning_30_days"
+                          className="block text-sm font-medium text-yellow-700 mb-2"
+                        >
                           30-Day Warning (Yellow)
                         </label>
                         <div className="flex items-center space-x-2">
@@ -413,7 +439,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="warning_60_days" className="block text-sm font-medium text-blue-700 mb-2">
+                        <label
+                          htmlFor="warning_60_days"
+                          className="block text-sm font-medium text-blue-700 mb-2"
+                        >
                           60-Day Warning (Blue)
                         </label>
                         <div className="flex items-center space-x-2">
@@ -435,12 +464,17 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="md:col-span-2">
-                        <label htmlFor="early_warning_90_days" className="block text-sm font-medium text-green-700 mb-2">
+                        <label
+                          htmlFor="early_warning_90_days"
+                          className="block text-sm font-medium text-green-700 mb-2"
+                        >
                           90-Day Early Warning (Green)
                         </label>
                         <div className="flex items-center space-x-2">
                           <input
-                            {...alertsForm.register('early_warning_90_days', { valueAsNumber: true })}
+                            {...alertsForm.register('early_warning_90_days', {
+                              valueAsNumber: true,
+                            })}
                             type="number"
                             id="early_warning_90_days"
                             min="1"
@@ -487,18 +521,28 @@ export default function SettingsPage() {
                       <span className="mr-2">👥</span>
                       Pilot Requirements
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">Configure pilot staffing requirements and operational parameters</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Configure pilot staffing requirements and operational parameters
+                    </p>
                   </div>
 
-                  <form onSubmit={requirementsForm.handleSubmit(onSubmitRequirements)} className="p-6">
+                  <form
+                    onSubmit={requirementsForm.handleSubmit(onSubmitRequirements)}
+                    className="p-6"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="pilot_retirement_age" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="pilot_retirement_age"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Pilot Retirement Age
                         </label>
                         <div className="flex items-center space-x-2">
                           <input
-                            {...requirementsForm.register('pilot_retirement_age', { valueAsNumber: true })}
+                            {...requirementsForm.register('pilot_retirement_age', {
+                              valueAsNumber: true,
+                            })}
                             type="number"
                             id="pilot_retirement_age"
                             min="60"
@@ -510,11 +554,16 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="number_of_aircraft" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="number_of_aircraft"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Number of Aircraft
                         </label>
                         <input
-                          {...requirementsForm.register('number_of_aircraft', { valueAsNumber: true })}
+                          {...requirementsForm.register('number_of_aircraft', {
+                            valueAsNumber: true,
+                          })}
                           type="number"
                           id="number_of_aircraft"
                           min="1"
@@ -524,11 +573,16 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="captains_per_hull" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="captains_per_hull"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Captains per Hull
                         </label>
                         <input
-                          {...requirementsForm.register('captains_per_hull', { valueAsNumber: true })}
+                          {...requirementsForm.register('captains_per_hull', {
+                            valueAsNumber: true,
+                          })}
                           type="number"
                           id="captains_per_hull"
                           min="1"
@@ -538,11 +592,16 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="first_officers_per_hull" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="first_officers_per_hull"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           First Officers per Hull
                         </label>
                         <input
-                          {...requirementsForm.register('first_officers_per_hull', { valueAsNumber: true })}
+                          {...requirementsForm.register('first_officers_per_hull', {
+                            valueAsNumber: true,
+                          })}
                           type="number"
                           id="first_officers_per_hull"
                           min="1"
@@ -552,11 +611,16 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="minimum_captains_per_hull" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="minimum_captains_per_hull"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Minimum Captains per Hull
                         </label>
                         <input
-                          {...requirementsForm.register('minimum_captains_per_hull', { valueAsNumber: true })}
+                          {...requirementsForm.register('minimum_captains_per_hull', {
+                            valueAsNumber: true,
+                          })}
                           type="number"
                           id="minimum_captains_per_hull"
                           min="1"
@@ -566,11 +630,16 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="minimum_first_officers_per_hull" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="minimum_first_officers_per_hull"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Minimum First Officers per Hull
                         </label>
                         <input
-                          {...requirementsForm.register('minimum_first_officers_per_hull', { valueAsNumber: true })}
+                          {...requirementsForm.register('minimum_first_officers_per_hull', {
+                            valueAsNumber: true,
+                          })}
                           type="number"
                           id="minimum_first_officers_per_hull"
                           min="1"
@@ -580,13 +649,18 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="training_captains_per_pilots" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="training_captains_per_pilots"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Training Captains per Pilots
                         </label>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-600">1 per</span>
                           <input
-                            {...requirementsForm.register('training_captains_per_pilots', { valueAsNumber: true })}
+                            {...requirementsForm.register('training_captains_per_pilots', {
+                              valueAsNumber: true,
+                            })}
                             type="number"
                             id="training_captains_per_pilots"
                             min="1"
@@ -598,13 +672,18 @@ export default function SettingsPage() {
                       </div>
 
                       <div>
-                        <label htmlFor="examiners_per_pilots" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          htmlFor="examiners_per_pilots"
+                          className="block text-sm font-medium text-gray-700 mb-2"
+                        >
                           Examiners per Pilots
                         </label>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-600">1 per</span>
                           <input
-                            {...requirementsForm.register('examiners_per_pilots', { valueAsNumber: true })}
+                            {...requirementsForm.register('examiners_per_pilots', {
+                              valueAsNumber: true,
+                            })}
                             type="number"
                             id="examiners_per_pilots"
                             min="1"
@@ -643,5 +722,5 @@ export default function SettingsPage() {
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

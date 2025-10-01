@@ -1,46 +1,102 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { LeaveRequestModal } from '@/components/leave/LeaveRequestModal'
-import { LeaveRequestsList } from '@/components/leave/LeaveRequestsList'
-import { LeaveCalendarView } from '@/components/leave/LeaveCalendarView'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
-import { getCurrentRosterPeriod } from '@/lib/roster-utils'
-import { getLeaveRequestStats, type LeaveRequestStats } from '@/lib/leave-service'
-import { format } from 'date-fns'
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LazyLeaveRequestModal } from '@/components/lazy';
+import { LazyLoader } from '@/components/ui/LazyLoader';
+import { LeaveRequestsList } from '@/components/leave/LeaveRequestsList';
+import { InteractiveRosterCalendar } from '@/components/leave/InteractiveRosterCalendar';
+import { RosterPeriodNavigator } from '@/components/leave/RosterPeriodNavigator';
+import { TeamAvailabilityView } from '@/components/leave/TeamAvailabilityView';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
+import { getCurrentRosterPeriod, RosterPeriod } from '@/lib/roster-utils';
+import {
+  getLeaveRequestStats,
+  type LeaveRequestStats,
+  getAllLeaveRequests,
+  updateLeaveRequest,
+} from '@/lib/leave-service';
+import { format, parseISO } from 'date-fns';
+import type { LeaveEvent } from '@/components/leave/InteractiveRosterCalendar';
 
 export default function LeaveRequestsPage() {
-  const { user } = useAuth()
-  const [showModal, setShowModal] = useState(false)
-  const [activeTab, setActiveTab] = useState<'requests' | 'calendar'>('requests')
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
-  const [stats, setStats] = useState<LeaveRequestStats | null>(null)
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'denied'>('all')
-  const currentRoster = getCurrentRosterPeriod()
+  const { user } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'requests' | 'calendar' | 'availability'>('requests');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [stats, setStats] = useState<LeaveRequestStats | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'denied'>(
+    'all'
+  );
+  const [currentRoster, setCurrentRoster] = useState<RosterPeriod>(getCurrentRosterPeriod());
+  const [leaveRequests, setLeaveRequests] = useState<LeaveEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadStats = async () => {
+    const loadData = async () => {
       try {
-        const statsData = await getLeaveRequestStats()
-        setStats(statsData)
+        setLoading(true);
+        const [statsData, requests] = await Promise.all([
+          getLeaveRequestStats(),
+          getAllLeaveRequests(),
+        ]);
+
+        setStats(statsData);
+
+        // Transform leave requests to LeaveEvent format
+        const transformedRequests: LeaveEvent[] = requests.map((request) => ({
+          id: request.id,
+          pilotName: request.pilot_name || 'Unknown Pilot',
+          employeeId: request.employee_id || '',
+          pilotId: request.pilot_id,
+          requestType: request.request_type,
+          startDate: parseISO(request.start_date),
+          endDate: parseISO(request.end_date),
+          status: request.status,
+          daysCount: request.days_count,
+        }));
+
+        setLeaveRequests(transformedRequests);
       } catch (error) {
-        console.error('Error loading stats:', error)
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-    loadStats()
-  }, [refreshTrigger])
+    };
+    loadData();
+  }, [refreshTrigger]);
 
   const handleModalSuccess = () => {
-    setShowModal(false)
-    setRefreshTrigger(prev => prev + 1)
-  }
+    setShowModal(false);
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   const handleStatsUpdate = (updatedStats: LeaveRequestStats) => {
-    setStats(updatedStats)
-  }
+    setStats(updatedStats);
+  };
+
+  const handleDateChange = async (leaveId: string, newStartDate: Date, newEndDate: Date) => {
+    try {
+      await updateLeaveRequest(leaveId, {
+        start_date: format(newStartDate, 'yyyy-MM-dd'),
+        end_date: format(newEndDate, 'yyyy-MM-dd'),
+      });
+      setRefreshTrigger((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error updating leave dates:', error);
+      throw error;
+    }
+  };
+
+  const handleConflictDetected = (conflicts: LeaveEvent[]) => {
+    console.warn('Conflicts detected:', conflicts);
+  };
+
+  const handleRosterPeriodChange = (period: RosterPeriod) => {
+    setCurrentRoster(period);
+  };
 
   return (
     <ProtectedRoute>
@@ -55,7 +111,8 @@ export default function LeaveRequestsPage() {
                   Leave Request Management
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Manage RDO requests, WDO requests, and annual leave requests within 28-day roster periods
+                  Manage RDO requests, WDO requests, and annual leave requests within 28-day roster
+                  periods
                 </p>
               </div>
               {permissions.canCreate(user) && (
@@ -164,12 +221,16 @@ export default function LeaveRequestsPage() {
             </div>
           )}
 
-          {/* New Request Modal */}
-          <LeaveRequestModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            onSuccess={handleModalSuccess}
-          />
+          {/* New Request Modal - Lazy Loaded */}
+          {showModal && (
+            <LazyLoader type="modal">
+              <LazyLeaveRequestModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onSuccess={handleModalSuccess}
+              />
+            </LazyLoader>
+          )}
 
           {/* Tabs */}
           <div className="flex items-center space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
@@ -193,7 +254,18 @@ export default function LeaveRequestsPage() {
               }`}
             >
               <span className="mr-2">📅</span>
-              Calendar
+              Interactive Calendar
+            </button>
+            <button
+              onClick={() => setActiveTab('availability')}
+              className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'availability'
+                  ? 'bg-white text-[#E4002B] shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <span className="mr-2">👥</span>
+              Team Availability
             </button>
           </div>
 
@@ -206,7 +278,7 @@ export default function LeaveRequestsPage() {
                   { value: 'all', label: 'All Requests', icon: '📋' },
                   { value: 'pending', label: 'Pending', icon: '⏳' },
                   { value: 'approved', label: 'Approved', icon: '✅' },
-                  { value: 'denied', label: 'Denied', icon: '❌' }
+                  { value: 'denied', label: 'Denied', icon: '❌' },
                 ].map((filter) => (
                   <button
                     key={filter.value}
@@ -233,10 +305,59 @@ export default function LeaveRequestsPage() {
           )}
 
           {activeTab === 'calendar' && (
-            <LeaveCalendarView />
+            <div className="space-y-6">
+              {/* Roster Period Navigator */}
+              <RosterPeriodNavigator
+                currentPeriod={currentRoster}
+                onPeriodChange={handleRosterPeriodChange}
+                showCountdown={true}
+                showTimeline={true}
+              />
+
+              {/* Interactive Calendar with Drag-Drop */}
+              {loading ? (
+                <div className="flex items-center justify-center p-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+                  <span className="ml-3 text-gray-600">Loading calendar...</span>
+                </div>
+              ) : (
+                <InteractiveRosterCalendar
+                  leaveRequests={leaveRequests}
+                  onDateChange={handleDateChange}
+                  onConflictDetected={handleConflictDetected}
+                  readonly={!permissions.canEdit(user)}
+                />
+              )}
+            </div>
+          )}
+
+          {activeTab === 'availability' && (
+            <div className="space-y-6">
+              {/* Roster Period Navigator */}
+              <RosterPeriodNavigator
+                currentPeriod={currentRoster}
+                onPeriodChange={handleRosterPeriodChange}
+                showCountdown={true}
+                showTimeline={false}
+              />
+
+              {/* Team Availability View */}
+              {loading ? (
+                <div className="flex items-center justify-center p-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+                  <span className="ml-3 text-gray-600">Loading availability data...</span>
+                </div>
+              ) : (
+                <TeamAvailabilityView
+                  leaveRequests={leaveRequests}
+                  rosterPeriod={currentRoster}
+                  totalPilots={27}
+                />
+              )}
+            </div>
           )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

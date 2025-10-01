@@ -1,81 +1,86 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { format, differenceInDays } from 'date-fns'
-import { updateLeaveRequestStatus, type LeaveRequest } from '@/lib/leave-service'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
-import { ModalSheet } from '@/components/ui/ModalSheet'
-import { CheckCircle, XCircle, User, Calendar, Clock, FileText, AlertTriangle } from 'lucide-react'
+import { useState } from 'react';
+import { format, differenceInDays } from 'date-fns';
+import { updateLeaveRequestStatus, type LeaveRequest } from '@/lib/leave-service';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
+import { ModalSheet } from '@/components/ui/ModalSheet';
+import { CheckCircle, XCircle, User, Calendar, Clock, FileText, AlertTriangle } from 'lucide-react';
 
 interface LeaveRequestReviewModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: (updatedRequest: LeaveRequest) => void
-  request: LeaveRequest
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (updatedRequest: LeaveRequest) => void;
+  request: LeaveRequest;
 }
 
-export function LeaveRequestReviewModal({ isOpen, onClose, onSuccess, request }: LeaveRequestReviewModalProps) {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [reviewComments, setReviewComments] = useState('')
-  const [error, setError] = useState<string | null>(null)
+export function LeaveRequestReviewModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  request,
+}: LeaveRequestReviewModalProps) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [reviewComments, setReviewComments] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   if (!user || !permissions.canApprove(user)) {
-    return null
+    return null;
   }
 
   const handleStatusUpdate = async (status: 'APPROVED' | 'DENIED') => {
-    if (!user) return
+    if (!user) return;
 
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       const updatedRequest = await updateLeaveRequestStatus(
         request.id,
         status,
         user.id,
         reviewComments || undefined
-      )
+      );
 
-      onSuccess(updatedRequest)
-      onClose()
-      setReviewComments('')
+      onSuccess(updatedRequest);
+      onClose();
+      setReviewComments('');
     } catch (error) {
-      console.error('Error updating leave request:', error)
-      setError(error instanceof Error ? error.message : 'Failed to update leave request')
+      console.error('Error updating leave request:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update leave request');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'APPROVED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'DENIED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getLeaveDuration = () => {
-    const startDate = new Date(request.start_date)
-    const endDate = new Date(request.end_date)
-    const days = differenceInDays(endDate, startDate) + 1
-    return days
-  }
+    const startDate = new Date(request.start_date);
+    const endDate = new Date(request.end_date);
+    const days = differenceInDays(endDate, startDate) + 1;
+    return days;
+  };
 
   const isUrgent = () => {
-    const startDate = new Date(request.start_date)
-    const today = new Date()
-    const daysUntilStart = differenceInDays(startDate, today)
-    return daysUntilStart <= 7 && daysUntilStart >= 0
-  }
+    const startDate = new Date(request.start_date);
+    const today = new Date();
+    const daysUntilStart = differenceInDays(startDate, today);
+    return daysUntilStart <= 7 && daysUntilStart >= 0;
+  };
 
   return (
     <ModalSheet isOpen={isOpen} onClose={onClose} title="Review Leave Request" size="lg">
@@ -92,7 +97,9 @@ export function LeaveRequestReviewModal({ isOpen, onClose, onSuccess, request }:
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(request.status)}`}>
+            <span
+              className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(request.status)}`}
+            >
               {request.status}
             </span>
             {isUrgent() && (
@@ -118,14 +125,18 @@ export function LeaveRequestReviewModal({ isOpen, onClose, onSuccess, request }:
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-              <p className="text-sm text-gray-900">{getLeaveDuration()} day{getLeaveDuration() !== 1 ? 's' : ''}</p>
+              <p className="text-sm text-gray-900">
+                {getLeaveDuration()} day{getLeaveDuration() !== 1 ? 's' : ''}
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
-                <p className="text-sm text-gray-900">{format(new Date(request.start_date), 'PPP')}</p>
+                <p className="text-sm text-gray-900">
+                  {format(new Date(request.start_date), 'PPP')}
+                </p>
               </div>
             </div>
 
@@ -139,7 +150,11 @@ export function LeaveRequestReviewModal({ isOpen, onClose, onSuccess, request }:
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Request Date</label>
-              <p className="text-sm text-gray-900">{request.request_date ? format(new Date(request.request_date), 'PPP') : 'Not specified'}</p>
+              <p className="text-sm text-gray-900">
+                {request.request_date
+                  ? format(new Date(request.request_date), 'PPP')
+                  : 'Not specified'}
+              </p>
             </div>
 
             <div>
@@ -225,5 +240,5 @@ export function LeaveRequestReviewModal({ isOpen, onClose, onSuccess, request }:
         </div>
       </div>
     </ModalSheet>
-  )
+  );
 }

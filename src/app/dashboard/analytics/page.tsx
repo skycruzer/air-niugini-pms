@@ -7,10 +7,10 @@
  * @since 2025-09-27
  */
 
-import { Suspense } from 'react'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard'
+import { Suspense } from 'react';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 
 // Loading component for the analytics dashboard
 function AnalyticsLoading() {
@@ -47,7 +47,7 @@ function AnalyticsLoading() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Error boundary component
@@ -60,8 +60,8 @@ function AnalyticsError() {
           Analytics Temporarily Unavailable
         </h2>
         <p className="text-red-600 mb-6">
-          We're experiencing technical difficulties loading the analytics dashboard.
-          Please try refreshing the page or contact support if the problem persists.
+          We're experiencing technical difficulties loading the analytics dashboard. Please try
+          refreshing the page or contact support if the problem persists.
         </p>
         <div className="flex justify-center space-x-4">
           <button
@@ -79,7 +79,7 @@ function AnalyticsError() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function AnalyticsPage() {
@@ -91,11 +91,12 @@ export default function AnalyticsPage() {
         </Suspense>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }
 
 // Generate metadata for the page
 export const metadata = {
   title: 'Analytics Dashboard - Air Niugini B767 PMS',
-  description: 'Advanced analytics and interactive charts for Air Niugini B767 fleet operations management',
-}
+  description:
+    'Advanced analytics and interactive charts for Air Niugini B767 fleet operations management',
+};

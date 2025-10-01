@@ -1,49 +1,52 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
-export type ViewMode = 'grid' | 'list'
+export type ViewMode = 'grid' | 'list';
 
-export function useViewToggle(storageKey: string = 'pilot-view-mode', defaultView: ViewMode = 'grid') {
-  const [viewMode, setViewMode] = useState<ViewMode>(defaultView)
-  const [isLoading, setIsLoading] = useState(true)
+export function useViewToggle(
+  storageKey: string = 'pilot-view-mode',
+  defaultView: ViewMode = 'grid'
+) {
+  const [viewMode, setViewMode] = useState<ViewMode>(defaultView);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Load saved view preference from localStorage
     try {
-      const savedView = localStorage.getItem(storageKey)
+      const savedView = localStorage.getItem(storageKey);
       if (savedView && (savedView === 'grid' || savedView === 'list')) {
-        setViewMode(savedView as ViewMode)
+        setViewMode(savedView as ViewMode);
       }
     } catch (error) {
-      console.warn('Failed to load view preference from localStorage:', error)
+      console.warn('Failed to load view preference from localStorage:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [storageKey])
+  }, [storageKey]);
 
   const toggleView = () => {
-    const newView: ViewMode = viewMode === 'grid' ? 'list' : 'grid'
-    setViewMode(newView)
+    const newView: ViewMode = viewMode === 'grid' ? 'list' : 'grid';
+    setViewMode(newView);
 
     // Save to localStorage
     try {
-      localStorage.setItem(storageKey, newView)
+      localStorage.setItem(storageKey, newView);
     } catch (error) {
-      console.warn('Failed to save view preference to localStorage:', error)
+      console.warn('Failed to save view preference to localStorage:', error);
     }
-  }
+  };
 
   const setView = (mode: ViewMode) => {
-    setViewMode(mode)
+    setViewMode(mode);
 
     // Save to localStorage
     try {
-      localStorage.setItem(storageKey, mode)
+      localStorage.setItem(storageKey, mode);
     } catch (error) {
-      console.warn('Failed to save view preference to localStorage:', error)
+      console.warn('Failed to save view preference to localStorage:', error);
     }
-  }
+  };
 
   return {
     viewMode,
@@ -51,6 +54,6 @@ export function useViewToggle(storageKey: string = 'pilot-view-mode', defaultVie
     toggleView,
     setView,
     isGridView: viewMode === 'grid',
-    isListView: viewMode === 'list'
-  }
+    isListView: viewMode === 'list',
+  };
 }

@@ -1,39 +1,42 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { DashboardLayout } from '@/components/layout/DashboardLayout'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
 import {
   getAllCheckTypes,
   getExpiringCertifications,
-  getPilotsWithExpiredCertifications
-} from '@/lib/pilot-service-client'
-import { getCategoryIcon, getCategoryColor } from '@/lib/certification-utils'
-import { CertificationCalendar } from '@/components/calendar/CertificationCalendar'
-import { BulkCertificationModal } from '@/components/certifications/BulkCertificationModal'
+  getPilotsWithExpiredCertifications,
+} from '@/lib/pilot-service-client';
+import { getCategoryIcon, getCategoryColor } from '@/lib/certification-utils';
+import { CertificationCalendar } from '@/components/calendar/CertificationCalendar';
+import { LazyBulkCertificationModal } from '@/components/lazy';
+import { LazyLoader } from '@/components/ui/LazyLoader';
+import { FleetTimelineView } from '@/components/certifications/FleetTimelineView';
+import { CategoryTimelineView } from '@/components/certifications/CategoryTimelineView';
 // Using emojis instead of lucide-react icons for consistency
 
 interface CheckType {
-  id: string
-  check_code: string
-  check_description: string
-  category: string
+  id: string;
+  check_code: string;
+  check_description: string;
+  category: string;
 }
 
 interface ExpiringCert {
-  pilotName: string
-  employeeId: string
-  checkCode: string
-  checkDescription: string
-  category: string
-  expiryDate: Date | string
+  pilotName: string;
+  employeeId: string;
+  checkCode: string;
+  checkDescription: string;
+  category: string;
+  expiryDate: Date | string;
   status: {
-    color: string
-    label: string
-    className: string
-  }
+    color: string;
+    label: string;
+    className: string;
+  };
 }
 
 function CheckTypeCard({ checkType }: { checkType: CheckType }) {
@@ -43,18 +46,18 @@ function CheckTypeCard({ checkType }: { checkType: CheckType }) {
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
             <span className="text-lg font-bold text-[#E4002B]">{checkType.check_code}</span>
-            <span className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(checkType.category)}`}>
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${getCategoryColor(checkType.category)}`}
+            >
               {checkType.category}
             </span>
           </div>
           <h3 className="font-semibold text-gray-900 mb-1">{checkType.check_description}</h3>
         </div>
-        <div className="text-2xl ml-4">
-          {getCategoryIcon(checkType.category)}
-        </div>
+        <div className="text-2xl ml-4">{getCategoryIcon(checkType.category)}</div>
       </div>
     </div>
-  )
+  );
 }
 
 function PilotExpiredCard({ pilot }: { pilot: any }) {
@@ -72,78 +75,88 @@ function PilotExpiredCard({ pilot }: { pilot: any }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function CertificationsPage() {
-  const { user } = useAuth()
-  const [checkTypes, setCheckTypes] = useState<CheckType[]>([])
-  const [expiringCerts, setExpiringCerts] = useState<ExpiringCert[]>([])
-  const [expiredPilots, setExpiredPilots] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | string>('all')
-  const [showAllExpiring, setShowAllExpiring] = useState(false)
-  const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list')
-  const [showBulkModal, setShowBulkModal] = useState(false)
+  const { user } = useAuth();
+  const [checkTypes, setCheckTypes] = useState<CheckType[]>([]);
+  const [expiringCerts, setExpiringCerts] = useState<ExpiringCert[]>([]);
+  const [expiredPilots, setExpiredPilots] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'all' | string>('all');
+  const [showAllExpiring, setShowAllExpiring] = useState(false);
+  const [currentView, setCurrentView] = useState<
+    'list' | 'calendar' | 'timeline' | 'category-timeline'
+  >('list');
+  const [showBulkModal, setShowBulkModal] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        setLoading(true)
-        console.log('🔍 Certifications Page: Starting data fetch...')
+        setLoading(true);
+        console.log('🔍 Certifications Page: Starting data fetch...');
 
         // Use API routes for all data loading
         const [typesResponse, expiringResponse, expiredResponse] = await Promise.all([
           fetch('/api/check-types'),
           fetch('/api/expiring-certifications?daysAhead=60'),
-          fetch('/api/expired-certifications')
-        ])
+          fetch('/api/expired-certifications'),
+        ]);
 
         const [typesResult, expiringResult, expiredResult] = await Promise.all([
           typesResponse.json(),
           expiringResponse.json(),
-          expiredResponse.json()
-        ])
+          expiredResponse.json(),
+        ]);
 
         if (typesResult.success) {
-          setCheckTypes(typesResult.data || [])
-          console.log('🔍 Loaded', typesResult.data?.length || 0, 'check types')
+          setCheckTypes(typesResult.data || []);
+          console.log('🔍 Loaded', typesResult.data?.length || 0, 'check types');
         }
 
         if (expiringResult.success) {
-          setExpiringCerts(expiringResult.data || [])
-          console.log('🔍 Loaded', expiringResult.data?.length || 0, 'expiring certifications')
+          setExpiringCerts(expiringResult.data || []);
+          console.log('🔍 Loaded', expiringResult.data?.length || 0, 'expiring certifications');
         }
 
         if (expiredResult.success) {
-          setExpiredPilots(expiredResult.data || [])
-          console.log('🔍 Loaded', expiredResult.data?.length || 0, 'pilots with expired certifications')
+          setExpiredPilots(expiredResult.data || []);
+          console.log(
+            '🔍 Loaded',
+            expiredResult.data?.length || 0,
+            'pilots with expired certifications'
+          );
         }
 
-        console.log('🔍 Certifications Page: Data loading completed')
+        console.log('🔍 Certifications Page: Data loading completed');
       } catch (error) {
-        console.error('Error loading certifications data:', error)
+        console.error('Error loading certifications data:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
-  const categories = Array.from(new Set(checkTypes.map(ct => ct.category))).sort()
-  const filteredCheckTypes = filter === 'all' ? checkTypes : checkTypes.filter(ct => ct.category === filter)
+  const categories = Array.from(new Set(checkTypes.map((ct) => ct.category))).sort();
+  const filteredCheckTypes =
+    filter === 'all' ? checkTypes : checkTypes.filter((ct) => ct.category === filter);
 
   // Transform expiring certifications for calendar
   const calendarEvents = expiringCerts.map((cert, index) => {
-    const expiryDate = cert.expiryDate instanceof Date ? cert.expiryDate : new Date(cert.expiryDate)
-    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    const expiryDate =
+      cert.expiryDate instanceof Date ? cert.expiryDate : new Date(cert.expiryDate);
+    const daysUntilExpiry = Math.ceil(
+      (expiryDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+    );
 
-    let status: 'expired' | 'expiring_soon' | 'due_soon' = 'due_soon'
+    let status: 'expired' | 'expiring_soon' | 'due_soon' = 'due_soon';
     if (daysUntilExpiry <= 0) {
-      status = 'expired'
+      status = 'expired';
     } else if (daysUntilExpiry <= 7) {
-      status = 'expiring_soon'
+      status = 'expiring_soon';
     }
 
     return {
@@ -153,9 +166,9 @@ export default function CertificationsPage() {
       checkCode: cert.checkCode,
       checkDescription: cert.checkDescription,
       expiryDate,
-      status
-    }
-  })
+      status,
+    };
+  });
 
   if (loading) {
     return (
@@ -169,7 +182,7 @@ export default function CertificationsPage() {
           </div>
         </DashboardLayout>
       </ProtectedRoute>
-    )
+    );
   }
 
   return (
@@ -193,6 +206,7 @@ export default function CertificationsPage() {
                   <span className="mr-2">📝</span>
                   Bulk Update
                 </button>
+                <div className="h-6 w-px bg-gray-300 mx-1"></div>
                 <button
                   onClick={() => setCurrentView('list')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
@@ -215,6 +229,28 @@ export default function CertificationsPage() {
                   <span className="mr-2">📅</span>
                   Calendar
                 </button>
+                <button
+                  onClick={() => setCurrentView('timeline')}
+                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                    currentView === 'timeline'
+                      ? 'bg-[#E4002B] text-white'
+                      : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="mr-2">📊</span>
+                  Timeline
+                </button>
+                <button
+                  onClick={() => setCurrentView('category-timeline')}
+                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                    currentView === 'category-timeline'
+                      ? 'bg-[#E4002B] text-white'
+                      : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="mr-2">🎯</span>
+                  By Category
+                </button>
               </div>
             </div>
           </div>
@@ -225,9 +261,23 @@ export default function CertificationsPage() {
               <CertificationCalendar
                 certifications={calendarEvents}
                 onDateSelect={(date, events) => {
-                  console.log('Selected date:', date, 'Events:', events)
+                  console.log('Selected date:', date, 'Events:', events);
                 }}
               />
+            </div>
+          )}
+
+          {/* Fleet Timeline View */}
+          {currentView === 'timeline' && (
+            <div className="mb-8">
+              <FleetTimelineView />
+            </div>
+          )}
+
+          {/* Category Timeline View */}
+          {currentView === 'category-timeline' && (
+            <div className="mb-8">
+              <CategoryTimelineView />
             </div>
           )}
 
@@ -300,17 +350,21 @@ export default function CertificationsPage() {
             </>
           )}
 
-          {/* Bulk Certification Modal */}
-          <BulkCertificationModal
-            isOpen={showBulkModal}
-            onClose={() => setShowBulkModal(false)}
-            onSuccess={() => {
-              setShowBulkModal(false)
-              // Optionally refresh data here if needed
-            }}
-          />
+          {/* Bulk Certification Modal - Lazy Loaded */}
+          {showBulkModal && (
+            <LazyLoader type="modal">
+              <LazyBulkCertificationModal
+                isOpen={showBulkModal}
+                onClose={() => setShowBulkModal(false)}
+                onSuccess={() => {
+                  setShowBulkModal(false);
+                  // Optionally refresh data here if needed
+                }}
+              />
+            </LazyLoader>
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>
-  )
+  );
 }

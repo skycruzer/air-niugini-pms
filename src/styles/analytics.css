@@ -9,15 +9,15 @@
 
 /* Air Niugini Analytics Theme */
 :root {
-  --air-niugini-red: #E4002B;
-  --air-niugini-gold: #FFC72C;
+  --air-niugini-red: #e4002b;
+  --air-niugini-gold: #ffc72c;
   --analytics-success: #059669;
-  --analytics-warning: #D97706;
-  --analytics-danger: #DC2626;
-  --analytics-info: #0EA5E9;
-  --analytics-dark: #1F2937;
-  --analytics-light: #F3F4F6;
-  --analytics-border: #E5E7EB;
+  --analytics-warning: #d97706;
+  --analytics-danger: #dc2626;
+  --analytics-info: #0ea5e9;
+  --analytics-dark: #1f2937;
+  --analytics-light: #f3f4f6;
+  --analytics-border: #e5e7eb;
   --analytics-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --analytics-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -172,7 +172,9 @@
 .analytics-chart-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
 }
 
 /* Loading States */
@@ -283,7 +285,9 @@
 /* High DPI / Retina Display Optimizations */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .analytics-chart-container {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.05),
+      0 4px 6px -2px rgba(0, 0, 0, 0.025);
   }
 }
 

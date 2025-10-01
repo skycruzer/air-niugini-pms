@@ -1,39 +1,45 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { getPilotById, updatePilot, checkEmployeeIdExists, PilotFormData, calculateSeniorityNumber } from '@/lib/pilot-service-client'
-import { ModalSheet } from '@/components/ui/ModalSheet'
-import { format } from 'date-fns'
+import { useState, useEffect } from 'react';
+import {
+  getPilotById,
+  updatePilot,
+  checkEmployeeIdExists,
+  PilotFormData,
+  calculateSeniorityNumber,
+} from '@/lib/pilot-service-client';
+import { ModalSheet } from '@/components/ui/ModalSheet';
+import { format } from 'date-fns';
 
 interface PilotEditModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess?: () => void
-  pilotId: string | null
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  pilotId: string | null;
 }
 
 function FormField({
   label,
   name,
-  type = "text",
+  type = 'text',
   value,
   onChange,
   required = false,
   options,
   error,
   readOnly = false,
-  placeholder
+  placeholder,
 }: {
-  label: string
-  name: string
-  type?: string
-  value: string | boolean
-  onChange: (value: string | boolean) => void
-  required?: boolean
-  options?: { value: string; label: string }[]
-  error?: string
-  readOnly?: boolean
-  placeholder?: string
+  label: string;
+  name: string;
+  type?: string;
+  value: string | boolean;
+  onChange: (value: string | boolean) => void;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  error?: string;
+  readOnly?: boolean;
+  placeholder?: string;
 }) {
   if (type === 'select' && options) {
     return (
@@ -64,7 +70,7 @@ function FormField({
           </p>
         )}
       </div>
-    )
+    );
   }
 
   if (type === 'checkbox') {
@@ -77,11 +83,9 @@ function FormField({
           className="h-4 w-4 text-[#E4002B] focus:ring-[#E4002B] border-gray-300 rounded"
           disabled={readOnly}
         />
-        <label className="ml-2 block text-sm text-gray-700">
-          {label}
-        </label>
+        <label className="ml-2 block text-sm text-gray-700">{label}</label>
       </div>
-    )
+    );
   }
 
   return (
@@ -108,15 +112,15 @@ function FormField({
         </p>
       )}
     </div>
-  )
+  );
 }
 
 export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEditModalProps) {
-  const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [pilot, setPilot] = useState<any>(null)
-  const [calculatedSeniority, setCalculatedSeniority] = useState<number | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [pilot, setPilot] = useState<any>(null);
+  const [calculatedSeniority, setCalculatedSeniority] = useState<number | null>(null);
 
   const [formData, setFormData] = useState<PilotFormData>({
     employee_id: '',
@@ -138,40 +142,40 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
     address: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
-    emergency_contact_relationship: ''
-  })
+    emergency_contact_relationship: '',
+  });
 
   // Load pilot data when modal opens and pilotId changes
   useEffect(() => {
     if (isOpen && pilotId) {
-      loadPilotData()
+      loadPilotData();
     }
-  }, [isOpen, pilotId])
+  }, [isOpen, pilotId]);
 
   const loadPilotData = async () => {
-    if (!pilotId) return
+    if (!pilotId) return;
 
     try {
-      setLoading(true)
-      const pilotData = await getPilotById(pilotId)
+      setLoading(true);
+      const pilotData = await getPilotById(pilotId);
 
       if (!pilotData) {
-        setErrors({ general: 'Pilot not found' })
-        return
+        setErrors({ general: 'Pilot not found' });
+        return;
       }
 
-      setPilot(pilotData)
+      setPilot(pilotData);
 
       // Populate form with existing data
       const formatDate = (dateValue: any) => {
-        if (!dateValue) return ''
+        if (!dateValue) return '';
         try {
-          return format(new Date(dateValue), 'yyyy-MM-dd')
+          return format(new Date(dateValue), 'yyyy-MM-dd');
         } catch (error) {
-          console.error('Date formatting error:', error)
-          return ''
+          console.error('Date formatting error:', error);
+          return '';
         }
-      }
+      };
 
       const newFormData = {
         employee_id: pilotData.employee_id || '',
@@ -193,126 +197,127 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
         address: '',
         emergency_contact_name: '',
         emergency_contact_phone: '',
-        emergency_contact_relationship: ''
-      }
+        emergency_contact_relationship: '',
+      };
 
-      setFormData(newFormData)
+      setFormData(newFormData);
 
       // Calculate seniority number if commencement date exists
       if (pilotData.commencement_date) {
         try {
-          const seniority = await calculateSeniorityNumber(pilotData.commencement_date, pilotId)
-          setCalculatedSeniority(seniority)
+          const seniority = await calculateSeniorityNumber(pilotData.commencement_date, pilotId);
+          setCalculatedSeniority(seniority);
         } catch (error) {
-          console.error('Error calculating seniority:', error)
-          setCalculatedSeniority(null)
+          console.error('Error calculating seniority:', error);
+          setCalculatedSeniority(null);
         }
       }
     } catch (error) {
-      console.error('Error loading pilot:', error)
-      setErrors({ general: 'Failed to load pilot data' })
+      console.error('Error loading pilot:', error);
+      setErrors({ general: 'Failed to load pilot data' });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updateFormData = async (field: keyof PilotFormData, value: string | boolean | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
+      [field]: value,
+    }));
 
     // Recalculate seniority when commencement date changes
     if (field === 'commencement_date' && value && pilotId) {
       try {
-        const seniority = await calculateSeniorityNumber(value as string, pilotId)
-        setCalculatedSeniority(seniority)
+        const seniority = await calculateSeniorityNumber(value as string, pilotId);
+        setCalculatedSeniority(seniority);
       } catch (error) {
-        console.error('Error calculating seniority:', error)
-        setCalculatedSeniority(null)
+        console.error('Error calculating seniority:', error);
+        setCalculatedSeniority(null);
       }
     }
 
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [field]: ''
-      }))
+        [field]: '',
+      }));
     }
-  }
+  };
 
   const validateForm = async (): Promise<boolean> => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Required fields
-    if (!formData.employee_id) newErrors.employee_id = 'Employee ID is required'
-    if (!formData.first_name) newErrors.first_name = 'First name is required'
-    if (!formData.last_name) newErrors.last_name = 'Last name is required'
-    if (!formData.role) newErrors.role = 'Role is required'
+    if (!formData.employee_id) newErrors.employee_id = 'Employee ID is required';
+    if (!formData.first_name) newErrors.first_name = 'First name is required';
+    if (!formData.last_name) newErrors.last_name = 'Last name is required';
+    if (!formData.role) newErrors.role = 'Role is required';
 
     // Check if employee ID is unique (excluding current pilot)
     if (formData.employee_id.trim() && formData.employee_id !== pilot?.employee_id) {
       try {
-        const exists = await checkEmployeeIdExists(formData.employee_id, pilotId!)
+        const exists = await checkEmployeeIdExists(formData.employee_id, pilotId!);
         if (exists) {
-          newErrors.employee_id = 'Employee ID already exists'
+          newErrors.employee_id = 'Employee ID already exists';
         }
       } catch (error) {
-        console.error('Error checking employee ID:', error)
+        console.error('Error checking employee ID:', error);
       }
     }
 
     // Date validation
     if (formData.date_of_birth && new Date(formData.date_of_birth) > new Date()) {
-      newErrors.date_of_birth = 'Date of birth cannot be in the future'
+      newErrors.date_of_birth = 'Date of birth cannot be in the future';
     }
 
     if (formData.passport_expiry && new Date(formData.passport_expiry) < new Date()) {
-      newErrors.passport_expiry = 'Passport expiry date should be in the future'
+      newErrors.passport_expiry = 'Passport expiry date should be in the future';
     }
 
     // Validate commencement date is after date of birth
     if (formData.date_of_birth && formData.commencement_date) {
-      const birthDate = new Date(formData.date_of_birth)
-      const commenceDate = new Date(formData.commencement_date)
+      const birthDate = new Date(formData.date_of_birth);
+      const commenceDate = new Date(formData.commencement_date);
 
       if (commenceDate <= birthDate) {
-        newErrors.commencement_date = 'Commencement date must be after date of birth'
+        newErrors.commencement_date = 'Commencement date must be after date of birth';
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!pilotId || saving) return
+    if (!pilotId || saving) return;
 
-    if (!await validateForm()) {
-      return
+    if (!(await validateForm())) {
+      return;
     }
 
-    setSaving(true)
+    setSaving(true);
 
     try {
-      await updatePilot(pilotId, formData)
+      await updatePilot(pilotId, formData);
 
       // Close modal and call success callback
-      onClose()
+      onClose();
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error updating pilot:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update pilot. Please try again.'
-      setErrors({ general: errorMessage })
+      console.error('Error updating pilot:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update pilot. Please try again.';
+      setErrors({ general: errorMessage });
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Reset form when modal closes
   useEffect(() => {
@@ -336,21 +341,16 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
         address: '',
         emergency_contact_name: '',
         emergency_contact_phone: '',
-        emergency_contact_relationship: ''
-      })
-      setErrors({})
-      setPilot(null)
-      setCalculatedSeniority(null)
+        emergency_contact_relationship: '',
+      });
+      setErrors({});
+      setPilot(null);
+      setCalculatedSeniority(null);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   return (
-    <ModalSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Edit Pilot"
-      size="xl"
-    >
+    <ModalSheet isOpen={isOpen} onClose={onClose} title="Edit Pilot" size="xl">
       {loading ? (
         <div className="p-6 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
@@ -393,7 +393,7 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
                 required
                 options={[
                   { value: 'Captain', label: 'Captain' },
-                  { value: 'First Officer', label: 'First Officer' }
+                  { value: 'First Officer', label: 'First Officer' },
                 ]}
                 error={errors.role}
               />
@@ -458,7 +458,7 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
                 options={[
                   { value: 'Fulltime', label: 'Fulltime' },
                   { value: 'Commuting', label: 'Commuting' },
-                  { value: 'Tours', label: 'Tours' }
+                  { value: 'Tours', label: 'Tours' },
                 ]}
               />
 
@@ -547,5 +547,5 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
         </form>
       )}
     </ModalSheet>
-  )
+  );
 }

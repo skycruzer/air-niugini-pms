@@ -1,34 +1,34 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createPilot, PilotFormData } from '@/lib/pilot-service-client'
-import { ModalSheet } from '@/components/ui/ModalSheet'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createPilot, PilotFormData } from '@/lib/pilot-service-client';
+import { ModalSheet } from '@/components/ui/ModalSheet';
 
 interface PilotAddModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSuccess?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
 }
 
 function FormField({
   label,
   name,
-  type = "text",
+  type = 'text',
   value,
   onChange,
   required = false,
   options,
-  error
+  error,
 }: {
-  label: string
-  name: string
-  type?: string
-  value: string | boolean
-  onChange: (value: string | boolean) => void
-  required?: boolean
-  options?: { value: string; label: string }[]
-  error?: string
+  label: string;
+  name: string;
+  type?: string;
+  value: string | boolean;
+  onChange: (value: string | boolean) => void;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  error?: string;
 }) {
   if (type === 'select' && options) {
     return (
@@ -58,7 +58,7 @@ function FormField({
           </p>
         )}
       </div>
-    )
+    );
   }
 
   if (type === 'checkbox') {
@@ -70,11 +70,9 @@ function FormField({
           onChange={(e) => onChange(e.target.checked)}
           className="h-4 w-4 text-[#E4002B] focus:ring-[#E4002B] border-gray-300 rounded"
         />
-        <label className="ml-2 block text-sm text-gray-700">
-          {label}
-        </label>
+        <label className="ml-2 block text-sm text-gray-700">{label}</label>
       </div>
-    )
+    );
   }
 
   return (
@@ -98,13 +96,13 @@ function FormField({
         </p>
       )}
     </div>
-  )
+  );
 }
 
 export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps) {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState<PilotFormData>({
     employee_id: '',
@@ -126,68 +124,68 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
     address: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
-    emergency_contact_relationship: ''
-  })
+    emergency_contact_relationship: '',
+  });
 
   const updateFormData = (field: keyof PilotFormData, value: string | boolean | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
+      [field]: value,
+    }));
 
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [field]: ''
-      }))
+        [field]: '',
+      }));
     }
-  }
+  };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Required fields
-    if (!formData.employee_id) newErrors.employee_id = 'Employee ID is required'
-    if (!formData.first_name) newErrors.first_name = 'First name is required'
-    if (!formData.last_name) newErrors.last_name = 'Last name is required'
-    if (!formData.role) newErrors.role = 'Role is required'
+    if (!formData.employee_id) newErrors.employee_id = 'Employee ID is required';
+    if (!formData.first_name) newErrors.first_name = 'First name is required';
+    if (!formData.last_name) newErrors.last_name = 'Last name is required';
+    if (!formData.role) newErrors.role = 'Role is required';
 
     // Date validation
     if (formData.date_of_birth && new Date(formData.date_of_birth) > new Date()) {
-      newErrors.date_of_birth = 'Date of birth cannot be in the future'
+      newErrors.date_of_birth = 'Date of birth cannot be in the future';
     }
 
     if (formData.passport_expiry && new Date(formData.passport_expiry) < new Date()) {
-      newErrors.passport_expiry = 'Passport expiry date should be in the future'
+      newErrors.passport_expiry = 'Passport expiry date should be in the future';
     }
 
     // Validate commencement date is after date of birth
     if (formData.date_of_birth && formData.commencement_date) {
-      const birthDate = new Date(formData.date_of_birth)
-      const commenceDate = new Date(formData.commencement_date)
+      const birthDate = new Date(formData.date_of_birth);
+      const commenceDate = new Date(formData.commencement_date);
 
       if (commenceDate <= birthDate) {
-        newErrors.commencement_date = 'Commencement date must be after date of birth'
+        newErrors.commencement_date = 'Commencement date must be after date of birth';
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
       // Create pilot using the service - formData already has correct field names
-      await createPilot(formData)
+      await createPilot(formData);
 
       // Reset form
       setFormData({
@@ -209,30 +207,26 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
         address: '',
         emergency_contact_name: '',
         emergency_contact_phone: '',
-        emergency_contact_relationship: ''
-      })
+        emergency_contact_relationship: '',
+      });
 
       // Close modal and call success callback
-      onClose()
+      onClose();
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (error) {
-      console.error('Error creating pilot:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create pilot. Please try again.'
-      setErrors({ general: errorMessage })
+      console.error('Error creating pilot:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to create pilot. Please try again.';
+      setErrors({ general: errorMessage });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <ModalSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Add New Pilot"
-      size="xl"
-    >
+    <ModalSheet isOpen={isOpen} onClose={onClose} title="Add New Pilot" size="xl">
       <form onSubmit={handleSubmit} className="p-6 space-y-8">
         {/* General Error */}
         {errors.general && (
@@ -269,7 +263,7 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
               required
               options={[
                 { value: 'Captain', label: 'Captain' },
-                { value: 'First Officer', label: 'First Officer' }
+                { value: 'First Officer', label: 'First Officer' },
               ]}
               error={errors.role}
             />
@@ -328,7 +322,7 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
               options={[
                 { value: 'Fulltime', label: 'Fulltime' },
                 { value: 'Commuting', label: 'Commuting' },
-                { value: 'Tours', label: 'Tours' }
+                { value: 'Tours', label: 'Tours' },
               ]}
             />
 
@@ -416,5 +410,5 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
         </div>
       </form>
     </ModalSheet>
-  )
+  );
 }

@@ -1,18 +1,19 @@
-import { NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
-import { getRosterPeriodFromDate } from '@/lib/roster-utils'
-import { differenceInDays } from 'date-fns'
+import { NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { getRosterPeriodFromDate } from '@/lib/roster-utils';
+import { differenceInDays } from 'date-fns';
 
 export async function GET() {
   try {
-    console.log('🔍 API /leave-requests: Fetching leave requests with OPTIMIZED JOIN query...')
+    console.log('🔍 API /leave-requests: Fetching leave requests with OPTIMIZED JOIN query...');
 
-    const supabaseAdmin = getSupabaseAdmin()
+    const supabaseAdmin = getSupabaseAdmin();
 
     // ⚡ OPTIMIZED: Single query with JOIN to eliminate N+1 pattern
     const { data: requests, error } = await supabaseAdmin
       .from('leave_requests')
-      .select(`
+      .select(
+        `
         *,
         pilots:pilot_id (
           first_name,
@@ -20,22 +21,23 @@ export async function GET() {
           last_name,
           employee_id
         )
-      `)
-      .order('created_at', { ascending: false })
+      `
+      )
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('🚨 API /leave-requests: Query error:', error)
+      console.error('🚨 API /leave-requests: Query error:', error);
       return NextResponse.json(
         { success: false, error: error.message || 'Failed to fetch leave requests' },
         { status: 500 }
-      )
+      );
     }
 
-    console.log('🔍 API /leave-requests: Found', requests?.length || 0, 'leave requests')
+    console.log('🔍 API /leave-requests: Found', requests?.length || 0, 'leave requests');
 
     // ⚡ OPTIMIZED: Transform data without additional queries
     const transformedRequests = (requests || []).map((request: any) => {
-      const pilot = request.pilots
+      const pilot = request.pilots;
       return {
         ...request,
         pilot_name: pilot
@@ -43,60 +45,60 @@ export async function GET() {
           : 'Unknown Pilot',
         employee_id: pilot?.employee_id || 'N/A',
         reviewer_name: null, // We'll get this separately if needed
-        pilots: undefined // Remove the nested object from response
-      }
-    })
-    console.log('🔍 API /leave-requests: Sample request:', JSON.stringify(transformedRequests[0], null, 2))
+        pilots: undefined, // Remove the nested object from response
+      };
+    });
+    console.log(
+      '🔍 API /leave-requests: Sample request:',
+      JSON.stringify(transformedRequests[0], null, 2)
+    );
 
     return NextResponse.json({
       success: true,
-      data: transformedRequests
-    })
+      data: transformedRequests,
+    });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('🚨 API /leave-requests: Fatal error:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const requestData = await request.json()
-    console.log('📝 API /leave-requests: Creating new leave request...', requestData)
+    const requestData = await request.json();
+    console.log('📝 API /leave-requests: Creating new leave request...', requestData);
 
-    const supabaseAdmin = getSupabaseAdmin()
+    const supabaseAdmin = getSupabaseAdmin();
 
     // Calculate roster period and days
-    const startDateRoster = getRosterPeriodFromDate(new Date(requestData.start_date))
-    const daysCount = differenceInDays(new Date(requestData.end_date), new Date(requestData.start_date)) + 1
+    const startDateRoster = getRosterPeriodFromDate(new Date(requestData.start_date));
+    const daysCount =
+      differenceInDays(new Date(requestData.end_date), new Date(requestData.start_date)) + 1;
 
     // Create the leave request
     const { data, error } = await supabaseAdmin
       .from('leave_requests')
-      .insert([{
-        pilot_id: requestData.pilot_id,
-        request_type: requestData.request_type,
-        roster_period: startDateRoster.code,
-        start_date: requestData.start_date,
-        end_date: requestData.end_date,
-        days_count: daysCount,
-        reason: requestData.reason,
-        request_date: requestData.request_date,
-        request_method: requestData.request_method,
-        is_late_request: requestData.is_late_request || false,
-        status: 'PENDING'
-      }])
+      .insert([
+        {
+          pilot_id: requestData.pilot_id,
+          request_type: requestData.request_type,
+          roster_period: startDateRoster.code,
+          start_date: requestData.start_date,
+          end_date: requestData.end_date,
+          days_count: daysCount,
+          reason: requestData.reason,
+          request_date: requestData.request_date,
+          request_method: requestData.request_method,
+          is_late_request: requestData.is_late_request || false,
+          status: 'PENDING',
+        },
+      ])
       .select('*')
-      .single()
+      .single();
 
     if (error) {
-      console.error('🚨 API /leave-requests: Error creating request:', error)
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      console.error('🚨 API /leave-requests: Error creating request:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
 
     // Get pilot information for the created request
@@ -104,7 +106,7 @@ export async function POST(request: Request) {
       .from('pilots')
       .select('first_name, middle_name, last_name, employee_id')
       .eq('id', data.pilot_id)
-      .single()
+      .single();
 
     const responseData = {
       ...data,
@@ -112,44 +114,41 @@ export async function POST(request: Request) {
         ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
-      reviewer_name: null
-    }
+      reviewer_name: null,
+    };
 
-    console.log('✅ API /leave-requests: Created leave request:', responseData.id)
+    console.log('✅ API /leave-requests: Created leave request:', responseData.id);
 
     return NextResponse.json({
       success: true,
-      data: responseData
-    })
+      data: responseData,
+    });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error creating request:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('🚨 API /leave-requests: Fatal error creating request:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const requestData = await request.json()
-    console.log('🔄 API /leave-requests: Updating leave request...', requestData)
+    const requestData = await request.json();
+    console.log('🔄 API /leave-requests: Updating leave request...', requestData);
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const { id, status, reviewer_comments } = requestData
+    const supabaseAdmin = getSupabaseAdmin();
+    const { id, status, reviewer_comments } = requestData;
 
     if (!id) {
       return NextResponse.json(
         { success: false, error: 'Leave request ID is required' },
         { status: 400 }
-      )
+      );
     }
 
     if (!['APPROVED', 'DENIED'].includes(status)) {
       return NextResponse.json(
         { success: false, error: 'Invalid status. Must be APPROVED or DENIED' },
         { status: 400 }
-      )
+      );
     }
 
     // Update the leave request
@@ -158,10 +157,11 @@ export async function PUT(request: Request) {
       .update({
         status,
         reviewer_comments,
-        reviewed_at: new Date().toISOString()
+        reviewed_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .select(`
+      .select(
+        `
         *,
         pilots:pilot_id (
           first_name,
@@ -169,19 +169,17 @@ export async function PUT(request: Request) {
           last_name,
           employee_id
         )
-      `)
-      .single()
+      `
+      )
+      .single();
 
     if (error) {
-      console.error('🚨 API /leave-requests: Error updating request:', error)
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      console.error('🚨 API /leave-requests: Error updating request:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
 
     // Transform the response data
-    const pilot = data.pilots
+    const pilot = data.pilots;
     const responseData = {
       ...data,
       pilot_name: pilot
@@ -189,22 +187,19 @@ export async function PUT(request: Request) {
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
       reviewer_name: null,
-      pilots: undefined // Remove the nested object from response
-    }
+      pilots: undefined, // Remove the nested object from response
+    };
 
-    console.log(`✅ API /leave-requests: ${status} leave request:`, responseData.id)
+    console.log(`✅ API /leave-requests: ${status} leave request:`, responseData.id);
 
     return NextResponse.json({
       success: true,
-      data: responseData
-    })
+      data: responseData,
+    });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error updating request:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('🚨 API /leave-requests: Fatal error updating request:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';

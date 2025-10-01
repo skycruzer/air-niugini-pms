@@ -7,9 +7,9 @@
  * @since 2025-09-27
  */
 
-import React from 'react'
-import { Document, Page, Text, View } from '@react-pdf/renderer'
-import { format } from 'date-fns'
+import React from 'react';
+import { Document, Page, Text, View } from '@react-pdf/renderer';
+import { format } from 'date-fns';
 import {
   PDFHeader,
   PDFFooter,
@@ -18,19 +18,28 @@ import {
   AlertBox,
   BulletList,
   Section,
-  pdfStyles
-} from './pdf-components'
-import { ComplianceReportData } from '@/types/pdf-reports'
+  pdfStyles,
+} from './pdf-components';
+import { ComplianceReportData } from '@/types/pdf-reports';
 
 /**
  * Fleet Compliance PDF Document Component
  */
 interface CompliancePDFDocumentProps {
-  reportData: ComplianceReportData
+  reportData: ComplianceReportData;
 }
 
 export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ reportData }) => {
-  const { metadata, overview, expirationBreakdown, complianceByCategory, pilotComplianceStatus, expiredCertifications, expiringCertifications, recommendations } = reportData
+  const {
+    metadata,
+    overview,
+    expirationBreakdown,
+    complianceByCategory,
+    pilotComplianceStatus,
+    expiredCertifications,
+    expiringCertifications,
+    recommendations,
+  } = reportData;
 
   return (
     <Document>
@@ -44,15 +53,35 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
             stats={[
               { label: 'Total Pilots', value: overview.totalPilots },
               { label: 'Total Certifications', value: overview.totalCertifications },
-              { label: 'Current Certifications', value: overview.currentCertifications, status: 'current' },
-              { label: 'Expiring Soon', value: overview.expiringCertifications, status: 'expiring' },
+              {
+                label: 'Current Certifications',
+                value: overview.currentCertifications,
+                status: 'current',
+              },
+              {
+                label: 'Expiring Soon',
+                value: overview.expiringCertifications,
+                status: 'expiring',
+              },
               { label: 'Expired', value: overview.expiredCertifications, status: 'expired' },
             ]}
           />
 
           <View style={[pdfStyles.flexRow, pdfStyles.justifyBetween, { marginTop: 15 }]}>
             <View style={{ width: '45%' }}>
-              <Text style={[pdfStyles.summaryValue, { color: overview.complianceRate >= 90 ? '#059669' : overview.complianceRate >= 75 ? '#D97706' : '#DC2626' }]}>
+              <Text
+                style={[
+                  pdfStyles.summaryValue,
+                  {
+                    color:
+                      overview.complianceRate >= 90
+                        ? '#059669'
+                        : overview.complianceRate >= 75
+                          ? '#D97706'
+                          : '#DC2626',
+                  },
+                ]}
+              >
                 {overview.complianceRate}%
               </Text>
               <Text style={pdfStyles.summaryLabel}>Overall Compliance Rate</Text>
@@ -69,9 +98,21 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         <Section title="Certification Expiration Timeline">
           <SummaryStats
             stats={[
-              { label: 'Next 7 Days', value: expirationBreakdown.next7Days, status: expirationBreakdown.next7Days > 0 ? 'critical' : 'current' },
-              { label: 'Next 14 Days', value: expirationBreakdown.next14Days, status: expirationBreakdown.next14Days > 5 ? 'expired' : 'current' },
-              { label: 'Next 30 Days', value: expirationBreakdown.next30Days, status: expirationBreakdown.next30Days > 10 ? 'expiring' : 'current' },
+              {
+                label: 'Next 7 Days',
+                value: expirationBreakdown.next7Days,
+                status: expirationBreakdown.next7Days > 0 ? 'critical' : 'current',
+              },
+              {
+                label: 'Next 14 Days',
+                value: expirationBreakdown.next14Days,
+                status: expirationBreakdown.next14Days > 5 ? 'expired' : 'current',
+              },
+              {
+                label: 'Next 30 Days',
+                value: expirationBreakdown.next30Days,
+                status: expirationBreakdown.next30Days > 10 ? 'expiring' : 'current',
+              },
               { label: 'Next 60 Days', value: expirationBreakdown.next60Days },
               { label: 'Next 90 Days', value: expirationBreakdown.next90Days },
             ]}
@@ -82,8 +123,8 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         {overview.expiredCertifications > 0 && (
           <AlertBox type="critical" title="🚨 Immediate Action Required">
             <Text>
-              {overview.expiredCertifications} certifications have expired and require immediate renewal.
-              This affects fleet operational capacity and regulatory compliance.
+              {overview.expiredCertifications} certifications have expired and require immediate
+              renewal. This affects fleet operational capacity and regulatory compliance.
             </Text>
           </AlertBox>
         )}
@@ -91,8 +132,8 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         {expirationBreakdown.next7Days > 0 && (
           <AlertBox type="warning" title="⏰ Urgent Renewals">
             <Text>
-              {expirationBreakdown.next7Days} certifications expire within the next 7 days.
-              Schedule renewal training immediately to avoid operational disruption.
+              {expirationBreakdown.next7Days} certifications expire within the next 7 days. Schedule
+              renewal training immediately to avoid operational disruption.
             </Text>
           </AlertBox>
         )}
@@ -102,13 +143,13 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
           <PDFTable
             headers={['Category', 'Total', 'Current', 'Expiring', 'Expired', 'Compliance %']}
             columnWidths={['30%', '14%', '14%', '14%', '14%', '14%']}
-            data={complianceByCategory.map(cat => [
+            data={complianceByCategory.map((cat) => [
               cat.category,
               cat.totalChecks.toString(),
               cat.currentChecks.toString(),
               cat.expiringChecks.toString(),
               cat.expiredChecks.toString(),
-              `${cat.compliancePercentage}%`
+              `${cat.compliancePercentage}%`,
             ])}
             statusColumn={5}
           />
@@ -128,17 +169,27 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
           </Text>
 
           <PDFTable
-            headers={['Pilot Name', 'Employee ID', 'Role', 'Current', 'Expiring', 'Expired', 'Risk Level']}
+            headers={[
+              'Pilot Name',
+              'Employee ID',
+              'Role',
+              'Current',
+              'Expiring',
+              'Expired',
+              'Risk Level',
+            ]}
             columnWidths={['25%', '12%', '13%', '10%', '10%', '10%', '20%']}
-            data={pilotComplianceStatus.slice(0, 15).map(pilot => [
-              `${pilot.pilot.first_name} ${pilot.pilot.last_name}`,
-              pilot.pilot.employee_id,
-              pilot.pilot.role,
-              pilot.currentChecks.toString(),
-              pilot.expiringChecks.toString(),
-              pilot.expiredChecks.toString(),
-              pilot.riskLevel
-            ])}
+            data={pilotComplianceStatus
+              .slice(0, 15)
+              .map((pilot) => [
+                `${pilot.pilot.first_name} ${pilot.pilot.last_name}`,
+                pilot.pilot.employee_id,
+                pilot.pilot.role,
+                pilot.currentChecks.toString(),
+                pilot.expiringChecks.toString(),
+                pilot.expiredChecks.toString(),
+                pilot.riskLevel,
+              ])}
             statusColumn={6}
           />
 
@@ -150,17 +201,24 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         </Section>
 
         {/* High Risk Pilots */}
-        {pilotComplianceStatus.filter(p => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL').length > 0 && (
+        {pilotComplianceStatus.filter((p) => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL')
+          .length > 0 && (
           <Section title="High Risk Pilots - Priority Action Required">
             <View style={pdfStyles.bulletList}>
               {pilotComplianceStatus
-                .filter(p => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL')
+                .filter((p) => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL')
                 .slice(0, 8)
                 .map((pilot, index) => (
                   <View key={index} style={pdfStyles.bulletItem}>
                     <Text style={pdfStyles.bullet}>•</Text>
                     <Text style={pdfStyles.bulletText}>
-                      <Text style={pilot.riskLevel === 'CRITICAL' ? pdfStyles.statusCritical : pdfStyles.statusExpired}>
+                      <Text
+                        style={
+                          pilot.riskLevel === 'CRITICAL'
+                            ? pdfStyles.statusCritical
+                            : pdfStyles.statusExpired
+                        }
+                      >
                         {pilot.pilot.first_name} {pilot.pilot.last_name}
                       </Text>
                       {` (${pilot.pilot.employee_id}) - ${pilot.pilot.role}: `}
@@ -186,21 +244,23 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
           <Section title="Expired Certifications - Immediate Action Required">
             <AlertBox type="critical" title="Regulatory Compliance Risk">
               <Text>
-                The following certifications have expired and must be renewed immediately to maintain
-                regulatory compliance and operational capacity.
+                The following certifications have expired and must be renewed immediately to
+                maintain regulatory compliance and operational capacity.
               </Text>
             </AlertBox>
 
             <PDFTable
               headers={['Pilot', 'Employee ID', 'Certification', 'Expired Date', 'Days Overdue']}
               columnWidths={['25%', '15%', '25%', '20%', '15%']}
-              data={expiredCertifications.slice(0, 12).map(cert => [
-                cert.pilot,
-                cert.employeeId,
-                cert.checkType,
-                format(new Date(cert.expiryDate), 'dd/MM/yyyy'),
-                cert.daysOverdue.toString()
-              ])}
+              data={expiredCertifications
+                .slice(0, 12)
+                .map((cert) => [
+                  cert.pilot,
+                  cert.employeeId,
+                  cert.checkType,
+                  format(new Date(cert.expiryDate), 'dd/MM/yyyy'),
+                  cert.daysOverdue.toString(),
+                ])}
               statusColumn={4}
             />
 
@@ -218,13 +278,15 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
             <PDFTable
               headers={['Pilot', 'Employee ID', 'Certification', 'Expiry Date', 'Days Remaining']}
               columnWidths={['25%', '15%', '25%', '20%', '15%']}
-              data={expiringCertifications.slice(0, 10).map(cert => [
-                cert.pilot,
-                cert.employeeId,
-                cert.checkType,
-                format(new Date(cert.expiryDate), 'dd/MM/yyyy'),
-                cert.daysUntilExpiry.toString()
-              ])}
+              data={expiringCertifications
+                .slice(0, 10)
+                .map((cert) => [
+                  cert.pilot,
+                  cert.employeeId,
+                  cert.checkType,
+                  format(new Date(cert.expiryDate), 'dd/MM/yyyy'),
+                  cert.daysUntilExpiry.toString(),
+                ])}
               statusColumn={4}
             />
 
@@ -247,10 +309,14 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         <View style={{ position: 'absolute', bottom: 80, left: 0, right: 0 }}>
           <AlertBox type="info" title="Report Notes">
             <Text>
-              • This report is generated from live database information and reflects current status as of {format(new Date(metadata.generatedAt), 'dd/MM/yyyy HH:mm')}.
-              {'\n'}• Compliance percentages are calculated based on current certifications vs. total required certifications.
-              {'\n'}• Risk levels: LOW (0 expired), MEDIUM (1-2 expired), HIGH (3-4 expired), CRITICAL (5+ expired).
-              {'\n'}• This document contains sensitive operational information and should be treated as confidential.
+              • This report is generated from live database information and reflects current status
+              as of {format(new Date(metadata.generatedAt), 'dd/MM/yyyy HH:mm')}.{'\n'}• Compliance
+              percentages are calculated based on current certifications vs. total required
+              certifications.
+              {'\n'}• Risk levels: LOW (0 expired), MEDIUM (1-2 expired), HIGH (3-4 expired),
+              CRITICAL (5+ expired).
+              {'\n'}• This document contains sensitive operational information and should be treated
+              as confidential.
             </Text>
           </AlertBox>
         </View>
@@ -258,40 +324,66 @@ export const CompliancePDFDocument: React.FC<CompliancePDFDocumentProps> = ({ re
         <PDFFooter pageNumber={3} totalPages={3} />
       </Page>
     </Document>
-  )
-}
+  );
+};
 
 /**
  * Risk Assessment PDF Document for focused risk analysis
  */
 interface RiskAssessmentPDFProps {
-  reportData: ComplianceReportData
+  reportData: ComplianceReportData;
 }
 
 export const RiskAssessmentPDFDocument: React.FC<RiskAssessmentPDFProps> = ({ reportData }) => {
-  const { metadata, overview, expiredCertifications, expiringCertifications, pilotComplianceStatus } = reportData
+  const {
+    metadata,
+    overview,
+    expiredCertifications,
+    expiringCertifications,
+    pilotComplianceStatus,
+  } = reportData;
 
-  const highRiskPilots = pilotComplianceStatus.filter(p => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL')
-  const mediumRiskPilots = pilotComplianceStatus.filter(p => p.riskLevel === 'MEDIUM')
+  const highRiskPilots = pilotComplianceStatus.filter(
+    (p) => p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL'
+  );
+  const mediumRiskPilots = pilotComplianceStatus.filter((p) => p.riskLevel === 'MEDIUM');
 
   return (
     <Document>
       <Page size="A4" style={pdfStyles.page}>
-        <PDFHeader metadata={{
-          ...metadata,
-          title: 'Fleet Risk Assessment Report',
-          subtitle: 'Critical and High-Risk Certification Analysis'
-        }} />
+        <PDFHeader
+          metadata={{
+            ...metadata,
+            title: 'Fleet Risk Assessment Report',
+            subtitle: 'Critical and High-Risk Certification Analysis',
+          }}
+        />
 
         {/* Risk Overview */}
         <Section title="Risk Assessment Overview">
           <SummaryStats
             stats={[
-              { label: 'Critical Risk Pilots', value: pilotComplianceStatus.filter(p => p.riskLevel === 'CRITICAL').length, status: 'critical' },
-              { label: 'High Risk Pilots', value: pilotComplianceStatus.filter(p => p.riskLevel === 'HIGH').length, status: 'expired' },
+              {
+                label: 'Critical Risk Pilots',
+                value: pilotComplianceStatus.filter((p) => p.riskLevel === 'CRITICAL').length,
+                status: 'critical',
+              },
+              {
+                label: 'High Risk Pilots',
+                value: pilotComplianceStatus.filter((p) => p.riskLevel === 'HIGH').length,
+                status: 'expired',
+              },
               { label: 'Medium Risk Pilots', value: mediumRiskPilots.length, status: 'expiring' },
-              { label: 'Expired Certifications', value: overview.expiredCertifications, status: 'expired' },
-              { label: 'Expiring (7 Days)', value: expiredCertifications.filter(c => c.daysOverdue <= 7).length, status: 'critical' },
+              {
+                label: 'Expired Certifications',
+                value: overview.expiredCertifications,
+                status: 'expired',
+              },
+              {
+                label: 'Expiring (7 Days)',
+                value: expiredCertifications.filter((c) => c.daysOverdue <= 7).length,
+                status: 'critical',
+              },
             ]}
           />
         </Section>
@@ -299,8 +391,8 @@ export const RiskAssessmentPDFDocument: React.FC<RiskAssessmentPDFProps> = ({ re
         {/* Critical Alerts */}
         <AlertBox type="critical" title="🚨 IMMEDIATE ACTION REQUIRED">
           <Text>
-            {highRiskPilots.length} pilots are classified as HIGH or CRITICAL risk due to expired certifications.
-            This poses significant operational and regulatory compliance risks.
+            {highRiskPilots.length} pilots are classified as HIGH or CRITICAL risk due to expired
+            certifications. This poses significant operational and regulatory compliance risks.
           </Text>
         </AlertBox>
 
@@ -310,13 +402,13 @@ export const RiskAssessmentPDFDocument: React.FC<RiskAssessmentPDFProps> = ({ re
             <PDFTable
               headers={['Pilot', 'Employee ID', 'Role', 'Expired', 'Risk Level', 'Priority Action']}
               columnWidths={['22%', '12%', '12%', '10%', '12%', '32%']}
-              data={highRiskPilots.map(pilot => [
+              data={highRiskPilots.map((pilot) => [
                 `${pilot.pilot.first_name} ${pilot.pilot.last_name}`,
                 pilot.pilot.employee_id,
                 pilot.pilot.role,
                 pilot.expiredChecks.toString(),
                 pilot.riskLevel,
-                pilot.priorityActions[0] || 'Schedule immediate renewal'
+                pilot.priorityActions[0] || 'Schedule immediate renewal',
               ])}
               statusColumn={4}
             />
@@ -326,18 +418,25 @@ export const RiskAssessmentPDFDocument: React.FC<RiskAssessmentPDFProps> = ({ re
         {/* Expired Certifications Detail */}
         <Section title="Expired Certifications by Severity">
           <PDFTable
-            headers={['Pilot', 'Certification', 'Expired Date', 'Days Overdue', 'Category', 'Severity']}
+            headers={[
+              'Pilot',
+              'Certification',
+              'Expired Date',
+              'Days Overdue',
+              'Category',
+              'Severity',
+            ]}
             columnWidths={['20%', '20%', '15%', '12%', '18%', '15%']}
             data={expiredCertifications
               .sort((a, b) => b.daysOverdue - a.daysOverdue)
               .slice(0, 15)
-              .map(cert => [
+              .map((cert) => [
                 cert.pilot,
                 cert.checkType,
                 format(new Date(cert.expiryDate), 'dd/MM/yyyy'),
                 cert.daysOverdue.toString(),
                 cert.category,
-                cert.daysOverdue > 30 ? 'CRITICAL' : cert.daysOverdue > 14 ? 'HIGH' : 'MEDIUM'
+                cert.daysOverdue > 30 ? 'CRITICAL' : cert.daysOverdue > 14 ? 'HIGH' : 'MEDIUM',
               ])}
             statusColumn={5}
           />
@@ -346,5 +445,5 @@ export const RiskAssessmentPDFDocument: React.FC<RiskAssessmentPDFProps> = ({ re
         <PDFFooter pageNumber={1} totalPages={1} />
       </Page>
     </Document>
-  )
-}
+  );
+};

@@ -1,93 +1,93 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { format, differenceInDays } from 'date-fns'
-import { updateLeaveRequestStatus, type LeaveRequest } from '@/lib/leave-service'
-import { useAuth } from '@/contexts/AuthContext'
-import { permissions } from '@/lib/auth-utils'
+import { useState } from 'react';
+import { format, differenceInDays } from 'date-fns';
+import { updateLeaveRequestStatus, type LeaveRequest } from '@/lib/leave-service';
+import { useAuth } from '@/contexts/AuthContext';
+import { permissions } from '@/lib/auth-utils';
 
 interface LeaveApprovalWorkflowProps {
-  request: LeaveRequest
-  onUpdate: (updatedRequest: LeaveRequest) => void
-  onError: (error: string) => void
+  request: LeaveRequest;
+  onUpdate: (updatedRequest: LeaveRequest) => void;
+  onError: (error: string) => void;
 }
 
 export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveApprovalWorkflowProps) {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [showReviewForm, setShowReviewForm] = useState(false)
-  const [reviewComments, setReviewComments] = useState('')
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewComments, setReviewComments] = useState('');
 
   if (!user || !permissions.canApprove(user)) {
-    return null
+    return null;
   }
 
   const handleStatusUpdate = async (status: 'APPROVED' | 'DENIED') => {
-    if (!user) return
+    if (!user) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
       const updatedRequest = await updateLeaveRequestStatus(
         request.id,
         status,
         user.id,
         reviewComments || undefined
-      )
-      onUpdate(updatedRequest)
-      setShowReviewForm(false)
-      setReviewComments('')
+      );
+      onUpdate(updatedRequest);
+      setShowReviewForm(false);
+      setReviewComments('');
     } catch (error) {
-      console.error('Error updating leave request:', error)
-      onError(error instanceof Error ? error.message : 'Failed to update leave request')
+      console.error('Error updating leave request:', error);
+      onError(error instanceof Error ? error.message : 'Failed to update leave request');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       case 'APPROVED':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'DENIED':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
-        return '⏳'
+        return '⏳';
       case 'APPROVED':
-        return '✅'
+        return '✅';
       case 'DENIED':
-        return '❌'
+        return '❌';
       default:
-        return '❓'
+        return '❓';
     }
-  }
+  };
 
   const getLeaveTypeIcon = (type: string) => {
     switch (type) {
       case 'RDO':
-        return '🏠'
+        return '🏠';
       case 'SDO':
-        return '🌴'
+        return '🌴';
       case 'ANNUAL':
-        return '🏖️'
+        return '🏖️';
       case 'SICK':
-        return '🏥'
+        return '🏥';
       default:
-        return '📋'
+        return '📋';
     }
-  }
+  };
 
   const calculateDays = () => {
-    return differenceInDays(new Date(request.end_date), new Date(request.start_date)) + 1
-  }
+    return differenceInDays(new Date(request.end_date), new Date(request.start_date)) + 1;
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
@@ -97,15 +97,15 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
           <div className="flex items-center space-x-3">
             <span className="text-2xl">{getLeaveTypeIcon(request.request_type)}</span>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {request.pilot_name}
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">{request.pilot_name}</h3>
               <p className="text-sm text-gray-600">
                 {request.employee_id} • {request.request_type} Request
               </p>
             </div>
           </div>
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}>
+          <span
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(request.status)}`}
+          >
             <span className="mr-1">{getStatusIcon(request.status)}</span>
             {request.status}
           </span>
@@ -125,19 +125,27 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Start Date:</span>
-                <span className="text-sm font-medium">{format(new Date(request.start_date), 'dd MMM yyyy')}</span>
+                <span className="text-sm font-medium">
+                  {format(new Date(request.start_date), 'dd MMM yyyy')}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">End Date:</span>
-                <span className="text-sm font-medium">{format(new Date(request.end_date), 'dd MMM yyyy')}</span>
+                <span className="text-sm font-medium">
+                  {format(new Date(request.end_date), 'dd MMM yyyy')}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Duration:</span>
-                <span className="text-sm font-medium">{calculateDays()} day{calculateDays() !== 1 ? 's' : ''}</span>
+                <span className="text-sm font-medium">
+                  {calculateDays()} day{calculateDays() !== 1 ? 's' : ''}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Requested:</span>
-                <span className="text-sm font-medium">{format(new Date(request.created_at), 'dd MMM yyyy HH:mm')}</span>
+                <span className="text-sm font-medium">
+                  {format(new Date(request.created_at), 'dd MMM yyyy HH:mm')}
+                </span>
               </div>
             </div>
           </div>
@@ -150,11 +158,15 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
                 <>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Reviewed By:</span>
-                    <span className="text-sm font-medium">{request.reviewer_name || 'Unknown'}</span>
+                    <span className="text-sm font-medium">
+                      {request.reviewer_name || 'Unknown'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Reviewed At:</span>
-                    <span className="text-sm font-medium">{format(new Date(request.reviewed_at), 'dd MMM yyyy HH:mm')}</span>
+                    <span className="text-sm font-medium">
+                      {format(new Date(request.reviewed_at), 'dd MMM yyyy HH:mm')}
+                    </span>
                   </div>
                   {request.review_comments && (
                     <div>
@@ -208,8 +220,8 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
                 <div className="flex items-center justify-end space-x-3">
                   <button
                     onClick={() => {
-                      setShowReviewForm(false)
-                      setReviewComments('')
+                      setShowReviewForm(false);
+                      setReviewComments('');
                     }}
                     disabled={loading}
                     className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -247,5 +259,5 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,10 +1,10 @@
 // Pilot service client using Supabase
 // Re-export all types and functions from the real pilot service
 
-import * as pilotService from './pilot-service'
+import * as pilotService from './pilot-service';
 
 // Re-export all types
-export * from './pilot-service'
+export * from './pilot-service';
 
 // Export all functions from the pilot service
 export const {
@@ -27,7 +27,7 @@ export const {
   // New dashboard statistics functions
   getFleetUtilization,
   getDashboardStats,
-  getRecentActivity
-} = pilotService
+  getRecentActivity,
+} = pilotService;
 
-console.log('🚀 Using REAL pilot service with Supabase')
+console.log('🚀 Using REAL pilot service with Supabase');

@@ -1,222 +1,257 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Calendar, ChevronLeft, ChevronRight, User, Clock, Eye, Grid, List, MapPin } from 'lucide-react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths, parseISO, isWithinInterval, startOfYear, endOfYear, eachMonthOfInterval, addYears, subYears } from 'date-fns'
+import { useState, useEffect } from 'react';
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Clock,
+  Eye,
+  Grid,
+  List,
+  MapPin,
+} from 'lucide-react';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  isToday,
+  addMonths,
+  subMonths,
+  parseISO,
+  isWithinInterval,
+  startOfYear,
+  endOfYear,
+  eachMonthOfInterval,
+  addYears,
+  subYears,
+} from 'date-fns';
 
 interface LeaveEvent {
-  id: string
-  pilotName: string
-  employeeId: string
-  requestType: 'RDO' | 'SDO' | 'ANNUAL' | 'SICK' | 'LSL' | 'LWOP' | 'MATERNITY' | 'COMPASSIONATE'
-  startDate: Date
-  endDate: Date
-  status: 'PENDING' | 'APPROVED' | 'DENIED'
-  daysCount: number
+  id: string;
+  pilotName: string;
+  employeeId: string;
+  requestType: 'RDO' | 'SDO' | 'ANNUAL' | 'SICK' | 'LSL' | 'LWOP' | 'MATERNITY' | 'COMPASSIONATE';
+  startDate: Date;
+  endDate: Date;
+  status: 'PENDING' | 'APPROVED' | 'DENIED';
+  daysCount: number;
 }
 
 interface LeaveCalendarProps {
-  leaveRequests: LeaveEvent[]
-  onDateSelect?: (date: Date, events: LeaveEvent[]) => void
+  leaveRequests: LeaveEvent[];
+  onDateSelect?: (date: Date, events: LeaveEvent[]) => void;
 }
 
-type ViewMode = 'month' | 'year'
+type ViewMode = 'month' | 'year';
 
 const getLeaveTypeColor = (type: string) => {
   switch (type) {
     case 'RDO':
-      return 'bg-blue-500 text-white'
+      return 'bg-blue-500 text-white';
     case 'SDO':
-      return 'bg-green-500 text-white'
+      return 'bg-green-500 text-white';
     case 'ANNUAL':
-      return 'bg-purple-500 text-white'
+      return 'bg-purple-500 text-white';
     case 'SICK':
-      return 'bg-red-500 text-white'
+      return 'bg-red-500 text-white';
     case 'LSL':
-      return 'bg-indigo-500 text-white'
+      return 'bg-indigo-500 text-white';
     case 'LWOP':
-      return 'bg-gray-500 text-white'
+      return 'bg-gray-500 text-white';
     case 'MATERNITY':
-      return 'bg-pink-500 text-white'
+      return 'bg-pink-500 text-white';
     case 'COMPASSIONATE':
-      return 'bg-yellow-500 text-white'
+      return 'bg-yellow-500 text-white';
     default:
-      return 'bg-gray-500 text-white'
+      return 'bg-gray-500 text-white';
   }
-}
+};
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'APPROVED':
-      return 'bg-green-50 border-green-200'
+      return 'bg-green-50 border-green-200';
     case 'DENIED':
-      return 'bg-red-50 border-red-200'
+      return 'bg-red-50 border-red-200';
     case 'PENDING':
-      return 'bg-yellow-50 border-yellow-200'
+      return 'bg-yellow-50 border-yellow-200';
     default:
-      return 'bg-gray-50 border-gray-200'
+      return 'bg-gray-50 border-gray-200';
   }
-}
+};
 
 const getLeaveTypeIcon = (type: string) => {
   switch (type) {
     case 'RDO':
-      return '🏠'
+      return '🏠';
     case 'SDO':
-      return '🌴'
+      return '🌴';
     case 'ANNUAL':
-      return '🏖️'
+      return '🏖️';
     case 'SICK':
-      return '🏥'
+      return '🏥';
     case 'LSL':
-      return '🎓'
+      return '🎓';
     case 'LWOP':
-      return '💼'
+      return '💼';
     case 'MATERNITY':
-      return '👶'
+      return '👶';
     case 'COMPASSIONATE':
-      return '💙'
+      return '💙';
     default:
-      return '📅'
+      return '📅';
   }
-}
+};
 
 export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProps) {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [viewMode, setViewMode] = useState<ViewMode>('month')
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
 
   // Get events for a specific date
   const getEventsForDate = (date: Date): LeaveEvent[] => {
-    return leaveRequests.filter(request =>
+    return leaveRequests.filter((request) =>
       isWithinInterval(date, { start: request.startDate, end: request.endDate })
-    )
-  }
+    );
+  };
 
-  const getDateStatus = (date: Date): { hasEvents: boolean; eventCount: number; types: string[]; statuses: string[] } => {
-    const events = getEventsForDate(date)
+  const getDateStatus = (
+    date: Date
+  ): { hasEvents: boolean; eventCount: number; types: string[]; statuses: string[] } => {
+    const events = getEventsForDate(date);
     if (events.length === 0) {
-      return { hasEvents: false, eventCount: 0, types: [], statuses: [] }
+      return { hasEvents: false, eventCount: 0, types: [], statuses: [] };
     }
 
-    const types = Array.from(new Set(events.map(e => e.requestType)))
-    const statuses = Array.from(new Set(events.map(e => e.status)))
+    const types = Array.from(new Set(events.map((e) => e.requestType)));
+    const statuses = Array.from(new Set(events.map((e) => e.status)));
 
-    return { hasEvents: true, eventCount: events.length, types, statuses }
-  }
+    return { hasEvents: true, eventCount: events.length, types, statuses };
+  };
 
   const handleDateClick = (date: Date) => {
-    setSelectedDate(date)
-    const events = getEventsForDate(date)
-    onDateSelect?.(date, events)
-  }
+    setSelectedDate(date);
+    const events = getEventsForDate(date);
+    onDateSelect?.(date, events);
+  };
 
   const navigateTime = (direction: 'prev' | 'next') => {
     if (viewMode === 'month') {
-      setCurrentDate(prev => direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1))
+      setCurrentDate((prev) => (direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1)));
     } else {
-      setCurrentDate(prev => direction === 'prev' ? subYears(prev, 1) : addYears(prev, 1))
+      setCurrentDate((prev) => (direction === 'prev' ? subYears(prev, 1) : addYears(prev, 1)));
     }
-  }
+  };
 
   const getDayClasses = (date: Date) => {
-    const { hasEvents, eventCount, statuses } = getDateStatus(date)
-    const baseClasses = "relative flex items-center justify-center text-sm cursor-pointer transition-all duration-200 rounded-lg"
+    const { hasEvents, eventCount, statuses } = getDateStatus(date);
+    const baseClasses =
+      'relative flex items-center justify-center text-sm cursor-pointer transition-all duration-200 rounded-lg';
 
-    let classes = baseClasses
+    let classes = baseClasses;
 
     if (viewMode === 'month') {
-      classes += " w-full h-12"
+      classes += ' w-full h-12';
     } else {
-      classes += " w-8 h-8 m-0.5"
+      classes += ' w-8 h-8 m-0.5';
     }
 
     // Month styling
     if (!isSameMonth(date, currentDate) && viewMode === 'month') {
-      classes += " text-gray-300"
+      classes += ' text-gray-300';
     } else {
-      classes += " text-gray-900"
+      classes += ' text-gray-900';
     }
 
     // Today styling
     if (isToday(date)) {
-      classes += " ring-2 ring-blue-500 font-bold bg-blue-50"
+      classes += ' ring-2 ring-blue-500 font-bold bg-blue-50';
     }
 
     // Selected date styling
     if (selectedDate && isSameDay(date, selectedDate)) {
-      classes += " bg-[#E4002B] text-white shadow-lg"
+      classes += ' bg-[#E4002B] text-white shadow-lg';
     } else if (hasEvents) {
       // Event status styling - prioritize most important status
       if (statuses.includes('DENIED')) {
-        classes += " bg-red-500 text-white font-semibold shadow-md hover:bg-red-600"
+        classes += ' bg-red-500 text-white font-semibold shadow-md hover:bg-red-600';
       } else if (statuses.includes('PENDING')) {
-        classes += " bg-yellow-400 text-gray-900 font-semibold shadow-md hover:bg-yellow-500"
+        classes += ' bg-yellow-400 text-gray-900 font-semibold shadow-md hover:bg-yellow-500';
       } else if (statuses.includes('APPROVED')) {
-        classes += " bg-green-500 text-white font-semibold shadow-md hover:bg-green-600"
+        classes += ' bg-green-500 text-white font-semibold shadow-md hover:bg-green-600';
       }
     } else {
-      classes += " hover:bg-gray-100 hover:shadow-sm"
+      classes += ' hover:bg-gray-100 hover:shadow-sm';
     }
 
-    return classes
-  }
+    return classes;
+  };
 
   const getMonthEvents = (monthDate: Date) => {
-    const monthStart = startOfMonth(monthDate)
-    const monthEnd = endOfMonth(monthDate)
-    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+    const monthStart = startOfMonth(monthDate);
+    const monthEnd = endOfMonth(monthDate);
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     return monthDays.reduce((count, day) => {
-      const events = getEventsForDate(day)
-      return count + events.length
-    }, 0)
-  }
+      const events = getEventsForDate(day);
+      return count + events.length;
+    }, 0);
+  };
 
   const getMonthStatus = (monthDate: Date) => {
-    const monthStart = startOfMonth(monthDate)
-    const monthEnd = endOfMonth(monthDate)
-    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+    const monthStart = startOfMonth(monthDate);
+    const monthEnd = endOfMonth(monthDate);
+    const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-    let hasDenied = false
-    let hasPending = false
-    let hasApproved = false
+    let hasDenied = false;
+    let hasPending = false;
+    let hasApproved = false;
 
     for (const day of monthDays) {
-      const events = getEventsForDate(day)
+      const events = getEventsForDate(day);
       for (const event of events) {
-        if (event.status === 'DENIED') hasDenied = true
-        if (event.status === 'PENDING') hasPending = true
-        if (event.status === 'APPROVED') hasApproved = true
+        if (event.status === 'DENIED') hasDenied = true;
+        if (event.status === 'PENDING') hasPending = true;
+        if (event.status === 'APPROVED') hasApproved = true;
       }
     }
 
-    if (hasDenied) return 'denied'
-    if (hasPending) return 'pending'
-    if (hasApproved) return 'approved'
-    return 'normal'
-  }
+    if (hasDenied) return 'denied';
+    if (hasPending) return 'pending';
+    if (hasApproved) return 'approved';
+    return 'normal';
+  };
 
   const renderMonthView = () => {
-    const monthStart = startOfMonth(currentDate)
-    const monthEnd = endOfMonth(currentDate)
-    const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     return (
       <div className="p-6">
         {/* Days of week header */}
         <div className="grid grid-cols-7 gap-2 mb-4">
-          {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-            <div key={day} className="h-10 flex items-center justify-center text-sm font-semibold text-gray-600 bg-gray-50 rounded-lg">
-              {day.substring(0, 3)}
-            </div>
-          ))}
+          {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
+            (day) => (
+              <div
+                key={day}
+                className="h-10 flex items-center justify-center text-sm font-semibold text-gray-600 bg-gray-50 rounded-lg"
+              >
+                {day.substring(0, 3)}
+              </div>
+            )
+          )}
         </div>
 
         {/* Calendar days */}
         <div className="grid grid-cols-7 gap-2">
-          {calendarDays.map(date => {
-            const { hasEvents, eventCount, types } = getDateStatus(date)
+          {calendarDays.map((date) => {
+            const { hasEvents, eventCount, types } = getDateStatus(date);
             return (
               <div
                 key={date.toISOString()}
@@ -227,7 +262,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
                 {hasEvents && (
                   <>
                     <div className="absolute top-1 right-1 text-xs">
-                      {getLeaveTypeIcon(types[0])}
+                      {types[0] && getLeaveTypeIcon(types[0])}
                     </div>
                     {eventCount > 1 && (
                       <div className="absolute bottom-1 left-1 bg-white text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow">
@@ -237,39 +272,47 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
                   </>
                 )}
               </div>
-            )
+            );
           })}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderYearView = () => {
-    const yearStart = startOfYear(currentDate)
-    const yearEnd = endOfYear(currentDate)
-    const months = eachMonthOfInterval({ start: yearStart, end: yearEnd })
+    const yearStart = startOfYear(currentDate);
+    const yearEnd = endOfYear(currentDate);
+    const months = eachMonthOfInterval({ start: yearStart, end: yearEnd });
 
     return (
       <div className="p-6">
         <div className="grid grid-cols-3 gap-6">
-          {months.map(month => {
-            const monthStart = startOfMonth(month)
-            const monthEnd = endOfMonth(month)
-            const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
-            const eventCount = getMonthEvents(month)
-            const monthStatus = getMonthStatus(month)
+          {months.map((month) => {
+            const monthStart = startOfMonth(month);
+            const monthEnd = endOfMonth(month);
+            const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+            const eventCount = getMonthEvents(month);
+            const monthStatus = getMonthStatus(month);
 
             return (
-              <div key={month.toISOString()} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div
+                key={month.toISOString()}
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-semibold text-gray-900">{format(month, 'MMMM')}</h4>
                   {eventCount > 0 && (
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      monthStatus === 'denied' ? 'bg-red-500 text-white' :
-                      monthStatus === 'pending' ? 'bg-yellow-400 text-gray-900' :
-                      monthStatus === 'approved' ? 'bg-green-500 text-white' :
-                      'bg-gray-400 text-white'
-                    }`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        monthStatus === 'denied'
+                          ? 'bg-red-500 text-white'
+                          : monthStatus === 'pending'
+                            ? 'bg-yellow-400 text-gray-900'
+                            : monthStatus === 'approved'
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-400 text-white'
+                      }`}
+                    >
                       {eventCount}
                     </div>
                   )}
@@ -278,34 +321,37 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
                 {/* Mini calendar grid */}
                 <div className="grid grid-cols-7 gap-px bg-gray-200 rounded">
                   {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-                    <div key={index} className="bg-gray-50 text-xs text-gray-500 p-1 text-center font-medium">
+                    <div
+                      key={index}
+                      className="bg-gray-50 text-xs text-gray-500 p-1 text-center font-medium"
+                    >
                       {day}
                     </div>
                   ))}
-                  {monthDays.map(date => {
-                    const { hasEvents, eventCount } = getDateStatus(date)
+                  {monthDays.map((date) => {
+                    const { hasEvents, eventCount } = getDateStatus(date);
                     return (
                       <div
                         key={date.toISOString()}
                         className={getDayClasses(date)}
                         onClick={() => {
-                          setViewMode('month')
-                          setCurrentDate(date)
-                          handleDateClick(date)
+                          setViewMode('month');
+                          setCurrentDate(date);
+                          handleDateClick(date);
                         }}
                       >
                         <span className="text-xs">{format(date, 'd')}</span>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
@@ -328,9 +374,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
               <button
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'month'
-                    ? 'bg-white text-[#E4002B]'
-                    : 'text-red-100 hover:text-white'
+                  viewMode === 'month' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <Grid className="w-4 h-4 inline mr-1" />
@@ -339,9 +383,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
               <button
                 onClick={() => setViewMode('year')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'year'
-                    ? 'bg-white text-[#E4002B]'
-                    : 'text-red-100 hover:text-white'
+                  viewMode === 'year' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <List className="w-4 h-4 inline mr-1" />
@@ -360,8 +402,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
               <h4 className="text-lg font-semibold min-w-[160px] text-center">
                 {viewMode === 'month'
                   ? format(currentDate, 'MMMM yyyy')
-                  : format(currentDate, 'yyyy')
-                }
+                  : format(currentDate, 'yyyy')}
               </h4>
               <button
                 onClick={() => navigateTime('next')}
@@ -427,21 +468,29 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
                           </span>
                         </div>
                         <div className="flex items-center space-x-3 mb-2">
-                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${getLeaveTypeColor(event.requestType)}`}>
+                          <span
+                            className={`px-3 py-1 text-xs rounded-full font-medium ${getLeaveTypeColor(event.requestType)}`}
+                          >
                             {event.requestType}
                           </span>
-                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${
-                            event.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                            event.status === 'DENIED' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span
+                            className={`px-3 py-1 text-xs rounded-full font-medium ${
+                              event.status === 'APPROVED'
+                                ? 'bg-green-100 text-green-800'
+                                : event.status === 'DENIED'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
                             {event.status}
                           </span>
                         </div>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <div className="flex items-center space-x-1">
                             <Clock className="w-3 h-3" />
-                            <span>{event.daysCount} day{event.daysCount !== 1 ? 's' : ''}</span>
+                            <span>
+                              {event.daysCount} day{event.daysCount !== 1 ? 's' : ''}
+                            </span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <MapPin className="w-3 h-3" />
@@ -465,5 +514,5 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
         </div>
       )}
     </div>
-  )
+  );
 }

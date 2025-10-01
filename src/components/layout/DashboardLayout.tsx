@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
-import { getRoleDisplayName, getRoleColor, permissions } from '@/lib/auth-utils'
-import { getCurrentRosterPeriod, formatRosterPeriod } from '@/lib/roster-utils'
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { getRoleDisplayName, getRoleColor, permissions } from '@/lib/auth-utils';
+import { getCurrentRosterPeriod, formatRosterPeriod } from '@/lib/roster-utils';
 
 interface DashboardLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, logout } = useAuth()
-  const pathname = usePathname()
-  const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [currentRoster, setCurrentRoster] = useState<any>(null)
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentRoster, setCurrentRoster] = useState<any>(null);
 
   useEffect(() => {
-    const roster = getCurrentRosterPeriod()
-    setCurrentRoster(roster)
-  }, [])
+    const roster = getCurrentRosterPeriod();
+    setCurrentRoster(roster);
+  }, []);
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: '🏠', description: 'Overview and analytics' },
@@ -33,11 +33,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: '📄',
       description: 'Track certifications',
       submenu: [
-        { name: 'Certification List', href: '/dashboard/certifications', description: 'Manage certifications' },
-        { name: 'Bulk Updates', href: '/dashboard/certifications/bulk', description: 'Mass certification updates' },
-        { name: 'Expiry Calendar', href: '/dashboard/certifications/calendar', description: 'Visual expiry timeline' },
-        { name: 'Expiry Planning', href: '/dashboard/certifications/expiry-planning', description: 'Plan certification renewals' }
-      ]
+        {
+          name: 'Certification List',
+          href: '/dashboard/certifications',
+          description: 'Manage certifications',
+        },
+        {
+          name: 'Bulk Updates',
+          href: '/dashboard/certifications/bulk',
+          description: 'Mass certification updates',
+        },
+        {
+          name: 'Expiry Calendar',
+          href: '/dashboard/certifications/calendar',
+          description: 'Visual expiry timeline',
+        },
+        {
+          name: 'Expiry Planning',
+          href: '/dashboard/certifications/expiry-planning',
+          description: 'Plan certification renewals',
+        },
+      ],
     },
     {
       name: 'Leave Requests',
@@ -46,33 +62,64 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       description: 'Manage leave requests',
       submenu: [
         { name: 'Leave Requests', href: '/dashboard/leave', description: 'Manage requests' },
-        { name: 'Leave Calendar', href: '/dashboard/leave/calendar', description: 'Visual leave timeline' },
-        { name: 'Roster Planning', href: '/dashboard/leave/roster-planning', description: 'Future roster leave planning' }
-      ]
+        {
+          name: 'Leave Calendar',
+          href: '/dashboard/leave/calendar',
+          description: 'Visual leave timeline',
+        },
+        {
+          name: 'Roster Planning',
+          href: '/dashboard/leave/roster-planning',
+          description: 'Future roster leave planning',
+        },
+      ],
     },
-    { name: 'Reports', href: '/dashboard/reports', icon: '📊', description: 'Fleet reports', requiresPermission: 'reports' },
-    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', description: 'System configuration', requiresPermission: 'settings' },
-  ]
+    {
+      name: 'Reports',
+      href: '/dashboard/reports',
+      icon: '📊',
+      description: 'Fleet reports',
+      requiresPermission: 'reports',
+    },
+    {
+      name: 'Audit Logs',
+      href: '/dashboard/audit',
+      icon: '🔍',
+      description: 'System audit trail',
+      requiresPermission: 'audit',
+    },
+    {
+      name: 'Settings',
+      href: '/dashboard/settings',
+      icon: '⚙️',
+      description: 'System configuration',
+      requiresPermission: 'settings',
+    },
+  ];
 
-  const filteredNavigation = navigation.filter(item => {
-    if (!item.requiresPermission) return true
+  const filteredNavigation = navigation.filter((item) => {
+    if (!item.requiresPermission) return true;
 
     if (item.requiresPermission === 'reports') {
-      return permissions.canViewReports(user)
+      return permissions.canViewReports(user);
+    }
+    if (item.requiresPermission === 'audit') {
+      // Only admins can view audit logs
+      return permissions.canCreate(user);
     }
     if (item.requiresPermission === 'settings') {
-      return permissions.canManageSettings ? permissions.canManageSettings(user) : false
+      return permissions.canManageSettings ? permissions.canManageSettings(user) : false;
     }
-    return true
-  })
+    return true;
+  });
 
   const handleLogout = async () => {
-    await logout()
-    router.push('/')
-  }
+    await logout();
+    router.push('/');
+  };
 
   // Notifications would come from real data in a complete implementation
-  const notifications: any[] = []
+  const notifications: any[] = [];
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -97,7 +144,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             onClick={() => setSidebarOpen(false)}
             aria-label="Close navigation menu"
           />
-          <nav className="relative flex w-full max-w-xs flex-col bg-white shadow-2xl" aria-label="Main navigation">
+          <nav
+            className="relative flex w-full max-w-xs flex-col bg-white shadow-2xl"
+            aria-label="Main navigation"
+          >
             <div className="absolute top-0 right-0 -mr-14 p-1">
               <button
                 type="button"
@@ -105,7 +155,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close navigation menu"
               >
-                <span className="h-6 w-6 text-white text-2xl" aria-hidden="true">✖️</span>
+                <span className="h-6 w-6 text-white text-2xl" aria-hidden="true">
+                  ✖️
+                </span>
               </button>
             </div>
 
@@ -138,7 +190,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium text-white">{currentRoster.code}</p>
-                        <p className="text-red-100 text-xs">{currentRoster.daysRemaining} days remaining</p>
+                        <p className="text-red-100 text-xs">
+                          {currentRoster.daysRemaining} days remaining
+                        </p>
                       </div>
                       <span className="w-4 h-4 text-red-200">🕐</span>
                     </div>
@@ -149,23 +203,21 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               {/* Mobile Navigation */}
               <nav className="px-4 space-y-2" role="navigation" aria-label="Main navigation">
                 {filteredNavigation.map((item) => {
-                  const isMainActive = pathname === item.href
-                  const hasSubmenuActive = item.submenu?.some(sub => pathname === sub.href)
-                  const isActive = isMainActive || hasSubmenuActive
+                  const isMainActive = pathname === item.href;
+                  const hasSubmenuActive = item.submenu?.some((sub) => pathname === sub.href);
+                  const isActive = isMainActive || hasSubmenuActive;
 
                   return (
                     <div key={item.name}>
                       <Link
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
-                        className={`mobile-nav-item ${
-                          isActive
-                            ? 'active'
-                            : ''
-                        }`}
+                        className={`mobile-nav-item ${isActive ? 'active' : ''}`}
                         aria-current={isActive ? 'page' : undefined}
                       >
-                        <span className="h-5 w-5 mr-3 text-lg" aria-hidden="true">{item.icon}</span>
+                        <span className="h-5 w-5 mr-3 text-lg" aria-hidden="true">
+                          {item.icon}
+                        </span>
                         <div className="flex-1">
                           <p className="font-medium">{item.name}</p>
                           <p className="text-xs opacity-75">{item.description}</p>
@@ -192,7 +244,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         </div>
                       )}
                     </div>
-                  )
+                  );
                 })}
               </nav>
 
@@ -207,7 +259,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                   <div className="ml-3 flex-1">
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                    <p className={`text-xs px-2 py-1 rounded-full inline-block mt-1 ${getRoleColor(user?.role || 'manager')}`}>
+                    <p
+                      className={`text-xs px-2 py-1 rounded-full inline-block mt-1 ${getRoleColor(user?.role || 'manager')}`}
+                    >
                       {getRoleDisplayName(user?.role || 'manager')}
                     </p>
                   </div>
@@ -217,7 +271,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     title="Sign Out"
                     aria-label="Sign out of your account"
                   >
-                    <span className="h-5 w-5 text-lg" aria-hidden="true">🚪</span>
+                    <span className="h-5 w-5 text-lg" aria-hidden="true">
+                      🚪
+                    </span>
                   </button>
                 </div>
               </div>
@@ -258,10 +314,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                 className="p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors touch-target"
-                aria-label={sidebarCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu'}
+                aria-label={
+                  sidebarCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu'
+                }
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
-                <span className={`h-4 w-4 transform transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} aria-hidden="true">▶️</span>
+                <span
+                  className={`h-4 w-4 transform transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                >
+                  ▶️
+                </span>
               </button>
             </div>
           </div>
@@ -279,7 +342,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 <div>
                   <p className="text-lg font-bold text-white">{currentRoster.code}</p>
-                  <p className="text-red-100 text-sm">{currentRoster.daysRemaining} days remaining</p>
+                  <p className="text-red-100 text-sm">
+                    {currentRoster.daysRemaining} days remaining
+                  </p>
                 </div>
               </div>
             </div>
@@ -299,22 +364,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Desktop Navigation */}
           <nav className={`flex-1 space-y-1 ${sidebarCollapsed ? 'px-2' : 'px-4'}`}>
             {filteredNavigation.map((item) => {
-              const isMainActive = pathname === item.href
-              const hasSubmenuActive = item.submenu?.some(sub => pathname === sub.href)
-              const isActive = isMainActive || hasSubmenuActive
+              const isMainActive = pathname === item.href;
+              const hasSubmenuActive = item.submenu?.some((sub) => pathname === sub.href);
+              const isActive = isMainActive || hasSubmenuActive;
 
               return (
                 <div key={item.name}>
                   <Link
                     href={item.href}
                     className={`nav-link group relative ${
-                      isActive
-                        ? 'nav-link-active'
-                        : 'nav-link-inactive'
+                      isActive ? 'nav-link-active' : 'nav-link-inactive'
                     } ${sidebarCollapsed ? 'justify-center' : ''}`}
                     title={sidebarCollapsed ? `${item.name} - ${item.description}` : undefined}
                   >
-                    <span className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} text-lg`}>{item.icon}</span>
+                    <span className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} text-lg`}>
+                      {item.icon}
+                    </span>
                     {!sidebarCollapsed && (
                       <div className="flex-1">
                         <p className="font-medium">{item.name}</p>
@@ -350,7 +415,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                   )}
                 </div>
-              )
+              );
             })}
           </nav>
 
@@ -358,7 +423,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {!sidebarCollapsed && (
             <div className="px-4 mb-4">
               <div className="bg-gray-50 rounded-xl p-4">
-                <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wider">System Status</h4>
+                <h4 className="text-xs font-medium text-gray-600 mb-3 uppercase tracking-wider">
+                  System Status
+                </h4>
                 <div className="space-y-2">
                   <div className="flex items-center text-xs">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow"></div>
@@ -381,7 +448,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {!sidebarCollapsed && (
             <div className="px-4 mb-4">
               <div className="bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-xl p-4 text-white">
-                <h4 className="text-xs font-medium mb-3 uppercase tracking-wider opacity-90">About</h4>
+                <h4 className="text-xs font-medium mb-3 uppercase tracking-wider opacity-90">
+                  About
+                </h4>
                 <div className="space-y-3">
                   <div>
                     <h5 className="text-sm font-semibold mb-1 flex items-center">
@@ -389,7 +458,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       Air Niugini B767 PMS
                     </h5>
                     <p className="text-xs opacity-80 leading-relaxed">
-                      Professional pilot management system for Papua New Guinea's national airline fleet operations.
+                      Professional pilot management system for Papua New Guinea's national airline
+                      fleet operations.
                     </p>
                   </div>
 
@@ -428,7 +498,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <>
                   <div className="ml-3 flex-1">
                     <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                    <p className={`text-xs px-2 py-1 rounded-full inline-block mt-1 ${getRoleColor(user?.role || 'manager')}`}>
+                    <p
+                      className={`text-xs px-2 py-1 rounded-full inline-block mt-1 ${getRoleColor(user?.role || 'manager')}`}
+                    >
                       {getRoleDisplayName(user?.role || 'manager')}
                     </p>
                   </div>
@@ -468,7 +540,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               aria-expanded={sidebarOpen}
               aria-controls="mobile-sidebar"
             >
-              <span className="h-5 w-5 text-lg" aria-hidden="true">☰</span>
+              <span className="h-5 w-5 text-lg" aria-hidden="true">
+                ☰
+              </span>
             </button>
 
             <div className="flex items-center">
@@ -482,7 +556,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 aria-label={`Notifications${notifications.length > 0 ? ` (${notifications.length} new)` : ''}`}
                 title="View notifications"
               >
-                <span className="h-5 w-5" aria-hidden="true">🔔</span>
+                <span className="h-5 w-5" aria-hidden="true">
+                  🔔
+                </span>
                 {notifications.length > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     <span className="sr-only">{notifications.length} new notifications</span>
@@ -496,7 +572,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 aria-label="Sign out of your account"
                 title="Sign out"
               >
-                <span className="h-5 w-5" aria-hidden="true">🚪</span>
+                <span className="h-5 w-5" aria-hidden="true">
+                  🚪
+                </span>
               </button>
             </div>
           </div>
@@ -508,5 +586,5 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </main>
       </div>
     </div>
-  )
+  );
 }

@@ -1,45 +1,45 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { getFutureRosterPeriods, formatRosterPeriod, RosterPeriod } from '@/lib/roster-utils'
+import { useState, useEffect } from 'react';
+import { getFutureRosterPeriods, formatRosterPeriod, RosterPeriod } from '@/lib/roster-utils';
 
 interface RosterPeriodSelectorProps {
-  selectedPeriod: string | null
-  onPeriodChange: (period: string) => void
-  monthsAhead?: number
-  className?: string
+  selectedPeriod: string | null;
+  onPeriodChange: (period: string) => void;
+  monthsAhead?: number;
+  className?: string;
 }
 
 export function RosterPeriodSelector({
   selectedPeriod,
   onPeriodChange,
   monthsAhead = 12,
-  className = ''
+  className = '',
 }: RosterPeriodSelectorProps) {
-  const [futureRosters, setFutureRosters] = useState<RosterPeriod[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [futureRosters, setFutureRosters] = useState<RosterPeriod[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadFutureRosters = async () => {
       try {
-        setIsLoading(true)
-        const rosters = getFutureRosterPeriods(monthsAhead)
-        setFutureRosters(rosters)
+        setIsLoading(true);
+        const rosters = getFutureRosterPeriods(monthsAhead);
+        setFutureRosters(rosters);
 
         // Auto-select the next roster period if none selected
-        if (!selectedPeriod && rosters.length > 1) {
+        if (!selectedPeriod && rosters.length > 1 && rosters[1]) {
           // Skip current roster (index 0), select next roster (index 1)
-          onPeriodChange(rosters[1].code)
+          onPeriodChange(rosters[1].code);
         }
       } catch (error) {
-        console.error('Error loading future roster periods:', error)
+        console.error('Error loading future roster periods:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadFutureRosters()
-  }, [monthsAhead, selectedPeriod, onPeriodChange])
+    loadFutureRosters();
+  }, [monthsAhead, selectedPeriod, onPeriodChange]);
 
   if (isLoading) {
     return (
@@ -51,7 +51,7 @@ export function RosterPeriodSelector({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (futureRosters.length === 0) {
@@ -61,16 +61,14 @@ export function RosterPeriodSelector({
           <span className="text-sm text-gray-600">No future roster periods available</span>
         </div>
       </div>
-    )
+    );
   }
 
-  const selectedRoster = futureRosters.find(r => r.code === selectedPeriod)
+  const selectedRoster = futureRosters.find((r) => r.code === selectedPeriod);
 
   return (
     <div className={`relative ${className}`}>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Select Roster Period
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Select Roster Period</label>
 
       <select
         value={selectedPeriod || ''}
@@ -120,5 +118,5 @@ export function RosterPeriodSelector({
         Air Niugini operates on 28-day roster periods for B767 fleet planning
       </div>
     </div>
-  )
+  );
 }

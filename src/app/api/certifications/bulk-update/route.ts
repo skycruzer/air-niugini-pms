@@ -1,44 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 interface BulkUpdateRequest {
-  checkTypeId: string
-  newExpiryDate: string
-  selectedPilots: string[]
+  checkTypeId: string;
+  newExpiryDate: string;
+  selectedPilots: string[];
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body: BulkUpdateRequest = await request.json()
-    const { checkTypeId, newExpiryDate, selectedPilots } = body
+    const body: BulkUpdateRequest = await request.json();
+    const { checkTypeId, newExpiryDate, selectedPilots } = body;
 
     if (!checkTypeId || !newExpiryDate || !selectedPilots || selectedPilots.length === 0) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
-      )
+      );
     }
 
-    console.log('🔍 API /certifications/bulk-update: Starting bulk update')
-    console.log('🔍 Check Type ID:', checkTypeId)
-    console.log('🔍 New Expiry Date:', newExpiryDate)
-    console.log('🔍 Selected Pilots:', selectedPilots.length)
+    console.log('🔍 API /certifications/bulk-update: Starting bulk update');
+    console.log('🔍 Check Type ID:', checkTypeId);
+    console.log('🔍 New Expiry Date:', newExpiryDate);
+    console.log('🔍 Selected Pilots:', selectedPilots.length);
 
-    const supabaseAdmin = getSupabaseAdmin()
+    const supabaseAdmin = getSupabaseAdmin();
 
     // Validate check type exists
     const { data: checkType, error: checkTypeError } = await supabaseAdmin
       .from('check_types')
       .select('check_code, check_description')
       .eq('id', checkTypeId)
-      .single()
+      .single();
 
     if (checkTypeError || !checkType) {
-      console.error('🚨 Invalid check type ID:', checkTypeId)
+      console.error('🚨 Invalid check type ID:', checkTypeId);
       return NextResponse.json(
         { success: false, error: 'Invalid check type selected' },
         { status: 400 }
-      )
+      );
     }
 
     // Validate pilots exist
@@ -46,51 +46,51 @@ export async function POST(request: NextRequest) {
       .from('pilots')
       .select('id, first_name, last_name, employee_id')
       .in('id', selectedPilots)
-      .eq('is_active', true)
+      .eq('is_active', true);
 
     if (pilotsError) {
-      console.error('🚨 Error validating pilots:', pilotsError)
+      console.error('🚨 Error validating pilots:', pilotsError);
       return NextResponse.json(
         { success: false, error: 'Error validating selected pilots' },
         { status: 500 }
-      )
+      );
     }
 
     if (!pilots || pilots.length !== selectedPilots.length) {
-      console.error('🚨 Some selected pilots not found or inactive')
+      console.error('🚨 Some selected pilots not found or inactive');
       return NextResponse.json(
         { success: false, error: 'Some selected pilots are invalid or inactive' },
         { status: 400 }
-      )
+      );
     }
 
     // Prepare bulk upsert data
-    const updates = selectedPilots.map(pilotId => ({
+    const updates = selectedPilots.map((pilotId) => ({
       pilot_id: pilotId,
       check_type_id: checkTypeId,
       expiry_date: newExpiryDate,
-      updated_at: new Date().toISOString()
-    }))
+      updated_at: new Date().toISOString(),
+    }));
 
-    console.log('🔧 Performing bulk upsert for', updates.length, 'records')
+    console.log('🔧 Performing bulk upsert for', updates.length, 'records');
 
     // Perform bulk upsert
     const { data, error: upsertError } = await supabaseAdmin
       .from('pilot_checks')
       .upsert(updates, {
-        onConflict: 'pilot_id,check_type_id'
+        onConflict: 'pilot_id,check_type_id',
       })
-      .select()
+      .select();
 
     if (upsertError) {
-      console.error('🚨 Bulk upsert error:', upsertError)
+      console.error('🚨 Bulk upsert error:', upsertError);
       return NextResponse.json(
         { success: false, error: 'Failed to update certifications' },
         { status: 500 }
-      )
+      );
     }
 
-    console.log('✅ Bulk update successful:', data?.length || 0, 'records updated')
+    console.log('✅ Bulk update successful:', data?.length || 0, 'records updated');
 
     return NextResponse.json({
       success: true,
@@ -98,14 +98,10 @@ export async function POST(request: NextRequest) {
       pilots: selectedPilots.length,
       checkType: checkType.check_code,
       expiryDate: newExpiryDate,
-      message: `Successfully updated ${checkType.check_code} certification for ${selectedPilots.length} pilots`
-    })
-
+      message: `Successfully updated ${checkType.check_code} certification for ${selectedPilots.length} pilots`,
+    });
   } catch (error) {
-    console.error('🚨 API /certifications/bulk-update: Fatal error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    console.error('🚨 API /certifications/bulk-update: Fatal error:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
