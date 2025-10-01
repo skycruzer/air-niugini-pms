@@ -26,12 +26,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-import {
-  getCertificationAnalytics,
-  getPilotAnalytics,
-  getTrendAnalytics,
-  getLeaveAnalytics,
-} from '@/lib/analytics-service';
+// Removed direct service imports - using API routes instead
 import type {
   CertificationAnalytics,
   PilotAnalytics,
@@ -68,17 +63,29 @@ export function AnalyticsDashboard() {
       setRefreshing(true);
       console.log('📊 Loading analytics data...');
 
-      const [certifications, pilots, trends, leave] = await Promise.all([
-        getCertificationAnalytics(),
-        getPilotAnalytics(),
-        getTrendAnalytics(12),
-        getLeaveAnalytics(),
+      // Fetch data from API routes instead of direct service calls
+      const [certificationsRes, pilotsRes, trendsRes, leaveRes] = await Promise.all([
+        fetch('/api/analytics/certification'),
+        fetch('/api/analytics/pilot'),
+        fetch('/api/analytics/trends?months=12'),
+        fetch('/api/analytics/leave'),
       ]);
 
-      setCertificationData(certifications);
-      setPilotData(pilots);
-      setTrendData(trends);
-      setLeaveData(leave);
+      if (!certificationsRes.ok || !pilotsRes.ok || !trendsRes.ok || !leaveRes.ok) {
+        throw new Error('Failed to fetch analytics data');
+      }
+
+      const [certifications, pilots, trends, leave] = await Promise.all([
+        certificationsRes.json(),
+        pilotsRes.json(),
+        trendsRes.json(),
+        leaveRes.json(),
+      ]);
+
+      setCertificationData(certifications.data);
+      setPilotData(pilots.data);
+      setTrendData(trends.data);
+      setLeaveData(leave.data);
       setError(null);
     } catch (err) {
       console.error('❌ Error loading analytics:', err);
