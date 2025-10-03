@@ -31,6 +31,7 @@ export default function LeaveRequestsPage() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'denied'>(
     'all'
   );
+  const [filterNextRosterOnly, setFilterNextRosterOnly] = useState(false);
   const [currentRoster, setCurrentRoster] = useState<RosterPeriod>(getCurrentRosterPeriod());
   const [leaveRequests, setLeaveRequests] = useState<LeaveEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,8 +126,9 @@ export default function LeaveRequestsPage() {
   const handleViewPendingRequests = () => {
     // Switch to Requests tab
     setActiveTab('requests');
-    // Filter to pending requests
+    // Filter to pending requests for NEXT ROSTER ONLY
     setFilterStatus('pending');
+    setFilterNextRosterOnly(true);
     // Scroll to requests list after a short delay to allow tab switch
     setTimeout(() => {
       const requestsSection = document.getElementById('requests-list');
@@ -328,7 +330,10 @@ export default function LeaveRequestsPage() {
                 ].map((filter) => (
                   <button
                     key={filter.value}
-                    onClick={() => setFilterStatus(filter.value as typeof filterStatus)}
+                    onClick={() => {
+                      setFilterStatus(filter.value as typeof filterStatus);
+                      setFilterNextRosterOnly(false); // Reset roster filter when user manually changes status
+                    }}
                     className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
                       filterStatus === filter.value
                         ? 'bg-[#E4002B] text-white'
@@ -346,6 +351,7 @@ export default function LeaveRequestsPage() {
                 refreshTrigger={refreshTrigger}
                 filterStatus={filterStatus}
                 onStatsUpdate={handleStatsUpdate}
+                filterNextRosterOnly={filterNextRosterOnly}
               />
             </>
           )}

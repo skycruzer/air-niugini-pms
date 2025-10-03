@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import {
   getAllLeaveRequests,
   getPendingLeaveRequests,
@@ -10,6 +10,7 @@ import {
   type LeaveRequest,
   type LeaveRequestStats,
 } from '@/lib/leave-service';
+import { getCurrentRosterPeriod } from '@/lib/roster-utils';
 import { LeaveRequestForm } from './LeaveRequestForm';
 import { LeaveRequestEditModal } from './LeaveRequestEditModal';
 import { LeaveRequestReviewModal } from './LeaveRequestReviewModal';
@@ -20,12 +21,14 @@ interface LeaveRequestsListProps {
   refreshTrigger?: number;
   filterStatus?: 'all' | 'pending' | 'approved' | 'denied';
   onStatsUpdate?: (stats: LeaveRequestStats) => void;
+  filterNextRosterOnly?: boolean; // Filter to show only next roster period requests
 }
 
 export function LeaveRequestsList({
   refreshTrigger,
   filterStatus = 'all',
   onStatsUpdate,
+  filterNextRosterOnly = false,
 }: LeaveRequestsListProps) {
   const { user } = useAuth();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
@@ -51,6 +54,21 @@ export function LeaveRequestsList({
       // Apply client-side filtering for non-pending statuses
       if (filterStatus !== 'all' && filterStatus !== 'pending') {
         requestsData = requestsData.filter((req) => req.status === filterStatus.toUpperCase());
+      }
+
+      // Apply next roster period filter if specified
+      if (filterNextRosterOnly) {
+        const currentRoster = getCurrentRosterPeriod();
+        const nextRosterStartDate = new Date(currentRoster.endDate);
+        nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1); // Day after current roster ends
+
+        const nextRosterEndDate = new Date(nextRosterStartDate);
+        nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day roster period
+
+        requestsData = requestsData.filter((req) => {
+          const startDate = parseISO(req.start_date);
+          return startDate >= nextRosterStartDate && startDate <= nextRosterEndDate;
+        });
       }
 
       setRequests(requestsData);
@@ -96,7 +114,7 @@ export function LeaveRequestsList({
 
   useEffect(() => {
     loadRequests();
-  }, [refreshTrigger, filterStatus]);
+  }, [refreshTrigger, filterStatus, filterNextRosterOnly]);
 
   const handleRequestUpdate = (updatedRequest: LeaveRequest) => {
     setRequests((prevRequests) =>
