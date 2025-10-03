@@ -8,6 +8,7 @@
  * - Does NOT alert for current roster period
  * - Does NOT include following rosters beyond next roster
  * - pendingCount should be filtered to only include requests starting within NEXT roster period
+ * - ONLY shows alert if there are pending requests (pendingCount > 0)
  *
  * Alert Severity Levels:
  * - URGENT (≤7 days): Red alert with immediate action required
@@ -44,8 +45,9 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
 
   if (!alert) return null;
 
-  // Only show alert if within review window OR if there are pending requests
-  if (!alert.isWithinReviewWindow && pendingCount === 0) {
+  // Only show alert if there are pending requests for next roster
+  // No pending requests = no alert (even if within review window)
+  if (pendingCount === 0) {
     return null;
   }
 
@@ -179,14 +181,6 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
             </div>
           )}
 
-          {/* Success Message (no pending) */}
-          {pendingCount === 0 && alert.isWithinReviewWindow && (
-            <div className="mt-4 p-4 rounded-lg bg-green-100 border-2 border-green-300">
-              <p className="font-bold text-green-900">
-                ✅ All leave requests reviewed! Roster {alert.nextRoster.code} is ready.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
