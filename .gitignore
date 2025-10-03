@@ -15,6 +15,9 @@ build/
 .env.test.local
 .env.production.local
 
+# MCP configuration (contains API keys)
+.mcp.json
+
 # IDE
 .vscode/
 .idea/
@@ -63,9 +66,16 @@ screenshots/
 
 # Test results and reports
 test-results/
-*.png
-*.jpg
-*.jpeg
+# Ignore test screenshots but allow public images
+/screenshots/*.png
+/test-results/*.png
+/playwright-report/**/*.png
+/playwright-report/**/*.jpg
+/playwright-report/**/*.jpeg
+# Don't ignore public images
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.jpeg
 
 # Playwright cache
 .playwright-mcp/
