@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { differenceInDays, addDays, format } from 'date-fns';
 import { getSupabaseAdmin } from '@/lib/supabase';
 
@@ -127,10 +128,13 @@ export default async function HomePage() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-30"></div>
                   <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <img
+                    <Image
                       src="/images/air-niugini-logo.jpg"
                       alt="Air Niugini Logo"
+                      width={48}
+                      height={48}
                       className="w-12 h-12 object-contain"
+                      priority
                     />
                   </div>
                 </div>
@@ -170,10 +174,13 @@ export default async function HomePage() {
             <div className="flex-shrink-0 animate-slide-in-right">
               {/* B767 Hero Image */}
               <div className="mb-6">
-                <img
+                <Image
                   src="/images/air-niugini-50th-anniversary.jpg"
                   alt="Air Niugini 50 Years - 1973-2023"
+                  width={672}
+                  height={245}
                   className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
+                  priority
                 />
               </div>
               <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
@@ -400,14 +407,16 @@ export default async function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center">
             <div className="flex items-center mb-6">
-              <img
+              <Image
                 src="/images/air-niugini-logo.jpg"
                 alt="Air Niugini Logo"
+                width={32}
+                height={32}
                 className="w-8 h-8 object-contain mr-3"
               />
               <div>
                 <h4 className="text-xl font-bold">Air Niugini</h4>
-                <p className="text-gray-400 text-sm">Papua New Guinea's National Airline</p>
+                <p className="text-gray-400 text-sm">Papua New Guinea&apos;s National Airline</p>
               </div>
             </div>
 
