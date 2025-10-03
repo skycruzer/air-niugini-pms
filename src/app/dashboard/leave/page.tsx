@@ -320,30 +320,61 @@ export default function LeaveRequestsPage() {
           {activeTab === 'requests' && (
             <>
               {/* Filters */}
-              <div id="requests-list" className="flex items-center space-x-4 mb-6">
-                <span className="text-sm font-medium text-gray-700">Filter by status:</span>
-                {[
-                  { value: 'all', label: 'All Requests', icon: '📋' },
-                  { value: 'pending', label: 'Pending', icon: '⏳' },
-                  { value: 'approved', label: 'Approved', icon: '✅' },
-                  { value: 'denied', label: 'Denied', icon: '❌' },
-                ].map((filter) => (
-                  <button
-                    key={filter.value}
-                    onClick={() => {
-                      setFilterStatus(filter.value as typeof filterStatus);
-                      setFilterNextRosterOnly(false); // Reset roster filter when user manually changes status
-                    }}
-                    className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
-                      filterStatus === filter.value
-                        ? 'bg-[#E4002B] text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <span className="mr-1">{filter.icon}</span>
-                    {filter.label}
-                  </button>
-                ))}
+              <div id="requests-list" className="space-y-4 mb-6">
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm font-medium text-gray-700">Filter by status:</span>
+                  {[
+                    { value: 'all', label: 'All Requests', icon: '📋' },
+                    { value: 'pending', label: 'Pending', icon: '⏳' },
+                    { value: 'approved', label: 'Approved', icon: '✅' },
+                    { value: 'denied', label: 'Denied', icon: '❌' },
+                  ].map((filter) => (
+                    <button
+                      key={filter.value}
+                      onClick={() => {
+                        setFilterStatus(filter.value as typeof filterStatus);
+                        setFilterNextRosterOnly(false); // Reset roster filter when user manually changes status
+                      }}
+                      className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
+                        filterStatus === filter.value
+                          ? 'bg-[#E4002B] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <span className="mr-1">{filter.icon}</span>
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Roster Period Filter (only show for pending status) */}
+                {filterStatus === 'pending' && (
+                  <div className="flex items-center space-x-4 pl-4 border-l-2 border-gray-200">
+                    <span className="text-sm font-medium text-gray-700">Roster period:</span>
+                    <button
+                      onClick={() => setFilterNextRosterOnly(false)}
+                      className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
+                        !filterNextRosterOnly
+                          ? 'bg-[#E4002B] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <span className="mr-1">📅</span>
+                      All Rosters
+                    </button>
+                    <button
+                      onClick={() => setFilterNextRosterOnly(true)}
+                      className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
+                        filterNextRosterOnly
+                          ? 'bg-[#E4002B] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <span className="mr-1">🎯</span>
+                      Next Roster Only
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Requests List */}
