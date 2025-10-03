@@ -1,15 +1,16 @@
 /**
  * LEAVE ELIGIBILITY ALERT COMPONENT
  *
- * Displays eligibility warnings, conflicts, and seniority-based recommendations
- * for leave requests. Shows real-time crew availability impact.
+ * Displays seniority-based priority review when multiple pilots request same dates.
+ * Always shows all conflicting requests sorted by seniority, regardless of crew availability.
  *
  * Features:
- * - Color-coded alerts (green/yellow/red) based on recommendation
+ * - Always displays when 2+ pilots request same/overlapping dates
+ * - Lists ALL pilots sorted by seniority priority (Rank → Seniority Number)
+ * - Shows crew availability status (sufficient vs. shortage risk)
  * - Detailed conflict information with affected dates
- * - Alternative pilot recommendations sorted by seniority
- * - Crew availability projections
- * - Expandable sections for detailed analysis
+ * - Color-coded border: green (sufficient crew) vs. yellow (shortage risk)
+ * - Consistent blue background for informational seniority comparison
  */
 
 'use client';
@@ -66,10 +67,11 @@ export function LeaveEligibilityAlert({
   const hasSufficientCrew = eligibility.recommendation === 'APPROVE' ||
     (eligibility.reasons && eligibility.reasons.some(r => r.includes('Sufficient')));
 
-  const bgColor = hasSufficientCrew ? 'bg-green-50' : 'bg-blue-50';
-  const borderColor = hasSufficientCrew ? 'border-green-300' : 'border-blue-300';
-  const headerColor = hasSufficientCrew ? 'text-green-900' : 'text-blue-900';
-  const headerIcon = hasSufficientCrew ? '✅' : '⚖️';
+  // Always use blue theme for seniority comparison (informational)
+  const bgColor = 'bg-blue-50';
+  const borderColor = hasSufficientCrew ? 'border-green-400' : 'border-yellow-400';
+  const headerColor = 'text-blue-900';
+  const headerIcon = '⚖️';
 
   return (
     <div className={`${bgColor} border-2 ${borderColor} rounded-lg p-5 mb-4`}>
@@ -77,15 +79,18 @@ export function LeaveEligibilityAlert({
       <div className="mb-4">
         <h4 className={`font-bold ${headerColor} text-lg flex items-center`}>
           <span className="mr-2">{headerIcon}</span>
-          {hasSufficientCrew
-            ? 'Crew Availability: Sufficient - Multiple Pilots Requesting Same Dates'
-            : 'Seniority Priority Review - Crew Shortage Risk'}
+          Multiple Pilots Requesting Same Dates - Seniority Priority Review
         </h4>
         {pilotName && (
-          <p className={`text-sm ${hasSufficientCrew ? 'text-green-800' : 'text-blue-800'} mt-1`}>
+          <p className="text-sm text-blue-800 mt-1">
             Reviewing request for: <strong>{pilotName}</strong>
           </p>
         )}
+        <p className="text-sm text-blue-700 mt-2">
+          {hasSufficientCrew
+            ? '✅ Crew Availability: Sufficient crew available - All requests can be approved'
+            : '⚠️ Crew Availability: Crew shortage risk - Use seniority priority for approval decisions'}
+        </p>
       </div>
 
       {/* Approval Decision Summary */}
@@ -151,15 +156,32 @@ export function LeaveEligibilityAlert({
           </div>
         )}
 
-        <div className={`text-sm ${hasSufficientCrew ? 'text-green-900 bg-green-100 border-green-200' : 'text-blue-900 bg-blue-100 border-blue-200'} rounded p-3 mb-3 border`}>
-          <strong>📋 {hasSufficientCrew ? 'Multiple Requests Detected' : 'Seniority Comparison'}:</strong> Multiple pilots have requested overlapping or nearby dates. {hasSufficientCrew ? 'Review details below for complete information.' : 'Priority is determined by rank and seniority number (lower = higher priority).'}
+        {/* Priority Rules Section */}
+        <div className="text-sm bg-blue-100 border-2 border-blue-300 rounded-lg p-4 mb-4">
+          <div className="flex items-start mb-2">
+            <span className="text-xl mr-2">⚖️</span>
+            <div className="flex-1">
+              <h5 className="font-bold text-blue-900 text-base mb-2">Seniority Priority Rules</h5>
+              <div className="bg-white rounded p-3 text-blue-900">
+                <p className="mb-2">
+                  <strong>Priority Determination:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-sm ml-2">
+                  <li><strong>1st:</strong> Rank (Captain has priority over First Officer)</li>
+                  <li><strong>2nd:</strong> Seniority Number (Lower number = Higher priority)</li>
+                </ul>
+                <p className="text-sm mt-3">
+                  All requests below are sorted by seniority priority. The highest priority pilot is listed first.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {eligibility.conflictingRequests && eligibility.conflictingRequests.length > 0 && (
-          <div className="text-sm font-bold text-green-900 bg-green-100 rounded p-3 mb-3 border-2 border-green-500">
-            🏆 <strong>PRIORITY PILOT:</strong> {eligibility.conflictingRequests[0]?.role} - Seniority #{eligibility.conflictingRequests[0]?.seniorityNumber}: {eligibility.conflictingRequests[0]?.pilotName}
-            {eligibility.conflictingRequests[0]?.pilotName === pilotName && <span className="ml-2">(Current Request - APPROVE)</span>}
-            {eligibility.conflictingRequests[0]?.pilotName !== pilotName && <span className="ml-2">(Approve this pilot first)</span>}
+          <div className="text-sm font-bold text-blue-900 bg-blue-100 rounded p-3 mb-3 border-2 border-blue-500">
+            🏆 <strong>HIGHEST PRIORITY:</strong> {eligibility.conflictingRequests[0]?.role} - Seniority #{eligibility.conflictingRequests[0]?.seniorityNumber}: {eligibility.conflictingRequests[0]?.pilotName}
+            {eligibility.conflictingRequests[0]?.pilotName === pilotName && <span className="ml-2">(Current Request)</span>}
           </div>
         )}
 
