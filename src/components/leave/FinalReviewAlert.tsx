@@ -4,9 +4,10 @@
  * Displays a prominent alert 22 days before next roster period begins
  * Reminds administrators to review and finalize pending leave requests
  *
- * IMPORTANT: Only shows alerts for NEXT roster and FOLLOWING rosters
+ * IMPORTANT: Review deadline applies ONLY to NEXT roster period
  * - Does NOT alert for current roster period
- * - pendingCount should be filtered to only include requests starting in future rosters
+ * - Does NOT include following rosters beyond next roster
+ * - pendingCount should be filtered to only include requests starting within NEXT roster period
  *
  * Alert Severity Levels:
  * - URGENT (≤7 days): Red alert with immediate action required
@@ -21,7 +22,7 @@ import { getFinalReviewAlert, type FinalReviewAlert as AlertData, formatRosterPe
 import { AlertTriangle, Clock, Info } from 'lucide-react';
 
 interface FinalReviewAlertProps {
-  pendingCount: number; // Count of pending requests for NEXT roster and FOLLOWING rosters only
+  pendingCount: number; // Count of pending requests for NEXT roster period ONLY
 }
 
 export function FinalReviewAlert({ pendingCount }: FinalReviewAlertProps) {
@@ -128,12 +129,12 @@ export function FinalReviewAlert({ pendingCount }: FinalReviewAlertProps) {
             </div>
 
             <div>
-              <p className="text-sm text-gray-600 mb-1">Pending Requests (Future Rosters)</p>
+              <p className="text-sm text-gray-600 mb-1">Pending Requests (Next Roster)</p>
               <p className={`font-bold text-2xl ${pendingCount > 0 ? 'text-[#E4002B]' : 'text-green-600'}`}>
                 {pendingCount}
               </p>
               <p className="text-xs text-gray-500">
-                {pendingCount === 0 ? 'All reviewed ✓' : `For ${alert.nextRoster.code}+`}
+                {pendingCount === 0 ? 'All reviewed ✓' : `For ${alert.nextRoster.code}`}
               </p>
             </div>
 
@@ -155,7 +156,7 @@ export function FinalReviewAlert({ pendingCount }: FinalReviewAlertProps) {
                 ⚠️ ACTION REQUIRED:
               </p>
               <ul className={`list-disc list-inside space-y-1 text-sm ${alert.severity === 'urgent' ? 'text-red-800' : 'text-yellow-800'}`}>
-                <li>Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code} and following rosters</li>
+                <li>Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code}</li>
                 <li>Check crew availability and seniority priorities</li>
                 <li>Approve or deny requests before {alert.nextRoster.code} begins</li>
                 <li>Ensure minimum 10 Captains and 10 First Officers maintained</li>

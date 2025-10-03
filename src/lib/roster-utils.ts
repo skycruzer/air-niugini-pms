@@ -420,9 +420,11 @@ export interface FinalReviewAlert {
  * Check if we're within 22 days before next roster period starts
  * This triggers a final review alert for pending leave requests
  *
- * IMPORTANT: Alert is ONLY for NEXT roster and FUTURE rosters, NOT current roster
+ * IMPORTANT: Review deadline applies ONLY to NEXT roster period
+ * - NOT for current roster period (already in progress)
+ * - NOT for following rosters beyond next roster (reviewed later)
  * - Review window opens 22 days BEFORE the next roster period STARTS
- * - This allows administrators to finalize leave requests before roster begins
+ * - This allows administrators to finalize leave requests for next roster before it begins
  */
 export function getFinalReviewAlert(): FinalReviewAlert {
   const REVIEW_WINDOW_DAYS = 22;

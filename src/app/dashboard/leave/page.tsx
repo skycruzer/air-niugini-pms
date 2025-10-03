@@ -69,24 +69,27 @@ export default function LeaveRequestsPage() {
     loadData();
   }, [refreshTrigger]);
 
-  // Calculate pending requests for NEXT roster and FOLLOWING rosters only (not current roster)
-  const getPendingCountForFutureRosters = () => {
+  // Calculate pending requests for NEXT ROSTER ONLY (review deadline is only for next roster)
+  const getPendingCountForNextRoster = () => {
     if (!stats) return 0;
 
     // Get all pending leave requests (status is lowercase 'pending' in LeaveEvent type)
     const pendingRequests = leaveRequests.filter(req => req.status.toLowerCase() === 'pending');
 
-    // Get next roster start date
-    const nextRoster = getCurrentRosterPeriod();
-    const nextRosterStartDate = new Date(nextRoster.endDate);
+    // Get next roster period boundaries
+    const currentRoster = getCurrentRosterPeriod();
+    const nextRosterStartDate = new Date(currentRoster.endDate);
     nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1); // Day after current roster ends
 
-    // Count only requests that START on or after next roster period
-    const futureRosterPendingCount = pendingRequests.filter(req => {
-      return req.startDate >= nextRosterStartDate;
+    const nextRosterEndDate = new Date(nextRosterStartDate);
+    nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day roster period (0-27 days)
+
+    // Count only requests that START within the NEXT roster period (not following rosters)
+    const nextRosterPendingCount = pendingRequests.filter(req => {
+      return req.startDate >= nextRosterStartDate && req.startDate <= nextRosterEndDate;
     }).length;
 
-    return futureRosterPendingCount;
+    return nextRosterPendingCount;
   };
 
   const handleModalSuccess = () => {
@@ -168,7 +171,7 @@ export default function LeaveRequestsPage() {
           </div>
 
           {/* Final Review Alert - 22 days before next roster */}
-          {stats && <FinalReviewAlert pendingCount={getPendingCountForFutureRosters()} />}
+          {stats && <FinalReviewAlert pendingCount={getPendingCountForNextRoster()} />}
 
           {/* Statistics */}
           {stats && (
