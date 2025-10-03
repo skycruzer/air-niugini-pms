@@ -56,24 +56,29 @@ export default function LoginPage() {
                 ← Back to Home
               </Link>
             </div>
-            <div className="flex items-center text-white">
+            <div className="flex items-center text-white group">
               <div className="relative mr-4">
-                <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-30"></div>
-                <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
+                {/* Enhanced glow effects */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-air-niugini-red to-air-niugini-gold rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity"></div>
+
+                {/* Logo container */}
+                <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md rounded-xl p-3 border-2 border-white/25 shadow-xl group-hover:scale-105 transition-transform duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/10 to-transparent rounded-xl"></div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/air-niugini-logo.jpg"
                     alt="Air Niugini Logo"
-                    width="32"
-                    height="32"
-                    className="w-8 h-8 object-contain"
+                    width="40"
+                    height="40"
+                    className="relative w-10 h-10 object-contain drop-shadow-xl"
                     loading="eager"
                   />
                 </div>
               </div>
               <div className="text-right">
-                <h1 className="text-xl font-bold">Air Niugini</h1>
-                <p className="text-xs text-blue-100">B767 Fleet Operations</p>
+                <h1 className="text-xl font-bold drop-shadow-lg">Air Niugini</h1>
+                <p className="text-xs text-blue-100 drop-shadow-md">B767 Fleet Operations</p>
               </div>
             </div>
           </div>

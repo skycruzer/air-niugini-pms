@@ -124,24 +124,32 @@ export default async function HomePage() {
             {/* Brand & Title */}
             <div className="flex-1 text-center lg:text-left animate-fade-in">
               <div className="flex items-center justify-center lg:justify-start mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-30"></div>
-                  <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                <div className="relative group">
+                  {/* Animated glow effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-air-niugini-red via-air-niugini-gold to-air-niugini-red rounded-full blur-xl opacity-75 group-hover:opacity-100 animate-pulse"></div>
+                  <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
+
+                  {/* Logo container with enhanced styling */}
+                  <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md rounded-2xl p-5 border-2 border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                    {/* Inner glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/20 to-transparent rounded-2xl"></div>
+
+                    {/* Logo image */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/images/air-niugini-logo.jpg"
                       alt="Air Niugini Logo"
-                      width="48"
-                      height="48"
-                      className="w-12 h-12 object-contain"
+                      width="56"
+                      height="56"
+                      className="relative w-14 h-14 object-contain drop-shadow-2xl"
                       loading="eager"
                     />
                   </div>
                 </div>
                 <div className="ml-6">
-                  <h1 className="text-display-medium text-white font-black">Air Niugini</h1>
-                  <p className="text-body-large text-blue-100 mt-1">
-                    Papua New Guinea's National Airline
+                  <h1 className="text-display-medium text-white font-black drop-shadow-lg">Air Niugini</h1>
+                  <p className="text-body-large text-blue-100 mt-1 drop-shadow-md">
+                    Papua New Guinea&apos;s National Airline
                   </p>
                 </div>
               </div>
@@ -407,17 +415,23 @@ export default async function HomePage() {
       <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center text-center">
-            <div className="flex items-center mb-6">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/air-niugini-logo.jpg"
-                alt="Air Niugini Logo"
-                width="32"
-                height="32"
-                className="w-8 h-8 object-contain mr-3"
-                loading="lazy"
-              />
-              <div>
+            <div className="flex items-center mb-6 group">
+              <div className="relative">
+                {/* Subtle glow for footer */}
+                <div className="absolute inset-0 bg-air-niugini-gold/30 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative bg-white/5 backdrop-blur-sm rounded-lg p-2 border border-white/10 group-hover:border-air-niugini-gold/50 transition-colors">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/air-niugini-logo.jpg"
+                    alt="Air Niugini Logo"
+                    width="32"
+                    height="32"
+                    className="w-8 h-8 object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="ml-3">
                 <h4 className="text-xl font-bold">Air Niugini</h4>
                 <p className="text-gray-400 text-sm">Papua New Guinea&apos;s National Airline</p>
               </div>
