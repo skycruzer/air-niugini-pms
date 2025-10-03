@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import dynamicImport from 'next/dynamic';
 
@@ -61,13 +60,14 @@ export default function LoginPage() {
               <div className="relative mr-4">
                 <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-30"></div>
                 <div className="relative bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/20">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src="/images/air-niugini-logo.jpg"
                     alt="Air Niugini Logo"
-                    width={32}
-                    height={32}
+                    width="32"
+                    height="32"
                     className="w-8 h-8 object-contain"
-                    priority
+                    loading="eager"
                   />
                 </div>
               </div>
@@ -107,13 +107,14 @@ export default function LoginPage() {
 
               {/* Air Niugini 50th Anniversary */}
               <div className="mb-8 flex justify-center lg:justify-start">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/images/air-niugini-50th-anniversary.jpg"
                   alt="Air Niugini 50 Years - 1973-2023"
-                  width={672}
-                  height={245}
+                  width="672"
+                  height="245"
                   className="w-full max-w-md rounded-2xl shadow-2xl object-cover h-48"
-                  priority
+                  loading="eager"
                 />
               </div>
 
