@@ -23,9 +23,10 @@ import { AlertTriangle, Clock, Info } from 'lucide-react';
 
 interface FinalReviewAlertProps {
   pendingCount: number; // Count of pending requests for NEXT roster period ONLY
+  onViewRequests?: () => void; // Callback to scroll to and show pending requests
 }
 
-export function FinalReviewAlert({ pendingCount }: FinalReviewAlertProps) {
+export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAlertProps) {
   const [alert, setAlert] = useState<AlertData | null>(null);
 
   useEffect(() => {
@@ -152,9 +153,23 @@ export function FinalReviewAlert({ pendingCount }: FinalReviewAlertProps) {
           {/* Action Required (only if pending requests) */}
           {pendingCount > 0 && alert.isWithinReviewWindow && (
             <div className={`mt-4 p-4 rounded-lg ${alert.severity === 'urgent' ? 'bg-red-100 border-2 border-red-300' : 'bg-yellow-100 border-2 border-yellow-300'}`}>
-              <p className={`font-bold mb-2 ${alert.severity === 'urgent' ? 'text-red-900' : 'text-yellow-900'}`}>
-                ⚠️ ACTION REQUIRED:
-              </p>
+              <div className="flex items-start justify-between mb-3">
+                <p className={`font-bold ${alert.severity === 'urgent' ? 'text-red-900' : 'text-yellow-900'}`}>
+                  ⚠️ ACTION REQUIRED:
+                </p>
+                {onViewRequests && (
+                  <button
+                    onClick={onViewRequests}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm ${
+                      alert.severity === 'urgent'
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                    }`}
+                  >
+                    📋 View Pending Requests
+                  </button>
+                )}
+              </div>
               <ul className={`list-disc list-inside space-y-1 text-sm ${alert.severity === 'urgent' ? 'text-red-800' : 'text-yellow-800'}`}>
                 <li>Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code}</li>
                 <li>Check crew availability and seniority priorities</li>

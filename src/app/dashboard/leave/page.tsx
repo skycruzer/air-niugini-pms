@@ -122,6 +122,20 @@ export default function LeaveRequestsPage() {
     setCurrentRoster(period);
   };
 
+  const handleViewPendingRequests = () => {
+    // Switch to Requests tab
+    setActiveTab('requests');
+    // Filter to pending requests
+    setFilterStatus('pending');
+    // Scroll to requests list after a short delay to allow tab switch
+    setTimeout(() => {
+      const requestsSection = document.getElementById('requests-list');
+      if (requestsSection) {
+        requestsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   return (
     <ProtectedRoute>
       <DashboardLayout>
@@ -171,7 +185,12 @@ export default function LeaveRequestsPage() {
           </div>
 
           {/* Final Review Alert - 22 days before next roster */}
-          {stats && <FinalReviewAlert pendingCount={getPendingCountForNextRoster()} />}
+          {stats && (
+            <FinalReviewAlert
+              pendingCount={getPendingCountForNextRoster()}
+              onViewRequests={handleViewPendingRequests}
+            />
+          )}
 
           {/* Statistics */}
           {stats && (
@@ -299,7 +318,7 @@ export default function LeaveRequestsPage() {
           {activeTab === 'requests' && (
             <>
               {/* Filters */}
-              <div className="flex items-center space-x-4 mb-6">
+              <div id="requests-list" className="flex items-center space-x-4 mb-6">
                 <span className="text-sm font-medium text-gray-700">Filter by status:</span>
                 {[
                   { value: 'all', label: 'All Requests', icon: '📋' },
