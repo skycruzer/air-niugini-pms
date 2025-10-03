@@ -401,3 +401,70 @@ export function formatCountdown(countdown: RosterCountdown): string {
     return `${countdown.seconds} seconds`;
   }
 }
+
+/**
+ * Final review alert interface
+ */
+export interface FinalReviewAlert {
+  isWithinReviewWindow: boolean;
+  daysUntilRosterStarts: number;
+  daysRemainingInWindow: number;
+  nextRoster: RosterPeriod;
+  currentRoster: RosterPeriod;
+  reviewDeadlineDate: Date;
+  severity: 'urgent' | 'warning' | 'info';
+  message: string;
+}
+
+/**
+ * Check if we're within 22 days before next roster period starts
+ * This triggers a final review alert for pending leave requests
+ *
+ * IMPORTANT: Alert is ONLY for NEXT roster and FUTURE rosters, NOT current roster
+ * - Review window opens 22 days BEFORE the next roster period STARTS
+ * - This allows administrators to finalize leave requests before roster begins
+ */
+export function getFinalReviewAlert(): FinalReviewAlert {
+  const REVIEW_WINDOW_DAYS = 22;
+  const now = new Date();
+  const current = getCurrentRosterPeriod();
+  const next = getNextRosterPeriod(current);
+
+  // Calculate days until NEXT roster starts (not current roster)
+  const daysUntilRosterStarts = differenceInDays(next.startDate, now);
+  const daysRemainingInWindow = Math.max(0, daysUntilRosterStarts);
+
+  // Within review window = 22 days or less before NEXT roster starts
+  const isWithinReviewWindow = daysUntilRosterStarts <= REVIEW_WINDOW_DAYS && daysUntilRosterStarts >= 0;
+
+  // Calculate the review deadline (22 days before NEXT roster starts)
+  const reviewDeadlineDate = addDays(next.startDate, -REVIEW_WINDOW_DAYS);
+
+  let severity: 'urgent' | 'warning' | 'info';
+  let message: string;
+
+  if (daysUntilRosterStarts <= 3) {
+    severity = 'urgent';
+    message = `URGENT: Next roster ${next.code} starts in ${daysUntilRosterStarts} day(s)! All pending leave for ${next.code} must be reviewed immediately.`;
+  } else if (daysUntilRosterStarts <= 7) {
+    severity = 'urgent';
+    message = `URGENT: Next roster ${next.code} starts in ${daysUntilRosterStarts} days. Final review window - approve or deny all pending leave requests for ${next.code}.`;
+  } else if (isWithinReviewWindow) {
+    severity = 'warning';
+    message = `REVIEW REQUIRED: Next roster ${next.code} starts in ${daysUntilRosterStarts} days. Please review and finalize all pending leave requests for ${next.code}.`;
+  } else {
+    severity = 'info';
+    message = `Next roster ${next.code} starts in ${daysUntilRosterStarts} days. Review window opens in ${daysUntilRosterStarts - REVIEW_WINDOW_DAYS} days.`;
+  }
+
+  return {
+    isWithinReviewWindow,
+    daysUntilRosterStarts,
+    daysRemainingInWindow,
+    nextRoster: next,
+    currentRoster: current,
+    reviewDeadlineDate,
+    severity,
+    message,
+  };
+}

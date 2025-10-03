@@ -753,28 +753,37 @@ export async function checkLeaveEligibility(
         });
       }
 
-      // ALWAYS show conflicting requests when multiple pilots are requesting same dates
-      // But change the recommendation based on crew availability
-      conflictingRequests = allConflictingRequests;
+      // ONLY show seniority comparison when MULTIPLE pilots are requesting same dates
+      // If only ONE pilot (no conflicts), straight approve based on crew availability
+      if (allConflictingRequests.length > 1) {
+        console.log('👥 MULTIPLE PILOTS detected:', allConflictingRequests.length);
+        conflictingRequests = allConflictingRequests;
 
-      if (!hasMinimumCrewForRole) {
-        // Below minimum crew for this role - need seniority review with spreading recommendations
-        console.log('⚠️ BELOW MINIMUM CREW - Seniority review required');
-        needsSeniorityReview = true;
+        if (!hasMinimumCrewForRole) {
+          // Below minimum crew for this role - need seniority review with spreading recommendations
+          console.log('⚠️ BELOW MINIMUM CREW - Seniority review required');
+          needsSeniorityReview = true;
 
-        // Generate intelligent spreading recommendations
-        seniorityRecommendation = generateSpreadingRecommendations(
-          allConflictingRequests,
-          request,
-          availableCaptains,
-          availableFirstOfficers,
-          requirements
-        );
+          // Generate intelligent spreading recommendations
+          seniorityRecommendation = generateSpreadingRecommendations(
+            allConflictingRequests,
+            request,
+            availableCaptains,
+            availableFirstOfficers,
+            requirements
+          );
+        } else {
+          // Sufficient crew - all can be approved, but still show the comparison
+          console.log('✅ SUFFICIENT CREW - All requests can be approved');
+          needsSeniorityReview = false;
+          seniorityRecommendation = `✅ Sufficient ${request.pilotRole} crew available (${request.pilotRole === 'Captain' ? availableCaptains : availableFirstOfficers} available, ${requirements.minimumCaptains} minimum required). All overlapping requests can be approved without crew shortage.`;
+        }
       } else {
-        // Sufficient crew - all can be approved, but still show the comparison
-        console.log('✅ SUFFICIENT CREW - All requests can be approved');
+        // Only ONE pilot requesting - straight approve based on crew availability only
+        console.log('✅ SINGLE PILOT - Straight approve based on crew availability');
+        conflictingRequests = [];
         needsSeniorityReview = false;
-        seniorityRecommendation = `✅ Sufficient ${request.pilotRole} crew available (${request.pilotRole === 'Captain' ? availableCaptains : availableFirstOfficers} available, ${requirements.minimumCaptains} minimum required). All overlapping requests can be approved without crew shortage.`;
+        seniorityRecommendation = '';
       }
     }
   }

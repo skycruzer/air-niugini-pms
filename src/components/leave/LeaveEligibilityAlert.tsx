@@ -46,8 +46,8 @@ export function LeaveEligibilityAlert({
     return null;
   }
 
-  // Show if there are conflicting requests (multiple pilots requesting same/nearby dates)
-  const hasConflictingRequests = eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 0;
+  // Show ONLY if there are MULTIPLE conflicting requests (more than 1 pilot)
+  const hasConflictingRequests = eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 1;
 
   console.log('📊 ALERT: Eligibility data received:', {
     hasConflictingRequests: hasConflictingRequests,
@@ -56,7 +56,7 @@ export function LeaveEligibilityAlert({
   });
 
   if (!hasConflictingRequests) {
-    console.log('📊 ALERT: Not showing alert - No conflicting requests');
+    console.log('📊 ALERT: Not showing alert - No multiple conflicting requests (need 2+ pilots)');
     return null;
   }
 

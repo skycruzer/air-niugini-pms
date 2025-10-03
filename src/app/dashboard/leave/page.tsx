@@ -9,6 +9,7 @@ import { LeaveRequestsList } from '@/components/leave/LeaveRequestsList';
 import { InteractiveRosterCalendar } from '@/components/leave/InteractiveRosterCalendar';
 import { RosterPeriodNavigator } from '@/components/leave/RosterPeriodNavigator';
 import { TeamAvailabilityView } from '@/components/leave/TeamAvailabilityView';
+import { FinalReviewAlert } from '@/components/leave/FinalReviewAlert';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import { getCurrentRosterPeriod, RosterPeriod } from '@/lib/roster-utils';
@@ -67,6 +68,26 @@ export default function LeaveRequestsPage() {
     };
     loadData();
   }, [refreshTrigger]);
+
+  // Calculate pending requests for NEXT roster and FOLLOWING rosters only (not current roster)
+  const getPendingCountForFutureRosters = () => {
+    if (!stats) return 0;
+
+    // Get all pending leave requests (status is lowercase 'pending' in LeaveEvent type)
+    const pendingRequests = leaveRequests.filter(req => req.status.toLowerCase() === 'pending');
+
+    // Get next roster start date
+    const nextRoster = getCurrentRosterPeriod();
+    const nextRosterStartDate = new Date(nextRoster.endDate);
+    nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1); // Day after current roster ends
+
+    // Count only requests that START on or after next roster period
+    const futureRosterPendingCount = pendingRequests.filter(req => {
+      return req.startDate >= nextRosterStartDate;
+    }).length;
+
+    return futureRosterPendingCount;
+  };
 
   const handleModalSuccess = () => {
     setShowModal(false);
@@ -145,6 +166,9 @@ export default function LeaveRequestsPage() {
               </div>
             </div>
           </div>
+
+          {/* Final Review Alert - 22 days before next roster */}
+          {stats && <FinalReviewAlert pendingCount={getPendingCountForFutureRosters()} />}
 
           {/* Statistics */}
           {stats && (
