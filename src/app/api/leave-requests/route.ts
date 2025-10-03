@@ -132,7 +132,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const requestData = await request.json();
-    console.log('🔄 API /leave-requests: Updating leave request...', requestData);
+    console.log('🔄 API /leave-requests: Updating leave request status...', requestData);
 
     const supabaseAdmin = getSupabaseAdmin();
     const { id, status, reviewer_comments } = requestData;
@@ -151,7 +151,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Update the leave request
+    // Update the leave request status
     const { data, error } = await supabaseAdmin
       .from('leave_requests')
       .update({
@@ -198,6 +198,84 @@ export async function PUT(request: Request) {
     });
   } catch (error) {
     console.error('🚨 API /leave-requests: Fatal error updating request:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const requestData = await request.json();
+    console.log('✏️ API /leave-requests PATCH: Updating leave request data...', requestData);
+
+    const supabaseAdmin = getSupabaseAdmin();
+    const { id, ...updateData } = requestData;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Leave request ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Calculate roster period and days if dates are provided
+    let updates: any = { ...updateData };
+
+    if (updateData.start_date) {
+      const startDateRoster = getRosterPeriodFromDate(new Date(updateData.start_date));
+      updates.roster_period = startDateRoster.code;
+    }
+
+    if (updateData.start_date && updateData.end_date) {
+      const daysCount = differenceInDays(
+        new Date(updateData.end_date),
+        new Date(updateData.start_date)
+      ) + 1;
+      updates.days_count = daysCount;
+    }
+
+    // Update the leave request data
+    const { data, error } = await supabaseAdmin
+      .from('leave_requests')
+      .update(updates)
+      .eq('id', id)
+      .select(
+        `
+        *,
+        pilots:pilot_id (
+          first_name,
+          middle_name,
+          last_name,
+          employee_id
+        )
+      `
+      )
+      .single();
+
+    if (error) {
+      console.error('🚨 API /leave-requests PATCH: Error updating request:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    }
+
+    // Transform the response data
+    const pilot = data.pilots;
+    const responseData = {
+      ...data,
+      pilot_name: pilot
+        ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+        : 'Unknown Pilot',
+      employee_id: pilot?.employee_id || 'N/A',
+      reviewer_name: null,
+      pilots: undefined, // Remove the nested object from response
+    };
+
+    console.log('✅ API /leave-requests PATCH: Updated leave request:', responseData.id);
+
+    return NextResponse.json({
+      success: true,
+      data: responseData,
+    });
+  } catch (error) {
+    console.error('🚨 API /leave-requests PATCH: Fatal error updating request:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

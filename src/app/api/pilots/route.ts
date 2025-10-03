@@ -209,12 +209,10 @@ export async function PUT(request: NextRequest) {
     }
 
     console.log('🔧 Now attempting actual update...');
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from('pilots')
       .update(cleanedBody)
-      .eq('id', pilotId)
-      .select()
-      .single();
+      .eq('id', pilotId);
 
     if (error) {
       console.error('🚨 API /pilots PUT: Supabase error details:', error);
@@ -233,16 +231,24 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    if (!data) {
-      console.error('🚨 API /pilots PUT: No data returned from update');
+    // Fetch fresh data after update to avoid cache issues
+    console.log('🔄 Fetching fresh data after update...');
+    const { data: freshData, error: fetchError } = await supabaseAdmin
+      .from('pilots')
+      .select()
+      .eq('id', pilotId)
+      .single();
+
+    if (fetchError || !freshData) {
+      console.error('🚨 API /pilots PUT: Error fetching updated data:', fetchError);
       return NextResponse.json(
-        { success: false, error: 'No data returned from update' },
+        { success: false, error: 'Update succeeded but failed to fetch updated data' },
         { status: 500 }
       );
     }
 
     console.log('✅ API /pilots PUT: Successfully updated pilot');
-    console.log('✅ API /pilots PUT: Updated data:', JSON.stringify(data, null, 2));
+    console.log('✅ API /pilots PUT: Fresh updated data:', JSON.stringify(freshData, null, 2));
 
     // Invalidate cache since pilot data was updated
     invalidateCache([...CACHE_INVALIDATION_PATTERNS.PILOT_DATA_UPDATED]);
@@ -250,7 +256,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data,
+      data: freshData,
     });
   } catch (error) {
     console.error('🚨 API /pilots PUT: Fatal error:', error);

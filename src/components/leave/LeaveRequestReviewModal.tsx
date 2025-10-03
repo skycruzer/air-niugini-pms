@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { updateLeaveRequestStatus, type LeaveRequest } from '@/lib/leave-service';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import { ModalSheet } from '@/components/ui/ModalSheet';
 import { CheckCircle, XCircle, User, Calendar, Clock, FileText, AlertTriangle } from 'lucide-react';
+import { LeaveEligibilityAlert } from './LeaveEligibilityAlert';
+import { useLeaveEligibility } from '@/hooks/useLeaveEligibility';
 
 interface LeaveRequestReviewModalProps {
   isOpen: boolean;
@@ -25,6 +27,41 @@ export function LeaveRequestReviewModal({
   const [loading, setLoading] = useState(false);
   const [reviewComments, setReviewComments] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [pilotRole, setPilotRole] = useState<'Captain' | 'First Officer' | null>(null);
+
+  // Eligibility checking hook
+  const { eligibility, isLoading: checkingEligibility, checkEligibility } = useLeaveEligibility();
+
+  // Fetch pilot role and check eligibility when modal opens
+  useEffect(() => {
+    async function fetchPilotRole() {
+      if (isOpen && request.pilot_id) {
+        try {
+          const response = await fetch(`/api/pilots/${request.pilot_id}`);
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.data) {
+              const role = result.data.role as 'Captain' | 'First Officer';
+              setPilotRole(role);
+
+              // Check eligibility
+              await checkEligibility({
+                pilotId: request.pilot_id,
+                pilotRole: role,
+                startDate: request.start_date,
+                endDate: request.end_date,
+                requestType: request.request_type,
+                requestId: request.id,
+              });
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching pilot role:', err);
+        }
+      }
+    }
+    fetchPilotRole();
+  }, [isOpen, request]);
 
   if (!user || !permissions.canApprove(user)) {
     return null;
@@ -177,6 +214,13 @@ export function LeaveRequestReviewModal({
             </div>
           )}
         </div>
+
+        {/* Eligibility Check */}
+        <LeaveEligibilityAlert
+          eligibility={eligibility}
+          isLoading={checkingEligibility}
+          pilotName={request.pilot_name}
+        />
 
         {/* Review Comments */}
         <div>

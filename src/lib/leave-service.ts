@@ -187,66 +187,30 @@ export async function updateLeaveRequest(
   requestData: Partial<LeaveRequestFormData>
 ): Promise<LeaveRequest> {
   try {
-    // Recalculate roster period and days if dates changed
-    const updates: any = { ...requestData };
+    console.log('📝 Updating leave request via API...', { requestId, requestData });
 
-    if (requestData.start_date && requestData.end_date) {
-      const startDateRoster = getRosterPeriodFromDate(new Date(requestData.start_date));
-      const daysCount = calculateDays(requestData.start_date, requestData.end_date);
-      updates.roster_period = startDateRoster.code;
-      updates.days_count = daysCount;
-    } else if (requestData.start_date || requestData.end_date) {
-      // If only one date changed, we need to get the other one first
-      const { data: currentRequest, error: fetchError } = await supabase
-        .from('leave_requests')
-        .select('start_date, end_date')
-        .eq('id', requestId)
-        .single();
+    const response = await fetch('/api/leave-requests', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: requestId,
+        ...requestData,
+      }),
+    });
 
-      if (fetchError) throw fetchError;
+    const result = await response.json();
 
-      const startDate = requestData.start_date || currentRequest.start_date;
-      const endDate = requestData.end_date || currentRequest.end_date;
-
-      const startDateRoster = getRosterPeriodFromDate(new Date(startDate));
-      const daysCount = calculateDays(startDate, endDate);
-      updates.roster_period = startDateRoster.code;
-      updates.days_count = daysCount;
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to update leave request');
     }
 
-    const { data, error } = await supabase
-      .from('leave_requests')
-      .update(updates)
-      .eq('id', requestId)
-      .select(
-        `
-        *,
-        pilots (
-          first_name,
-          middle_name,
-          last_name,
-          employee_id
-        ),
-        reviewer:an_users!reviewed_by (
-          name
-        )
-      `
-      )
-      .single();
-
-    if (error) throw error;
-
-    return {
-      ...data,
-      pilot_name: data.pilots
-        ? `${data.pilots.first_name} ${data.pilots.middle_name ? data.pilots.middle_name + ' ' : ''}${data.pilots.last_name}`
-        : 'Unknown Pilot',
-      employee_id: data.pilots?.employee_id || 'N/A',
-      reviewer_name: data.reviewer?.name || null,
-    };
+    console.log('✅ Leave request updated successfully:', result.data.id);
+    return result.data;
   } catch (error) {
     console.error('Error updating leave request:', error);
-    throw new Error(handleSupabaseError(error));
+    throw new Error(error instanceof Error ? error.message : 'Failed to update leave request');
   }
 }
 

@@ -65,18 +65,18 @@ npx playwright test --ui               # Run with Playwright UI
 **Production Tables** (Active Live Data):
 
 - `pilots` (27 records) - Main pilot information with seniority tracking
-- `pilot_checks` (556+ records) - Certification tracking with expiry dates
-- `check_types` (34+ records) - Aviation certification types across 8 categories
-- `users` (mapped to `an_users`) - System authentication (admin/manager roles)
-- `leave_requests` (11+ records) - Leave management tied to 28-day roster periods
+- `pilot_checks` (571 records) - Certification tracking with expiry dates
+- `check_types` (34 records) - Aviation certification types across 8 categories
+- `an_users` (3 records) - System authentication (admin/manager roles)
+- `leave_requests` (12 records) - Leave management tied to 28-day roster periods
 - `settings` (3 records) - System configuration
-- `contract_types` - Pilot contract classifications
+- `contract_types` (3 records) - Pilot contract classifications
 
-**Legacy Development Tables** (Historical):
-
-- `an_pilots`, `an_pilot_checks`, `an_check_types` - Legacy development data (limited records)
-
-**CRITICAL**: Always use production tables (`pilots`, `pilot_checks`, `check_types`) for live operations, not the `an_*` prefixed legacy tables.
+**Database Cleanup (2025-10-03)**:
+- ✅ Removed legacy development tables: `an_pilots`, `an_pilot_checks`, `an_check_types`, `an_leave_requests`
+- ✅ Kept `an_users` - This is the ACTIVE authentication table (not legacy)
+- ✅ All production data intact and verified
+- ✅ Application tested and working correctly
 
 ### Key Business Logic
 

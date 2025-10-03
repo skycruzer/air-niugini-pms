@@ -91,30 +91,8 @@ function createSupabaseAdmin() {
       persistSession: false,
     },
     global: {
-      fetch: async (url, options = {}) => {
-        console.log('🌐 Supabase fetch:', {
-          url: String(url).substring(0, 50) + '...',
-          method: options?.method || 'GET',
-          hasAuth: !!(options?.headers as any)?.Authorization,
-        });
-
-        try {
-          // Try with a longer timeout and better error handling
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-          const response = await fetch(url, {
-            ...options,
-            signal: controller.signal,
-          });
-
-          clearTimeout(timeoutId);
-          return response;
-        } catch (error) {
-          console.error('🚨 Fetch error:', error);
-          // Re-throw the error so Supabase can handle it
-          throw error;
-        }
+      headers: {
+        'Prefer': 'return=representation',
       },
     },
   });

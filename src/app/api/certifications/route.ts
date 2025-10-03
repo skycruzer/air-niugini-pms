@@ -116,27 +116,42 @@ export async function PUT(request: NextRequest) {
     }));
 
     // Use service role to bypass RLS and perform upsert
-    const { data, error } = await getSupabaseAdmin()
+    const { error } = await getSupabaseAdmin()
       .from('pilot_checks')
       .upsert(updates, {
         onConflict: 'pilot_id,check_type_id',
-      })
-      .select();
+      });
 
     if (error) {
       console.error('🚨 API /certifications PUT: Database error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
+    // Fetch fresh data after upsert to avoid cache issues
+    console.log('🔄 Fetching fresh certification data after update...');
+    const { data: freshData, error: fetchError } = await getSupabaseAdmin()
+      .from('pilot_checks')
+      .select()
+      .eq('pilot_id', pilotId)
+      .in('check_type_id', updates.map(u => u.check_type_id));
+
+    if (fetchError) {
+      console.error('🚨 API /certifications PUT: Error fetching updated data:', fetchError);
+      return NextResponse.json(
+        { success: false, error: 'Update succeeded but failed to fetch updated data' },
+        { status: 500 }
+      );
+    }
+
     console.log(
-      '🔍 API /certifications PUT: Successfully updated',
-      data?.length || 0,
+      '✅ API /certifications PUT: Successfully updated',
+      freshData?.length || 0,
       'certification records'
     );
 
     return NextResponse.json({
       success: true,
-      data: data,
+      data: freshData,
     });
   } catch (error) {
     console.error('🚨 API /certifications PUT: Fatal error:', error);
