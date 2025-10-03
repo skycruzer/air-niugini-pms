@@ -28,8 +28,7 @@ export function LeaveEligibilityAlert({
   isLoading,
   pilotName,
 }: LeaveEligibilityAlertProps) {
-  const [showDetails, setShowDetails] = useState(false);
-  const [showAlternatives, setShowAlternatives] = useState(false);
+  const [showConflictingRequests, setShowConflictingRequests] = useState(true); // Show by default if present
 
   if (isLoading) {
     return (
@@ -43,181 +42,203 @@ export function LeaveEligibilityAlert({
   }
 
   if (!eligibility) {
+    console.log('📊 ALERT: No eligibility data');
     return null;
   }
 
-  // Determine alert color and icon based on recommendation
-  const alertStyles = {
-    APPROVE: {
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      text: 'text-green-800',
-      icon: '✅',
-      title: 'Approved - Crew Requirements Met',
-    },
-    REVIEW_REQUIRED: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-      text: 'text-yellow-800',
-      icon: '⚠️',
-      title: 'Review Required - Potential Crew Shortage',
-    },
-    DENY: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-800',
-      icon: '❌',
-      title: 'Recommend Deny - Critical Crew Shortage',
-    },
-  };
+  // Show if there are conflicting requests (multiple pilots requesting same/nearby dates)
+  const hasConflictingRequests = eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 0;
 
-  const style = alertStyles[eligibility.recommendation];
+  console.log('📊 ALERT: Eligibility data received:', {
+    hasConflictingRequests: hasConflictingRequests,
+    conflictingRequestsCount: eligibility.conflictingRequests?.length,
+    recommendation: eligibility.recommendation
+  });
+
+  if (!hasConflictingRequests) {
+    console.log('📊 ALERT: Not showing alert - No conflicting requests');
+    return null;
+  }
+
+  console.log('📊 ALERT: Showing comparison with', eligibility.conflictingRequests.length, 'pilots');
+
+  // Determine if this is a crew shortage scenario or sufficient crew
+  const hasSufficientCrew = eligibility.recommendation === 'APPROVE' ||
+    (eligibility.reasons && eligibility.reasons.some(r => r.includes('Sufficient')));
+
+  const bgColor = hasSufficientCrew ? 'bg-green-50' : 'bg-blue-50';
+  const borderColor = hasSufficientCrew ? 'border-green-300' : 'border-blue-300';
+  const headerColor = hasSufficientCrew ? 'text-green-900' : 'text-blue-900';
+  const headerIcon = hasSufficientCrew ? '✅' : '⚖️';
 
   return (
-    <div className={`${style.bg} border-2 ${style.border} rounded-lg p-4 mb-4`}>
+    <div className={`${bgColor} border-2 ${borderColor} rounded-lg p-5 mb-4`}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-start">
-          <span className="text-2xl mr-3">{style.icon}</span>
-          <div>
-            <h4 className={`font-bold ${style.text} text-lg`}>{style.title}</h4>
-            {pilotName && (
-              <p className={`text-sm ${style.text} mt-1`}>
-                Leave request for: <strong>{pilotName}</strong>
-              </p>
-            )}
-          </div>
-        </div>
-        {eligibility.conflicts.length > 0 && (
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className={`text-xs ${style.text} hover:underline font-medium`}
-          >
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </button>
+      <div className="mb-4">
+        <h4 className={`font-bold ${headerColor} text-lg flex items-center`}>
+          <span className="mr-2">{headerIcon}</span>
+          {hasSufficientCrew
+            ? 'Crew Availability: Sufficient - Multiple Pilots Requesting Same Dates'
+            : 'Seniority Priority Review - Crew Shortage Risk'}
+        </h4>
+        {pilotName && (
+          <p className={`text-sm ${hasSufficientCrew ? 'text-green-800' : 'text-blue-800'} mt-1`}>
+            Reviewing request for: <strong>{pilotName}</strong>
+          </p>
         )}
       </div>
 
-      {/* Reasons */}
-      <div className="space-y-2 mb-3">
-        {eligibility.reasons.map((reason, index) => (
-          <p key={index} className={`text-sm ${style.text}`}>
-            {reason}
-          </p>
-        ))}
-      </div>
-
-      {/* Conflicts Details (Expandable) */}
-      {showDetails && eligibility.conflicts.length > 0 && (
-        <div className="mt-4 border-t border-current/20 pt-4">
-          <h5 className={`font-semibold ${style.text} mb-2 flex items-center`}>
-            <span className="mr-2">📅</span>
-            Conflict Details ({eligibility.conflicts.length} dates affected)
-          </h5>
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {eligibility.conflicts.map((conflict, index) => (
-              <div
-                key={index}
-                className={`text-xs ${style.text} bg-white/50 rounded p-2 border ${style.border}`}
-              >
-                <div className="font-medium mb-1">{conflict.message}</div>
-                <div className="flex items-center space-x-4 text-xs opacity-75">
-                  <span>
-                    Captains: {conflict.availableCaptains}/{conflict.requiredCaptains}
-                  </span>
-                  <span>
-                    First Officers: {conflict.availableFirstOfficers}/
-                    {conflict.requiredFirstOfficers}
-                  </span>
-                  <span className="text-xs px-2 py-0.5 bg-white rounded">
-                    {conflict.severity}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Alternative Pilots (Seniority-based) */}
-      {eligibility.alternativePilots.length > 0 && (
-        <div className="mt-4 border-t border-current/20 pt-4">
-          <button
-            onClick={() => setShowAlternatives(!showAlternatives)}
-            className={`font-semibold ${style.text} mb-2 flex items-center hover:underline`}
-          >
-            <span className="mr-2">👥</span>
-            Alternative Pilots Available ({eligibility.alternativePilots.filter(
-              (p) => p.currentLeaveStatus === 'AVAILABLE'
-            ).length} available by seniority)
-            <span className="ml-2">{showAlternatives ? '▼' : '▶'}</span>
-          </button>
-
-          {showAlternatives && (
-            <div className="space-y-2 max-h-60 overflow-y-auto mt-3">
-              {eligibility.alternativePilots.slice(0, 10).map((pilot) => (
-                <div
-                  key={pilot.pilotId}
-                  className={`text-xs bg-white/50 rounded p-3 border ${style.border} ${pilot.currentLeaveStatus === 'AVAILABLE' ? 'border-l-4 border-l-green-500' : 'opacity-60'}`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="font-semibold">
-                      #{pilot.seniorityNumber} - {pilot.pilotName}
-                    </div>
-                    <div
-                      className={`text-xs px-2 py-0.5 rounded ${
-                        pilot.currentLeaveStatus === 'AVAILABLE'
-                          ? 'bg-green-100 text-green-800'
-                          : pilot.currentLeaveStatus === 'PENDING_LEAVE'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {pilot.currentLeaveStatus.replace('_', ' ')}
-                    </div>
-                  </div>
-                  <div className={`text-xs ${style.text}`}>
-                    {pilot.employeeId} • {pilot.role} • Priority #{pilot.priority}
-                  </div>
-                  <div className={`text-xs ${style.text} mt-1 opacity-75`}>
-                    {pilot.reason}
-                  </div>
-                </div>
-              ))}
-              {eligibility.alternativePilots.length > 10 && (
-                <p className={`text-xs ${style.text} text-center py-2`}>
-                  + {eligibility.alternativePilots.length - 10} more pilots not shown
+      {/* Approval Decision Summary */}
+      <div className="space-y-3 max-h-96 overflow-y-auto">
+        {hasSufficientCrew ? (
+          <div className="text-sm bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4">
+            <div className="flex items-start mb-3">
+              <span className="text-2xl mr-3">✅</span>
+              <div className="flex-1">
+                <h5 className="font-bold text-green-900 text-base mb-2">RECOMMENDATION: APPROVE</h5>
+                <p className="text-green-800 mb-2">
+                  <strong>{pilotName}</strong> can be approved. Sufficient crew members available to maintain minimum requirements.
                 </p>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Crew Impact Summary */}
-      {eligibility.crewImpact.length > 0 && showDetails && (
-        <div className="mt-4 border-t border-current/20 pt-4">
-          <h5 className={`font-semibold ${style.text} mb-2 flex items-center`}>
-            <span className="mr-2">📊</span>
-            Projected Crew Availability Impact
-          </h5>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white/50 rounded p-2 border ${style.border}">
-              <div className={`text-xs ${style.text} opacity-75 mb-1`}>Date Range</div>
-              <div className={`text-sm ${style.text} font-medium`}>
-                {eligibility.crewImpact[0]?.date} to{' '}
-                {eligibility.crewImpact[eligibility.crewImpact.length - 1]?.date}
-              </div>
-            </div>
-            <div className="bg-white/50 rounded p-2 border ${style.border}">
-              <div className={`text-xs ${style.text} opacity-75 mb-1`}>Days Affected</div>
-              <div className={`text-sm ${style.text} font-medium`}>
-                {eligibility.crewImpact.length} days
+                <div className="bg-white rounded p-3 text-green-900">
+                  <p className="mb-1">
+                    <strong>Crew Status:</strong> {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} available after approval will remain above minimum requirements.
+                  </p>
+                  <p className="text-sm">
+                    Multiple pilots requesting same dates, but crew levels allow all approvals without operational impact.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+        ) : (
+          <div className="text-sm bg-yellow-50 border-2 border-yellow-500 rounded-lg p-4 mb-4">
+            <div className="flex items-start mb-3">
+              <span className="text-2xl mr-3">⚠️</span>
+              <div className="flex-1">
+                <h5 className="font-bold text-yellow-900 text-base mb-2">RECOMMENDATION: REVIEW REQUIRED</h5>
+                <p className="text-yellow-800 mb-2">
+                  <strong>CAUTION:</strong> Approving all conflicting requests may result in crew shortage. Review seniority priority below.
+                </p>
+
+                {/* Display detailed spreading recommendations ONLY when crew shortage exists */}
+                {eligibility.reasons && eligibility.reasons.length > 0 && eligibility.reasons.some(r => r.includes('CREW SHORTAGE RISK')) && (
+                  <div className="bg-white rounded p-4 text-yellow-900 mb-3">
+                    {eligibility.reasons.map((reason, idx) => {
+                      // Only show spreading recommendations when there's an actual crew shortage
+                      if (reason.includes('CREW SHORTAGE RISK') && reason.includes('SENIORITY-BASED SPREADING')) {
+                        return (
+                          <div key={idx} className="whitespace-pre-wrap font-mono text-xs leading-relaxed">
+                            {reason}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                )}
+
+                <div className="bg-white rounded p-3 text-yellow-900">
+                  <p className="mb-2">
+                    <strong>⚖️ Priority Determination Rules:</strong>
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-sm ml-2">
+                    <li><strong>1st:</strong> Rank (Captain has priority over First Officer)</li>
+                    <li><strong>2nd:</strong> Seniority Number (Lower number = Higher priority)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={`text-sm ${hasSufficientCrew ? 'text-green-900 bg-green-100 border-green-200' : 'text-blue-900 bg-blue-100 border-blue-200'} rounded p-3 mb-3 border`}>
+          <strong>📋 {hasSufficientCrew ? 'Multiple Requests Detected' : 'Seniority Comparison'}:</strong> Multiple pilots have requested overlapping or nearby dates. {hasSufficientCrew ? 'Review details below for complete information.' : 'Priority is determined by rank and seniority number (lower = higher priority).'}
         </div>
-      )}
+
+        {eligibility.conflictingRequests && eligibility.conflictingRequests.length > 0 && (
+          <div className="text-sm font-bold text-green-900 bg-green-100 rounded p-3 mb-3 border-2 border-green-500">
+            🏆 <strong>PRIORITY PILOT:</strong> {eligibility.conflictingRequests[0]?.role} - Seniority #{eligibility.conflictingRequests[0]?.seniorityNumber}: {eligibility.conflictingRequests[0]?.pilotName}
+            {eligibility.conflictingRequests[0]?.pilotName === pilotName && <span className="ml-2">(Current Request - APPROVE)</span>}
+            {eligibility.conflictingRequests[0]?.pilotName !== pilotName && <span className="ml-2">(Approve this pilot first)</span>}
+          </div>
+        )}
+
+        {eligibility.conflictingRequests && eligibility.conflictingRequests
+          .map((conflictReq, index) => {
+            const isCurrentPilot = conflictReq.pilotName === pilotName;
+
+            // Color based on overlap type
+            let bgColor = 'bg-gray-50';
+            let borderColor = 'border-gray-300';
+            let badgeColor = 'bg-gray-200 text-gray-900';
+
+            if (isCurrentPilot) {
+              bgColor = 'bg-blue-50';
+              borderColor = 'border-blue-500';
+            } else if (conflictReq.overlapType === 'EXACT') {
+              bgColor = 'bg-orange-50';
+              borderColor = 'border-orange-500';
+              badgeColor = 'bg-orange-200 text-orange-900';
+            } else if (conflictReq.overlapType === 'PARTIAL') {
+              bgColor = 'bg-yellow-50';
+              borderColor = 'border-yellow-500';
+              badgeColor = 'bg-yellow-200 text-yellow-900';
+            } else if (conflictReq.overlapType === 'ADJACENT') {
+              bgColor = 'bg-amber-50';
+              borderColor = 'border-amber-400';
+              badgeColor = 'bg-amber-200 text-amber-900';
+            }
+
+            return (
+              <div
+                key={conflictReq.requestId}
+                className={`rounded-lg p-4 border-2 ${bgColor} ${borderColor} ${isCurrentPilot ? 'ring-2 ring-blue-300' : ''}`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="font-bold text-base text-gray-900">
+                    {index === 0 ? '🏆' : '📍'} {conflictReq.role} - Seniority #{conflictReq.seniorityNumber}: {conflictReq.pilotName}
+                    {isCurrentPilot && <span className="ml-2 text-xs text-blue-700 font-bold">(Current Request)</span>}
+                  </div>
+                  <div className={`text-xs px-3 py-1.5 rounded-full font-bold ${badgeColor}`}>
+                    {conflictReq.overlapType}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 mb-3 bg-white p-3 rounded">
+                  <div><strong>Overall Priority:</strong> #{index + 1}</div>
+                  <div><strong>Employee ID:</strong> {conflictReq.employeeId}</div>
+                  <div><strong>Rank:</strong> {conflictReq.role}</div>
+                  <div><strong>Seniority #:</strong> {conflictReq.seniorityNumber}</div>
+                  <div><strong>Request Type:</strong> {conflictReq.requestType || 'N/A'}</div>
+                  <div><strong>Duration:</strong> {conflictReq.overlappingDays} days</div>
+                  <div className="col-span-2"><strong>Requested Dates:</strong> {new Date(conflictReq.startDate).toLocaleDateString('en-AU')} to {new Date(conflictReq.endDate).toLocaleDateString('en-AU')}</div>
+                  <div className="col-span-2"><strong>Overlap:</strong> {conflictReq.overlapMessage}</div>
+                  {conflictReq.reason && (
+                    <div className="col-span-2">
+                      <strong>Reason:</strong> {conflictReq.reason}
+                    </div>
+                  )}
+                </div>
+
+                <div className={`text-sm font-semibold p-3 rounded border ${
+                  conflictReq.overlapType === 'EXACT'
+                    ? 'bg-orange-100 text-orange-900 border-orange-300'
+                    : conflictReq.overlapType === 'PARTIAL'
+                    ? 'bg-yellow-100 text-yellow-900 border-yellow-300'
+                    : 'bg-gray-100 text-gray-800 border-gray-300'
+                }`}>
+                  {conflictReq.recommendation}
+                </div>
+
+                {conflictReq.spreadSuggestion && (
+                  <div className="mt-2 text-sm p-3 bg-purple-50 text-purple-900 rounded border border-purple-200">
+                    <strong>Spreading Recommendation:</strong> {conflictReq.spreadSuggestion}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }

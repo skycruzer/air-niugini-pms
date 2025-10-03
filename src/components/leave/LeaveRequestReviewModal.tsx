@@ -27,41 +27,38 @@ export function LeaveRequestReviewModal({
   const [loading, setLoading] = useState(false);
   const [reviewComments, setReviewComments] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [pilotRole, setPilotRole] = useState<'Captain' | 'First Officer' | null>(null);
-
   // Eligibility checking hook
   const { eligibility, isLoading: checkingEligibility, checkEligibility } = useLeaveEligibility();
 
-  // Fetch pilot role and check eligibility when modal opens
+  // Check eligibility when modal opens (using pilot_role from request object)
   useEffect(() => {
-    async function fetchPilotRole() {
-      if (isOpen && request.pilot_id) {
+    async function checkRequestEligibility() {
+      if (isOpen && request.pilot_role) {
         try {
-          const response = await fetch(`/api/pilots/${request.pilot_id}`);
-          if (response.ok) {
-            const result = await response.json();
-            if (result.success && result.data) {
-              const role = result.data.role as 'Captain' | 'First Officer';
-              setPilotRole(role);
+          console.log('🔍 Checking eligibility for:', {
+            pilotName: request.pilot_name,
+            pilotRole: request.pilot_role,
+            dates: `${request.start_date} to ${request.end_date}`,
+          });
 
-              // Check eligibility
-              await checkEligibility({
-                pilotId: request.pilot_id,
-                pilotRole: role,
-                startDate: request.start_date,
-                endDate: request.end_date,
-                requestType: request.request_type,
-                requestId: request.id,
-              });
-            }
-          }
+          await checkEligibility({
+            pilotId: request.pilot_id,
+            pilotRole: request.pilot_role,
+            startDate: request.start_date,
+            endDate: request.end_date,
+            requestType: request.request_type,
+            requestId: request.id,
+          });
         } catch (err) {
-          console.error('Error fetching pilot role:', err);
+          console.error('❌ Error checking eligibility:', err);
         }
+      } else if (isOpen && !request.pilot_role) {
+        console.warn('⚠️ Cannot check eligibility - pilot_role not available in request object');
       }
     }
-    fetchPilotRole();
-  }, [isOpen, request]);
+    checkRequestEligibility();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, request.id, request.pilot_role]);
 
   if (!user || !permissions.canApprove(user)) {
     return null;

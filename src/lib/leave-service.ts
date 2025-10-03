@@ -21,6 +21,7 @@ export interface LeaveRequest {
   // Joined data
   pilot_name?: string;
   employee_id?: string;
+  pilot_role?: 'Captain' | 'First Officer';
   reviewer_name?: string;
 }
 
@@ -93,7 +94,8 @@ export async function getLeaveRequestById(requestId: string): Promise<LeaveReque
           first_name,
           middle_name,
           last_name,
-          employee_id
+          employee_id,
+          role
         ),
         reviewer:an_users!reviewed_by (
           name
@@ -118,6 +120,7 @@ export async function getLeaveRequestById(requestId: string): Promise<LeaveReque
         ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
+      pilot_role: request.pilots?.role || null,
       reviewer_name: request.reviewer?.name || null,
     };
   } catch (error) {

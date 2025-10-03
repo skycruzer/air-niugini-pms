@@ -19,7 +19,8 @@ export async function GET() {
           first_name,
           middle_name,
           last_name,
-          employee_id
+          employee_id,
+          role
         )
       `
       )
@@ -44,6 +45,7 @@ export async function GET() {
           ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
           : 'Unknown Pilot',
         employee_id: pilot?.employee_id || 'N/A',
+        pilot_role: pilot?.role || null,
         reviewer_name: null, // We'll get this separately if needed
         pilots: undefined, // Remove the nested object from response
       };
@@ -104,7 +106,7 @@ export async function POST(request: Request) {
     // Get pilot information for the created request
     const { data: pilot } = await supabaseAdmin
       .from('pilots')
-      .select('first_name, middle_name, last_name, employee_id')
+      .select('first_name, middle_name, last_name, employee_id, role')
       .eq('id', data.pilot_id)
       .single();
 
@@ -114,6 +116,7 @@ export async function POST(request: Request) {
         ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
+      pilot_role: pilot?.role || null,
       reviewer_name: null,
     };
 
@@ -167,7 +170,8 @@ export async function PUT(request: Request) {
           first_name,
           middle_name,
           last_name,
-          employee_id
+          employee_id,
+          role
         )
       `
       )
@@ -186,6 +190,7 @@ export async function PUT(request: Request) {
         ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
+      pilot_role: pilot?.role || null,
       reviewer_name: null,
       pilots: undefined, // Remove the nested object from response
     };
@@ -245,7 +250,8 @@ export async function PATCH(request: Request) {
           first_name,
           middle_name,
           last_name,
-          employee_id
+          employee_id,
+          role
         )
       `
       )
@@ -264,6 +270,7 @@ export async function PATCH(request: Request) {
         ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
+      pilot_role: pilot?.role || null,
       reviewer_name: null,
       pilots: undefined, // Remove the nested object from response
     };
