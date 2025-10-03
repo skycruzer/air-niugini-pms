@@ -21,14 +21,14 @@ interface LeaveRequestsListProps {
   refreshTrigger?: number;
   filterStatus?: 'all' | 'pending' | 'approved' | 'denied';
   onStatsUpdate?: (stats: LeaveRequestStats) => void;
-  filterNextRosterOnly?: boolean; // Filter to show only next roster period requests
+  rosterFilter?: 'all' | 'next' | 'following'; // Filter by roster period
 }
 
 export function LeaveRequestsList({
   refreshTrigger,
   filterStatus = 'all',
   onStatsUpdate,
-  filterNextRosterOnly = false,
+  rosterFilter = 'all',
 }: LeaveRequestsListProps) {
   const { user } = useAuth();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
@@ -56,19 +56,33 @@ export function LeaveRequestsList({
         requestsData = requestsData.filter((req) => req.status === filterStatus.toUpperCase());
       }
 
-      // Apply next roster period filter if specified
-      if (filterNextRosterOnly) {
+      // Apply roster period filter if specified
+      if (rosterFilter !== 'all') {
         const currentRoster = getCurrentRosterPeriod();
         const nextRosterStartDate = new Date(currentRoster.endDate);
         nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1); // Day after current roster ends
 
-        const nextRosterEndDate = new Date(nextRosterStartDate);
-        nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day roster period
+        if (rosterFilter === 'next') {
+          // Next roster only (28 days)
+          const nextRosterEndDate = new Date(nextRosterStartDate);
+          nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day roster period
 
-        requestsData = requestsData.filter((req) => {
-          const startDate = parseISO(req.start_date);
-          return startDate >= nextRosterStartDate && startDate <= nextRosterEndDate;
-        });
+          requestsData = requestsData.filter((req) => {
+            const startDate = parseISO(req.start_date);
+            return startDate >= nextRosterStartDate && startDate <= nextRosterEndDate;
+          });
+        } else if (rosterFilter === 'following') {
+          // Following rosters (after next roster)
+          const nextRosterEndDate = new Date(nextRosterStartDate);
+          nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // End of next roster
+          const followingRostersStartDate = new Date(nextRosterEndDate);
+          followingRostersStartDate.setDate(followingRostersStartDate.getDate() + 1); // Day after next roster ends
+
+          requestsData = requestsData.filter((req) => {
+            const startDate = parseISO(req.start_date);
+            return startDate >= followingRostersStartDate;
+          });
+        }
       }
 
       setRequests(requestsData);
@@ -114,7 +128,7 @@ export function LeaveRequestsList({
 
   useEffect(() => {
     loadRequests();
-  }, [refreshTrigger, filterStatus, filterNextRosterOnly]);
+  }, [refreshTrigger, filterStatus, rosterFilter]);
 
   const handleRequestUpdate = (updatedRequest: LeaveRequest) => {
     setRequests((prevRequests) =>

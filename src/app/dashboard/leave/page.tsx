@@ -31,7 +31,7 @@ export default function LeaveRequestsPage() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'denied'>(
     'all'
   );
-  const [filterNextRosterOnly, setFilterNextRosterOnly] = useState(false);
+  const [rosterFilter, setRosterFilter] = useState<'all' | 'next' | 'following'>('all');
   const [currentRoster, setCurrentRoster] = useState<RosterPeriod>(getCurrentRosterPeriod());
   const [leaveRequests, setLeaveRequests] = useState<LeaveEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +128,7 @@ export default function LeaveRequestsPage() {
     setActiveTab('requests');
     // Filter to pending requests for NEXT ROSTER ONLY
     setFilterStatus('pending');
-    setFilterNextRosterOnly(true);
+    setRosterFilter('next');
     // Scroll to requests list after a short delay to allow tab switch
     setTimeout(() => {
       const requestsSection = document.getElementById('requests-list');
@@ -333,7 +333,7 @@ export default function LeaveRequestsPage() {
                       key={filter.value}
                       onClick={() => {
                         setFilterStatus(filter.value as typeof filterStatus);
-                        setFilterNextRosterOnly(false); // Reset roster filter when user manually changes status
+                        setRosterFilter('all'); // Reset roster filter when user manually changes status
                       }}
                       className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
                         filterStatus === filter.value
@@ -352,9 +352,9 @@ export default function LeaveRequestsPage() {
                   <div className="flex items-center space-x-4 pl-4 border-l-2 border-gray-200">
                     <span className="text-sm font-medium text-gray-700">Roster period:</span>
                     <button
-                      onClick={() => setFilterNextRosterOnly(false)}
+                      onClick={() => setRosterFilter('all')}
                       className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
-                        !filterNextRosterOnly
+                        rosterFilter === 'all'
                           ? 'bg-[#E4002B] text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
@@ -363,15 +363,26 @@ export default function LeaveRequestsPage() {
                       All Rosters
                     </button>
                     <button
-                      onClick={() => setFilterNextRosterOnly(true)}
+                      onClick={() => setRosterFilter('next')}
                       className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
-                        filterNextRosterOnly
+                        rosterFilter === 'next'
                           ? 'bg-[#E4002B] text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                       <span className="mr-1">🎯</span>
                       Next Roster Only
+                    </button>
+                    <button
+                      onClick={() => setRosterFilter('following')}
+                      className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
+                        rosterFilter === 'following'
+                          ? 'bg-[#E4002B] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <span className="mr-1">📆</span>
+                      Following Rosters
                     </button>
                   </div>
                 )}
@@ -382,7 +393,7 @@ export default function LeaveRequestsPage() {
                 refreshTrigger={refreshTrigger}
                 filterStatus={filterStatus}
                 onStatsUpdate={handleStatsUpdate}
-                filterNextRosterOnly={filterNextRosterOnly}
+                rosterFilter={rosterFilter}
               />
             </>
           )}
