@@ -191,7 +191,7 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
         commencement_date: formatDate(pilotData.commencement_date),
         seniority_number: undefined,
         is_active: pilotData.is_active ?? true,
-        // These fields don't exist in the database yet
+        // These fields don&apos;t exist in the database yet
         email: '',
         phone: '',
         address: '',
@@ -291,26 +291,46 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('🔧 PilotEditModal: handleSubmit called', { pilotId, saving, formData });
     e.preventDefault();
 
-    if (!pilotId || saving) return;
-
-    if (!(await validateForm())) {
+    if (!pilotId || saving) {
+      console.log('🔧 PilotEditModal: Early return - no pilotId or already saving', { pilotId, saving });
       return;
     }
 
+    console.log('🔧 PilotEditModal: Validating form...');
+    const isValid = await validateForm();
+    console.log('🔧 PilotEditModal: Validation result:', isValid);
+
+    if (!isValid) {
+      console.log('🔧 PilotEditModal: Validation failed, showing error');
+      setErrors((prev) => ({
+        ...prev,
+        general: 'Please fix the validation errors above before saving.',
+      }));
+      return;
+    }
+
+    console.log('🔧 PilotEditModal: Setting saving to true and calling updatePilot...');
     setSaving(true);
 
     try {
+      console.log('🔧 PilotEditModal: Calling updatePilot with:', { pilotId, formData });
       await updatePilot(pilotId, formData);
 
-      // Close modal and call success callback
-      onClose();
+      console.log('🔧 PilotEditModal: Update successful, calling success callback');
+      // Call success callback BEFORE closing to ensure it executes
       if (onSuccess) {
-        onSuccess();
+        await onSuccess();
+        console.log('🔧 PilotEditModal: Success callback completed');
       }
+
+      // Now close the modal
+      console.log('🔧 PilotEditModal: Closing modal');
+      onClose();
     } catch (error) {
-      console.error('Error updating pilot:', error);
+      console.error('🔧 PilotEditModal: Error updating pilot:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to update pilot. Please try again.';
       setErrors({ general: errorMessage });
@@ -357,7 +377,11 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
           <p className="text-gray-600 mt-2">Loading pilot data...</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+        <form
+          onSubmit={handleSubmit}
+          onClick={(e) => e.stopPropagation()}
+          className="p-6 space-y-8"
+        >
           {/* General Error */}
           {errors.general && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

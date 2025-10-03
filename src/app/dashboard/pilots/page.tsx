@@ -72,13 +72,16 @@ export default function PilotsPage() {
   // Fetch pilots from Supabase
   const fetchPilots = async () => {
     try {
+      console.log('🔄 fetchPilots: Starting to fetch pilots...');
       setLoading(true);
       setError(null);
       const data = await getAllPilots();
+      console.log('✅ fetchPilots: Received', data.length, 'pilots from API');
       setPilots(data);
 
       // Initialize search service
       pilotSearchService.initialize(data);
+      console.log('✅ fetchPilots: Pilots state updated and search service initialized');
     } catch (err) {
       console.error('Error fetching pilots:', err);
       setError(err instanceof Error ? err.message : 'Failed to load pilots');
@@ -210,8 +213,11 @@ export default function PilotsPage() {
     fetchPilots();
   };
 
-  const handleEditPilotSuccess = () => {
-    fetchPilots();
+  const handleEditPilotSuccess = async () => {
+    console.log('🔄 Pilot updated successfully, refreshing pilot list...');
+    await fetchPilots();
+    console.log('✅ Pilot list refreshed');
+    // No need for hard refresh - fetchPilots() updates the state
   };
 
   const handleCloseEditModal = () => {

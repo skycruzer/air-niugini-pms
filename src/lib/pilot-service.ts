@@ -419,11 +419,15 @@ export async function updatePilot(
   pilotId: string,
   pilotData: Partial<PilotFormData>
 ): Promise<Pilot> {
+  console.log('🔧 updatePilot: Function called with:', { pilotId, pilotData });
+
   try {
     // Calculate seniority number if commencement date is being updated
     let seniorityNumber = undefined;
     if (pilotData.commencement_date) {
+      console.log('🔧 updatePilot: Calculating seniority number...');
       seniorityNumber = await calculateSeniorityNumber(pilotData.commencement_date, pilotId);
+      console.log('🔧 updatePilot: Seniority number calculated:', seniorityNumber);
     }
 
     // Only include fields that exist in the database
@@ -452,10 +456,13 @@ export async function updatePilot(
         .map(([key, value]) => [key, value === '' ? null : value])
     );
 
+    console.log('🔧 updatePilot: Cleaned data for update:', cleanedData);
+
     // Use API route for client-side calls, direct admin client for server-side
     if (typeof window !== 'undefined') {
       // Client-side - use API route
       console.log('🔍 updatePilot: Client-side - using API route...');
+      console.log('🔍 updatePilot: Making PUT request to:', `/api/pilots?id=${pilotId}`);
 
       const response = await fetch(`/api/pilots?id=${pilotId}`, {
         method: 'PUT',
