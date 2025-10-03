@@ -81,13 +81,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       description: 'Fleet reports',
       requiresPermission: 'reports',
     },
-    {
-      name: 'Audit Logs',
-      href: '/dashboard/audit',
-      icon: '🔍',
-      description: 'System audit trail',
-      requiresPermission: 'audit',
-    },
+    // Audit Logs feature not yet implemented (requires database migration)
+    // {
+    //   name: 'Audit Logs',
+    //   href: '/dashboard/audit',
+    //   icon: '🔍',
+    //   description: 'System audit trail',
+    //   requiresPermission: 'audit',
+    // },
     {
       name: 'Settings',
       href: '/dashboard/settings',
@@ -103,10 +104,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     if (item.requiresPermission === 'reports') {
       return permissions.canViewReports(user);
     }
-    if (item.requiresPermission === 'audit') {
-      // Only admins can view audit logs
-      return permissions.canCreate(user);
-    }
+    // Audit logs temporarily disabled
+    // if (item.requiresPermission === 'audit') {
+    //   return permissions.canCreate(user);
+    // }
     if (item.requiresPermission === 'settings') {
       return permissions.canManageSettings ? permissions.canManageSettings(user) : false;
     }
