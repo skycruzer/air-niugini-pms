@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Air Niugini B767 Pilot Management System - A comprehensive pilot certification tracking and leave management system for Papua New Guinea's national airline fleet operations.
+Air Niugini B767 Pilot Management System - A comprehensive pilot certification tracking and leave request management system for Papua New Guinea's national airline fleet operations. Note: Leave balances are NOT tracked - only leave requests within 28-day roster periods.
 
 **Current Status**: Production-ready system with authentication, pilot CRUD operations, certification tracking, dashboard functionality, and comprehensive testing suite.
 
