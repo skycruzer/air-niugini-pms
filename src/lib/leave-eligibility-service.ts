@@ -4,17 +4,57 @@
  * Comprehensive service for checking leave request eligibility based on:
  * - Minimum crew requirements (Captains and First Officers)
  * - Conflicting leave requests for the same period
- * - Seniority-based recommendations
+ * - Seniority-based recommendations (SEPARATE for each rank)
  * - Aircraft fleet requirements
  *
- * Business Rules:
- * - Minimum crew must be maintained at all times per aircraft
- * - Senior pilots (lower seniority number) have priority
- * - Leave requests are evaluated against approved + pending requests
- * - Real-time conflict detection for overlapping dates
+ * Business Rules (Updated 2025-10-04):
+ *
+ * CRITICAL: SENIORITY RULES APPLY SEPARATELY TO EACH RANK
+ * - Captains are compared ONLY against other Captains
+ * - First Officers are compared ONLY against other First Officers
+ * - Each rank has its own minimum requirement: 10 Captains AND 10 First Officers
+ * - Crew availability checked independently for each rank
+ *
+ * CREW CALCULATION LOGIC (Per Rank):
+ * - currentAvailable = total pilots OF THIS RANK - pilots already on APPROVED leave OF THIS RANK
+ * - totalRequesting = number of pilots OF THIS RANK requesting leave for overlapping dates
+ * - remainingAfterApproval = currentAvailable - totalRequesting
+ * - maxApprovable = how many can be approved while keeping remaining >= 10 FOR THIS RANK
+ *
+ * Examples (Captains):
+ * • 19 Captains available, 2 Captains requesting → 19 - 2 = 17 remaining (≥10) ✅ Approve both
+ * • 12 Captains available, 4 Captains requesting → 12 - 4 = 8 remaining (<10) ❌ Only approve 2
+ *
+ * Examples (First Officers):
+ * • 15 First Officers available, 3 First Officers requesting → 15 - 3 = 12 remaining (≥10) ✅ Approve all 3
+ * • 11 First Officers available, 3 First Officers requesting → 11 - 3 = 8 remaining (<10) ❌ Only approve 1
+ *
+ * SCENARIO 1: No other pilots of SAME RANK requesting same dates
+ * → APPROVE if currentAvailable - 1 >= 10 (maintaining minimum crew FOR THIS RANK)
+ *
+ * SCENARIO 2: Multiple pilots of SAME RANK requesting same dates
+ * → Calculate: remainingAfterAllApprovals = currentAvailable - totalRequesting
+ * → Sub-scenarios:
+ *    2a. remainingAfterAllApprovals >= 10 → APPROVE ALL in seniority order (green border)
+ *    2b. remainingAfterAllApprovals < 10 BUT some can be approved → APPROVE highest seniority
+ *        up to maxApprovable (currentAvailable - 10), recommend alternatives for rest (yellow border)
+ *    2c. currentAvailable <= 10 (at/below minimum already) → Recommend spreading/sequential
+ *        approval for all requests (red border)
+ *
+ * Key Principles:
+ * - Minimum crew MUST be maintained: 10 Captains AND 10 First Officers at all times
+ * - Priority order for approval decisions:
+ *   1. Rank (Captain has priority over First Officer)
+ *   2. Seniority Number (lower = higher priority WITHIN THE SAME RANK)
+ *   3. Request Submission Date (earlier submission = higher priority for spreading tie-breaker)
+ * - Captains and First Officers evaluated independently with separate minimums
+ * - Leave requests evaluated against approved + pending requests OF THE SAME RANK
+ * - Real-time conflict detection for overlapping dates WITHIN THE SAME RANK
+ * - Seniority comparison ALWAYS shown when 2+ pilots OF THE SAME RANK request same dates
  *
  * Created: 2025-10-03
- * Purpose: Ensure operational crew requirements while managing leave requests
+ * Updated: 2025-10-04 - Corrected crew availability calculation logic and clarified rank-specific rules
+ * Purpose: Ensure operational crew requirements while managing leave requests per rank
  */
 
 import { getSupabaseAdmin } from './supabase';
@@ -411,7 +451,7 @@ export async function getConflictingPendingRequests(
       };
     })
     .sort((a, b) => {
-      // Priority order: Overlap Type > Rank (Captain > First Officer) > Seniority Number (lower = higher)
+      // Priority order: Overlap Type > Rank (Captain > First Officer) > Seniority Number (lower = higher) > Request Date (earlier = higher priority)
       const overlapPriority = { EXACT: 0, PARTIAL: 1, ADJACENT: 2, NEARBY: 3 };
       const overlapCompare = overlapPriority[a.overlapType!] - overlapPriority[b.overlapType!];
       if (overlapCompare !== 0) return overlapCompare;
@@ -421,8 +461,14 @@ export async function getConflictingPendingRequests(
       const rankCompare = rankPriority[a.role!] - rankPriority[b.role!];
       if (rankCompare !== 0) return rankCompare;
 
-      // Finally by seniority number (lower = higher priority)
-      return a.seniorityNumber - b.seniorityNumber;
+      // Then by seniority number (lower = higher priority)
+      const seniorityCompare = a.seniorityNumber - b.seniorityNumber;
+      if (seniorityCompare !== 0) return seniorityCompare;
+
+      // Finally by request date (earlier submission = higher priority for spreading)
+      const dateA = a.requestDate ? new Date(a.requestDate).getTime() : Infinity;
+      const dateB = b.requestDate ? new Date(b.requestDate).getTime() : Infinity;
+      return dateA - dateB;
     });
 
   // Generate overall seniority recommendation
@@ -753,18 +799,85 @@ export async function checkLeaveEligibility(
         });
       }
 
-      // ONLY show seniority comparison when MULTIPLE pilots are requesting same dates
-      // If only ONE pilot (no conflicts), straight approve based on crew availability
+      // LOGIC UPDATE (2025-10-04): New seniority-based approval logic
+      // CRITICAL: Must maintain minimum 10 Captains AND 10 First Officers
+      //
+      // Calculation Logic:
+      // - currentAvailable = pilots of this rank currently available (not on approved leave)
+      // - totalRequesting = number of pilots of this rank requesting leave for overlapping dates
+      // - remainingAfterApproval = currentAvailable - totalRequesting
+      // - maxApprovable = how many we can approve while keeping remainingAfterApproval >= 10
+      //
+      // Examples:
+      // Scenario 1: 15 Captains available, 2 requesting → 15 - 2 = 13 remaining (>= 10) ✅ Approve both
+      // Scenario 2: 12 FOs available, 4 requesting → 12 - 4 = 8 remaining (< 10) ❌ Only approve 2 (12-10=2)
+
       if (allConflictingRequests.length > 1) {
         console.log('👥 MULTIPLE PILOTS detected:', allConflictingRequests.length);
         conflictingRequests = allConflictingRequests;
+        needsSeniorityReview = true; // Always show seniority comparison for multiple pilots
 
-        if (!hasMinimumCrewForRole) {
-          // Below minimum crew for this role - need seniority review with spreading recommendations
-          console.log('⚠️ BELOW MINIMUM CREW - Seniority review required');
-          needsSeniorityReview = true;
+        // Count how many pilots can be approved while maintaining minimum crew
+        const requestingRole = request.pilotRole;
+        const currentAvailable = requestingRole === 'Captain' ? availableCaptains : availableFirstOfficers;
+        const minimumRequired = requestingRole === 'Captain' ? requirements.minimumCaptains : requirements.minimumFirstOfficers;
+        const totalRequesting = allConflictingRequests.length;
 
-          // Generate intelligent spreading recommendations
+        // CORRECTED LOGIC: Calculate remaining crew after approving all requests
+        // If (currentAvailable - totalRequesting) >= minimumRequired, then ALL can be approved
+        // Otherwise, maxApprovable = currentAvailable - minimumRequired
+        const remainingAfterAllApprovals = currentAvailable - totalRequesting;
+        const canApproveAll = remainingAfterAllApprovals >= minimumRequired;
+        const maxApprovable = canApproveAll ? totalRequesting : Math.max(0, currentAvailable - minimumRequired);
+
+        console.log('📊 SENIORITY APPROVAL CALCULATION:', {
+          requestingRole,
+          currentlyAvailable: currentAvailable,
+          minimumRequired: minimumRequired,
+          totalRequesting: totalRequesting,
+          remainingAfterAllApprovals: remainingAfterAllApprovals,
+          canApproveAll: canApproveAll,
+          maxCanApprove: maxApprovable
+        });
+
+        if (maxApprovable >= allConflictingRequests.length) {
+          // SCENARIO 2a: Above minimum crew - ALL can be approved, no spreading needed
+          console.log('✅ SUFFICIENT CREW - All requests can be approved');
+          seniorityRecommendation = ''; // No spreading recommendations needed when all can be approved
+
+        } else if (maxApprovable > 0) {
+          // SCENARIO 2b: Can approve some, but not all - use seniority to determine who gets approved
+          console.log('⚠️ PARTIAL APPROVAL - Only top seniority pilots can be approved');
+          const canApprove = allConflictingRequests.slice(0, maxApprovable);
+          const mustReschedule = allConflictingRequests.slice(maxApprovable);
+
+          seniorityRecommendation = `⚠️ CREW SHORTAGE RISK\n\n` +
+            `Current ${requestingRole}s Available: ${currentAvailable}\n` +
+            `Minimum Required: ${minimumRequired}\n` +
+            `Total Requesting Leave: ${totalRequesting} ${requestingRole}${totalRequesting > 1 ? 's' : ''}\n` +
+            `If All Approved, Remaining: ${remainingAfterAllApprovals} (❌ BELOW minimum of ${minimumRequired})\n` +
+            `Maximum Can Approve: ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''} (to maintain minimum crew)\n\n` +
+            `✅ APPROVE (Highest Seniority - ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''}):\n` +
+            canApprove.map((req, index) =>
+              `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
+              `     • Employee ID: ${req.employeeId}\n` +
+              `     • Dates: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n`
+            ).join('\n') +
+            `\n🔄 REQUEST TO RESCHEDULE (Lower Seniority - ${mustReschedule.length} pilot${mustReschedule.length > 1 ? 's' : ''}):\n` +
+            mustReschedule.map((req, index) => {
+              const spreadingOptions = generateDateSpreadingSuggestions(req.startDate, req.endDate, allConflictingRequests);
+              const remainingIfApproved = currentAvailable - maxApprovable - 1;
+              return `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
+              `     • Employee ID: ${req.employeeId}\n` +
+              `     • Current Request: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n` +
+              `     • Reason: Approving would drop crew below minimum (${remainingIfApproved}/${minimumRequired})\n` +
+              `     • Suggested Alternative Dates:\n` +
+              spreadingOptions.map((option, optIndex) => `        ${optIndex + 1}) ${option}\n`).join('');
+            }).join('\n');
+
+        } else {
+          // SCENARIO 2c: At or below minimum already - need spreading recommendations for ALL
+          console.log('❌ CREW SHORTAGE - All requests need rescheduling or sequential approval');
           seniorityRecommendation = generateSpreadingRecommendations(
             allConflictingRequests,
             request,
@@ -772,15 +885,10 @@ export async function checkLeaveEligibility(
             availableFirstOfficers,
             requirements
           );
-        } else {
-          // Sufficient crew - all can be approved, but still show the comparison
-          console.log('✅ SUFFICIENT CREW - All requests can be approved');
-          needsSeniorityReview = false;
-          seniorityRecommendation = `✅ Sufficient ${request.pilotRole} crew available (${request.pilotRole === 'Captain' ? availableCaptains : availableFirstOfficers} available, ${requirements.minimumCaptains} minimum required). All overlapping requests can be approved without crew shortage.`;
         }
       } else {
-        // Only ONE pilot requesting - straight approve based on crew availability only
-        console.log('✅ SINGLE PILOT - Straight approve based on crew availability');
+        // SCENARIO 1: Only ONE pilot requesting - straight approve based on crew availability
+        console.log('✅ SINGLE PILOT - Straight approve (no conflicts)');
         conflictingRequests = [];
         needsSeniorityReview = false;
         seniorityRecommendation = '';

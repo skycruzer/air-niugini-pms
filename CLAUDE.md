@@ -17,31 +17,45 @@ Air Niugini B767 Pilot Management System - A comprehensive pilot certification t
 npm run dev          # Starts on http://localhost:3001 (or 3000)
 
 # Build and production
-npm run build        # Build for production
+npm run build        # Build for production (SKIP_ENV_VALIDATION=true)
+npm run build:analyze # Build with bundle analyzer
 npm start            # Start production server
 npm run lint         # Run ESLint with Next.js rules
+npm run lint:fix     # Auto-fix ESLint issues
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+npm run type-check   # TypeScript type checking
+npm run validate     # Run all checks (format, lint, type-check, test, build)
+```
+
+### Testing
+
+```bash
+# Jest unit tests
+npm test                  # Run all tests
+npm run test:watch        # Run tests in watch mode
+npm run test:coverage     # Run tests with coverage report
+npm run test:unit         # Run unit tests only
+npm run test:integration  # Run integration tests only
+npm run test:ci           # Run tests in CI mode
+
+# Playwright E2E tests
+npx playwright test                    # Run all E2E tests
+npx playwright test test-login.spec.js # Run specific test
+npx playwright test --headed           # Run with browser visible
+npx playwright test --ui               # Run with Playwright UI
 ```
 
 ### Database Operations
 
 ```bash
 # Core database management scripts
-node test-connection.js       # Test Supabase connection
-node deploy-schema.js         # Deploy complete database schema
-node populate-data.js         # Populate with sample data
-node create-users.js          # Create system users
-node run-seniority-migration.js  # Update seniority calculations
-node execute-migration.js    # Execute custom migrations
-```
-
-### Testing (Playwright E2E)
-
-```bash
-# Comprehensive testing suite
-npx playwright test                    # Run all tests
-npx playwright test test-login.spec.js # Run specific test
-npx playwright test --headed           # Run with browser visible
-npx playwright test --ui               # Run with Playwright UI
+node test-connection.js             # Test Supabase connection
+node deploy-schema.js               # Deploy complete database schema
+node populate-data.js               # Populate with sample data
+node create-users.js                # Create system users
+node run-seniority-migration.js     # Update seniority calculations
+node execute-migration.js           # Execute custom migrations
 ```
 
 ## Architecture Overview
@@ -303,6 +317,120 @@ const expiringChecks = await supabase
   .lte('days_until_expiry', 30);
 ```
 
+### Leave Management System Architecture
+
+**Critical Business Logic** (Completed 2025-10-03, Updated 2025-10-04):
+
+**APPROVAL RULES** (Updated 2025-10-04):
+
+**CRITICAL**: Captains and First Officers are evaluated **SEPARATELY**. Each rank has independent minimum requirements (10 Captains AND 10 First Officers). Never compare priority across ranks.
+
+**SCENARIO 1**: No other pilots of same rank requesting same dates + above minimum crew
+→ **APPROVE** (no seniority comparison shown)
+
+**SCENARIO 2**: Multiple pilots of same rank requesting same dates
+→ **ALWAYS show seniority comparison** (informational display)
+→ Sub-scenarios based on crew availability:
+- **2a**: Can approve ALL pilots of this rank while staying above minimum (≥10) → Green border, approve all, NO spreading recommendations
+- **2b**: Can approve SOME pilots while maintaining minimum (≥10) → Yellow border, approve highest seniority, show spreading recommendations for lower seniority
+- **2c**: Below minimum crew already → Red border, recommend spreading/sequential approval for all
+
+**Priority Order (Within Same Rank Only)**:
+1. **Seniority Number** (Lower number = Higher priority, 1 = most senior)
+2. **Request Submission Date** (Earlier submission = Higher priority, used as tiebreaker)
+
+#### 1. Final Review Alert Component
+**Location**: `src/components/leave/FinalReviewAlert.tsx`
+
+**Key Behavior**:
+- Displays 22 days before next roster period starts
+- **ONLY shows when `pendingCount > 0`** (hidden if no pending requests)
+- Applies ONLY to NEXT roster period (not current, not following)
+- Severity levels: urgent (≤7 days), warning (8-22 days), info (>22 days)
+
+```typescript
+// Critical visibility logic
+if (pendingCount === 0) {
+  return null; // No alert if no pending requests
+}
+```
+
+#### 2. Seniority Priority Review Component
+**Location**: `src/components/leave/LeaveEligibilityAlert.tsx`
+
+**Key Behavior**:
+- **ALWAYS displays when 2+ pilots OF THE SAME RANK request same/overlapping dates**
+- Shows complete seniority comparison regardless of crew availability
+- Blue informational background (consistent for all scenarios)
+- Border color indicates crew status: green (sufficient crew ≥10) vs yellow (crew shortage <10)
+- Lists pilots of same rank sorted by: Seniority Number (lower = higher) → Request Date (earlier = higher)
+- **Captains and First Officers are NEVER compared against each other** - evaluated separately with independent minimums
+
+```typescript
+// Always show seniority comparison for multiple pilots OF SAME RANK
+const hasConflictingRequests = eligibility?.conflictingRequests &&
+                               eligibility.conflictingRequests.length > 1;
+
+// Detect sufficient crew based on seniorityRecommendation
+// Empty or no "CREW SHORTAGE RISK" = sufficient crew
+const hasSufficientCrew = !eligibility.seniorityRecommendation ||
+  !eligibility.seniorityRecommendation.includes('CREW SHORTAGE RISK');
+
+// Border color based on crew availability
+const bgColor = 'bg-blue-50';
+const borderColor = hasSufficientCrew ? 'border-green-400' : 'border-yellow-400';
+```
+
+#### 3. Leave Eligibility Service
+**Location**: `src/lib/leave-eligibility-service.ts`
+
+**Core Logic**:
+- Checks crew availability: minimum 10 Captains AND 10 First Officers (independently)
+- Detects conflicting requests (exact, partial, adjacent overlaps)
+- Filters conflicts by rank - Captains ONLY compared with Captains, First Officers ONLY with First Officers
+- Calculates seniority priority for conflict resolution within same rank
+- Generates spreading recommendations ONLY when crew shortage exists
+- Sorting priority: Seniority Number (lower = higher) → Request Date (earlier = higher)
+
+```typescript
+// Crew availability check (per rank)
+const MIN_CAPTAINS_REQUIRED = 10;
+const MIN_FIRST_OFFICERS_REQUIRED = 10;
+
+// Filter by rank - critical for separate evaluation
+const allConflictingRequests = conflictingPendingRequests
+  .filter((req: any) => req.pilots?.role === request.pilotRole); // Same rank only!
+
+// Crew calculation for this specific rank
+const currentAvailable = requestingRole === 'Captain' ? availableCaptains : availableFirstOfficers;
+const remainingAfterAllApprovals = currentAvailable - totalRequesting;
+const canApproveAll = remainingAfterAllApprovals >= minimumRequired;
+
+// NO spreading recommendations when sufficient crew
+if (canApproveAll) {
+  seniorityRecommendation = ''; // Empty = sufficient crew
+}
+```
+
+#### 4. Roster Period Filtering
+**Locations**: `src/app/dashboard/leave/page.tsx`, `src/components/leave/LeaveRequestsList.tsx`
+
+**Filter Options**:
+- **All Rosters**: Show all leave requests (current, next, following)
+- **Next Roster Only**: Show requests starting in RP12/2025 (next 28-day period)
+- **Following Rosters**: Show requests starting after next roster
+
+```typescript
+// Next roster boundary calculation
+const currentRoster = getCurrentRosterPeriod();
+const nextRosterStartDate = new Date(currentRoster.endDate);
+nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1);
+const nextRosterEndDate = new Date(nextRosterStartDate);
+nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day period
+```
+
+**IMPORTANT**: For complete leave management documentation, see `LEAVE_MANAGEMENT_SYSTEM.md` (645 lines)
+
 ### Testing Architecture
 
 **Playwright E2E Test Suite**:
@@ -509,11 +637,79 @@ const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certificati
 - Service layer architecture for production stability
 - Email notifications and automated reporting
 
+✅ **Leave Management System** (Completed 2025-10-03):
+
+- Complete leave request workflow with seniority-based conflict resolution
+- Final Review Alert (22 days before next roster, shows only when pending requests exist)
+- Seniority Priority Review (always displays when 2+ pilots request same dates)
+- Crew availability checking with minimum requirements (10 Captains + 10 First Officers)
+- Roster period filtering (All/Next/Following rosters)
+- Interactive calendar and team availability views
+- Spreading recommendations for crew shortage scenarios
+
 🚧 **Active Development**:
 
-- Advanced leave request management
-- Calendar integration for scheduling
-- Enhanced reporting features
+- Enhanced analytics and metrics
+- Advanced reporting features
+- Calendar integration improvements
+
+## Code Quality Tools
+
+### Husky Git Hooks
+- **Pre-commit**: Runs lint-staged to format and lint staged files
+- **Commit-msg**: Validates commit messages using commitlint (conventional commits)
+
+### Commitlint Configuration
+Enforces conventional commit format:
+```
+feat: add new feature
+fix: bug fix
+docs: documentation changes
+style: formatting changes
+refactor: code restructuring
+test: adding tests
+chore: maintenance tasks
+```
+
+### Lint-Staged
+Automatically formats and lints files before commit:
+- Prettier for code formatting
+- ESLint for JavaScript/TypeScript linting
+- Type checking for TypeScript files
+
+## Key File Locations
+
+### Documentation Files
+- `CLAUDE.md` - AI assistant guidance (this file)
+- `LEAVE_MANAGEMENT_SYSTEM.md` - Complete leave management documentation (645 lines)
+- `README.md` - Project overview and quick start
+- `PLAN.md` - Implementation plan
+- `SPEC.md` - Technical specification
+- `PROMPT.md` - Development prompt reference
+
+### Database Management Scripts
+All located in project root:
+- `test-connection.js` - Test Supabase connection
+- `deploy-schema.js` - Deploy complete schema
+- `populate-data.js` - Sample data population
+- `create-users.js` - User creation
+- `run-seniority-migration.js` - Seniority calculations
+- `execute-migration.js` - Custom migrations
+
+### Core Service Files
+Located in `src/lib/`:
+- `leave-eligibility-service.ts` - Seniority and crew availability logic
+- `leave-service.ts` - Leave request CRUD operations
+- `roster-utils.ts` - 28-day roster period calculations
+- `pilot-service.ts` - Pilot management operations
+- `expiring-certifications-service.ts` - Certification expiry logic
+- `auth-utils.ts` - Permission and role management
+
+### Key Components
+- `src/components/leave/FinalReviewAlert.tsx` - 22-day deadline alert
+- `src/components/leave/LeaveEligibilityAlert.tsx` - Seniority priority review
+- `src/components/leave/LeaveRequestsList.tsx` - Leave requests with filtering
+- `src/app/dashboard/leave/page.tsx` - Main leave management page
 
 ## Important Notes
 
@@ -525,6 +721,7 @@ const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certificati
 - **Security**: Role-based access control and RLS policies protect sensitive pilot data
 - **Production Stability**: Service layer architecture prevents inter-API call issues in production
 - **Environment Management**: Critical to maintain clean environment variables without trailing characters
+- **Leave Management**: Seniority priority review ALWAYS shows for 2+ pilots, Final Review Alert ONLY shows when pending requests exist
 
 ---
 

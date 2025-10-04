@@ -1,16 +1,41 @@
 /**
  * LEAVE ELIGIBILITY ALERT COMPONENT
  *
- * Displays seniority-based priority review when multiple pilots request same dates.
+ * Displays seniority-based priority review when multiple pilots of THE SAME RANK request same dates.
  * Always shows all conflicting requests sorted by seniority, regardless of crew availability.
  *
+ * Business Logic (Updated 2025-10-04):
+ *
+ * CRITICAL: EVALUATES PILOTS OF THE SAME RANK SEPARATELY
+ * - Captains are compared ONLY with other Captains
+ * - First Officers are compared ONLY with other First Officers
+ * - Each rank maintains its own minimum requirement: 10 Captains AND 10 First Officers
+ *
+ * CREW CALCULATION (Per Rank):
+ * - currentAvailable = pilots OF THIS RANK NOT on approved leave
+ * - totalRequesting = pilots OF THIS RANK requesting leave for overlapping dates
+ * - remainingAfterApproval = currentAvailable - totalRequesting
+ * - If remainingAfterApproval >= 10: Can approve all ✅
+ * - If remainingAfterApproval < 10: Can only approve (currentAvailable - 10) pilots ⚠️
+ *
+ * DISPLAY SCENARIOS:
+ * - SCENARIO 1: No conflicts from SAME RANK → No alert shown
+ * - SCENARIO 2a: Multiple requests from SAME RANK + remainingAfterApproval >= 10 → Green border (approve all)
+ * - SCENARIO 2b: Multiple requests from SAME RANK + remainingAfterApproval < 10 → Yellow border (approve some by seniority)
+ * - SCENARIO 2c: currentAvailable <= 10 → Red border (crew shortage, spread requests)
+ *
  * Features:
- * - Always displays when 2+ pilots request same/overlapping dates
- * - Lists ALL pilots sorted by seniority priority (Rank → Seniority Number)
- * - Shows crew availability status (sufficient vs. shortage risk)
+ * - Always displays when 2+ pilots OF THE SAME RANK request same/overlapping dates
+ * - Lists ALL pilots of the same rank sorted by:
+ *   1. Seniority Number (lower = higher priority)
+ *   2. Request Submission Date (earlier = higher priority as tie-breaker)
+ * - Shows crew availability status and approval capacity FOR THAT SPECIFIC RANK
  * - Detailed conflict information with affected dates
- * - Color-coded border: green (sufficient crew) vs. yellow (shortage risk)
+ * - Color-coded border indicates crew status for the rank
  * - Consistent blue background for informational seniority comparison
+ * - Alternative date suggestions for lower seniority pilots when needed
+ * - Captains and First Officers managed independently with separate minimums
+ * - Request order used for spreading recommendations when seniority is equal
  */
 
 'use client';
@@ -64,8 +89,10 @@ export function LeaveEligibilityAlert({
   console.log('📊 ALERT: Showing comparison with', eligibility.conflictingRequests.length, 'pilots');
 
   // Determine if this is a crew shortage scenario or sufficient crew
-  const hasSufficientCrew = eligibility.recommendation === 'APPROVE' ||
-    (eligibility.reasons && eligibility.reasons.some(r => r.includes('Sufficient')));
+  // When seniorityRecommendation is empty AND there are multiple conflicting requests, it means sufficient crew
+  // When seniorityRecommendation contains "CREW SHORTAGE RISK", it means crew shortage
+  const hasSufficientCrew = !eligibility.seniorityRecommendation ||
+    !eligibility.seniorityRecommendation.includes('CREW SHORTAGE RISK');
 
   // Always use blue theme for seniority comparison (informational)
   const bgColor = 'bg-blue-50';
@@ -100,16 +127,19 @@ export function LeaveEligibilityAlert({
             <div className="flex items-start mb-3">
               <span className="text-2xl mr-3">✅</span>
               <div className="flex-1">
-                <h5 className="font-bold text-green-900 text-base mb-2">RECOMMENDATION: APPROVE</h5>
+                <h5 className="font-bold text-green-900 text-base mb-2">SUMMARY</h5>
                 <p className="text-green-800 mb-2">
-                  <strong>{pilotName}</strong> can be approved. Sufficient crew members available to maintain minimum requirements.
+                  <strong>{pilotName}&apos;s</strong> leave request can be approved. Sufficient {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} available to maintain minimum crew requirements (≥10).
                 </p>
                 <div className="bg-white rounded p-3 text-green-900">
-                  <p className="mb-1">
-                    <strong>Crew Status:</strong> {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} available after approval will remain above minimum requirements.
+                  <p className="mb-2">
+                    <strong>✅ RECOMMENDATION: APPROVE</strong>
                   </p>
-                  <p className="text-sm">
-                    Multiple pilots requesting same dates, but crew levels allow all approvals without operational impact.
+                  <p className="text-sm mb-1">
+                    Multiple pilots of the same rank are requesting overlapping dates, but crew levels allow all approvals without operational impact.
+                  </p>
+                  <p className="text-sm text-green-700">
+                    No crew availability issues. All requests can be approved while maintaining minimum requirements.
                   </p>
                 </div>
               </div>
@@ -120,14 +150,27 @@ export function LeaveEligibilityAlert({
             <div className="flex items-start mb-3">
               <span className="text-2xl mr-3">⚠️</span>
               <div className="flex-1">
-                <h5 className="font-bold text-yellow-900 text-base mb-2">RECOMMENDATION: REVIEW REQUIRED</h5>
+                <h5 className="font-bold text-yellow-900 text-base mb-2">SUMMARY</h5>
                 <p className="text-yellow-800 mb-2">
-                  <strong>CAUTION:</strong> Approving all conflicting requests may result in crew shortage. Review seniority priority below.
+                  <strong>{pilotName}&apos;s</strong> leave request requires review. Approving all conflicting requests may reduce {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} below minimum requirement (10).
                 </p>
+
+                <div className="bg-white rounded p-3 text-yellow-900 mb-3">
+                  <p className="mb-2">
+                    <strong>⚠️ RECOMMENDATION: REVIEW REQUIRED</strong>
+                  </p>
+                  <p className="text-sm mb-2">
+                    Multiple pilots of the same rank are requesting overlapping dates, but approving all would cause crew shortage.
+                  </p>
+                  <p className="text-sm text-yellow-800 font-semibold">
+                    Use seniority priority below to determine which requests to approve. Higher seniority pilots (lower seniority number) should be approved first.
+                  </p>
+                </div>
 
                 {/* Display detailed spreading recommendations ONLY when crew shortage exists */}
                 {eligibility.reasons && eligibility.reasons.length > 0 && eligibility.reasons.some(r => r.includes('CREW SHORTAGE RISK')) && (
                   <div className="bg-white rounded p-4 text-yellow-900 mb-3">
+                    <p className="text-xs font-bold mb-2 text-yellow-800">📋 ALTERNATIVE DATE RECOMMENDATIONS:</p>
                     {eligibility.reasons.map((reason, idx) => {
                       // Only show spreading recommendations when there's an actual crew shortage
                       if (reason.includes('CREW SHORTAGE RISK') && reason.includes('SENIORITY-BASED SPREADING')) {
@@ -144,12 +187,15 @@ export function LeaveEligibilityAlert({
 
                 <div className="bg-white rounded p-3 text-yellow-900">
                   <p className="mb-2">
-                    <strong>⚖️ Priority Determination Rules:</strong>
+                    <strong>⚖️ Priority Determination Rules (Within Same Rank):</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm ml-2">
-                    <li><strong>1st:</strong> Rank (Captain has priority over First Officer)</li>
-                    <li><strong>2nd:</strong> Seniority Number (Lower number = Higher priority)</li>
+                    <li><strong>1st:</strong> Seniority Number (Lower number = Higher priority)</li>
+                    <li><strong>2nd:</strong> Request Submission Date (Earlier submission = Higher priority)</li>
                   </ul>
+                  <p className="text-xs mt-2 text-yellow-700">
+                    Note: Captains and First Officers are evaluated separately with independent minimums (10 each).
+                  </p>
                 </div>
               </div>
             </div>
@@ -161,17 +207,17 @@ export function LeaveEligibilityAlert({
           <div className="flex items-start mb-2">
             <span className="text-xl mr-2">⚖️</span>
             <div className="flex-1">
-              <h5 className="font-bold text-blue-900 text-base mb-2">Seniority Priority Rules</h5>
+              <h5 className="font-bold text-blue-900 text-base mb-2">Seniority Priority Rules (Within Same Rank)</h5>
               <div className="bg-white rounded p-3 text-blue-900">
                 <p className="mb-2">
                   <strong>Priority Determination:</strong>
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-sm ml-2">
-                  <li><strong>1st:</strong> Rank (Captain has priority over First Officer)</li>
-                  <li><strong>2nd:</strong> Seniority Number (Lower number = Higher priority)</li>
+                  <li><strong>1st:</strong> Seniority Number (Lower number = Higher priority)</li>
+                  <li><strong>2nd:</strong> Request Submission Date (Earlier submission = Higher priority)</li>
                 </ul>
-                <p className="text-sm mt-3">
-                  All requests below are sorted by seniority priority. The highest priority pilot is listed first.
+                <p className="text-xs mt-3 text-blue-700">
+                  Note: Captains and First Officers are evaluated separately with independent minimums (10 each). All requests below are sorted by seniority priority within their rank.
                 </p>
               </div>
             </div>
