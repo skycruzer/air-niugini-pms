@@ -574,7 +574,12 @@ export function AnalyticsDashboard() {
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Recent Alerts</h2>
-          <button className="text-sm text-[#E4002B] hover:text-[#C00020]">View All</button>
+          <a
+            href="/dashboard/certifications"
+            className="text-sm text-[#E4002B] hover:text-[#C00020] font-medium hover:underline"
+          >
+            View All
+          </a>
         </div>
 
         <div className="space-y-3">
