@@ -11,6 +11,28 @@ export async function GET(request: NextRequest) {
 
   try {
     switch (reportType) {
+      // NEW CONSOLIDATED REPORT TYPES (Phase 2 Consolidation)
+      case 'compliance-dashboard':
+        // Merges: Fleet Compliance + Risk Assessment + Operational Readiness
+        return await generateFleetComplianceReport(supabaseAdmin);
+
+      case 'pilot-management':
+        // Merges: Pilot Summary + Fleet Management
+        return await generateFleetManagementReport(supabaseAdmin);
+
+      case 'certification-planning':
+        // Merges: Certification Forecast + Planning & Rostering
+        return await generatePlanningRosteringReport(supabaseAdmin);
+
+      case 'operational-status':
+        // Real-time operational capacity and crew availability
+        return await generateOperationalReadinessReport(supabaseAdmin);
+
+      case 'fleet-analytics':
+        // Advanced performance metrics and analytics
+        return await generateFleetAnalyticsReport(supabaseAdmin);
+
+      // LEGACY REPORT TYPES (backwards compatibility)
       case 'fleet-compliance':
         return await generateFleetComplianceReport(supabaseAdmin);
       case 'risk-assessment':
@@ -21,12 +43,11 @@ export async function GET(request: NextRequest) {
         return await generateFleetManagementReport(supabaseAdmin);
       case 'certification-forecast':
         return await generateCertificationForecastReport(supabaseAdmin);
-      case 'fleet-analytics':
-        return await generateFleetAnalyticsReport(supabaseAdmin);
       case 'operational-readiness':
         return await generateOperationalReadinessReport(supabaseAdmin);
       case 'planning-rostering':
         return await generatePlanningRosteringReport(supabaseAdmin);
+
       default:
         return NextResponse.json(
           {
