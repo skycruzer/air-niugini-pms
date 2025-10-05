@@ -72,7 +72,7 @@ export const LazyCertificationStatusChart = lazy(() =>
 );
 
 export const LazyComplianceGaugeChart = lazy(() =>
-  import('@/components/charts/ComplianceGaugeChart').then((mod) => ({
+  import('@/components/shared/charts/ComplianceGaugeChart').then((mod) => ({
     default: mod.ComplianceGaugeChart,
   }))
 );

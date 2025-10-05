@@ -237,6 +237,9 @@ body {
 .btn {
   @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer;
   box-shadow: var(--shadow-sm);
+  /* Minimum touch target size for accessibility */
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .btn:hover {
@@ -253,6 +256,11 @@ body {
   outline: none;
   ring: 2px;
   ring-offset: 2px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--air-niugini-red);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -689,6 +697,32 @@ body {
     min-height: 44px;
   }
 
+  /* Improve horizontal scrolling indicators */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #E4002B transparent;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #E4002B;
+    border-radius: 3px;
+  }
+
+  /* Swipe-friendly cards */
+  .swipe-card {
+    touch-action: pan-x;
+    user-select: none;
+  }
+
   .btn-sm {
     @apply px-3 py-2 text-sm;
     min-height: 40px;
@@ -959,6 +993,16 @@ body {
   }
   50% {
     opacity: 0.6;
+  }
+}
+
+/* Shimmer Animation for Skeletons */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 

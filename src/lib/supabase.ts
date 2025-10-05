@@ -102,8 +102,10 @@ function createSupabaseAdmin() {
 }
 
 // Lazy initialization of admin client to avoid build-time errors
-let _supabaseAdmin: any = null;
-export function getSupabaseAdmin() {
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+let _supabaseAdmin: SupabaseClient | null = null;
+export function getSupabaseAdmin(): SupabaseClient {
   if (!_supabaseAdmin) {
     _supabaseAdmin = createSupabaseAdmin();
   }
@@ -290,10 +292,20 @@ export interface LeaveRequest {
 // =============================================================================
 
 /**
+ * Supabase error type definition
+ */
+interface SupabaseError {
+  message?: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+}
+
+/**
  * Standardized error handler for Supabase operations
  * Provides consistent error logging and user-friendly error messages
  *
- * @param {any} error - Supabase error object
+ * @param {SupabaseError | Error | unknown} error - Supabase error object
  * @returns {string} User-friendly error message
  *
  * @example
@@ -303,7 +315,16 @@ export interface LeaveRequest {
  *   setErrorState(message);
  * }
  */
-export const handleSupabaseError = (error: any) => {
+export const handleSupabaseError = (error: SupabaseError | Error | unknown): string => {
   console.error('Supabase error:', error);
-  return error.message || 'An unexpected error occurred';
+
+  if (error && typeof error === 'object' && 'message' in error) {
+    return (error as SupabaseError).message || 'An unexpected error occurred';
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'An unexpected error occurred';
 };

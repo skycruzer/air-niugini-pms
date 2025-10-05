@@ -1,46 +1,65 @@
 # Air Niugini B767 Pilot Management System
 
-A streamlined web application for managing pilot certifications and leave requests within 28-day roster periods for Papua New Guinea's national airline B767 fleet operations.
+**Production-Ready** pilot certification tracking and leave management system for Papua New Guinea's national airline B767 fleet operations.
 
 ## 🚀 Quick Start
 
 ```bash
 # Development server
-npm run dev
+npm run dev          # Starts on http://localhost:3001
 
-# Visit http://localhost:3001 (or http://localhost:3000)
+# Production build
+npm run build
+npm start
+
+# Run tests
+npm test
+npx playwright test  # E2E tests
 ```
 
-## ✅ Phase 1 Complete (Foundation)
+## 📊 System Status
 
-- ✅ Next.js 14 project with TypeScript
-- ✅ Air Niugini branding (#E4002B red, #FFC72C gold)
-- ✅ Supabase database connection (existing project)
-- ✅ New database tables (prefixed with `an_`)
-- ✅ Core utilities (roster calculations, certification status)
-- ✅ Landing page with current roster display
-- ✅ Development server running on port 3001
+**Status**: ✅ Production Ready (v1.0)
 
-## 🏗️ Current Status
+**Live Fleet Data**:
+- 👨‍✈️ **27 Active Pilots** (Captains & First Officers)
+- 🛡️ **571 Certifications** tracked across the fleet
+- 📋 **34 Check Types** across 8 certification categories
+- 🗓️ **12 Leave Requests** in current roster period
 
-**Development Phase**: Phase 1 Complete → Starting Phase 2
+**Current Roster**: RP11/2025 (ends October 10, 2025)
 
-**Next Steps**:
+## ✨ Key Features
 
-- Authentication system (Admin/Manager roles)
-- Login page with Air Niugini branding
-- Dashboard with pilot statistics
-- Navigation structure
+### ✅ Completed & Production Ready
+
+- **Authentication** - Supabase Auth with Admin/Manager roles
+- **Dashboard** - Real-time statistics, compliance tracking, alerts
+- **Pilot Management** - Full CRUD with seniority tracking
+- **Certification Tracking** - 571 certifications with expiry monitoring
+- **Leave Management** - Seniority-based conflict resolution
+- **Analytics** - Interactive charts, trends, performance metrics
+- **Reports** - 5 consolidated reports with PDF/CSV export
+- **PWA Support** - Offline capability with service worker
+- **Testing** - Comprehensive E2E test suite with Playwright
 
 ## 🛢️ Database Structure
 
-All tables are prefixed with `an_` to avoid conflicts:
+**Production Tables** (Active):
+- `pilots` - 27 pilot records with seniority tracking
+- `pilot_checks` - 571 certification records with expiry dates
+- `check_types` - 34 certification types across 8 categories
+- `an_users` - 3 system users (admin/manager authentication)
+- `leave_requests` - 12 leave requests tied to roster periods
+- `settings` - System configuration
+- `contract_types` - Pilot contract classifications
 
-- `an_users` - System users (Admin/Manager)
-- `an_pilots` - Pilot information
-- `an_check_types` - Certification types (38 types)
-- `an_pilot_checks` - Pilot certifications with expiry dates
-- `an_leave_requests` - Leave/RDO/WDO requests
+**Database Views** (Optimized Queries):
+- `compliance_dashboard` - Fleet compliance metrics
+- `pilot_report_summary` - Comprehensive pilot summaries
+- `detailed_expiring_checks` - Expiring certifications with details
+- `expiring_checks` - Simplified expiring checks
+- `captain_qualifications_summary` - Captain qualifications
 
 ## 📊 Current Roster
 

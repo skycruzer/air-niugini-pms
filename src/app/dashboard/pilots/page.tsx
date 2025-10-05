@@ -25,6 +25,7 @@ import { BulkActionsBar } from '@/components/pilots/BulkActionsBar';
 import { pilotSearchService, SearchResult } from '@/lib/search-service';
 import { usePilotSort } from '@/hooks/usePilotSort';
 import { AnimatePresence, motion } from 'framer-motion';
+import { PilotStatsGrid } from '@/components/shared/PilotStatsGrid';
 
 type ViewMode = 'card' | 'list' | 'table';
 
@@ -704,52 +705,17 @@ export default function PilotsPage() {
               >
                 Fleet Summary
               </h3>
-              <div className="mobile-stats-grid md:grid-cols-4 gap-3 md:gap-4">
-                <div className="text-center p-3 bg-white rounded-lg">
-                  <p
-                    className="text-xl md:text-2xl font-bold text-blue-600"
-                    aria-describedby="active-pilots-desc"
-                  >
-                    {pilots.filter((p) => p.is_active).length}
-                  </p>
-                  <p id="active-pilots-desc" className="text-xs md:text-sm text-gray-600">
-                    Active Pilots
-                  </p>
-                </div>
-                <div className="text-center p-3 bg-white rounded-lg">
-                  <p
-                    className="text-xl md:text-2xl font-bold text-purple-600"
-                    aria-describedby="captains-desc"
-                  >
-                    {pilots.filter((p) => p.role === 'Captain').length}
-                  </p>
-                  <p id="captains-desc" className="text-xs md:text-sm text-gray-600">
-                    Captains
-                  </p>
-                </div>
-                <div className="text-center p-3 bg-white rounded-lg">
-                  <p
-                    className="text-xl md:text-2xl font-bold text-green-600"
-                    aria-describedby="first-officers-desc"
-                  >
-                    {pilots.filter((p) => p.role === 'First Officer').length}
-                  </p>
-                  <p id="first-officers-desc" className="text-xs md:text-sm text-gray-600">
-                    First Officers
-                  </p>
-                </div>
-                <div className="text-center p-3 bg-white rounded-lg">
-                  <p
-                    className="text-xl md:text-2xl font-bold text-red-600"
-                    aria-describedby="expired-certs-desc"
-                  >
-                    {pilots.reduce((sum, p) => sum + p.certificationStatus.expired, 0)}
-                  </p>
-                  <p id="expired-certs-desc" className="text-xs md:text-sm text-gray-600">
-                    Expired Certifications
-                  </p>
-                </div>
-              </div>
+              <PilotStatsGrid
+                stats={{
+                  total: pilots.length,
+                  captains: pilots.filter((p) => p.role === 'Captain').length,
+                  firstOfficers: pilots.filter((p) => p.role === 'First Officer').length,
+                  active: pilots.filter((p) => p.is_active).length,
+                  expiredCertifications: pilots.reduce((sum, p) => sum + p.certificationStatus.expired, 0),
+                }}
+                variant="detailed"
+                showTrends={false}
+              />
             </aside>
           )}
         </div>

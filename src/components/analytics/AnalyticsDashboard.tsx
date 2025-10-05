@@ -34,6 +34,7 @@ import type {
   LeaveAnalytics,
 } from '@/types/analytics';
 import { AIR_NIUGINI_COLORS } from '@/types/analytics';
+import { CertificationStatusChart } from '@/components/shared/CertificationStatusChart';
 
 // Register Chart.js components
 ChartJS.register(
@@ -477,8 +478,17 @@ export function AnalyticsDashboard() {
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Certification Status</h2>
           <div className="h-80">
-            {certificationStatusData ? (
-              <Doughnut data={certificationStatusData} options={doughnutOptions} />
+            {certificationData ? (
+              <CertificationStatusChart
+                data={{
+                  current: certificationData.current,
+                  expiring: certificationData.expiring,
+                  expired: certificationData.expired,
+                }}
+                variant="doughnut"
+                height={320}
+                showLegend={true}
+              />
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>

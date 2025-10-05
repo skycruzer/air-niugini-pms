@@ -25,6 +25,9 @@ import {
 import { getLeaveRequestStats } from '@/lib/leave-service';
 import { LazyRetirementReportModal } from '@/components/lazy';
 import { LazyLoader } from '@/components/ui/LazyLoader';
+import { PilotStatsGrid } from '@/components/shared/PilotStatsGrid';
+import { CertificationStatusChart } from '@/components/shared/CertificationStatusChart';
+import { ComplianceGauge } from '@/components/shared/ComplianceGauge';
 // Using emojis and custom SVGs instead of Lucide React icons
 
 interface StatCardProps {
@@ -801,104 +804,39 @@ export default function DashboardPage() {
                   <h4 className="text-lg font-semibold text-gray-900">Certification Status</h4>
                   <span className="text-2xl">📋</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Current</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {totalCertifications - expiringCount - expiredCount}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-amber-500 rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Expiring Soon</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{expiringCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Expired</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{expiredCount}</span>
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Compliance Rate</span>
-                    <span
-                      className={`text-lg font-bold ${
-                        complianceRate >= 95
-                          ? 'text-green-600'
-                          : complianceRate >= 85
-                            ? 'text-amber-600'
-                            : 'text-red-600'
-                      }`}
-                    >
-                      {complianceRate}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        complianceRate >= 95
-                          ? 'bg-green-500'
-                          : complianceRate >= 85
-                            ? 'bg-amber-500'
-                            : 'bg-red-500'
-                      }`}
-                      style={{ width: `${complianceRate}%` }}
-                    ></div>
-                  </div>
-                </div>
+                <CertificationStatusChart
+                  data={{
+                    current: totalCertifications - expiringCount - expiredCount,
+                    expiring: expiringCount,
+                    expired: expiredCount,
+                  }}
+                  variant="pie"
+                  height={250}
+                  showLegend={true}
+                />
               </div>
 
-              {/* Pilot Role Distribution */}
+              {/* Fleet Compliance Gauge */}
               <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold text-gray-900">Pilot Roles</h4>
-                  <span className="text-2xl">👨‍✈️</span>
+                  <h4 className="text-lg font-semibold text-gray-900">Fleet Compliance</h4>
+                  <span className="text-2xl">🎯</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-[#E4002B] rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Captains</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{stats.captains}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-[#FFC72C] rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">First Officers</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{stats.firstOfficers}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Training Captains</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {stats.trainingCaptains}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                      <span className="text-sm text-gray-700">Examiners</span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{stats.examiners}</span>
-                  </div>
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="text-center">
-                    <span className="text-2xl font-bold text-[#E4002B]">{stats.total}</span>
-                    <p className="text-sm text-gray-600">Total Active Pilots</p>
-                  </div>
+                <ComplianceGauge
+                  complianceRate={complianceRate}
+                  variant="svg-circle"
+                  size="md"
+                  showLabel={true}
+                  showStatus={false}
+                />
+                <div className="mt-4 text-center">
+                  <ComplianceGauge
+                    complianceRate={complianceRate}
+                    variant="simple"
+                    size="sm"
+                    showLabel={false}
+                    showStatus={true}
+                  />
                 </div>
               </div>
 
@@ -925,22 +863,13 @@ export default function DashboardPage() {
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-700">Compliance</span>
-                      <span className="text-sm font-medium text-gray-900">{complianceRate}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          complianceRate >= 95
-                            ? 'bg-green-500'
-                            : complianceRate >= 85
-                              ? 'bg-amber-500'
-                              : 'bg-red-500'
-                        }`}
-                        style={{ width: `${complianceRate}%` }}
-                      ></div>
-                    </div>
+                    <ComplianceGauge
+                      complianceRate={complianceRate}
+                      variant="bar"
+                      size="sm"
+                      showLabel={true}
+                      showStatus={false}
+                    />
                   </div>
 
                   <div>

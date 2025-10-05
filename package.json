@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "SKIP_ENV_VALIDATION=true next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build:analyze": "ANALYZE=true SKIP_ENV_VALIDATION=true next build",
+    "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

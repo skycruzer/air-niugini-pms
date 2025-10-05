@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Cell, PieChart, Pie } from 'recharts';
 import { CheckCircle2, AlertTriangle, XCircle, Activity } from 'lucide-react';
+import { CertificationStatusChart } from '@/components/shared/CertificationStatusChart';
+import { ComplianceGauge } from '@/components/shared/ComplianceGauge';
 
 interface ComplianceMetricsProps {
   timeRange: string;
@@ -70,37 +72,13 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
           <CardDescription>Fleet-wide compliance rating</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center">
-            <div className="relative w-48 h-48">
-              <svg className="w-full h-full" viewBox="0 0 100 100">
-                <circle
-                  className="text-gray-200"
-                  strokeWidth="10"
-                  stroke="currentColor"
-                  fill="transparent"
-                  r="40"
-                  cx="50"
-                  cy="50"
-                />
-                <circle
-                  className="text-[#E4002B]"
-                  strokeWidth="10"
-                  strokeDasharray={`${parseFloat(overallCompliance) * 2.51} 251`}
-                  strokeLinecap="round"
-                  stroke="currentColor"
-                  fill="transparent"
-                  r="40"
-                  cx="50"
-                  cy="50"
-                  transform="rotate(-90 50 50)"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center flex-col">
-                <span className="text-4xl font-bold">{overallCompliance}%</span>
-                <span className="text-sm text-gray-600">Compliant</span>
-              </div>
-            </div>
-          </div>
+          <ComplianceGauge
+            complianceRate={parseFloat(overallCompliance)}
+            variant="svg-circle"
+            size="lg"
+            showLabel={true}
+            showStatus={false}
+          />
           <div className="mt-6 grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
@@ -185,27 +163,16 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
           <CardDescription>Overall certification status breakdown</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <CertificationStatusChart
+            data={{
+              current: statusData[0].value,
+              expiring: statusData[1].value,
+              expired: statusData[2].value,
+            }}
+            variant="pie"
+            height={300}
+            showLegend={true}
+          />
         </CardContent>
       </Card>
 

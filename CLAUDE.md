@@ -4,26 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Air Niugini B767 Pilot Management System - A comprehensive pilot certification tracking and leave request management system for Papua New Guinea's national airline fleet operations. Note: Leave balances are NOT tracked - only leave requests within 28-day roster periods.
+Air Niugini B767 Pilot Management System - A comprehensive pilot certification tracking and leave request management system for Papua New Guinea's national airline fleet operations.
 
-**Current Status**: Production-ready system with authentication, pilot CRUD operations, certification tracking, dashboard functionality, and comprehensive testing suite.
+**Current Status**: Production-ready system with authentication, pilot CRUD operations, certification tracking, leave management, dashboard functionality, and comprehensive testing suite.
 
 ## Commands
 
 ### Development
 
 ```bash
-# Start development server
-npm run dev          # Starts on http://localhost:3001 (or 3000)
-
-# Build and production
-npm run build        # Build for production (SKIP_ENV_VALIDATION=true)
+npm run dev          # Start dev server on http://localhost:3001
+npm run build        # Production build (SKIP_ENV_VALIDATION=true)
 npm run build:analyze # Build with bundle analyzer
 npm start            # Start production server
-npm run lint         # Run ESLint with Next.js rules
+npm run lint         # ESLint with Next.js rules
 npm run lint:fix     # Auto-fix ESLint issues
 npm run format       # Format code with Prettier
-npm run format:check # Check code formatting
 npm run type-check   # TypeScript type checking
 npm run validate     # Run all checks (format, lint, type-check, test, build)
 ```
@@ -33,11 +29,11 @@ npm run validate     # Run all checks (format, lint, type-check, test, build)
 ```bash
 # Jest unit tests
 npm test                  # Run all tests
-npm run test:watch        # Run tests in watch mode
-npm run test:coverage     # Run tests with coverage report
-npm run test:unit         # Run unit tests only
-npm run test:integration  # Run integration tests only
-npm run test:ci           # Run tests in CI mode
+npm run test:watch        # Jest watch mode
+npm run test:coverage     # Coverage report
+npm run test:unit         # Unit tests only
+npm run test:integration  # Integration tests only
+npm run test:ci           # CI mode with coverage
 
 # Playwright E2E tests
 npx playwright test                    # Run all E2E tests
@@ -49,60 +45,149 @@ npx playwright test --ui               # Run with Playwright UI
 ### Database Operations
 
 ```bash
-# Core database management scripts
-node test-connection.js             # Test Supabase connection
-node deploy-schema.js               # Deploy complete database schema
-node populate-data.js               # Populate with sample data
-node create-users.js                # Create system users
-node run-seniority-migration.js     # Update seniority calculations
-node execute-migration.js           # Execute custom migrations
+node test-connection.js           # Test Supabase connection
+node deploy-schema.js             # Deploy complete database schema
+node populate-data.js             # Populate with sample data
+node create-users.js              # Create system users
+node run-seniority-migration.js   # Update seniority calculations
 ```
 
-## Architecture Overview
+## Technology Stack
 
-### Technology Stack
-
-- **Framework**: Next.js 14.2.33 with App Router and TypeScript 5.9.2
-- **Database**: Supabase PostgreSQL (Project ID: wgdmgvonqysflwdiiols) with Row Level Security
+- **Framework**: Next.js 14.2.33 with App Router
+- **Runtime**: React 18.3.1, TypeScript 5.9.2 (strict mode)
+- **Database**: Supabase PostgreSQL (Project ID: wgdmgvonqysflwdiiols)
 - **Authentication**: Supabase Auth with role-based permissions (admin/manager)
-- **State Management**: React Context (AuthContext) + TanStack Query 5.90.2
+- **State Management**: React Context API (AuthContext) + TanStack Query 5.90.2
 - **Forms**: React Hook Form 7.63.0 with Zod 4.1.11 validation
-- **Styling**: TailwindCSS 3.4.17 with Air Niugini brand colors
+- **Styling**: TailwindCSS 3.4.17 with Air Niugini brand colors (#E4002B red, #FFC72C gold)
 - **Icons**: Lucide React 0.544.0
-- **Date Handling**: date-fns 4.1.0 for roster calculations
-- **PDF Generation**: @react-pdf/renderer 4.3.1
+- **PDF**: @react-pdf/renderer 4.3.1
 - **Charts**: Chart.js 4.5.0 with react-chartjs-2 5.3.0
-- **Testing**: Playwright 1.55.1 with comprehensive E2E test suite
+- **Testing**: Playwright 1.55.1 (E2E) + Jest 29.7.0 (unit)
+- **PWA**: next-pwa 5.6.0 with offline support
 
-### Database Architecture
+## Database Architecture
 
-**Production Tables** (Active Live Data):
+### Production Tables (Live Data)
+- **pilots** (27 records) - Main pilot information with seniority tracking
+- **pilot_checks** (571 records) - Certification tracking with expiry dates
+- **check_types** (34 records) - Aviation certification types across 8 categories
+- **an_users** (3 records) - System authentication (admin/manager roles)
+- **leave_requests** (12 records) - Leave management tied to 28-day roster periods
+- **settings** (3 records) - System configuration
+- **contract_types** (3 records) - Pilot contract classifications
 
-- `pilots` (27 records) - Main pilot information with seniority tracking
-- `pilot_checks` (571 records) - Certification tracking with expiry dates
-- `check_types` (34 records) - Aviation certification types across 8 categories
-- `an_users` (3 records) - System authentication (admin/manager roles)
-- `leave_requests` (12 records) - Leave management tied to 28-day roster periods
-- `settings` (3 records) - System configuration
-- `contract_types` (3 records) - Pilot contract classifications
+### Database Views (Optimized Queries)
+- **compliance_dashboard** - Fleet compliance metrics
+- **pilot_report_summary** - Comprehensive pilot summaries
+- **detailed_expiring_checks** - Expiring certifications with details
+- **expiring_checks** - Simplified expiring checks
+- **captain_qualifications_summary** - Captain qualifications
 
-**Database Cleanup (2025-10-03)**:
-- ✅ Removed legacy development tables: `an_pilots`, `an_pilot_checks`, `an_check_types`, `an_leave_requests`
-- ✅ Kept `an_users` - This is the ACTIVE authentication table (not legacy)
-- ✅ All production data intact and verified
-- ✅ Application tested and working correctly
+**IMPORTANT**: Legacy `an_*` tables (except `an_users`) were removed 2025-10-03. Always use production tables (`pilots`, `pilot_checks`, `check_types`).
 
-### Key Business Logic
+## Architecture Patterns
 
-#### 1. Roster Period System (28-Day Cycles)
+### 1. Service Layer (Critical Pattern)
+
+**Always use dedicated service functions** - never make direct database calls in API routes or components. This ensures consistency and prevents production issues.
 
 ```typescript
-// Core roster calculation pattern
+// ✅ Correct - Service layer pattern
+// src/lib/expiring-certifications-service.ts
+export async function getExpiringCertifications(daysAhead: number = 60) {
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data } = await supabaseAdmin
+    .from('pilot_checks')
+    .select(`
+      id, expiry_date,
+      pilots!inner (id, first_name, last_name, employee_id),
+      check_types!inner (id, check_code, check_description, category)
+    `)
+    .not('expiry_date', 'is', null)
+    .order('expiry_date', { ascending: true });
+
+  return processedData;
+}
+
+// API routes use service functions
+// src/app/api/expiring-certifications/route.ts
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
+
+export async function GET(request: NextRequest) {
+  const result = await getExpiringCertifications(daysAhead);
+  return NextResponse.json({ success: true, data: result });
+}
+
+// ❌ Wrong - Direct database calls in API routes
+const { data } = await supabase.from('pilot_checks').select('*');
+```
+
+**Key Services**:
+- `pilot-service.ts` - Pilot CRUD operations
+- `leave-service.ts` - Leave request operations
+- `leave-eligibility-service.ts` - Seniority & crew availability logic
+- `expiring-certifications-service.ts` - Certification expiry logic
+- `dashboard-service.ts` - Dashboard statistics
+- `analytics-service.ts` - Analytics data processing
+- `pdf-data-service.ts` - PDF report data preparation
+- `cache-service.ts` - Performance caching layer
+- `audit-log-service.ts` - Audit trail logging
+- `email-service.ts` - Email notifications
+
+### 2. Progressive Web App (PWA) Architecture
+
+The system is a full PWA with offline support via `next-pwa`:
+
+**Caching Strategies** (configured in `next.config.js`):
+- **CacheFirst**: Google fonts (1 year)
+- **StaleWhileRevalidate**: Images (24h), fonts (7 days), CSS/JS (24h)
+- **NetworkFirst**: API calls (1 min), Supabase API (1 min), dashboard pages (5 min)
+
+**Offline Handling**:
+- Fallback page: `/offline` (src/app/offline.tsx)
+- Service worker: `public/service-worker.js`
+- Offline component: `src/components/offline/OfflineIndicator.tsx`
+
+**PWA Features**:
+- Auto-registration on production
+- Skip waiting enabled for instant updates
+- Runtime caching for all static assets
+- API response caching with network timeout
+
+### 3. Webpack Optimization & Code Splitting
+
+**Critical optimization** in `next.config.js`:
+
+```javascript
+webpack: (config, { dev, isServer }) => {
+  config.optimization.splitChunks = {
+    chunks: 'all',
+    cacheGroups: {
+      vendor: { test: /[\\/]node_modules[\\/]/, name: 'vendors', priority: 10 },
+      react: { test: /react|react-dom/, name: 'react-vendor', priority: 20 },
+      radixui: { test: /@radix-ui/, name: 'radix-vendor', chunks: 'async', priority: 15 },
+      charts: { test: /chart\.js|recharts/, name: 'chart-vendor', chunks: 'async', priority: 15 },
+      heavy: { test: /framer-motion|@react-pdf/, name: 'heavy-vendor', chunks: 'async', priority: 15 },
+      common: { minChunks: 2, priority: 5, reuseExistingChunk: true }
+    }
+  };
+}
+```
+
+**Package Import Optimization**:
+- Optimized imports for: lucide-react, @tanstack/react-query, date-fns, framer-motion, recharts, chart.js, @radix-ui components
+
+### 4. Core Business Logic
+
+**28-Day Roster Periods** (`src/lib/roster-utils.ts`):
+```typescript
 const ROSTER_DURATION = 28;
 const KNOWN_ROSTER = {
   number: 11,
   year: 2025,
-  endDate: new Date('2025-10-10'),
+  endDate: new Date('2025-10-10')
 };
 
 export function getCurrentRosterPeriod() {
@@ -113,15 +198,13 @@ export function getCurrentRosterPeriod() {
   return {
     code: `RP${number}/${year}`,
     startDate: calculatedStart,
-    endDate: calculatedEnd,
+    endDate: calculatedEnd
   };
 }
 ```
 
-#### 2. Certification Status Color Coding
-
+**Certification Status (FAA Color Coding)** (`src/lib/certification-utils.ts`):
 ```typescript
-// Aviation compliance color system
 export function getCertificationStatus(expiryDate: Date | null) {
   if (!expiryDate) return { color: 'gray', label: 'No Date' };
 
@@ -137,327 +220,143 @@ export function getCertificationStatus(expiryDate: Date | null) {
 }
 ```
 
-#### 3. Seniority Calculations
-
+**Seniority Calculations** (`src/lib/roster-utils.ts`):
 ```typescript
 // Seniority based on commencement date (1 = most senior)
 export function calculateSeniority(pilots: Pilot[]) {
   return pilots
-    .filter((p) => p.commencement_date)
-    .sort(
-      (a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime()
-    )
-    .map((pilot, index) => ({
-      ...pilot,
-      seniority_number: index + 1,
-    }));
+    .filter(p => p.commencement_date)
+    .sort((a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime())
+    .map((pilot, index) => ({ ...pilot, seniority_number: index + 1 }));
 }
 ```
 
-#### 4. Permission System
-
+**Permission System** (`src/lib/auth-utils.ts`):
 ```typescript
-// Role-based access control pattern
 export const permissions = {
   canCreate: (user: User) => user.role === 'admin',
   canEdit: (user: User) => ['admin', 'manager'].includes(user.role),
   canDelete: (user: User) => user.role === 'admin',
-  canApprove: (user: User) => ['admin', 'manager'].includes(user.role),
+  canApprove: (user: User) => ['admin', 'manager'].includes(user.role)
 };
 ```
 
-### Project Structure
+## Leave Management System
+
+### Approval Rules (Updated 2025-10-04)
+
+**CRITICAL**: Captains and First Officers are evaluated **SEPARATELY**. Each rank has independent minimum requirements (10 Captains AND 10 First Officers).
+
+**Scenario 1**: No other pilots of same rank requesting same dates + above minimum crew
+→ **APPROVE** (no seniority comparison shown)
+
+**Scenario 2**: Multiple pilots of same rank requesting same dates
+→ **ALWAYS show seniority comparison** (informational display)
+
+Sub-scenarios based on crew availability:
+- **2a**: Can approve ALL pilots while staying above minimum (≥10) → Green border, approve all, NO spreading recommendations
+- **2b**: Can approve SOME while maintaining minimum (≥10) → Yellow border, approve highest seniority, show spreading recommendations
+- **2c**: Below minimum crew already → Red border, recommend spreading/sequential approval for all
+
+**Priority Order (Within Same Rank Only)**:
+1. Seniority Number (Lower = Higher priority, 1 = most senior)
+2. Request Submission Date (Earlier = Higher priority, tiebreaker)
+
+### Key Components
+
+1. **Final Review Alert** (`src/components/leave/FinalReviewAlert.tsx`)
+   - Displays 22 days before next roster period starts
+   - **ONLY shows when `pendingCount > 0`** (hidden if no pending requests)
+   - Applies ONLY to NEXT roster period (not current, not following)
+   - Severity: urgent (≤7 days), warning (8-22 days), info (>22 days)
+
+2. **Seniority Priority Review** (`src/components/leave/LeaveEligibilityAlert.tsx`)
+   - **ALWAYS displays when 2+ pilots OF SAME RANK request same/overlapping dates**
+   - Shows seniority comparison regardless of crew availability
+   - Border color: green (sufficient ≥10) vs yellow (shortage <10)
+   - Lists pilots sorted by: Seniority Number → Request Date
+
+3. **Leave Eligibility Service** (`src/lib/leave-eligibility-service.ts`)
+   - Checks crew availability: min 10 Captains AND 10 First Officers (independently)
+   - Detects conflicting requests (exact, partial, adjacent overlaps)
+   - Filters conflicts by rank - Captains ONLY compared with Captains
+   - Generates spreading recommendations ONLY when crew shortage exists
+
+**Complete documentation**: See `LEAVE_MANAGEMENT_SYSTEM.md` (645 lines)
+
+## Component Organization
+
+### Feature-Based Structure
+
+Components are organized by domain:
 
 ```
-src/
-├── app/                        # Next.js App Router
-│   ├── dashboard/             # Protected dashboard pages
-│   │   ├── pilots/           # Pilot management with [id] routes
-│   │   ├── certifications/   # Certification tracking & calendar
-│   │   ├── leave/            # Leave management & calendar
-│   │   ├── analytics/        # Analytics dashboard
-│   │   ├── reports/          # Report generation
-│   │   └── settings/         # Admin settings
-│   ├── login/                # Authentication pages
-│   ├── api/                  # API routes for data operations
-│   ├── layout.tsx            # Root layout with providers
-│   └── globals.css           # Air Niugini branded styles
-├── components/               # Reusable UI components
-│   ├── auth/                # AuthProvider, ProtectedRoute
-│   ├── layout/              # DashboardLayout, Navigation
-│   ├── providers/           # React Query, Context providers
-│   └── ui/                  # Generic UI components
-├── contexts/                # React Context providers
-│   └── AuthContext.tsx      # Authentication state management
-├── lib/                     # Core business logic & services
-│   ├── supabase.ts          # Database client & type definitions
-│   ├── supabase-admin.ts    # Admin client wrapper for service operations
-│   ├── pilot-service.ts     # Pilot CRUD operations
-│   ├── pilot-service-client.ts # Client-side pilot operations
-│   ├── expiring-certifications-service.ts # Certification expiry logic
-│   ├── analytics-service.ts # Analytics data processing
-│   ├── dashboard-service.ts # Dashboard statistics
-│   ├── leave-service.ts     # Leave request operations
-│   ├── settings-service.ts  # System settings management
-│   ├── cache-service.ts     # Performance caching layer
-│   ├── pdf-data-service.ts  # PDF report data preparation
-│   ├── auth-utils.ts        # Permission & role management
-│   ├── roster-utils.ts      # 28-day period calculations
-│   └── certification-utils.ts # Status logic & validation
-└── types/                   # TypeScript definitions
-    ├── analytics.ts         # Analytics & reporting types
-    └── pdf-reports.ts       # PDF generation types
+src/components/
+├── analytics/          # Analytics dashboard components
+├── audit/              # Audit log viewers
+├── auth/               # AuthProvider, ProtectedRoute
+├── calendar/           # Leave calendar components
+├── certifications/     # Certification tracking UI
+├── charts/             # Chart.js wrappers
+├── command/            # Command palette (Cmd+K)
+├── dashboard/          # Dashboard widgets
+├── documents/          # Document management
+├── error/              # Error boundaries
+├── layout/             # DashboardLayout, Navigation
+├── lazy/               # Lazy-loaded components
+├── leave/              # Leave management UI
+├── notifications/      # Toast notifications
+├── offline/            # Offline indicators
+├── pilots/             # Pilot management UI
+├── providers/          # React Query, Context providers
+├── reports/            # PDF report components
+├── settings/           # Settings UI
+└── ui/                 # Generic Radix UI components
 ```
 
-### Service Layer Architecture
+### Lazy Loading Pattern
 
-**Critical Pattern**: Use dedicated service functions for all data operations to ensure consistency and reusability between API routes and internal calls:
+Heavy components are lazy-loaded to improve initial page load:
 
 ```typescript
-// ✅ Correct - Service layer pattern with reusable functions
-// src/lib/expiring-certifications-service.ts
-import { getSupabaseAdmin } from '@/lib/supabase';
+// src/components/lazy/LazyChart.tsx
+import dynamic from 'next/dynamic';
 
-export async function getExpiringCertifications(daysAhead: number = 60) {
-  const supabaseAdmin = getSupabaseAdmin();
-
-  const { data, error } = await supabaseAdmin
-    .from('pilot_checks')
-    .select(
-      `
-      id, expiry_date,
-      pilots!inner (id, first_name, last_name, employee_id),
-      check_types!inner (id, check_code, check_description, category)
-    `
-    )
-    .not('expiry_date', 'is', null)
-    .gte('expiry_date', today.toISOString().split('T')[0])
-    .lte('expiry_date', futureDate.toISOString().split('T')[0])
-    .order('expiry_date', { ascending: true });
-
-  // Transform and return processed data with status calculations
-  return processedData;
-}
-
-// API routes use service functions
-// src/app/api/expiring-certifications/route.ts
-import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
-
-export async function GET(request: NextRequest) {
-  const result = await getExpiringCertifications(daysAhead);
-  return NextResponse.json({ success: true, data: result });
-}
-
-// ❌ Incorrect - Direct database calls in API routes
-const { data } = await supabase.from('pilot_checks').select('*');
+export const LazyLineChart = dynamic(
+  () => import('../charts/LineChart').then(mod => ({ default: mod.LineChart })),
+  { loading: () => <ChartSkeleton />, ssr: false }
+);
 ```
 
-**Service Layer Benefits**:
+Used for: Charts, PDF viewers, calendar views, analytics dashboards
 
-- Reusable between API routes and server-side operations
-- Avoids inter-API HTTP calls in production
-- Centralized business logic and data transformations
-- Consistent error handling and logging
+## Air Niugini Branding
 
-### Air Niugini Branding Standards
-
-**Color Palette** (Strict Adherence Required):
+### Color Palette (Strict Adherence)
 
 ```css
-/* Primary Brand Colors */
---air-niugini-red: #e4002b; /* Headers, buttons, alerts */
---air-niugini-gold: #ffc72c; /* Accents, highlights */
---air-niugini-black: #000000; /* Navigation, text */
---air-niugini-white: #ffffff; /* Backgrounds */
+--air-niugini-red: #e4002b;     /* Headers, buttons, alerts */
+--air-niugini-gold: #ffc72c;    /* Accents, highlights */
+--air-niugini-black: #000000;   /* Navigation, text */
+--air-niugini-white: #ffffff;   /* Backgrounds */
 ```
 
-**UI Component Standards**:
+### UI Standards
 
 ```tsx
-// ✅ Correct - Air Niugini branded components
-<button className="bg-[#E4002B] hover:bg-[#C00020] text-white">
-  Submit
-</button>
+// ✅ Correct - Air Niugini branded
+<button className="bg-[#E4002B] hover:bg-[#C00020] text-white">Submit</button>
 
-// Status indicators follow aviation standards
+// Status indicators (FAA standards)
 <span className="bg-red-100 text-red-800">Expired</span>
 <span className="bg-yellow-100 text-yellow-800">Expiring Soon</span>
 <span className="bg-green-100 text-green-800">Current</span>
 ```
 
-### Authentication Flow
-
-1. **Supabase Auth Integration**: Email/password authentication
-2. **User Profile Mapping**: Fetch from `an_users` table for role assignment
-3. **Context State Management**: AuthContext provides user state throughout app
-4. **Route Protection**: ProtectedRoute component guards dashboard pages
-5. **Permission Enforcement**: Role-based UI rendering and API access
-
-### Database Query Optimization Patterns
-
-```typescript
-// ✅ Efficient - Single query with joins
-const pilotsWithChecks = await supabase
-  .from('pilots')
-  .select(
-    `
-    *,
-    pilot_checks (
-      *,
-      check_types (*)
-    )
-  `
-  )
-  .eq('is_active', true);
-
-// ✅ Use database views for complex queries
-const expiringChecks = await supabase
-  .from('expiring_checks') // Pre-computed view
-  .select('*')
-  .lte('days_until_expiry', 30);
-```
-
-### Leave Management System Architecture
-
-**Critical Business Logic** (Completed 2025-10-03, Updated 2025-10-04):
-
-**APPROVAL RULES** (Updated 2025-10-04):
-
-**CRITICAL**: Captains and First Officers are evaluated **SEPARATELY**. Each rank has independent minimum requirements (10 Captains AND 10 First Officers). Never compare priority across ranks.
-
-**SCENARIO 1**: No other pilots of same rank requesting same dates + above minimum crew
-→ **APPROVE** (no seniority comparison shown)
-
-**SCENARIO 2**: Multiple pilots of same rank requesting same dates
-→ **ALWAYS show seniority comparison** (informational display)
-→ Sub-scenarios based on crew availability:
-- **2a**: Can approve ALL pilots of this rank while staying above minimum (≥10) → Green border, approve all, NO spreading recommendations
-- **2b**: Can approve SOME pilots while maintaining minimum (≥10) → Yellow border, approve highest seniority, show spreading recommendations for lower seniority
-- **2c**: Below minimum crew already → Red border, recommend spreading/sequential approval for all
-
-**Priority Order (Within Same Rank Only)**:
-1. **Seniority Number** (Lower number = Higher priority, 1 = most senior)
-2. **Request Submission Date** (Earlier submission = Higher priority, used as tiebreaker)
-
-#### 1. Final Review Alert Component
-**Location**: `src/components/leave/FinalReviewAlert.tsx`
-
-**Key Behavior**:
-- Displays 22 days before next roster period starts
-- **ONLY shows when `pendingCount > 0`** (hidden if no pending requests)
-- Applies ONLY to NEXT roster period (not current, not following)
-- Severity levels: urgent (≤7 days), warning (8-22 days), info (>22 days)
-
-```typescript
-// Critical visibility logic
-if (pendingCount === 0) {
-  return null; // No alert if no pending requests
-}
-```
-
-#### 2. Seniority Priority Review Component
-**Location**: `src/components/leave/LeaveEligibilityAlert.tsx`
-
-**Key Behavior**:
-- **ALWAYS displays when 2+ pilots OF THE SAME RANK request same/overlapping dates**
-- Shows complete seniority comparison regardless of crew availability
-- Blue informational background (consistent for all scenarios)
-- Border color indicates crew status: green (sufficient crew ≥10) vs yellow (crew shortage <10)
-- Lists pilots of same rank sorted by: Seniority Number (lower = higher) → Request Date (earlier = higher)
-- **Captains and First Officers are NEVER compared against each other** - evaluated separately with independent minimums
-
-```typescript
-// Always show seniority comparison for multiple pilots OF SAME RANK
-const hasConflictingRequests = eligibility?.conflictingRequests &&
-                               eligibility.conflictingRequests.length > 1;
-
-// Detect sufficient crew based on seniorityRecommendation
-// Empty or no "CREW SHORTAGE RISK" = sufficient crew
-const hasSufficientCrew = !eligibility.seniorityRecommendation ||
-  !eligibility.seniorityRecommendation.includes('CREW SHORTAGE RISK');
-
-// Border color based on crew availability
-const bgColor = 'bg-blue-50';
-const borderColor = hasSufficientCrew ? 'border-green-400' : 'border-yellow-400';
-```
-
-#### 3. Leave Eligibility Service
-**Location**: `src/lib/leave-eligibility-service.ts`
-
-**Core Logic**:
-- Checks crew availability: minimum 10 Captains AND 10 First Officers (independently)
-- Detects conflicting requests (exact, partial, adjacent overlaps)
-- Filters conflicts by rank - Captains ONLY compared with Captains, First Officers ONLY with First Officers
-- Calculates seniority priority for conflict resolution within same rank
-- Generates spreading recommendations ONLY when crew shortage exists
-- Sorting priority: Seniority Number (lower = higher) → Request Date (earlier = higher)
-
-```typescript
-// Crew availability check (per rank)
-const MIN_CAPTAINS_REQUIRED = 10;
-const MIN_FIRST_OFFICERS_REQUIRED = 10;
-
-// Filter by rank - critical for separate evaluation
-const allConflictingRequests = conflictingPendingRequests
-  .filter((req: any) => req.pilots?.role === request.pilotRole); // Same rank only!
-
-// Crew calculation for this specific rank
-const currentAvailable = requestingRole === 'Captain' ? availableCaptains : availableFirstOfficers;
-const remainingAfterAllApprovals = currentAvailable - totalRequesting;
-const canApproveAll = remainingAfterAllApprovals >= minimumRequired;
-
-// NO spreading recommendations when sufficient crew
-if (canApproveAll) {
-  seniorityRecommendation = ''; // Empty = sufficient crew
-}
-```
-
-#### 4. Roster Period Filtering
-**Locations**: `src/app/dashboard/leave/page.tsx`, `src/components/leave/LeaveRequestsList.tsx`
-
-**Filter Options**:
-- **All Rosters**: Show all leave requests (current, next, following)
-- **Next Roster Only**: Show requests starting in RP12/2025 (next 28-day period)
-- **Following Rosters**: Show requests starting after next roster
-
-```typescript
-// Next roster boundary calculation
-const currentRoster = getCurrentRosterPeriod();
-const nextRosterStartDate = new Date(currentRoster.endDate);
-nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1);
-const nextRosterEndDate = new Date(nextRosterStartDate);
-nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day period
-```
-
-**IMPORTANT**: For complete leave management documentation, see `LEAVE_MANAGEMENT_SYSTEM.md` (645 lines)
-
-### Testing Architecture
-
-**Playwright E2E Test Suite**:
-
-- `test-login.spec.js` - Authentication flow testing
-- `test-comprehensive.spec.js` - Full application workflow
-- `test-error-handling.spec.js` - Error boundary testing
-- `test-deployment.spec.js` - Production deployment validation
-
-**Test Data Management**:
-
-```javascript
-// Production test pattern
-const testCredentials = {
-  email: 'skycruzer@icloud.com',
-  password: 'mron2393',
-};
-
-// Always test against live production tables
-await page.goto('http://localhost:3001/dashboard/pilots');
-await expect(page.locator('[data-testid="pilot-count"]')).toContainText('27');
-```
-
 ## Environment Configuration
 
 ```env
-# Required environment variables
+# Required (.env.local)
 NEXT_PUBLIC_SUPABASE_URL=https://wgdmgvonqysflwdiiols.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
@@ -467,261 +366,132 @@ NEXT_PUBLIC_CURRENT_ROSTER=RP11/2025
 NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ```
 
-## Performance Configuration
-
-### Next.js Optimizations (next.config.js)
-
-- **React Strict Mode**: Disabled for production performance
-- **SWC Minification**: Enabled for faster builds
-- **Package Import Optimization**: Lucide React, TanStack Query
-- **Bundle Splitting**: Vendor chunks separated
-- **Compression**: Enabled
-- **Security Headers**: X-Frame-Options, CSP, HSTS
-
-### Database Performance
-
-- **Indexes**: Comprehensive indexing on frequently queried columns
-- **Views**: Pre-computed views for complex queries (`expiring_checks`, `pilot_checks_overview`)
-- **RLS Policies**: Row Level Security for data protection
-- **Connection Pooling**: Managed by Supabase
+**IMPORTANT**: Never include trailing newlines/spaces in production environment variables.
 
 ## Critical Business Rules
 
-1. **Roster Periods**: All leave requests must fall within 28-day roster boundaries
-2. **Certification Compliance**: Color-coded status system (red/yellow/green) drives all UI
+1. **Roster Periods**: All leave requests fall within 28-day roster boundaries
+2. **Certification Compliance**: Color-coded status (red/yellow/green) drives all UI
 3. **Role-Based Access**: Admin (full CRUD), Manager (edit/approve only)
-4. **Data Integrity**: Employee IDs must be unique across pilots table
-5. **Seniority System**: Based on commencement date with automatic calculation
-6. **Production Data**: Always use main tables (`pilots`, `pilot_checks`, `check_types`)
-7. **Air Niugini Branding**: Consistent use of brand colors and terminology
+4. **Data Integrity**: Employee IDs unique across pilots table
+5. **Seniority System**: Based on commencement date (1 = most senior)
+6. **Production Tables**: Always use `pilots`, `pilot_checks`, `check_types` (NOT `an_*` legacy tables)
+7. **Air Niugini Branding**: Consistent colors (#E4002B red, #FFC72C gold)
+8. **Rank Separation**: Captains and First Officers evaluated independently
 
-## Common Development Patterns
+## Common Pitfalls
 
-### Component Structure
-
-```tsx
-interface ComponentProps {
-  // Define props with TypeScript
-}
-
-export function ComponentName({ props }: ComponentProps) {
-  // 1. Hooks (React Query, state)
-  const { data, isLoading } = useQuery();
-  const [state, setState] = useState();
-
-  // 2. Effects
-  useEffect(() => {}, []);
-
-  // 3. Handlers
-  const handleSubmit = async () => {};
-
-  // 4. Permission checks
-  if (!permissions.canView(user)) return <Unauthorized />;
-
-  // 5. Loading states
-  if (isLoading) return <Loading />;
-
-  // 6. Main render
-  return <div className="air-niugini-branded">{/* Component JSX */}</div>;
-}
-```
-
-### Error Handling Pattern
-
+### 1. Table Selection
 ```typescript
-try {
-  const result = await pilotService.updatePilot(id, data);
-  // Success handling
-} catch (error) {
-  console.error('Operation failed:', error);
-  setErrors({
-    submit: 'Failed to update pilot. Please try again.',
-  });
-}
+// ❌ Wrong - Don't use an_ legacy tables (except an_users)
+await supabase.from('an_pilots').select('*')
+
+// ✅ Correct - Use production tables
+await supabase.from('pilots').select('*')
 ```
 
-### Form Validation Pattern
-
+### 2. Production API Calls
 ```typescript
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+// ❌ Wrong - Inter-API HTTP calls fail in production
+const response = await fetch(`${process.env.VERCEL_URL}/api/certifications`);
 
-const pilotSchema = z.object({
-  employee_id: z.string().min(1, 'Employee ID required'),
-  first_name: z.string().min(1, 'First name required'),
-  role: z.enum(['Captain', 'First Officer']),
-});
-
-const {
-  register,
-  handleSubmit,
-  formState: { errors },
-} = useForm({
-  resolver: zodResolver(pilotSchema),
-});
+// ✅ Correct - Direct service calls
+import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
+const certifications = await getExpiringCertifications(timeframeDays);
 ```
 
-## Performance Guidelines
+### 3. Date Handling
+```typescript
+// ❌ Wrong - String comparison
+if (expiryDate < today) { }
 
-### Database Best Practices
+// ✅ Correct - Use date-fns
+import { isBefore } from 'date-fns';
+if (isBefore(expiryDate, today)) { }
+```
 
-- Use single queries with joins instead of multiple round trips
-- Leverage database views for complex aggregations
-- Apply proper indexing on frequently filtered columns
-- Use RLS policies for security without performance impact
+### 4. PWA Service Worker
+```typescript
+// ❌ Wrong - Importing service worker in components
+import '/service-worker.js';
 
-### Frontend Optimization
-
-- Implement proper loading states for all async operations
-- Use React Query for server state management and caching
-- Optimize bundle size with dynamic imports for large components
-- Implement proper error boundaries for graceful failure handling
+// ✅ Correct - Service worker auto-registered by next-pwa
+// No manual registration needed
+```
 
 ## Development Workflow
 
-1. **Database Changes**: Use migration scripts in root directory
-2. **Feature Development**: Follow component → service → integration pattern
-3. **Local Testing**: Always test functionality locally before deployment
-4. **Build Verification**: Run `npm run build` to ensure production build succeeds
-5. **Testing**: Run Playwright tests before deployment
-6. **Code Quality**: Use ESLint and TypeScript strict mode
-7. **Deployment**: Git push triggers automatic Vercel deployment
+### Starting Fresh Session
+1. Navigate: `cd "/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms"`
+2. Verify database: `node test-connection.js`
+3. Start dev: `npm run dev`
+4. Run tests if modifying critical features: `npx playwright test`
 
-## Production Deployment & Troubleshooting
+### Making Database Changes
+1. Create migration SQL file in project root
+2. Test locally: `node deploy-schema.js`
+3. Verify application functions
+4. Update TypeScript types if schema changed (use Supabase MCP)
+5. Run test suites: `npm test && npx playwright test`
 
-### Critical Production Patterns
+### Code Quality Workflow
+```bash
+# Pre-commit (runs automatically via Husky)
+npm run format          # Format code
+npm run lint:fix        # Fix linting issues
+npm run type-check      # Verify TypeScript
 
-**Service Layer for Production Stability**:
-
-```typescript
-// ✅ Correct - Direct service calls avoid production HTTP issues
-import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
-
-export async function POST(request: NextRequest) {
-  // Direct service call - works in all environments
-  const certifications = await getExpiringCertifications(timeframeDays);
-  return processData(certifications);
-}
-
-// ❌ Incorrect - Inter-API HTTP calls fail in production
-const response = await fetch(`${process.env.VERCEL_URL}/api/expiring-certifications`);
+# Full validation before deployment
+npm run validate        # Runs: format:check, lint, type-check, test, build
 ```
 
-**Common Production Issues & Solutions**:
+## Performance Optimization
 
-1. **401 Unauthorized**: Usually environment variable corruption - check for trailing newlines
-2. **ECONNREFUSED**: Avoid localhost/inter-API calls - use service layer instead
-3. **Build Failures**: Run local testing and build verification before deployment
-4. **PDF Generation**: Use service layer for data fetching, not HTTP requests
+### Database
+- Use single queries with joins (not multiple round trips)
+- Leverage database views (`expiring_checks`, `pilot_checks_overview`)
+- Index frequently filtered columns
+- Use RLS policies for security without performance impact
 
-**Environment Variable Management**:
+### Frontend
+- Lazy load heavy components (charts, PDF viewers)
+- Use TanStack Query caching (2-30 min stale times)
+- Dynamic imports for large libraries
+- Service layer prevents inter-API HTTP calls
 
-- Never include trailing newlines or spaces in production environment variables
-- Use `getSupabaseAdmin()` for server-side operations requiring elevated privileges
-- Test both local and production environments before considering deployment complete
+### PWA Caching
+- Static assets: StaleWhileRevalidate (24h)
+- API calls: NetworkFirst with 1-min cache
+- Dashboard pages: NetworkFirst with 5-min cache
+- Offline fallback: `/offline` page
 
-## Current Feature Status
+## Production Features
 
-✅ **Production Ready**:
+✅ **Complete Authentication** - Admin/manager roles with Supabase Auth
+✅ **Pilot CRUD Operations** - Full CRUD with validation
+✅ **Certification Tracking** - 571 certifications, 34 types, automated monitoring
+✅ **Leave Management** - Seniority-based conflict resolution, crew availability
+✅ **Final Review Alert** - 22 days before roster (shows only when pending)
+✅ **Seniority Priority Review** - Always shows for 2+ pilots requesting same dates
+✅ **Crew Availability** - Min 10 Captains + 10 First Officers
+✅ **Roster Period Filtering** - 28-day cycles (All/Next/Following)
+✅ **PDF Reports** - Certification expiry and roster leave
+✅ **Analytics Dashboard** - Charts, metrics, fleet statistics
+✅ **E2E Test Suite** - Comprehensive Playwright tests
+✅ **PWA Support** - Offline capability with service worker
+✅ **Service Layer Architecture** - Production-stable communication
 
-- Complete authentication system with role-based permissions
-- Dashboard with real-time statistics (27 pilots, 556+ certifications)
-- Pilot CRUD operations with comprehensive validation
-- Certification tracking with expiration monitoring and bulk updates
-- Seniority calculations and management
-- Air Niugini branded UI with consistent design system
-- Comprehensive E2E testing suite
-- PDF report generation for certification expiry and roster leave
-- Analytics dashboard with charts and metrics
-- Service layer architecture for production stability
-- Email notifications and automated reporting
+## Important Reminders
 
-✅ **Leave Management System** (Completed 2025-10-03):
-
-- Complete leave request workflow with seniority-based conflict resolution
-- Final Review Alert (22 days before next roster, shows only when pending requests exist)
-- Seniority Priority Review (always displays when 2+ pilots request same dates)
-- Crew availability checking with minimum requirements (10 Captains + 10 First Officers)
-- Roster period filtering (All/Next/Following rosters)
-- Interactive calendar and team availability views
-- Spreading recommendations for crew shortage scenarios
-
-🚧 **Active Development**:
-
-- Enhanced analytics and metrics
-- Advanced reporting features
-- Calendar integration improvements
-
-## Code Quality Tools
-
-### Husky Git Hooks
-- **Pre-commit**: Runs lint-staged to format and lint staged files
-- **Commit-msg**: Validates commit messages using commitlint (conventional commits)
-
-### Commitlint Configuration
-Enforces conventional commit format:
-```
-feat: add new feature
-fix: bug fix
-docs: documentation changes
-style: formatting changes
-refactor: code restructuring
-test: adding tests
-chore: maintenance tasks
-```
-
-### Lint-Staged
-Automatically formats and lints files before commit:
-- Prettier for code formatting
-- ESLint for JavaScript/TypeScript linting
-- Type checking for TypeScript files
-
-## Key File Locations
-
-### Documentation Files
-- `CLAUDE.md` - AI assistant guidance (this file)
-- `LEAVE_MANAGEMENT_SYSTEM.md` - Complete leave management documentation (645 lines)
-- `README.md` - Project overview and quick start
-- `PLAN.md` - Implementation plan
-- `SPEC.md` - Technical specification
-- `PROMPT.md` - Development prompt reference
-
-### Database Management Scripts
-All located in project root:
-- `test-connection.js` - Test Supabase connection
-- `deploy-schema.js` - Deploy complete schema
-- `populate-data.js` - Sample data population
-- `create-users.js` - User creation
-- `run-seniority-migration.js` - Seniority calculations
-- `execute-migration.js` - Custom migrations
-
-### Core Service Files
-Located in `src/lib/`:
-- `leave-eligibility-service.ts` - Seniority and crew availability logic
-- `leave-service.ts` - Leave request CRUD operations
-- `roster-utils.ts` - 28-day roster period calculations
-- `pilot-service.ts` - Pilot management operations
-- `expiring-certifications-service.ts` - Certification expiry logic
-- `auth-utils.ts` - Permission and role management
-
-### Key Components
-- `src/components/leave/FinalReviewAlert.tsx` - 22-day deadline alert
-- `src/components/leave/LeaveEligibilityAlert.tsx` - Seniority priority review
-- `src/components/leave/LeaveRequestsList.tsx` - Leave requests with filtering
-- `src/app/dashboard/leave/page.tsx` - Main leave management page
-
-## Important Notes
-
-- **Keep Focus**: This is a pilot certification and leave management tool, not a full ERP system
-- **Data Integrity**: Always verify operations against live production data (27 pilots, 556+ certifications)
-- **Air Niugini Standards**: Maintain consistent branding and aviation industry terminology
-- **Performance**: System handles real production load with optimized queries and caching
-- **Testing**: Comprehensive test coverage ensures reliability for critical aviation operations
-- **Security**: Role-based access control and RLS policies protect sensitive pilot data
-- **Production Stability**: Service layer architecture prevents inter-API call issues in production
-- **Environment Management**: Critical to maintain clean environment variables without trailing characters
-- **Leave Management**: Seniority priority review ALWAYS shows for 2+ pilots, Final Review Alert ONLY shows when pending requests exist
+1. **Focus**: Pilot certification and leave management (NOT full ERP)
+2. **Data Integrity**: Verify against live production data (27 pilots, 571 certifications)
+3. **Air Niugini Standards**: Maintain consistent branding
+4. **Performance**: Optimized queries and PWA caching
+5. **Testing**: Comprehensive E2E coverage ensures reliability
+6. **Security**: Role-based access control and RLS policies
+7. **Production Stability**: Service layer prevents inter-API issues
+8. **Environment**: Clean variables without trailing characters
+9. **Leave Management**: Seniority ALWAYS shows for 2+ pilots, Final Review ONLY when pending
 
 ---
 

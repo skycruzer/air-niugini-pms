@@ -1,96 +1,74 @@
-# MCP (Model Context Protocol) Setup Guide
+# MCP Server Setup Guide - Air Niugini PMS
 
-## Project-Specific MCP Configuration
+## Current MCP Configuration
 
-This project uses a **project-specific** `.mcp.json` file to isolate API keys and configuration from the global MCP settings.
+The project now has Supabase MCP configured correctly with proper authentication.
 
-### Setup Instructions
+## Configuration Details
 
-1. **Copy the example configuration:**
-   ```bash
-   cp .mcp.json.example .mcp.json
-   ```
+### Supabase MCP Server
+- **Type**: Command-based (npx)
+- **Package**: `@supabase/mcp-server-supabase`
+- **Project**: wgdmgvonqysflwdiiols
+- **Authentication**: Access token + Service role key
 
-2. **Get your Supabase credentials:**
+### Configuration Files
 
-   **Project Reference:** `wgdmgvonqysflwdiiols`
+1. **Project Level**: `/Users/skycruzer/Desktop/Fleet Office Management/.mcp.json`
+2. **App Level**: `/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms/.mcp.json`
 
-   **Service Role Key:** Found in `.env.local` as `SUPABASE_SERVICE_ROLE_KEY`
+Both files are now synchronized with correct authentication.
 
-   **Access Token:**
-   - Visit: https://supabase.com/dashboard/account/tokens
-   - Create a new access token
-   - Copy the token (starts with `sbp_`)
+## MCP Servers Status
 
-3. **Update `.mcp.json` with your credentials:**
-   ```json
-   {
-     "mcpServers": {
-       "supabase": {
-         "command": "npx",
-         "args": ["-y", "@supabase/mcp-server-supabase", "--project-ref=wgdmgvonqysflwdiiols"],
-         "env": {
-           "SUPABASE_ACCESS_TOKEN": "sbp_your_access_token_here",
-           "SUPABASE_SERVICE_ROLE_KEY": "your_service_role_key_here"
-         }
-       }
-     }
-   }
-   ```
+✅ **Connected**:
+- `exa` - Web search and research
+- `playwright` - Browser automation
+- `filesystem` - File system operations
 
-4. **Restart Claude Code** to load the new MCP configuration
+🔧 **Fixed**:
+- `supabase` - Changed from HTTP to command-based with proper auth
 
-### Security Notes
+❌ **Failed** (not required):
+- `database` - Generic database (not needed, using Supabase)
+- `vercel` - Deployment (can be configured later)
+- `context7` - Documentation (can be configured later)
+- `figma` - Design (not needed for this project)
 
-⚠️ **IMPORTANT:**
-- `.mcp.json` is in `.gitignore` and will NOT be committed to git
-- Never commit API keys or tokens to version control
-- Each developer needs their own `.mcp.json` file
-- Use `.mcp.json.example` as a template
+## How to Reconnect MCP Servers
 
-### Available MCP Tools
+After updating the configuration, you need to:
 
-With the Supabase MCP server configured, you'll have access to:
+1. **Restart Claude Code** to reload MCP configuration
+2. **Or reload the MCP servers** from the settings
 
-- `mcp__supabase__list_tables` - List all database tables
-- `mcp__supabase__execute_sql` - Execute SQL queries (read-only)
-- `mcp__supabase__apply_migration` - Apply database migrations
-- `mcp__supabase__list_migrations` - List migration history
-- `mcp__supabase__search_docs` - Search Supabase documentation
-- `mcp__supabase__get_project_url` - Get API URL
-- `mcp__supabase__get_anon_key` - Get anonymous key
-- And more...
+## Testing Supabase MCP
 
-### Troubleshooting
+Once reconnected, you can test with:
 
-**Issue: MCP tools not available**
-- Ensure `.mcp.json` exists in the project root
-- Verify credentials are correct
-- Restart Claude Code after making changes
+```bash
+# In the air-niugini-pms directory
+node test-connection.js
+```
 
-**Issue: "Read-only" errors on migrations**
-- This is by design for safety
-- Use Supabase Dashboard SQL Editor for DDL operations
-- Or use `mcp__supabase__apply_migration` for tracked migrations
+## Available MCP Tools
 
-**Issue: Wrong project data**
-- Verify `project-ref` is `wgdmgvonqysflwdiiols`
-- Check that service role key matches `.env.local`
+When Supabase MCP is connected, you'll have access to:
+- Database table operations
+- Schema migrations
+- SQL execution
+- Type generation
+- Real-time subscriptions
 
-### Project Information
+## Next Steps
 
-- **Project ID:** wgdmgvonqysflwdiiols
-- **Project URL:** https://wgdmgvonqysflwdiiols.supabase.co
-- **Dashboard:** https://supabase.com/dashboard/project/wgdmgvonqysflwdiiols
-
-### Migration Workflow
-
-1. Create migration file in `supabase/migrations/`
-2. Use naming: `YYYYMMDD_description.sql`
-3. Apply via Dashboard SQL Editor or MCP tools
-4. Verify changes with `mcp__supabase__list_migrations`
+1. ✅ Updated MCP configuration with proper authentication
+2. 🔄 Restart Claude Code or reload MCP servers
+3. ✅ Verify Supabase MCP shows "connected" status
+4. 🚀 Deploy database schema
+5. 📊 Populate with sample data
 
 ---
 
-**Air Niugini B767 Pilot Management System**
-*MCP Configuration - Version 1.0*
+**Project**: Air Niugini B767 Pilot Management System
+**Database**: Supabase PostgreSQL (wgdmgvonqysflwdiiols)

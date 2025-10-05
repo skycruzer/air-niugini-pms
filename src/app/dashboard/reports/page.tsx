@@ -9,7 +9,7 @@ import {
   CategoryBreakdownChart,
   AvailabilityGauge,
   RiskTrendChart,
-} from '@/components/charts/ReportCharts';
+} from '@/components/shared/charts/ReportCharts';
 import {
   exportPilotsToCSV,
   exportCertificationsToCSV,
@@ -45,70 +45,49 @@ interface ReportData {
 
 const REPORT_TYPES = [
   {
-    id: 'fleet-compliance',
-    title: 'Fleet Compliance Report',
-    description: 'Overall certification status and compliance rates with detailed analysis',
+    id: 'compliance-dashboard',
+    title: 'Compliance Dashboard',
+    description: 'Comprehensive compliance status, risk assessment, and operational readiness with detailed analytics and immediate action items',
     icon: '📊',
     color: 'blue',
     pdfSupported: true,
+    features: ['Certification compliance rates', 'Risk analysis', 'Operational capacity', 'Critical alerts']
   },
   {
-    id: 'risk-assessment',
-    title: 'Risk Assessment Report',
-    description: 'Critical and high-risk pilot certification analysis with immediate action items',
-    icon: '⚠️',
-    color: 'red',
-    pdfSupported: true,
-  },
-  {
-    id: 'pilot-summary',
-    title: 'Pilot Summary Report',
-    description: 'Complete pilot roster with certification status and performance metrics',
+    id: 'pilot-management',
+    title: 'Pilot Management Report',
+    description: 'Complete pilot roster, qualifications, succession planning, and performance metrics for fleet management',
     icon: '👨‍✈️',
     color: 'green',
     pdfSupported: true,
+    features: ['Pilot roster', 'Qualifications tracking', 'Succession planning', 'Performance metrics']
   },
   {
-    id: 'fleet-management',
-    title: 'Fleet Management Report',
-    description:
-      'Comprehensive fleet analysis including roster, qualifications, and succession planning',
-    icon: '🛫',
+    id: 'certification-planning',
+    title: 'Certification Planning',
+    description: 'Certification expiry forecast (7, 14, 28, 60, 90 days), upcoming renewals, and pilot requirements planning',
+    icon: '📅',
     color: 'purple',
     pdfSupported: true,
+    features: ['Expiry forecast', 'Renewal planning', 'Pilot requirements', 'Roster analysis']
   },
   {
-    id: 'operational-readiness',
-    title: 'Operational Readiness Report',
-    description: 'Current operational capacity, crew availability, and readiness assessment',
-    icon: '💼',
+    id: 'operational-status',
+    title: 'Operational Status Report',
+    description: 'Real-time operational capacity, crew availability, readiness assessment, and fleet utilization metrics',
+    icon: '✈️',
     color: 'indigo',
     pdfSupported: true,
-  },
-  {
-    id: 'certification-forecast',
-    title: 'Certification Forecast Report',
-    description: 'Upcoming renewals and planning',
-    icon: '📅',
-    color: 'yellow',
-    pdfSupported: false,
+    features: ['Crew availability', 'Readiness assessment', 'Fleet utilization', 'Leave status']
   },
   {
     id: 'fleet-analytics',
-    title: 'Fleet Analytics Report',
-    description: 'Performance metrics and trends',
+    title: 'Fleet Analytics',
+    description: 'Advanced performance metrics, trends analysis, and data-driven insights for strategic decision making',
     icon: '📈',
     color: 'teal',
-    pdfSupported: false,
-  },
-  {
-    id: 'planning-rostering',
-    title: 'Planning & Rostering Report',
-    description:
-      'Certification expiry planning (7, 14, 28, 60, 90 days) with pilot requirements and roster analysis',
-    icon: '📋',
-    color: 'orange',
-    pdfSupported: false,
+    pdfSupported: true,
+    features: ['Performance trends', 'Comparative analysis', 'Predictive insights', 'Strategic metrics']
   },
 ];
 

@@ -706,24 +706,33 @@ export async function getAllCheckTypes() {
 // Get expiring certifications
 export async function getExpiringCertifications(daysAhead: number = 60) {
   try {
+    // Calculate the future date threshold
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + daysAhead);
+
     const { data: expiringChecks, error } = await supabase
       .from('expiring_checks')
       .select('*')
-      .gte('days_until_expiry', 0)
-      .lte('days_until_expiry', daysAhead)
+      .lte('expiry_date', futureDate.toISOString().split('T')[0])
       .order('expiry_date', { ascending: true });
 
     if (error) throw error;
 
-    return (expiringChecks || []).map((check: any) => ({
-      pilotName: check.pilot_name,
-      employeeId: check.employee_id,
-      checkCode: check.check_code,
-      checkDescription: check.check_description,
-      category: check.category,
-      expiryDate: new Date(check.expiry_date),
-      status: getCertificationStatus(new Date(check.expiry_date)),
-    }));
+    return (expiringChecks || []).map((check: any) => {
+      const expiryDate = new Date(check.expiry_date);
+      const pilotName = `${check.first_name || ''} ${check.last_name || ''}`.trim();
+
+      return {
+        pilotName,
+        employeeId: check.employee_id,
+        checkCode: check.check_code,
+        checkDescription: check.check_description,
+        category: check.category,
+        expiryDate,
+        status: getCertificationStatus(expiryDate),
+      };
+    });
   } catch (error) {
     console.error('Error fetching expiring certifications:', error);
     return [];
@@ -733,10 +742,27 @@ export async function getExpiringCertifications(daysAhead: number = 60) {
 // Get pilots with expired certifications
 export async function getPilotsWithExpiredCertifications() {
   try {
+    // Query expired certifications directly from pilot_checks joined with pilots and check_types
+    const today = new Date().toISOString().split('T')[0];
+
     const { data: expiredChecks, error } = await supabase
-      .from('pilot_checks_overview')
-      .select('*')
-      .lt('expiry_date', new Date().toISOString())
+      .from('pilot_checks')
+      .select(`
+        id,
+        expiry_date,
+        pilots!inner (
+          id,
+          first_name,
+          last_name,
+          employee_id
+        ),
+        check_types!inner (
+          check_code,
+          check_description
+        )
+      `)
+      .not('expiry_date', 'is', null)
+      .lt('expiry_date', today)
       .order('expiry_date', { ascending: true });
 
     if (error) throw error;
@@ -744,19 +770,20 @@ export async function getPilotsWithExpiredCertifications() {
     // Group by pilot
     const pilotMap = new Map();
     expiredChecks?.forEach((check: any) => {
-      const key = check.employee_id;
+      const pilot = check.pilots;
+      const key = pilot.employee_id;
       if (!pilotMap.has(key)) {
         pilotMap.set(key, {
-          pilot_name: check.pilot_name,
-          employee_id: check.employee_id,
+          pilot_name: `${pilot.first_name || ''} ${pilot.last_name || ''}`.trim(),
+          employee_id: pilot.employee_id,
           expired_count: 0,
           certifications: [],
         });
       }
       pilotMap.get(key).expired_count++;
       pilotMap.get(key).certifications.push({
-        check_code: check.check_code,
-        check_description: check.check_description,
+        check_code: check.check_types?.check_code,
+        check_description: check.check_types?.check_description,
         expiry_date: check.expiry_date,
       });
     });
