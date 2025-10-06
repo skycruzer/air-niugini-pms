@@ -34,37 +34,76 @@ export interface SettingsData {
 
 /**
  * Settings service for managing system configuration
+ * Uses direct database calls (service layer pattern) instead of inter-API HTTP calls
  */
 export const settingsService = {
   /**
    * Get all system settings
+   * Direct database access - no HTTP calls
    */
   async getSettings(): Promise<SettingsData> {
     try {
-      // Handle both server-side and client-side contexts with proper port detection
-      const baseUrl =
-        typeof window === 'undefined'
-          ? process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : process.env.NEXT_PUBLIC_APP_URL || `http://localhost:${process.env.PORT || 3000}`
-          : '';
+      // SERVER-SIDE: Direct database access
+      if (typeof window === 'undefined') {
+        const { getSupabaseAdmin } = await import('@/lib/supabase-admin');
+        const supabase = getSupabaseAdmin();
 
-      const { robustAPICall } = await import('@/lib/retry-utils');
+        console.log('🔧 Settings Service: Fetching settings from database...');
 
-      const result = await robustAPICall(
-        `${baseUrl}/api/settings`,
-        {
-          method: 'GET',
-          headers: {
-            'Cache-Control': 'no-cache',
-          },
-        },
-        {
-          maxAttempts: 3,
-          timeout: 8000,
-          baseDelay: 1000,
+        const { data, error } = await supabase.from('settings').select('*').order('key');
+
+        if (error) {
+          console.error('❌ Settings Service: Database error:', error);
+          throw new Error(error.message);
         }
-      );
+
+        console.log('✅ Settings Service: Found', data?.length || 0, 'settings');
+
+        // Transform flat settings array into structured data
+        const settingsMap =
+          data?.reduce(
+            (acc: Record<string, any>, setting: any) => {
+              acc[setting.key] = setting.value;
+              return acc;
+            },
+            {} as Record<string, any>
+          ) || {};
+
+        return {
+          app_title: settingsMap.app_title || 'Air Niugini Pilot Management System',
+          alert_thresholds: settingsMap.alert_thresholds || {
+            critical_days: 7,
+            urgent_days: 14,
+            warning_30_days: 30,
+            warning_60_days: 60,
+            early_warning_90_days: 90,
+          },
+          pilot_requirements: settingsMap.pilot_requirements || {
+            pilot_retirement_age: 65,
+            number_of_aircraft: 2,
+            captains_per_hull: 7,
+            first_officers_per_hull: 7,
+            minimum_captains_per_hull: 10,
+            minimum_first_officers_per_hull: 10,
+            training_captains_per_pilots: 11,
+            examiners_per_pilots: 11,
+          },
+        };
+      }
+
+      // CLIENT-SIDE: Call API route (this is fine for browser)
+      const response = await fetch('/api/settings', {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch settings from API');
+      }
+
+      const result = await response.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch settings');
