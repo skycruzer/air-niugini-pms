@@ -100,12 +100,14 @@ export class IntegrationAPIService {
   /**
    * Register new integration
    */
-  async registerIntegration(config: Omit<IntegrationConfig, 'id' | 'createdAt' | 'updatedAt'>): Promise<IntegrationConfig> {
+  async registerIntegration(
+    config: Omit<IntegrationConfig, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<IntegrationConfig> {
     const integration: IntegrationConfig = {
       ...config,
       id: nanoid(),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.integrations.set(integration.id, integration);
@@ -133,7 +135,7 @@ export class IntegrationAPIService {
     const updated: IntegrationConfig = {
       ...integration,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.integrations.set(id, updated);
@@ -198,7 +200,7 @@ export class IntegrationAPIService {
       endpoint,
       requestBody: options?.body,
       duration: 0,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     try {
@@ -208,7 +210,7 @@ export class IntegrationAPIService {
       const response = await fetch(url, {
         method,
         headers,
-        body: options?.body ? JSON.stringify(options.body) : undefined
+        body: options?.body ? JSON.stringify(options.body) : undefined,
       });
 
       call.responseCode = response.status;
@@ -240,7 +242,7 @@ export class IntegrationAPIService {
   ): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...customHeaders
+      ...customHeaders,
     };
 
     const authConfig = integration.authConfig;
@@ -258,7 +260,9 @@ export class IntegrationAPIService {
       const prefix = authConfig.prefix || '';
       headers[authConfig.headerName] = `${prefix}${authConfig.key}`;
     } else if (authConfig.type === 'basic_auth') {
-      const credentials = Buffer.from(`${authConfig.username}:${authConfig.password}`).toString('base64');
+      const credentials = Buffer.from(`${authConfig.username}:${authConfig.password}`).toString(
+        'base64'
+      );
       headers['Authorization'] = `Basic ${credentials}`;
     }
 
@@ -282,7 +286,7 @@ export class IntegrationAPIService {
       redirect_uri: config.redirectUri,
       scope: config.scope.join(' '),
       state,
-      response_type: 'code'
+      response_type: 'code',
     });
 
     return `${config.authorizationUrl}?${params.toString()}`;
@@ -291,11 +295,7 @@ export class IntegrationAPIService {
   /**
    * Handle OAuth 2.0 callback
    */
-  async handleOAuth2Callback(
-    integrationId: string,
-    code: string,
-    state: string
-  ): Promise<void> {
+  async handleOAuth2Callback(integrationId: string, code: string, state: string): Promise<void> {
     const integration = this.integrations.get(integrationId);
     if (!integration || integration.authConfig.type !== 'oauth2') {
       throw new Error('Invalid integration or not OAuth2');
@@ -307,15 +307,15 @@ export class IntegrationAPIService {
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
         redirect_uri: config.redirectUri,
         client_id: config.clientId,
-        client_secret: config.clientSecret
-      })
+        client_secret: config.clientSecret,
+      }),
     });
 
     if (!response.ok) {
@@ -327,7 +327,7 @@ export class IntegrationAPIService {
     // Update integration with tokens
     config.accessToken = data.access_token;
     config.refreshToken = data.refresh_token;
-    config.expiresAt = new Date(Date.now() + (data.expires_in * 1000));
+    config.expiresAt = new Date(Date.now() + data.expires_in * 1000);
 
     await this.updateIntegration(integrationId, { authConfig: config });
   }
@@ -350,14 +350,14 @@ export class IntegrationAPIService {
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: config.refreshToken,
         client_id: config.clientId,
-        client_secret: config.clientSecret
-      })
+        client_secret: config.clientSecret,
+      }),
     });
 
     if (!response.ok) {
@@ -370,7 +370,7 @@ export class IntegrationAPIService {
     if (data.refresh_token) {
       config.refreshToken = data.refresh_token;
     }
-    config.expiresAt = new Date(Date.now() + (data.expires_in * 1000));
+    config.expiresAt = new Date(Date.now() + data.expires_in * 1000);
 
     await this.updateIntegration(integrationId, { authConfig: config });
   }
@@ -388,7 +388,7 @@ export class IntegrationAPIService {
       return {
         success: false,
         responseTime: 0,
-        error: 'Integration not found'
+        error: 'Integration not found',
       };
     }
 
@@ -400,7 +400,7 @@ export class IntegrationAPIService {
 
       const response = await fetch(integration.baseUrl, {
         method: 'GET',
-        headers
+        headers,
       });
 
       const responseTime = Date.now() - startTime;
@@ -408,13 +408,13 @@ export class IntegrationAPIService {
       return {
         success: response.ok,
         responseTime,
-        error: response.ok ? undefined : `HTTP ${response.status}`
+        error: response.ok ? undefined : `HTTP ${response.status}`,
       };
     } catch (error: any) {
       return {
         success: false,
         responseTime: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -432,9 +432,12 @@ export class IntegrationAPIService {
     this.stopSync(integrationId);
 
     // Start new sync interval
-    const interval = setInterval(async () => {
-      await this.performSync(integrationId);
-    }, integration.syncInterval * 60 * 1000);
+    const interval = setInterval(
+      async () => {
+        await this.performSync(integrationId);
+      },
+      integration.syncInterval * 60 * 1000
+    );
 
     this.syncIntervals.set(integrationId, interval);
 
@@ -468,7 +471,7 @@ export class IntegrationAPIService {
       status: 'running',
       startTime: new Date(),
       recordsSynced: 0,
-      errors: []
+      errors: [],
     };
 
     this.syncJobs.set(job.id, job);
@@ -499,7 +502,7 @@ export class IntegrationAPIService {
    */
   getSyncJobs(integrationId: string): SyncJob[] {
     return Array.from(this.syncJobs.values())
-      .filter(job => job.integrationId === integrationId)
+      .filter((job) => job.integrationId === integrationId)
       .sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
   }
 
@@ -520,7 +523,7 @@ export class IntegrationAPIService {
    */
   getAPICallHistory(integrationId: string, limit: number = 50): ExternalAPICall[] {
     return this.apiCalls
-      .filter(call => call.integrationId === integrationId)
+      .filter((call) => call.integrationId === integrationId)
       .slice(-limit)
       .reverse();
   }
@@ -538,16 +541,17 @@ export class IntegrationAPIService {
     successfulSyncs: number;
     lastSync?: Date;
   } {
-    const calls = this.apiCalls.filter(call => call.integrationId === integrationId);
-    const successful = calls.filter(call => !call.error);
-    const failed = calls.filter(call => call.error);
+    const calls = this.apiCalls.filter((call) => call.integrationId === integrationId);
+    const successful = calls.filter((call) => !call.error);
+    const failed = calls.filter((call) => call.error);
 
-    const avgResponseTime = successful.length > 0
-      ? successful.reduce((sum, call) => sum + call.duration, 0) / successful.length
-      : 0;
+    const avgResponseTime =
+      successful.length > 0
+        ? successful.reduce((sum, call) => sum + call.duration, 0) / successful.length
+        : 0;
 
     const syncs = this.getSyncJobs(integrationId);
-    const successfulSyncs = syncs.filter(job => job.status === 'completed');
+    const successfulSyncs = syncs.filter((job) => job.status === 'completed');
 
     return {
       totalCalls: calls.length,
@@ -557,7 +561,7 @@ export class IntegrationAPIService {
       lastCall: calls.length > 0 ? calls[calls.length - 1].timestamp : undefined,
       totalSyncs: syncs.length,
       successfulSyncs: successfulSyncs.length,
-      lastSync: syncs.length > 0 ? syncs[0].startTime : undefined
+      lastSync: syncs.length > 0 ? syncs[0].startTime : undefined,
     };
   }
 
@@ -565,7 +569,7 @@ export class IntegrationAPIService {
    * Clean up
    */
   destroy(): void {
-    this.syncIntervals.forEach(interval => clearInterval(interval));
+    this.syncIntervals.forEach((interval) => clearInterval(interval));
     this.syncIntervals.clear();
   }
 }

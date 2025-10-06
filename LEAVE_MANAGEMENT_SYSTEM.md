@@ -1,7 +1,7 @@
 # Leave Management System - Complete Documentation
 
 **Air Niugini B767 Pilot Management System**
-*Last Updated: 2025-10-03*
+_Last Updated: 2025-10-03_
 
 ---
 
@@ -16,9 +16,11 @@ The leave management system provides comprehensive tracking and approval workflo
 ### Core Components
 
 #### 1. **Main Leave Management Page**
+
 **Location**: `src/app/dashboard/leave/page.tsx`
 
 **Key Features:**
+
 - Statistics dashboard showing all leave types (RDO, WDO, ANNUAL, SICK, LSL, LWOP, MATERNITY, COMPASSIONATE)
 - Status filtering (All, Pending, Approved, Denied)
 - Roster period filtering (All Rosters, Next Roster Only, Following Rosters)
@@ -26,6 +28,7 @@ The leave management system provides comprehensive tracking and approval workflo
 - Tab-based navigation (Requests, Interactive Calendar, Team Availability)
 
 **State Management:**
+
 ```typescript
 const [activeTab, setActiveTab] = useState<'requests' | 'calendar' | 'availability'>('requests');
 const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'denied'>('all');
@@ -33,32 +36,36 @@ const [rosterFilter, setRosterFilter] = useState<'all' | 'next' | 'following'>('
 ```
 
 **Pending Count Calculation:**
+
 ```typescript
 const getPendingCountForNextRoster = () => {
-  const pendingRequests = leaveRequests.filter(req => req.status.toLowerCase() === 'pending');
+  const pendingRequests = leaveRequests.filter((req) => req.status.toLowerCase() === 'pending');
   const currentRoster = getCurrentRosterPeriod();
   const nextRosterStartDate = new Date(currentRoster.endDate);
   nextRosterStartDate.setDate(nextRosterStartDate.getDate() + 1);
   const nextRosterEndDate = new Date(nextRosterStartDate);
   nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day period
 
-  return pendingRequests.filter(req => {
+  return pendingRequests.filter((req) => {
     return req.startDate >= nextRosterStartDate && req.startDate <= nextRosterEndDate;
   }).length;
 };
 ```
 
 #### 2. **Final Review Alert Component**
+
 **Location**: `src/components/leave/FinalReviewAlert.tsx`
 
 **Purpose**: Displays prominent alert 22 days before next roster period begins
 
 **Alert Behavior:**
+
 - **ONLY shows when `pendingCount > 0`** (no pending requests = no alert)
 - Applies ONLY to NEXT roster period (not current, not following)
 - Severity levels: urgent (≤7 days), warning (8-22 days), info (>22 days)
 
 **Key Props:**
+
 ```typescript
 interface FinalReviewAlertProps {
   pendingCount: number; // Count of pending requests for NEXT roster period ONLY
@@ -67,6 +74,7 @@ interface FinalReviewAlertProps {
 ```
 
 **Interactive Button:**
+
 ```typescript
 const handleViewPendingRequests = () => {
   setActiveTab('requests');
@@ -79,9 +87,11 @@ const handleViewPendingRequests = () => {
 ```
 
 #### 3. **Leave Requests List Component**
+
 **Location**: `src/components/leave/LeaveRequestsList.tsx`
 
 **Filtering Logic:**
+
 ```typescript
 interface LeaveRequestsListProps {
   refreshTrigger?: number;
@@ -92,6 +102,7 @@ interface LeaveRequestsListProps {
 ```
 
 **Roster Period Filtering:**
+
 ```typescript
 if (rosterFilter === 'next') {
   // Next roster only (28 days)
@@ -117,15 +128,17 @@ if (rosterFilter === 'next') {
 ```
 
 #### 4. **Leave Eligibility Alert Component**
+
 **Location**: `src/components/leave/LeaveEligibilityAlert.tsx`
 
 **Purpose**: Shows seniority comparison when multiple pilots request same dates
 
 **Display Logic:**
+
 ```typescript
 // Show ONLY if there are MULTIPLE conflicting requests (more than 1 pilot)
-const hasConflictingRequests = eligibility?.conflictingRequests &&
-                                eligibility.conflictingRequests.length > 1;
+const hasConflictingRequests =
+  eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 1;
 
 if (!hasConflictingRequests) {
   return null; // Single pilot = straight approve/deny based on crew availability
@@ -133,13 +146,16 @@ if (!hasConflictingRequests) {
 ```
 
 **Visual Indicators:**
+
 - Green alert: Sufficient crew available, all can be approved
 - Yellow/Blue alert: Crew shortage risk, seniority priority review required
 
 #### 5. **Leave Eligibility Service**
+
 **Location**: `src/lib/leave-eligibility-service.ts`
 
 **Single vs Multiple Pilot Logic:**
+
 ```typescript
 // ONLY show seniority comparison when MULTIPLE pilots are requesting same dates
 if (allConflictingRequests.length > 1) {
@@ -162,23 +178,27 @@ if (allConflictingRequests.length > 1) {
 ```
 
 **Crew Requirements:**
+
 - Minimum 10 Captains
 - Minimum 10 First Officers
 
 **Seniority Priority:**
+
 1. Rank (Captain > First Officer)
 2. Seniority Number (lower = higher priority)
 
 #### 6. **Roster Utilities**
+
 **Location**: `src/lib/roster-utils.ts`
 
 **Core Roster Calculation:**
+
 ```typescript
 const ROSTER_DURATION = 28;
 const KNOWN_ROSTER = {
   number: 11,
   year: 2025,
-  endDate: new Date('2025-10-10')
+  endDate: new Date('2025-10-10'),
 };
 
 export function getCurrentRosterPeriod() {
@@ -188,19 +208,20 @@ export function getCurrentRosterPeriod() {
 
   const totalPeriods = KNOWN_ROSTER.number + periodsPassed;
   const year = KNOWN_ROSTER.year + Math.floor(totalPeriods / 13);
-  const number = (totalPeriods % 13) || 13;
+  const number = totalPeriods % 13 || 13;
 
   return {
     code: `RP${number}/${year}`,
     number,
     year,
     startDate: addDays(KNOWN_ROSTER.endDate, periodsPassed * ROSTER_DURATION + 1),
-    endDate: addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION)
+    endDate: addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION),
   };
 }
 ```
 
 **Final Review Alert Logic:**
+
 ```typescript
 export function getFinalReviewAlert(): FinalReviewAlert {
   const REVIEW_WINDOW_DAYS = 22;
@@ -239,11 +260,13 @@ export function getFinalReviewAlert(): FinalReviewAlert {
 ## API Endpoints
 
 ### 1. **GET /api/leave-requests**
+
 **Purpose**: Fetch all leave requests with pilot information
 
 **Implementation**: `src/app/api/leave-requests/route.ts`
 
 **Response:**
+
 ```typescript
 {
   success: true,
@@ -252,35 +275,44 @@ export function getFinalReviewAlert(): FinalReviewAlert {
 ```
 
 **Optimizations:**
+
 - Single JOIN query eliminates N+1 pattern
 - Includes pilot name, employee_id, role in response
 
 ### 2. **POST /api/leave-requests**
+
 **Purpose**: Create new leave request
 
 **Validation:**
+
 - Calculates days_count automatically
 - Determines roster_period from start_date
 - Sets initial status as 'PENDING'
 
 ### 3. **PATCH /api/leave-requests**
+
 **Purpose**: Update existing leave request
 
 **Allowed for:**
+
 - Admin/Manager to update status (APPROVED/DENIED)
 - Pilot to update their own pending requests
 
 ### 4. **DELETE /api/leave-requests**
+
 **Purpose**: Delete leave request
 
 **Permissions:**
+
 - Only PENDING requests can be deleted
 - User must have delete permissions
 
 ### 5. **POST /api/leave-eligibility/check**
+
 **Purpose**: Check crew availability and conflicts
 
 **Response:**
+
 ```typescript
 {
   isEligible: boolean,
@@ -301,6 +333,7 @@ export function getFinalReviewAlert(): FinalReviewAlert {
 **Note**: The application uses `leave_requests` table (not `an_leave_requests` which is legacy).
 
 **Schema:**
+
 ```sql
 CREATE TABLE leave_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -325,6 +358,7 @@ CREATE TABLE leave_requests (
 ```
 
 **Indexes:**
+
 ```sql
 CREATE INDEX idx_leave_requests_pilot_id ON leave_requests(pilot_id);
 CREATE INDEX idx_leave_requests_status ON leave_requests(status);
@@ -337,35 +371,43 @@ CREATE INDEX idx_leave_requests_start_date ON leave_requests(start_date);
 ## Leave Types
 
 ### 1. **RDO (Roster Day Off)**
+
 - Regular scheduled days off within roster period
 - Icon: 🏠
 - Color coding based on approval status
 
 ### 2. **WDO (Weekly Day Off)**
+
 - Weekly scheduled days off
 - Icon: 🌴
 
 ### 3. **ANNUAL (Annual Leave)**
+
 - Paid vacation time
 - Icon: 🏖️
 
 ### 4. **SICK (Sick Leave)**
+
 - Medical leave
 - Icon: 🏥
 
 ### 5. **LSL (Long Service Leave)**
+
 - Extended service recognition leave
 - Icon: 🎓
 
 ### 6. **LWOP (Leave Without Pay)**
+
 - Unpaid leave period
 - Icon: 💼
 
 ### 7. **MATERNITY (Maternity Leave)**
+
 - Parental leave
 - Icon: 👶
 
 ### 8. **COMPASSIONATE (Compassionate Leave)**
+
 - Emergency family leave
 - Icon: 💙
 
@@ -424,24 +466,28 @@ CREATE INDEX idx_leave_requests_start_date ON leave_requests(start_date);
 ## Business Rules
 
 ### 1. **Roster Period Alignment**
+
 - All leave requests must align with 28-day roster periods
 - Current roster: RP11/2025 (ends 2025-10-10)
 - Next roster: RP12/2025 (starts 2025-10-11)
 - Following roster: RP13/2025 (starts 2025-11-08)
 
 ### 2. **Final Review Deadline**
+
 - Alert appears 22 days before NEXT roster starts
 - Only counts pending requests for NEXT roster
 - Does NOT include current or following rosters
 - Alert hidden if no pending requests exist
 
 ### 3. **Crew Availability**
+
 - Minimum 10 Captains required at all times
 - Minimum 10 First Officers required at all times
 - System checks availability for each day of requested leave
 - Projects impact on crew levels
 
 ### 4. **Seniority Priority**
+
 - Only applies when 2+ pilots request same/overlapping dates
 - Priority determined by:
   1. Rank (Captain > First Officer)
@@ -449,16 +495,19 @@ CREATE INDEX idx_leave_requests_start_date ON leave_requests(start_date);
 - Single pilot requests bypass seniority comparison
 
 ### 5. **Conflict Detection**
+
 - **EXACT**: Same start and end dates
 - **PARTIAL**: Overlapping date ranges
 - **ADJACENT**: Back-to-back requests (no gap)
 - **NEARBY**: Requests within 7 days
 
 ### 6. **Late Request Flagging**
+
 - Requests with less than 21 days advance notice flagged
 - `is_late_request = true` set automatically
 
 ### 7. **Permissions**
+
 - **Admin**: Full CRUD permissions
 - **Manager**: Edit/Approve permissions (no delete)
 - **Pilot**: Create, edit own pending requests, delete own pending requests
@@ -468,23 +517,30 @@ CREATE INDEX idx_leave_requests_start_date ON leave_requests(start_date);
 ## UI Components & Patterns
 
 ### Status Color Coding
+
 ```typescript
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-    case 'APPROVED': return 'bg-green-100 text-green-800';
-    case 'DENIED': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case 'PENDING':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'APPROVED':
+      return 'bg-green-100 text-green-800';
+    case 'DENIED':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
   }
 };
 ```
 
 ### Status Icons
+
 - PENDING: ⏳
 - APPROVED: ✅
 - DENIED: ❌
 
 ### Air Niugini Branding
+
 - Primary Red: `#E4002B`
 - Secondary Gold: `#FFC72C`
 - Consistent use throughout leave management interface
@@ -494,6 +550,7 @@ const getStatusColor = (status: string) => {
 ## Testing Checklist
 
 ### Functional Tests
+
 - [ ] Create leave request with all leave types
 - [ ] Edit pending request
 - [ ] Delete pending request
@@ -510,6 +567,7 @@ const getStatusColor = (status: string) => {
 - [ ] Seniority priority ordering correct
 
 ### Edge Cases
+
 - [ ] Requests spanning roster period boundaries
 - [ ] Back-to-back requests from same pilot
 - [ ] Maximum crew on leave simultaneously
@@ -518,6 +576,7 @@ const getStatusColor = (status: string) => {
 - [ ] Late request flagging (<21 days)
 
 ### Permission Tests
+
 - [ ] Admin can create/edit/delete all requests
 - [ ] Manager can edit/approve but not delete
 - [ ] Pilot can only edit/delete own pending requests
@@ -528,17 +587,20 @@ const getStatusColor = (status: string) => {
 ## Performance Optimizations
 
 ### Database Query Patterns
+
 - Single JOIN query for leave requests + pilot info
 - Indexed columns: pilot_id, status, roster_period, start_date
 - Filter operations done in database, not in client
 
 ### Component Rendering
+
 - React Query caching for leave requests list
 - Debounced search/filter inputs
 - Lazy loading for calendar views
 - Memoized calculations for crew availability
 
 ### API Response Times
+
 - Target: <500ms for leave requests list
 - Target: <200ms for eligibility check
 - Target: <100ms for CRUD operations
@@ -548,6 +610,7 @@ const getStatusColor = (status: string) => {
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Bulk Approval/Denial**
    - Select multiple pending requests
    - Apply same decision to all
@@ -584,22 +647,27 @@ const getStatusColor = (status: string) => {
 ### Common Issues
 
 **Issue**: Final Review Alert not showing
+
 - **Solution**: Check if there are pending requests for next roster period
 - **Note**: Alert is intentionally hidden when pendingCount = 0
 
 **Issue**: Eligibility alert showing for single pilot
+
 - **Solution**: This should not happen; check conflictingRequests.length logic
 - **Expected**: Alert only shows when 2+ pilots request same dates
 
 **Issue**: Roster period calculations incorrect
+
 - **Solution**: Verify KNOWN_ROSTER constant in roster-utils.ts
 - **Current**: RP11/2025 ends 2025-10-10
 
 **Issue**: Crew availability showing incorrect numbers
+
 - **Solution**: Check minimum requirements (10 Captains, 10 First Officers)
 - **Note**: System counts available crew AFTER approving current request
 
 **Issue**: Filtering not working
+
 - **Solution**: Ensure rosterFilter prop passed to LeaveRequestsList
 - **Values**: 'all' | 'next' | 'following'
 
@@ -608,6 +676,7 @@ const getStatusColor = (status: string) => {
 ## File Locations Reference
 
 ### Core Files
+
 - Main page: `src/app/dashboard/leave/page.tsx`
 - Requests list: `src/components/leave/LeaveRequestsList.tsx`
 - Final alert: `src/components/leave/FinalReviewAlert.tsx`
@@ -617,16 +686,19 @@ const getStatusColor = (status: string) => {
 - Review modal: `src/components/leave/LeaveRequestReviewModal.tsx`
 
 ### Services & Utilities
+
 - Leave service: `src/lib/leave-service.ts`
 - Eligibility service: `src/lib/leave-eligibility-service.ts`
 - Roster utils: `src/lib/roster-utils.ts`
 
 ### API Routes
+
 - Main endpoint: `src/app/api/leave-requests/route.ts`
 - Eligibility check: `src/app/api/leave-eligibility/check/route.ts`
 - Roster period: `src/app/api/leave-requests/roster-period/route.ts`
 
 ### Database
+
 - Schema: `supabase-complete-migration.sql`
 - RLS policies: `supabase-rls-policies.sql`
 
@@ -641,5 +713,5 @@ const getStatusColor = (status: string) => {
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Papua New Guinea's National Airline Fleet Operations Management*
-*Production System - Version 1.0*
+_Papua New Guinea's National Airline Fleet Operations Management_
+_Production System - Version 1.0_

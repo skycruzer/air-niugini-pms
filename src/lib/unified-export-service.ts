@@ -60,18 +60,19 @@ class CSVExporter extends BaseExporter {
     headers: { key: keyof T; label: string }[],
     options: ExportOptions
   ): void {
-    const filename = options.filename || this.generateFilename('export', 'csv', options.includeTimestamp ?? true);
+    const filename =
+      options.filename || this.generateFilename('export', 'csv', options.includeTimestamp ?? true);
 
     let csv = '';
 
     // Add headers
     if (options.includeHeaders !== false) {
-      csv += headers.map(h => this.escapeCSV(h.label)).join(',') + '\n';
+      csv += headers.map((h) => this.escapeCSV(h.label)).join(',') + '\n';
     }
 
     // Add data rows
-    data.forEach(row => {
-      csv += headers.map(h => this.escapeCSV(row[h.key])).join(',') + '\n';
+    data.forEach((row) => {
+      csv += headers.map((h) => this.escapeCSV(row[h.key])).join(',') + '\n';
     });
 
     this.downloadFile(csv, filename, 'text/csv;charset=utf-8;');
@@ -101,11 +102,13 @@ export class UnifiedExportService {
       { key: 'is_active' as const, label: 'Status' },
     ];
 
-    const formattedData = pilots.map(pilot => ({
+    const formattedData = pilots.map((pilot) => ({
       ...pilot,
       is_active: pilot.is_active ? 'Active' : 'Inactive',
       date_of_birth: pilot.date_of_birth ? format(new Date(pilot.date_of_birth), 'yyyy-MM-dd') : '',
-      commencement_date: pilot.commencement_date ? format(new Date(pilot.commencement_date), 'yyyy-MM-dd') : '',
+      commencement_date: pilot.commencement_date
+        ? format(new Date(pilot.commencement_date), 'yyyy-MM-dd')
+        : '',
     }));
 
     this.csvExporter.export(formattedData, headers, {
@@ -131,7 +134,7 @@ export class UnifiedExportService {
       { key: 'days_until_expiry' as const, label: 'Days Until Expiry' },
     ];
 
-    const formattedData = certifications.map(cert => ({
+    const formattedData = certifications.map((cert) => ({
       ...cert,
       expiry_date: cert.expiry_date ? format(new Date(cert.expiry_date), 'yyyy-MM-dd') : 'N/A',
     }));
@@ -159,7 +162,7 @@ export class UnifiedExportService {
       { key: 'reason' as const, label: 'Reason' },
     ];
 
-    const formattedData = leaveRequests.map(leave => ({
+    const formattedData = leaveRequests.map((leave) => ({
       pilot_name: `${leave.pilots?.first_name} ${leave.pilots?.last_name}`,
       employee_id: leave.pilots?.employee_id,
       leave_type: leave.leave_type,

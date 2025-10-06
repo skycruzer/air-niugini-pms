@@ -14,10 +14,10 @@ export default function NotFound() {
               <FileQuestion className="w-16 h-16 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white text-center mb-2">
-            404 - Page Not Found
-          </h1>
-          <p className="text-white/90 text-center">The page you&apos;re looking for doesn&apos;t exist</p>
+          <h1 className="text-4xl font-bold text-white text-center mb-2">404 - Page Not Found</h1>
+          <p className="text-white/90 text-center">
+            The page you&apos;re looking for doesn&apos;t exist
+          </p>
         </div>
 
         {/* Content */}

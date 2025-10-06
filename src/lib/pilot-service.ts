@@ -747,7 +747,8 @@ export async function getPilotsWithExpiredCertifications() {
 
     const { data: expiredChecks, error } = await supabase
       .from('pilot_checks')
-      .select(`
+      .select(
+        `
         id,
         expiry_date,
         pilots!inner (
@@ -760,7 +761,8 @@ export async function getPilotsWithExpiredCertifications() {
           check_code,
           check_description
         )
-      `)
+      `
+      )
       .not('expiry_date', 'is', null)
       .lt('expiry_date', today)
       .order('expiry_date', { ascending: true });

@@ -4,7 +4,7 @@
 
 **Version**: 1.0.0
 **Date**: 2025-10-01
-**Tester**: ******\_\_\_******
+**Tester**: **\*\***\_\_\_**\*\***
 **Environment**: ☐ Production ☐ Staging ☐ Local
 
 ---
@@ -48,7 +48,7 @@
 - [ ] Scope is correct (`/`)
 - [ ] No console errors
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -71,7 +71,7 @@
 - [ ] App launches in standalone window
 - [ ] App icon shows in start menu/dock
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Install Prompt - iOS Safari
 
@@ -91,7 +91,7 @@
 - [ ] Tapping icon launches in standalone mode
 - [ ] Status bar color matches theme (#E4002B)
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Install Prompt - Android Chrome
 
@@ -112,7 +112,7 @@
 - [ ] App launches in standalone mode
 - [ ] Navigation bar color matches theme
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -134,7 +134,7 @@
 - [ ] Last updated timestamp shows
 - [ ] No JavaScript errors in console
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Navigate While Offline
 
@@ -153,7 +153,7 @@
 - [ ] Uncached routes redirect to `/offline` page
 - [ ] Offline page displays correctly with branding
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Connection Restored
 
@@ -171,7 +171,7 @@
 - [ ] Green banner auto-dismisses after 5 seconds
 - [ ] Fresh data loads automatically
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -195,7 +195,7 @@
 - [ ] Pilot persists after page refresh
 - [ ] No visual flicker or rollback
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Create Pilot (Offline)
 
@@ -217,7 +217,7 @@
 - [ ] Pilot appears optimistically in UI
 - [ ] Sync queue shows the operation
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Update Pilot (Online)
 
@@ -236,7 +236,7 @@
 - [ ] Changes persist after refresh
 - [ ] No rollback occurs
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Update Pilot (Offline → Online)
 
@@ -257,7 +257,7 @@
 - [ ] Changes persist on server
 - [ ] Sync queue clears
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Failed Update (Rollback)
 
@@ -277,7 +277,7 @@
 - [ ] Item remains in sync queue with retry count
 - [ ] User can retry manually
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -302,7 +302,7 @@
   - Timestamp
 - [ ] Manual sync button is disabled (offline)
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Manual Sync
 
@@ -322,7 +322,7 @@
 - [ ] Floating button disappears
 - [ ] Data refreshes automatically
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Partial Sync Failure
 
@@ -342,7 +342,7 @@
 - [ ] Success toast shows successful count
 - [ ] User can retry failed operations
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -368,7 +368,7 @@
 - [ ] Critical routes pre-cached
 - [ ] Console shows "Cache warming completed"
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Stale Cache Cleanup
 
@@ -385,7 +385,7 @@
 - [ ] Current cache version retained
 - [ ] No errors in console
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Cache Version Change
 
@@ -403,7 +403,7 @@
 - [ ] Application works correctly
 - [ ] No stale data issues
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -426,7 +426,7 @@
 - [ ] Green banner shows when back online
 - [ ] Banner auto-dismisses after 5 seconds
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: OfflineBadge in Navigation
 
@@ -443,7 +443,7 @@
 - [ ] Red dot animates/pulses
 - [ ] Badge disappears when back online
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: OfflineDataView Component
 
@@ -461,7 +461,7 @@
 - [ ] Refresh button available
 - [ ] No errors or missing data
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -485,7 +485,7 @@
 - [ ] Touch interactions responsive
 - [ ] No horizontal scrolling
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Mobile Layout - Landscape
 
@@ -504,7 +504,7 @@
 - [ ] Sync panel opens correctly
 - [ ] Offline indicators visible
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Tablet Layout
 
@@ -523,7 +523,7 @@
 - [ ] All features accessible
 - [ ] No layout issues
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -613,7 +613,7 @@
 - [ ] No duplicate sync attempts
 - [ ] Queue remains consistent
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Large Sync Queue
 
@@ -632,7 +632,7 @@
 - [ ] Queue processes completely
 - [ ] App remains responsive
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Service Worker Update
 
@@ -650,7 +650,7 @@
 - [ ] Page reloads with new version
 - [ ] No data loss
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Quota Exceeded
 
@@ -667,7 +667,7 @@
 - [ ] Oldest caches cleaned up
 - [ ] Application continues working
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -683,7 +683,7 @@
 - [ ] No console errors
 
 **Version**: **\_\_\_**
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Edge Desktop
 
@@ -695,7 +695,7 @@
 - [ ] No console errors
 
 **Version**: **\_\_\_**
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Safari Desktop
 
@@ -705,7 +705,7 @@
 - [ ] Graceful degradation for unsupported features
 
 **Version**: **\_\_\_**
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Firefox Desktop
 
@@ -715,7 +715,7 @@
 - [ ] Install options available
 
 **Version**: **\_\_\_**
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -736,7 +736,7 @@
 - [ ] Session data not in localStorage
 - [ ] Only appropriate data cached
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Test: Cache Access After Logout
 
@@ -754,7 +754,7 @@
 - [ ] Redirect to login when appropriate
 - [ ] Session invalidated
 
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ---
 
@@ -778,7 +778,7 @@
 - [ ] All PWA criteria met
 
 **Score**: **\_\_\_**
-**Screenshot**: ******\_\_******
+**Screenshot**: **\*\***\_\_**\*\***
 
 ### Performance Audit
 
@@ -834,13 +834,13 @@
 
 ## Sign-Off
 
-**Tester Name**: **********\_\_\_**********
-**Date**: **********\_\_\_**********
-**Signature**: **********\_\_\_**********
+**Tester Name**: ****\*\*****\_\_\_****\*\*****
+**Date**: ****\*\*****\_\_\_****\*\*****
+**Signature**: ****\*\*****\_\_\_****\*\*****
 
-**Approved By**: **********\_\_\_**********
-**Date**: **********\_\_\_**********
-**Signature**: **********\_\_\_**********
+**Approved By**: ****\*\*****\_\_\_****\*\*****
+**Date**: ****\*\*****\_\_\_****\*\*****
+**Signature**: ****\*\*****\_\_\_****\*\*****
 
 ---
 

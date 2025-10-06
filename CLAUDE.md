@@ -70,6 +70,7 @@ node run-seniority-migration.js   # Update seniority calculations
 ## Database Architecture
 
 ### Production Tables (Live Data)
+
 - **pilots** (27 records) - Main pilot information with seniority tracking
 - **pilot_checks** (571 records) - Certification tracking with expiry dates
 - **check_types** (34 records) - Aviation certification types across 8 categories
@@ -79,6 +80,7 @@ node run-seniority-migration.js   # Update seniority calculations
 - **contract_types** (3 records) - Pilot contract classifications
 
 ### Database Views (Optimized Queries)
+
 - **compliance_dashboard** - Fleet compliance metrics
 - **pilot_report_summary** - Comprehensive pilot summaries
 - **detailed_expiring_checks** - Expiring certifications with details
@@ -100,11 +102,13 @@ export async function getExpiringCertifications(daysAhead: number = 60) {
   const supabaseAdmin = getSupabaseAdmin();
   const { data } = await supabaseAdmin
     .from('pilot_checks')
-    .select(`
+    .select(
+      `
       id, expiry_date,
       pilots!inner (id, first_name, last_name, employee_id),
       check_types!inner (id, check_code, check_description, category)
-    `)
+    `
+    )
     .not('expiry_date', 'is', null)
     .order('expiry_date', { ascending: true });
 
@@ -125,6 +129,7 @@ const { data } = await supabase.from('pilot_checks').select('*');
 ```
 
 **Key Services**:
+
 - `pilot-service.ts` - Pilot CRUD operations
 - `leave-service.ts` - Leave request operations
 - `leave-eligibility-service.ts` - Seniority & crew availability logic
@@ -141,16 +146,19 @@ const { data } = await supabase.from('pilot_checks').select('*');
 The system is a full PWA with offline support via `next-pwa`:
 
 **Caching Strategies** (configured in `next.config.js`):
+
 - **CacheFirst**: Google fonts (1 year)
 - **StaleWhileRevalidate**: Images (24h), fonts (7 days), CSS/JS (24h)
 - **NetworkFirst**: API calls (1 min), Supabase API (1 min), dashboard pages (5 min)
 
 **Offline Handling**:
+
 - Fallback page: `/offline` (src/app/offline.tsx)
 - Service worker: `public/service-worker.js`
 - Offline component: `src/components/offline/OfflineIndicator.tsx`
 
 **PWA Features**:
+
 - Auto-registration on production
 - Skip waiting enabled for instant updates
 - Runtime caching for all static assets
@@ -169,25 +177,32 @@ webpack: (config, { dev, isServer }) => {
       react: { test: /react|react-dom/, name: 'react-vendor', priority: 20 },
       radixui: { test: /@radix-ui/, name: 'radix-vendor', chunks: 'async', priority: 15 },
       charts: { test: /chart\.js|recharts/, name: 'chart-vendor', chunks: 'async', priority: 15 },
-      heavy: { test: /framer-motion|@react-pdf/, name: 'heavy-vendor', chunks: 'async', priority: 15 },
-      common: { minChunks: 2, priority: 5, reuseExistingChunk: true }
-    }
+      heavy: {
+        test: /framer-motion|@react-pdf/,
+        name: 'heavy-vendor',
+        chunks: 'async',
+        priority: 15,
+      },
+      common: { minChunks: 2, priority: 5, reuseExistingChunk: true },
+    },
   };
-}
+};
 ```
 
 **Package Import Optimization**:
+
 - Optimized imports for: lucide-react, @tanstack/react-query, date-fns, framer-motion, recharts, chart.js, @radix-ui components
 
 ### 4. Core Business Logic
 
 **28-Day Roster Periods** (`src/lib/roster-utils.ts`):
+
 ```typescript
 const ROSTER_DURATION = 28;
 const KNOWN_ROSTER = {
   number: 11,
   year: 2025,
-  endDate: new Date('2025-10-10')
+  endDate: new Date('2025-10-10'),
 };
 
 export function getCurrentRosterPeriod() {
@@ -198,12 +213,13 @@ export function getCurrentRosterPeriod() {
   return {
     code: `RP${number}/${year}`,
     startDate: calculatedStart,
-    endDate: calculatedEnd
+    endDate: calculatedEnd,
   };
 }
 ```
 
 **Certification Status (FAA Color Coding)** (`src/lib/certification-utils.ts`):
+
 ```typescript
 export function getCertificationStatus(expiryDate: Date | null) {
   if (!expiryDate) return { color: 'gray', label: 'No Date' };
@@ -221,23 +237,27 @@ export function getCertificationStatus(expiryDate: Date | null) {
 ```
 
 **Seniority Calculations** (`src/lib/roster-utils.ts`):
+
 ```typescript
 // Seniority based on commencement date (1 = most senior)
 export function calculateSeniority(pilots: Pilot[]) {
   return pilots
-    .filter(p => p.commencement_date)
-    .sort((a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime())
+    .filter((p) => p.commencement_date)
+    .sort(
+      (a, b) => new Date(a.commencement_date).getTime() - new Date(b.commencement_date).getTime()
+    )
     .map((pilot, index) => ({ ...pilot, seniority_number: index + 1 }));
 }
 ```
 
 **Permission System** (`src/lib/auth-utils.ts`):
+
 ```typescript
 export const permissions = {
   canCreate: (user: User) => user.role === 'admin',
   canEdit: (user: User) => ['admin', 'manager'].includes(user.role),
   canDelete: (user: User) => user.role === 'admin',
-  canApprove: (user: User) => ['admin', 'manager'].includes(user.role)
+  canApprove: (user: User) => ['admin', 'manager'].includes(user.role),
 };
 ```
 
@@ -254,11 +274,13 @@ export const permissions = {
 → **ALWAYS show seniority comparison** (informational display)
 
 Sub-scenarios based on crew availability:
+
 - **2a**: Can approve ALL pilots while staying above minimum (≥10) → Green border, approve all, NO spreading recommendations
 - **2b**: Can approve SOME while maintaining minimum (≥10) → Yellow border, approve highest seniority, show spreading recommendations
 - **2c**: Below minimum crew already → Red border, recommend spreading/sequential approval for all
 
 **Priority Order (Within Same Rank Only)**:
+
 1. Seniority Number (Lower = Higher priority, 1 = most senior)
 2. Request Submission Date (Earlier = Higher priority, tiebreaker)
 
@@ -335,10 +357,10 @@ Used for: Charts, PDF viewers, calendar views, analytics dashboards
 ### Color Palette (Strict Adherence)
 
 ```css
---air-niugini-red: #e4002b;     /* Headers, buttons, alerts */
---air-niugini-gold: #ffc72c;    /* Accents, highlights */
---air-niugini-black: #000000;   /* Navigation, text */
---air-niugini-white: #ffffff;   /* Backgrounds */
+--air-niugini-red: #e4002b; /* Headers, buttons, alerts */
+--air-niugini-gold: #ffc72c; /* Accents, highlights */
+--air-niugini-black: #000000; /* Navigation, text */
+--air-niugini-white: #ffffff; /* Backgrounds */
 ```
 
 ### UI Standards
@@ -382,15 +404,17 @@ NEXT_PUBLIC_ROSTER_END_DATE=2025-10-10
 ## Common Pitfalls
 
 ### 1. Table Selection
+
 ```typescript
 // ❌ Wrong - Don't use an_ legacy tables (except an_users)
-await supabase.from('an_pilots').select('*')
+await supabase.from('an_pilots').select('*');
 
 // ✅ Correct - Use production tables
-await supabase.from('pilots').select('*')
+await supabase.from('pilots').select('*');
 ```
 
 ### 2. Production API Calls
+
 ```typescript
 // ❌ Wrong - Inter-API HTTP calls fail in production
 const response = await fetch(`${process.env.VERCEL_URL}/api/certifications`);
@@ -401,16 +425,20 @@ const certifications = await getExpiringCertifications(timeframeDays);
 ```
 
 ### 3. Date Handling
+
 ```typescript
 // ❌ Wrong - String comparison
-if (expiryDate < today) { }
+if (expiryDate < today) {
+}
 
 // ✅ Correct - Use date-fns
 import { isBefore } from 'date-fns';
-if (isBefore(expiryDate, today)) { }
+if (isBefore(expiryDate, today)) {
+}
 ```
 
 ### 4. PWA Service Worker
+
 ```typescript
 // ❌ Wrong - Importing service worker in components
 import '/service-worker.js';
@@ -422,12 +450,14 @@ import '/service-worker.js';
 ## Development Workflow
 
 ### Starting Fresh Session
+
 1. Navigate: `cd "/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms"`
 2. Verify database: `node test-connection.js`
 3. Start dev: `npm run dev`
 4. Run tests if modifying critical features: `npx playwright test`
 
 ### Making Database Changes
+
 1. Create migration SQL file in project root
 2. Test locally: `node deploy-schema.js`
 3. Verify application functions
@@ -435,6 +465,7 @@ import '/service-worker.js';
 5. Run test suites: `npm test && npx playwright test`
 
 ### Code Quality Workflow
+
 ```bash
 # Pre-commit (runs automatically via Husky)
 npm run format          # Format code
@@ -448,18 +479,21 @@ npm run validate        # Runs: format:check, lint, type-check, test, build
 ## Performance Optimization
 
 ### Database
+
 - Use single queries with joins (not multiple round trips)
 - Leverage database views (`expiring_checks`, `pilot_checks_overview`)
 - Index frequently filtered columns
 - Use RLS policies for security without performance impact
 
 ### Frontend
+
 - Lazy load heavy components (charts, PDF viewers)
 - Use TanStack Query caching (2-30 min stale times)
 - Dynamic imports for large libraries
 - Service layer prevents inter-API HTTP calls
 
 ### PWA Caching
+
 - Static assets: StaleWhileRevalidate (24h)
 - API calls: NetworkFirst with 1-min cache
 - Dashboard pages: NetworkFirst with 5-min cache

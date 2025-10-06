@@ -72,8 +72,8 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       'pilot:read',
       'pilot:update',
       'pilot:delete',
-      'pilot:view_sensitive'
-    ]
+      'pilot:view_sensitive',
+    ],
   },
   {
     name: 'Certification Management',
@@ -83,8 +83,8 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       'certification:read',
       'certification:update',
       'certification:delete',
-      'certification:bulk_update'
-    ]
+      'certification:bulk_update',
+    ],
   },
   {
     name: 'Leave Management',
@@ -95,8 +95,8 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       'leave:update',
       'leave:delete',
       'leave:approve',
-      'leave:reject'
-    ]
+      'leave:reject',
+    ],
   },
   {
     name: 'Reports & Analytics',
@@ -106,8 +106,8 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       'reports:export',
       'reports:create',
       'analytics:view',
-      'analytics:advanced'
-    ]
+      'analytics:advanced',
+    ],
   },
   {
     name: 'System Administration',
@@ -119,18 +119,14 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
       'system:backup',
       'system:monitoring',
       'system:webhooks',
-      'system:api_keys'
-    ]
+      'system:api_keys',
+    ],
   },
   {
     name: 'Check Types Management',
     description: 'Manage certification check types',
-    permissions: [
-      'check_types:create',
-      'check_types:update',
-      'check_types:delete'
-    ]
-  }
+    permissions: ['check_types:create', 'check_types:update', 'check_types:delete'],
+  },
 ];
 
 /**
@@ -143,37 +139,66 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
     description: 'Full system access with all permissions',
     permissions: [
       // All permissions
-      'pilot:create', 'pilot:read', 'pilot:update', 'pilot:delete', 'pilot:view_sensitive',
-      'certification:create', 'certification:read', 'certification:update', 'certification:delete', 'certification:bulk_update',
-      'leave:create', 'leave:read', 'leave:update', 'leave:delete', 'leave:approve', 'leave:reject',
-      'reports:view', 'reports:export', 'reports:create',
-      'analytics:view', 'analytics:advanced',
-      'system:settings', 'system:users', 'system:audit', 'system:backup', 'system:monitoring', 'system:webhooks', 'system:api_keys',
-      'check_types:create', 'check_types:update', 'check_types:delete'
-    ]
+      'pilot:create',
+      'pilot:read',
+      'pilot:update',
+      'pilot:delete',
+      'pilot:view_sensitive',
+      'certification:create',
+      'certification:read',
+      'certification:update',
+      'certification:delete',
+      'certification:bulk_update',
+      'leave:create',
+      'leave:read',
+      'leave:update',
+      'leave:delete',
+      'leave:approve',
+      'leave:reject',
+      'reports:view',
+      'reports:export',
+      'reports:create',
+      'analytics:view',
+      'analytics:advanced',
+      'system:settings',
+      'system:users',
+      'system:audit',
+      'system:backup',
+      'system:monitoring',
+      'system:webhooks',
+      'system:api_keys',
+      'check_types:create',
+      'check_types:update',
+      'check_types:delete',
+    ],
   },
   manager: {
     name: 'manager',
     displayName: 'Manager',
     description: 'Manage pilots, certifications, and approve leave',
     permissions: [
-      'pilot:read', 'pilot:update', 'pilot:view_sensitive',
-      'certification:create', 'certification:read', 'certification:update', 'certification:bulk_update',
-      'leave:create', 'leave:read', 'leave:update', 'leave:approve', 'leave:reject',
-      'reports:view', 'reports:export',
-      'analytics:view'
-    ]
+      'pilot:read',
+      'pilot:update',
+      'pilot:view_sensitive',
+      'certification:create',
+      'certification:read',
+      'certification:update',
+      'certification:bulk_update',
+      'leave:create',
+      'leave:read',
+      'leave:update',
+      'leave:approve',
+      'leave:reject',
+      'reports:view',
+      'reports:export',
+      'analytics:view',
+    ],
   },
   user: {
     name: 'user',
     displayName: 'User',
     description: 'View access and create leave requests',
-    permissions: [
-      'pilot:read',
-      'certification:read',
-      'leave:create', 'leave:read',
-      'reports:view'
-    ]
+    permissions: ['pilot:read', 'certification:read', 'leave:create', 'leave:read', 'reports:view'],
   },
   readonly: {
     name: 'readonly',
@@ -184,9 +209,9 @@ export const ROLE_DEFINITIONS: Record<Role, RoleDefinition> = {
       'certification:read',
       'leave:read',
       'reports:view',
-      'analytics:view'
-    ]
-  }
+      'analytics:view',
+    ],
+  },
 };
 
 /**
@@ -219,14 +244,14 @@ export class RBACService {
    * Check if user has all specified permissions
    */
   hasAllPermissions(permissions: Permission[]): boolean {
-    return permissions.every(permission => this.hasPermission(permission));
+    return permissions.every((permission) => this.hasPermission(permission));
   }
 
   /**
    * Check if user has any of the specified permissions
    */
   hasAnyPermission(permissions: Permission[]): boolean {
-    return permissions.some(permission => this.hasPermission(permission));
+    return permissions.some((permission) => this.hasPermission(permission));
   }
 
   /**
@@ -246,7 +271,7 @@ export class RBACService {
       readonly: 1,
       user: 2,
       manager: 3,
-      admin: 4
+      admin: 4,
     };
 
     return roleHierarchy[this.userRole] >= roleHierarchy[requiredRole];
@@ -297,7 +322,7 @@ export function roleHasPermission(role: Role, permission: Permission): boolean {
  * Get permissions by group
  */
 export function getPermissionsByGroup(groupName: string): Permission[] {
-  const group = PERMISSION_GROUPS.find(g => g.name === groupName);
+  const group = PERMISSION_GROUPS.find((g) => g.name === groupName);
   return group ? group.permissions : [];
 }
 
@@ -305,21 +330,24 @@ export function getPermissionsByGroup(groupName: string): Permission[] {
  * Get all available permissions
  */
 export function getAllPermissions(): Permission[] {
-  return PERMISSION_GROUPS.flatMap(group => group.permissions);
+  return PERMISSION_GROUPS.flatMap((group) => group.permissions);
 }
 
 /**
  * Get permissions difference between roles
  */
-export function getPermissionDifference(fromRole: Role, toRole: Role): {
+export function getPermissionDifference(
+  fromRole: Role,
+  toRole: Role
+): {
   added: Permission[];
   removed: Permission[];
 } {
   const fromPermissions = new Set(ROLE_DEFINITIONS[fromRole].permissions);
   const toPermissions = new Set(ROLE_DEFINITIONS[toRole].permissions);
 
-  const added = Array.from(toPermissions).filter(p => !fromPermissions.has(p));
-  const removed = Array.from(fromPermissions).filter(p => !toPermissions.has(p));
+  const added = Array.from(toPermissions).filter((p) => !fromPermissions.has(p));
+  const removed = Array.from(fromPermissions).filter((p) => !toPermissions.has(p));
 
   return { added, removed };
 }
@@ -337,9 +365,10 @@ export function isValidRole(role: string): role is Role {
 export function formatPermission(permission: Permission): string {
   const [resource, action] = permission.split(':');
   const formattedResource = resource.charAt(0).toUpperCase() + resource.slice(1);
-  const formattedAction = action.split('_').map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
+  const formattedAction = action
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 
   return `${formattedResource}: ${formattedAction}`;
 }
@@ -365,7 +394,7 @@ export function checkPermissionDetailed(
   if (!allowed) {
     return {
       allowed: false,
-      reason: `User role '${rbac.getRoleDisplayName()}' does not have permission '${formatPermission(permission)}'`
+      reason: `User role '${rbac.getRoleDisplayName()}' does not have permission '${formatPermission(permission)}'`,
     };
   }
 
@@ -398,5 +427,5 @@ export default {
   getAllPermissions,
   getPermissionsByGroup,
   isValidRole,
-  formatPermission
+  formatPermission,
 };

@@ -701,7 +701,7 @@ body {
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: #E4002B transparent;
+    scrollbar-color: #e4002b transparent;
   }
 
   .overflow-x-auto::-webkit-scrollbar {
@@ -713,7 +713,7 @@ body {
   }
 
   .overflow-x-auto::-webkit-scrollbar-thumb {
-    background: #E4002B;
+    background: #e4002b;
     border-radius: 3px;
   }
 

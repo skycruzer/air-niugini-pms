@@ -337,7 +337,9 @@ export default function PilotCertificationsPage() {
             <div className="text-center py-12">
               <span className="text-6xl block mb-4">👨‍✈️</span>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Pilot not found</h3>
-              <p className="text-gray-600 mb-4">The pilot you&apos;re looking for doesn&apos;t exist.</p>
+              <p className="text-gray-600 mb-4">
+                The pilot you&apos;re looking for doesn&apos;t exist.
+              </p>
               <button
                 onClick={() => router.push('/dashboard/pilots')}
                 className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"

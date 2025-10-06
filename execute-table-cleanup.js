@@ -35,7 +35,6 @@ async function dropTable(tableName) {
     console.log(`   📊 Table ${tableName} exists with ${data?.length || 0} rows`);
     console.log(`   ⚠️  Cannot drop via Supabase client - manual deletion required`);
     return false;
-
   } catch (error) {
     console.error(`   ❌ Error:`, error.message);
     return false;
@@ -54,12 +53,7 @@ async function main() {
   console.log('   4. an_check_types (10 rows)');
   console.log('\n⚠️  Table an_users will be KEPT (active authentication)\n');
 
-  const tables = [
-    'an_leave_requests',
-    'an_pilot_checks',
-    'an_pilots',
-    'an_check_types'
-  ];
+  const tables = ['an_leave_requests', 'an_pilot_checks', 'an_pilots', 'an_check_types'];
 
   console.log('═'.repeat(48));
   console.log('MANUAL DELETION REQUIRED');
@@ -92,7 +86,7 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error('❌ Error:', error);
     process.exit(1);
   });

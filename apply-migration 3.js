@@ -15,8 +15,8 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function applyMigration() {
@@ -50,7 +50,6 @@ async function applyMigration() {
     console.log('   2. Enable additional MFA options (TOTP, WebAuthn)');
     console.log('   3. Schedule Postgres upgrade to apply security patches');
     console.log('');
-
   } catch (err) {
     console.error('❌ Error:', err.message);
     process.exit(1);

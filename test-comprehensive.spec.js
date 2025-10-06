@@ -10,7 +10,7 @@ test('Comprehensive Air Niugini System Test', async ({ page }) => {
 
   // 1. Test Login
   console.log('🔐 Testing login...');
-  await page.goto('http://localhost:3001/login');
+  await page.goto('http://localhost:3000/login');
   await page.waitForLoadState('networkidle');
 
   // Verify login page loaded

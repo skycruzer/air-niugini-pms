@@ -237,7 +237,6 @@ export function PilotQuickView({
                   </div>
                 </section>
               )}
-
             </div>
 
             {/* Footer Actions */}

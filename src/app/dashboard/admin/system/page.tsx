@@ -29,7 +29,7 @@ import {
   HardDrive,
   Zap,
   Users,
-  Globe
+  Globe,
 } from 'lucide-react';
 
 interface SystemMetrics {
@@ -128,45 +128,45 @@ export default function SystemMonitoringPage() {
         cpu: {
           usage: 25,
           loadAverage: [0.5, 0.6, 0.7],
-          cores: 2
+          cores: 2,
         },
         memory: {
           total: parseFloat(data.checks.memory.total),
           used: parseFloat(data.checks.memory.used),
           free: parseFloat(data.checks.memory.total) - parseFloat(data.checks.memory.used),
-          percentage: parseFloat(data.checks.memory.percentage)
+          percentage: parseFloat(data.checks.memory.percentage),
         },
         database: {
           status: data.checks.database.status,
           connectionCount: 10,
           averageQueryTime: parseFloat(data.checks.database.averageQueryTime),
           slowQueries: 0,
-          activeConnections: data.checks.database.activeConnections
+          activeConnections: data.checks.database.activeConnections,
         },
         api: {
           totalRequests: 1250,
           successRate: parseFloat(data.checks.api.successRate),
           averageResponseTime: parseFloat(data.checks.api.averageResponseTime),
           requestsPerMinute: data.checks.api.requestsPerMinute,
-          endpoints: []
+          endpoints: [],
         },
         errors: {
           total: data.checks.errors.total,
           rate: data.checks.errors.rate,
           byType: {},
-          recent: []
+          recent: [],
         },
         uptime: {
           startTime: new Date().toISOString(),
           uptime: data.checks.uptime.seconds,
-          uptimePercentage: parseFloat(data.checks.uptime.percentage)
-        }
+          uptimePercentage: parseFloat(data.checks.uptime.percentage),
+        },
       });
 
       setHealth({
         healthy: data.healthy,
         issues: data.issues || [],
-        warnings: data.warnings || []
+        warnings: data.warnings || [],
       });
 
       setSessions({
@@ -176,8 +176,8 @@ export default function SystemMonitoringPage() {
         sessionsByRole: {
           admin: 2,
           manager: 5,
-          user: 5
-        }
+          user: 5,
+        },
       });
     } catch (error) {
       console.error('Failed to load metrics:', error);
@@ -232,19 +232,10 @@ export default function SystemMonitoringPage() {
           <p className="text-gray-600">Real-time system health and performance metrics</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAutoRefresh(!autoRefresh)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}>
             {autoRefresh ? 'Disable Auto-Refresh' : 'Enable Auto-Refresh'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadMetrics}
-            disabled={refreshing}
-          >
+          <Button variant="outline" size="sm" onClick={loadMetrics} disabled={refreshing}>
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
@@ -281,7 +272,9 @@ export default function SystemMonitoringPage() {
                 <h4 className="font-semibold text-red-800 mb-2">Critical Issues</h4>
                 <ul className="list-disc list-inside space-y-1">
                   {health.issues.map((issue: string, i: number) => (
-                    <li key={i} className="text-sm text-red-700">{issue}</li>
+                    <li key={i} className="text-sm text-red-700">
+                      {issue}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -292,7 +285,9 @@ export default function SystemMonitoringPage() {
                 <h4 className="font-semibold text-yellow-800 mb-2">Warnings</h4>
                 <ul className="list-disc list-inside space-y-1">
                   {health.warnings.map((warning: string, i: number) => (
-                    <li key={i} className="text-sm text-yellow-700">{warning}</li>
+                    <li key={i} className="text-sm text-yellow-700">
+                      {warning}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -318,9 +313,7 @@ export default function SystemMonitoringPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.cpu.usage.toFixed(1)}%</div>
-            <p className="text-xs text-gray-600 mt-1">
-              {metrics.cpu.cores} cores
-            </p>
+            <p className="text-xs text-gray-600 mt-1">{metrics.cpu.cores} cores</p>
           </CardContent>
         </Card>
 
@@ -360,9 +353,7 @@ export default function SystemMonitoringPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.uptime.uptimePercentage}%</div>
-            <p className="text-xs text-gray-600 mt-1">
-              {formatUptime(metrics.uptime.uptime)}
-            </p>
+            <p className="text-xs text-gray-600 mt-1">{formatUptime(metrics.uptime.uptime)}</p>
           </CardContent>
         </Card>
       </div>
@@ -400,7 +391,9 @@ export default function SystemMonitoringPage() {
                   {metrics.api.successRate.toFixed(1)}%
                 </div>
                 <p className="text-xs text-gray-600 mt-1">
-                  {metrics.api.totalRequests - Math.floor(metrics.api.totalRequests * metrics.api.successRate / 100)} failures
+                  {metrics.api.totalRequests -
+                    Math.floor((metrics.api.totalRequests * metrics.api.successRate) / 100)}{' '}
+                  failures
                 </p>
               </CardContent>
             </Card>
@@ -411,9 +404,7 @@ export default function SystemMonitoringPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.api.averageResponseTime}ms</div>
-                <p className="text-xs text-gray-600 mt-1">
-                  API latency
-                </p>
+                <p className="text-xs text-gray-600 mt-1">API latency</p>
               </CardContent>
             </Card>
           </div>
@@ -439,10 +430,10 @@ export default function SystemMonitoringPage() {
                 <CardTitle className="text-sm font-medium">Query Performance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metrics.database.averageQueryTime.toFixed(0)}ms</div>
-                <p className="text-xs text-gray-600 mt-1">
-                  Average query time
-                </p>
+                <div className="text-2xl font-bold">
+                  {metrics.database.averageQueryTime.toFixed(0)}ms
+                </div>
+                <p className="text-xs text-gray-600 mt-1">Average query time</p>
               </CardContent>
             </Card>
 
@@ -452,9 +443,7 @@ export default function SystemMonitoringPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.database.slowQueries}</div>
-                <p className="text-xs text-gray-600 mt-1">
-                  Queries &gt;1s
-                </p>
+                <p className="text-xs text-gray-600 mt-1">Queries &gt;1s</p>
               </CardContent>
             </Card>
           </div>
@@ -470,9 +459,7 @@ export default function SystemMonitoringPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{sessions.activeUsers}</div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Currently logged in
-                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Currently logged in</p>
                 </CardContent>
               </Card>
 
@@ -482,9 +469,7 @@ export default function SystemMonitoringPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{sessions.activeSessions}</div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Open connections
-                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Open connections</p>
                 </CardContent>
               </Card>
 
@@ -494,9 +479,7 @@ export default function SystemMonitoringPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{sessions.averageSessionDuration}m</div>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Average session length
-                  </p>
+                  <p className="text-xs text-gray-600 mt-1">Average session length</p>
                 </CardContent>
               </Card>
 

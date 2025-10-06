@@ -32,8 +32,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function executeCleanup() {
@@ -63,10 +63,10 @@ async function executeCleanup() {
 
       // Split and execute each DROP statement individually
       const statements = [
-        "DROP TABLE IF EXISTS an_leave_requests CASCADE",
-        "DROP TABLE IF EXISTS an_pilot_checks CASCADE",
-        "DROP TABLE IF EXISTS an_pilots CASCADE",
-        "DROP TABLE IF EXISTS an_check_types CASCADE"
+        'DROP TABLE IF EXISTS an_leave_requests CASCADE',
+        'DROP TABLE IF EXISTS an_pilot_checks CASCADE',
+        'DROP TABLE IF EXISTS an_pilots CASCADE',
+        'DROP TABLE IF EXISTS an_check_types CASCADE',
       ];
 
       for (const statement of statements) {
@@ -101,7 +101,7 @@ async function executeCleanup() {
       console.error('❌ Error fetching tables:', tableError.message);
     } else {
       console.log('Remaining tables:');
-      tables.forEach(table => {
+      tables.forEach((table) => {
         const name = table.table_name;
         if (name === 'an_users') {
           console.log(`   ✅ ${name} (Active Auth Table - KEPT)`);
@@ -115,7 +115,6 @@ async function executeCleanup() {
 
     console.log('\n✅ Legacy table cleanup complete!');
     console.log('==========================================\n');
-
   } catch (error) {
     console.error('❌ Unexpected error:', error);
     process.exit(1);
@@ -128,7 +127,7 @@ executeCleanup()
     console.log('✨ Done!');
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('❌ Fatal error:', error);
     process.exit(1);
   });

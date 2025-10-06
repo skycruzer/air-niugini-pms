@@ -22,6 +22,7 @@ npx playwright test  # E2E tests
 **Status**: ✅ Production Ready (v1.0)
 
 **Live Fleet Data**:
+
 - 👨‍✈️ **27 Active Pilots** (Captains & First Officers)
 - 🛡️ **571 Certifications** tracked across the fleet
 - 📋 **34 Check Types** across 8 certification categories
@@ -46,6 +47,7 @@ npx playwright test  # E2E tests
 ## 🛢️ Database Structure
 
 **Production Tables** (Active):
+
 - `pilots` - 27 pilot records with seniority tracking
 - `pilot_checks` - 571 certification records with expiry dates
 - `check_types` - 34 certification types across 8 categories
@@ -55,6 +57,7 @@ npx playwright test  # E2E tests
 - `contract_types` - Pilot contract classifications
 
 **Database Views** (Optimized Queries):
+
 - `compliance_dashboard` - Fleet compliance metrics
 - `pilot_report_summary` - Comprehensive pilot summaries
 - `detailed_expiring_checks` - Expiring certifications with details

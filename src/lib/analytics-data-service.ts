@@ -9,12 +9,15 @@
  */
 
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { differenceInYears, differenceInDays, format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import type {
-  PilotAnalytics,
-  CertificationAnalytics,
-  LeaveAnalytics,
-} from '@/types/analytics';
+import {
+  differenceInYears,
+  differenceInDays,
+  format,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+} from 'date-fns';
+import type { PilotAnalytics, CertificationAnalytics, LeaveAnalytics } from '@/types/analytics';
 
 /**
  * Get comprehensive pilot analytics from database

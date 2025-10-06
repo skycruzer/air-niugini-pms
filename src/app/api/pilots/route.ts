@@ -209,10 +209,7 @@ export async function PUT(request: NextRequest) {
     }
 
     console.log('🔧 Now attempting actual update...');
-    const { error } = await supabaseAdmin
-      .from('pilots')
-      .update(cleanedBody)
-      .eq('id', pilotId);
+    const { error } = await supabaseAdmin.from('pilots').update(cleanedBody).eq('id', pilotId);
 
     if (error) {
       console.error('🚨 API /pilots PUT: Supabase error details:', error);

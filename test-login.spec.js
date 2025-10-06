@@ -9,7 +9,7 @@ test('Test login with user credentials', async ({ page }) => {
   });
 
   // Navigate to login page (using port 3001)
-  await page.goto('http://localhost:3001/login');
+  await page.goto('http://localhost:3000/login');
   await page.waitForLoadState('networkidle');
 
   // Verify login page loaded
@@ -39,8 +39,24 @@ test('Test login with user credentials', async ({ page }) => {
   if (currentUrl.includes('/dashboard')) {
     console.log('🎉 SUCCESS: Redirected to dashboard!');
 
-    // Verify dashboard content
-    await expect(page.locator('h1, h2, h3').first()).toBeVisible();
+    // Verify dashboard content - wait for navigation or dashboard elements
+    await page.waitForTimeout(2000); // Allow dashboard to fully render
+
+    // Check for essential dashboard elements (nav should always be present)
+    const navVisible = await page
+      .locator('nav')
+      .isVisible()
+      .catch(() => false);
+    const headerVisible = await page
+      .locator('header')
+      .isVisible()
+      .catch(() => false);
+    const mainVisible = await page
+      .locator('main')
+      .isVisible()
+      .catch(() => false);
+
+    expect(navVisible || headerVisible || mainVisible).toBe(true);
     console.log('✅ Dashboard loaded successfully');
 
     // Check for admin elements

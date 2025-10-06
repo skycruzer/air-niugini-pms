@@ -3,6 +3,7 @@
 ## ⚠️ IMPORTANT: Read Before Proceeding
 
 This cleanup will **permanently delete** 4 legacy tables that are no longer used:
+
 - `an_leave_requests` (0 rows - empty)
 - `an_pilot_checks` (18 rows - legacy dev data)
 - `an_pilots` (5 rows - legacy dev data)
@@ -52,6 +53,7 @@ node verify-cleanup.js
 ```
 
 **Expected output:**
+
 ```
 ✅ CLEANUP SUCCESSFUL!
 
@@ -84,6 +86,7 @@ npm run dev
 ```
 
 Then test:
+
 - ✅ Login works (uses `an_users`)
 - ✅ Dashboard loads with correct stats (27 pilots, 571 certifications)
 - ✅ Pilot management works (uses `pilots` table)
@@ -99,6 +102,7 @@ Then test:
 The following data was exported and saved:
 
 ### an_pilots (5 rows)
+
 - PNG001 - Joseph Kila Wambi (Captain)
 - PNG002 - Maria Temu Kaupa (First Officer)
 - PNG003 - Peter Namaliu Sori (Captain)
@@ -106,13 +110,16 @@ The following data was exported and saved:
 - PNG005 - John Bani Vanimo (Captain)
 
 ### an_check_types (10 rows)
+
 - LINE_CHECK, SIM_CHECK, MEDICAL, LICENSE, DG_CERT
 - CRM, ETOPS, CAT2, CAT3, RVSM
 
 ### an_pilot_checks (18 rows)
+
 - Various certification records for the 3 pilots above
 
 ### an_leave_requests (0 rows)
+
 - Table was empty
 
 ---
@@ -153,5 +160,5 @@ After successful cleanup:
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Database Cleanup - Version 1.0*
-*Execution Date: 2025-10-03*
+_Database Cleanup - Version 1.0_
+_Execution Date: 2025-10-03_

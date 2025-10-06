@@ -15,6 +15,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 **Type**: Cloud-hosted MCP Server (URL-based)
 
 **Configuration**:
+
 ```json
 {
   "url": "https://mcp.supabase.com/mcp?project_ref=wgdmgvonqysflwdiiols&features=docs%2Caccount%2Cdatabase%2Cdevelopment%2Cdebugging%2Cfunctions%2Cbranching%2Cstorage"
@@ -22,6 +23,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 ```
 
 **Enabled Features**:
+
 - `docs` - Documentation search and access
 - `account` - Account management and settings
 - `database` - Database schema inspection and queries
@@ -32,6 +34,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 - `storage` - Storage bucket management
 
 **Capabilities**:
+
 - Database schema inspection
 - Table creation and modification
 - Row-level security (RLS) policy management
@@ -42,6 +45,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 - TypeScript type generation
 
 **Common Operations**:
+
 ```
 "Create a new table called notifications"
 "Add RLS policies to the pilots table"
@@ -51,6 +55,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 ```
 
 **Project Integration**:
+
 - Database: PostgreSQL (Project: wgdmgvonqysflwdiiols)
 - Tables: pilots, pilot_checks, check_types, leave_requests, etc.
 - RLS: Configured for all tables
@@ -65,6 +70,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 **Package**: `@modelcontextprotocol/server-shadcn`
 
 **Configuration**:
+
 ```json
 {
   "command": "npx",
@@ -73,6 +79,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 ```
 
 **Capabilities**:
+
 - Add new shadcn/ui components
 - List available components
 - Get component documentation
@@ -80,6 +87,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 - Install dependencies automatically
 
 **Common Operations**:
+
 ```
 "Add the calendar component from shadcn"
 "Install shadcn tooltip"
@@ -88,6 +96,7 @@ This project uses the Model Context Protocol (MCP) to extend Claude Code's capab
 ```
 
 **Project Configuration**:
+
 - Style: New York
 - Base Color: Slate
 - CSS Variables: Enabled
@@ -106,6 +115,7 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 **Location**: `.mcp.json` (project root)
 
 **Full Configuration**:
+
 ```json
 {
   "mcpServers": {
@@ -121,6 +131,7 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 ```
 
 **Configuration Types**:
+
 - **URL-based** (Supabase): Cloud-hosted MCP server accessed via HTTPS
 - **Command-based** (shadcn): Locally executed via npx
 
@@ -161,6 +172,7 @@ MCP Protocol
 MCP servers enable natural language operations:
 
 **Database Operations**:
+
 ```
 "Show me all tables in the database"
 "Create a new column 'retirement_date' in the pilots table"
@@ -169,6 +181,7 @@ MCP servers enable natural language operations:
 ```
 
 **UI Component Management**:
+
 ```
 "Add the calendar component"
 "Install tooltip and hover-card components"
@@ -178,6 +191,7 @@ MCP servers enable natural language operations:
 ### Automatic Context
 
 MCP servers provide context to Claude Code:
+
 - Current database schema
 - Installed UI components
 - Available operations
@@ -190,6 +204,7 @@ MCP servers provide context to Claude Code:
 ### 1. Faster Development
 
 **Before MCP**:
+
 ```bash
 # Manual steps
 supabase db diff -f migration_name
@@ -202,6 +217,7 @@ npx shadcn@latest add calendar
 ```
 
 **With MCP**:
+
 ```
 "Create a migration to add retirement_date column and generate types"
 "Add calendar and tooltip components"
@@ -216,6 +232,7 @@ npx shadcn@latest add calendar
 ### 3. Intelligent Assistance
 
 Claude Code understands:
+
 - Current database schema
 - Installed components
 - Project configuration
@@ -227,30 +244,30 @@ Claude Code understands:
 
 ### Supabase MCP Tools
 
-| Tool | Purpose |
-|------|---------|
-| `list_tables` | List all database tables |
-| `list_extensions` | Show installed PostgreSQL extensions |
-| `list_migrations` | List migration history |
-| `apply_migration` | Execute DDL operations |
-| `execute_sql` | Run SQL queries |
-| `get_logs` | Fetch service logs |
-| `get_advisors` | Security/performance advisories |
-| `generate_typescript_types` | Generate TypeScript types |
-| `list_edge_functions` | List deployed functions |
-| `deploy_edge_function` | Deploy new function |
-| `create_branch` | Create development branch |
-| `list_branches` | List database branches |
-| `list_storage_buckets` | List storage buckets |
+| Tool                        | Purpose                              |
+| --------------------------- | ------------------------------------ |
+| `list_tables`               | List all database tables             |
+| `list_extensions`           | Show installed PostgreSQL extensions |
+| `list_migrations`           | List migration history               |
+| `apply_migration`           | Execute DDL operations               |
+| `execute_sql`               | Run SQL queries                      |
+| `get_logs`                  | Fetch service logs                   |
+| `get_advisors`              | Security/performance advisories      |
+| `generate_typescript_types` | Generate TypeScript types            |
+| `list_edge_functions`       | List deployed functions              |
+| `deploy_edge_function`      | Deploy new function                  |
+| `create_branch`             | Create development branch            |
+| `list_branches`             | List database branches               |
+| `list_storage_buckets`      | List storage buckets                 |
 
 ### shadcn MCP Tools
 
-| Tool | Purpose |
-|------|---------|
-| `add_component` | Install a new component |
-| `list_components` | Show available components |
-| `get_component_info` | Component documentation |
-| `update_config` | Modify components.json |
+| Tool                 | Purpose                   |
+| -------------------- | ------------------------- |
+| `add_component`      | Install a new component   |
+| `list_components`    | Show available components |
+| `get_component_info` | Component documentation   |
+| `update_config`      | Modify components.json    |
 
 ---
 
@@ -265,6 +282,7 @@ Create isolated development databases:
 ```
 
 Benefits:
+
 - Test migrations safely
 - Parallel development
 - Easy rollback
@@ -279,6 +297,7 @@ Deploy serverless functions:
 ```
 
 Features:
+
 - TypeScript support
 - Environment variables
 - Scheduled execution
@@ -293,6 +312,7 @@ Manage file storage:
 ```
 
 Capabilities:
+
 - Bucket creation
 - RLS policies
 - File size limits
@@ -312,22 +332,26 @@ Capabilities:
 ### Supabase MCP Issues
 
 **Connection Failed**:
+
 - Verify `SUPABASE_ACCESS_TOKEN` is valid
 - Check `SUPABASE_SERVICE_ROLE_KEY` is correct
 - Ensure project ref `wgdmgvonqysflwdiiols` is correct
 
 **Permission Denied**:
+
 - Verify service role key has admin permissions
 - Check RLS policies aren't blocking operations
 
 ### shadcn MCP Issues
 
 **Component Installation Failed**:
+
 - Verify `components.json` exists
 - Check path aliases in `tsconfig.json`
 - Ensure TailwindCSS is properly configured
 
 **Component Not Found**:
+
 - Verify component name is correct
 - Check shadcn/ui version compatibility
 
@@ -338,12 +362,14 @@ Capabilities:
 ### 1. Use MCP for Repetitive Tasks
 
 ✅ **Good**:
+
 ```
 "Add RLS policies to the new notifications table"
 "Generate TypeScript types after schema changes"
 ```
 
 ❌ **Bad**:
+
 ```bash
 # Manual SQL editing
 # Manual type generation
@@ -352,6 +378,7 @@ Capabilities:
 ### 2. Combine MCP Operations
 
 ✅ **Good**:
+
 ```
 "Create a new table for pilot documents, add RLS policies,
 create a storage bucket, and generate TypeScript types"
@@ -360,6 +387,7 @@ create a storage bucket, and generate TypeScript types"
 ### 3. Verify After Operations
 
 ✅ **Good**:
+
 ```
 "Show me the RLS policies on the pilots table"
 "List all database tables to verify the migration"
@@ -368,6 +396,7 @@ create a storage bucket, and generate TypeScript types"
 ### 4. Use Branches for Experiments
 
 ✅ **Good**:
+
 ```
 "Create a database branch to test the new schema"
 ```
@@ -379,6 +408,7 @@ create a storage bucket, and generate TypeScript types"
 ### Service Role Key
 
 ⚠️ **Important**: The `SUPABASE_SERVICE_ROLE_KEY` has admin access:
+
 - Never commit to git (excluded in `.gitignore`)
 - Never expose in client code
 - Rotate periodically
@@ -387,11 +417,13 @@ create a storage bucket, and generate TypeScript types"
 ### MCP Configuration
 
 ✅ **Secure**:
+
 - `.mcp.json` contains credentials (excluded from git)
 - Environment variables used where possible
 - Access tokens with limited scope
 
 ❌ **Insecure**:
+
 - Committing `.mcp.json` to public repos
 - Sharing access tokens
 - Using production credentials in development
@@ -403,6 +435,7 @@ create a storage bucket, and generate TypeScript types"
 ### Recommended for Air Niugini PMS
 
 1. **Vercel MCP** (Deployment)
+
    ```json
    {
      "command": "npx",
@@ -411,6 +444,7 @@ create a storage bucket, and generate TypeScript types"
    ```
 
 2. **GitHub MCP** (Version Control)
+
    ```json
    {
      "command": "npx",
@@ -431,15 +465,18 @@ create a storage bucket, and generate TypeScript types"
 ## Resources
 
 ### MCP Protocol
+
 - **Documentation**: https://modelcontextprotocol.io
 - **Specification**: https://spec.modelcontextprotocol.io
 - **GitHub**: https://github.com/modelcontextprotocol
 
 ### Supabase MCP
+
 - **Package**: https://www.npmjs.com/package/@supabase/mcp-server-supabase
 - **Supabase Docs**: https://supabase.com/docs
 
 ### shadcn MCP
+
 - **Package**: https://www.npmjs.com/package/@modelcontextprotocol/server-shadcn
 - **shadcn/ui Docs**: https://ui.shadcn.com
 
@@ -462,6 +499,7 @@ create a storage bucket, and generate TypeScript types"
 **Status**: ✅ Fully configured and operational
 
 MCP servers significantly enhance Claude Code's ability to:
+
 - Manage database operations efficiently
 - Install and configure UI components
 - Generate TypeScript types automatically

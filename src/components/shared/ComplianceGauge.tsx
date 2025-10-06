@@ -32,16 +32,19 @@ export function ComplianceGauge({
   showStatus = true,
   className = '',
 }: ComplianceGaugeProps) {
-
   const getColor = () => {
-    if (complianceRate >= 95) return { fill: '#22c55e', text: 'text-green-600', bg: 'bg-green-100' };
-    if (complianceRate >= 85) return { fill: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-100' };
+    if (complianceRate >= 95)
+      return { fill: '#22c55e', text: 'text-green-600', bg: 'bg-green-100' };
+    if (complianceRate >= 85)
+      return { fill: '#f59e0b', text: 'text-amber-600', bg: 'bg-amber-100' };
     return { fill: '#ef4444', text: 'text-red-600', bg: 'bg-red-100' };
   };
 
   const getStatusInfo = () => {
-    if (complianceRate >= 95) return { emoji: '✅', label: 'Excellent', bg: 'bg-green-100 text-green-800' };
-    if (complianceRate >= 85) return { emoji: '⚠️', label: 'Good', bg: 'bg-amber-100 text-amber-800' };
+    if (complianceRate >= 95)
+      return { emoji: '✅', label: 'Excellent', bg: 'bg-green-100 text-green-800' };
+    if (complianceRate >= 85)
+      return { emoji: '⚠️', label: 'Good', bg: 'bg-amber-100 text-amber-800' };
     return { emoji: '❌', label: 'Needs Attention', bg: 'bg-red-100 text-red-800' };
   };
 
@@ -57,14 +60,33 @@ export function ComplianceGauge({
       const { cx, cy } = viewBox;
       return (
         <g>
-          <text x={cx} y={cy - 10} className="recharts-text recharts-label" textAnchor="middle" dominantBaseline="central">
-            <tspan alignmentBaseline="middle" fontSize={size === 'sm' ? '24' : size === 'lg' ? '40' : '32'} fontWeight="bold" fill={color.fill}>
+          <text
+            x={cx}
+            y={cy - 10}
+            className="recharts-text recharts-label"
+            textAnchor="middle"
+            dominantBaseline="central"
+          >
+            <tspan
+              alignmentBaseline="middle"
+              fontSize={size === 'sm' ? '24' : size === 'lg' ? '40' : '32'}
+              fontWeight="bold"
+              fill={color.fill}
+            >
               {complianceRate}%
             </tspan>
           </text>
           {showLabel && (
-            <text x={cx} y={cy + 20} className="recharts-text recharts-label" textAnchor="middle" dominantBaseline="central">
-              <tspan fontSize="14" fill="#6b7280">Fleet Compliance</tspan>
+            <text
+              x={cx}
+              y={cy + 20}
+              className="recharts-text recharts-label"
+              textAnchor="middle"
+              dominantBaseline="central"
+            >
+              <tspan fontSize="14" fill="#6b7280">
+                Fleet Compliance
+              </tspan>
             </text>
           )}
         </g>
@@ -85,7 +107,12 @@ export function ComplianceGauge({
             endAngle={0}
           >
             <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-            <RadialBar background={{ fill: '#e5e7eb' }} dataKey="value" cornerRadius={10} label={<CustomLabel />} />
+            <RadialBar
+              background={{ fill: '#e5e7eb' }}
+              dataKey="value"
+              cornerRadius={10}
+              label={<CustomLabel />}
+            />
           </RadialBarChart>
         </ResponsiveContainer>
 
@@ -158,7 +185,9 @@ export function ComplianceGauge({
           />
         </div>
         {showStatus && (
-          <div className={`inline-flex items-center px-3 py-1 rounded-full ${status.bg} text-xs font-semibold`}>
+          <div
+            className={`inline-flex items-center px-3 py-1 rounded-full ${status.bg} text-xs font-semibold`}
+          >
             <span className="mr-1">{status.emoji}</span>
             {status.label}
           </div>
@@ -193,7 +222,9 @@ export function ComplianceGauge({
             </p>
           )}
         </div>
-        <div className={`w-16 h-16 rounded-full ${color.bg} ${color.text} flex items-center justify-center text-3xl font-bold border-2 ${color.text.replace('text', 'border')}`}>
+        <div
+          className={`w-16 h-16 rounded-full ${color.bg} ${color.text} flex items-center justify-center text-3xl font-bold border-2 ${color.text.replace('text', 'border')}`}
+        >
           {complianceRate}
         </div>
       </div>

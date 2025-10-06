@@ -287,9 +287,7 @@ export default function NotificationPreferences() {
             <Calendar className="h-5 w-5 text-[#E4002B]" />
             Leave Request Alerts
           </CardTitle>
-          <CardDescription>
-            Get notified about leave requests and approvals
-          </CardDescription>
+          <CardDescription>Get notified about leave requests and approvals</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -339,9 +337,7 @@ export default function NotificationPreferences() {
             <Info className="h-5 w-5 text-[#E4002B]" />
             System Notifications
           </CardTitle>
-          <CardDescription>
-            Receive important system updates and announcements
-          </CardDescription>
+          <CardDescription>Receive important system updates and announcements</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -394,7 +390,9 @@ export default function NotificationPreferences() {
                 }
                 disabled={!preferences.email_enabled}
               />
-              <p className="text-xs text-gray-500">Time when you'd like to receive the daily digest</p>
+              <p className="text-xs text-gray-500">
+                Time when you'd like to receive the daily digest
+              </p>
             </div>
           )}
         </CardContent>

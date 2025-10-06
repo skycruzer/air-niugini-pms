@@ -1,4 +1,5 @@
 # Air Niugini B767 Pilot Management System
+
 # Email & SMS Notification System - Setup Guide
 
 ## Overview
@@ -8,6 +9,7 @@ This guide will help you set up and configure the complete notification system f
 ## Features Implemented
 
 ✅ **Email Service (Resend Integration)**
+
 - Certification expiry alerts (30, 14, 7, 3, 1 days before)
 - Leave request notifications
 - Leave approval/rejection notifications
@@ -17,24 +19,28 @@ This guide will help you set up and configure the complete notification system f
 - Air Niugini branded HTML templates
 
 ✅ **Notification Queue System**
+
 - Queued notifications with priority
 - Automatic retry with exponential backoff
 - Delivery tracking and logging
 - Batch notification processing
 
 ✅ **Scheduled Jobs**
+
 - Daily certification expiry checks
 - Notification queue processing
 - Automatic cleanup of old notifications
 - Daily digest emails
 
 ✅ **In-App Notification Center**
+
 - Bell icon with unread count
 - Real-time notification dropdown
 - Mark as read/delete functionality
 - Toast notifications for new alerts
 
 ✅ **User Preferences**
+
 - Email on/off toggle
 - Notification type preferences
 - Daily digest scheduling
@@ -100,6 +106,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
 4. Copy key to `.env.local`
 
 **Free Tier Limits:**
+
 - 100 emails per day
 - 3,000 emails per month
 - Good for testing and small deployments
@@ -116,6 +123,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3001
    - Add DNS records provided by Resend
 
 2. **Update Environment Variables:**
+
    ```env
    EMAIL_FROM=Fleet Operations <notifications@airniugini.com>
    EMAIL_REPLY_TO=fleetops@airniugini.com.pg
@@ -142,6 +150,7 @@ curl -X POST http://localhost:3001/api/notifications/test \
 ```
 
 ### Test Types Available:
+
 - `certification_expiry` - Certification expiry alert
 - `leave_request` - Leave request notification
 - `system` - System notification (default)
@@ -281,9 +290,9 @@ await queueNotification({
     check_description: 'Proficiency Check',
     expiry_date: '2025-10-15',
     days_remaining: 7,
-    category: 'Flight Operations'
+    category: 'Flight Operations',
   },
-  priority: 1 // High priority
+  priority: 1, // High priority
 });
 ```
 
@@ -302,9 +311,9 @@ await queueNotification({
     start_date: '2025-10-20',
     end_date: '2025-10-22',
     roster_period: 'RP11/2025',
-    comments: 'Family commitment'
+    comments: 'Family commitment',
   },
-  priority: 3
+  priority: 3,
 });
 ```
 
@@ -320,7 +329,7 @@ await supabase.from('in_app_notifications').insert({
   notification_type: 'certification_expiry',
   action_url: '/dashboard/certifications',
   icon: 'alert',
-  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
 });
 ```
 
@@ -344,17 +353,20 @@ SELECT * FROM notification_log ORDER BY sent_at DESC LIMIT 10;
 ### Common Issues
 
 **1. Emails not sending:**
+
 - Check `RESEND_API_KEY` is set correctly
 - Verify Resend API key is active
 - Check daily sending limits (100/day on free tier)
 - Review `notification_log` for error messages
 
 **2. Queue not processing:**
+
 - Ensure cron jobs are running
 - Check `notification_queue` table for pending items
 - Manually trigger: `POST /api/cron/process-queue`
 
 **3. In-app notifications not appearing:**
+
 - Check Supabase real-time is enabled
 - Verify user permissions in RLS policies
 - Check browser console for errors
@@ -381,22 +393,23 @@ Before deploying to production:
 
 ## 10. API Endpoints Reference
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/notifications/send` | POST | Queue a notification |
-| `/api/notifications/preferences` | GET | Get user preferences |
-| `/api/notifications/preferences` | PUT | Update preferences |
-| `/api/notifications/test` | POST | Send test notification |
-| `/api/cron/daily-certification-check` | POST | Run daily cert check |
-| `/api/cron/process-queue` | POST | Process notification queue |
-| `/api/cron/cleanup-notifications` | POST | Cleanup old notifications |
-| `/api/cron/daily-digest` | POST | Send daily digests |
+| Endpoint                              | Method | Description                |
+| ------------------------------------- | ------ | -------------------------- |
+| `/api/notifications/send`             | POST   | Queue a notification       |
+| `/api/notifications/preferences`      | GET    | Get user preferences       |
+| `/api/notifications/preferences`      | PUT    | Update preferences         |
+| `/api/notifications/test`             | POST   | Send test notification     |
+| `/api/cron/daily-certification-check` | POST   | Run daily cert check       |
+| `/api/cron/process-queue`             | POST   | Process notification queue |
+| `/api/cron/cleanup-notifications`     | POST   | Cleanup old notifications  |
+| `/api/cron/daily-digest`              | POST   | Send daily digests         |
 
 ---
 
 ## 11. Notification Thresholds
 
 **Certification Expiry Alerts:**
+
 - 30 days before expiry
 - 14 days before expiry
 - 7 days before expiry (URGENT)
@@ -404,6 +417,7 @@ Before deploying to production:
 - 1 day before expiry (URGENT)
 
 **Notification Priority Levels:**
+
 - Priority 1: Critical/Urgent (immediate sending)
 - Priority 2-3: High (within 5 minutes)
 - Priority 4-6: Medium (within 15 minutes)
@@ -414,11 +428,13 @@ Before deploying to production:
 ## 12. Cost Estimation
 
 **Resend Pricing (as of 2025):**
+
 - **Free Tier:** 100 emails/day, 3,000/month
 - **Paid Tier:** $20/month for 50,000 emails
 - **Enterprise:** Custom pricing
 
 **Estimated Usage:**
+
 - 27 pilots × 36 check types = ~972 certifications
 - Alert at 5 thresholds = ~4,860 potential alerts/year
 - Daily operations: ~13 alerts/day
@@ -429,6 +445,7 @@ Before deploying to production:
 ## Support & Maintenance
 
 **Maintenance Tasks:**
+
 - Review notification logs weekly
 - Clear old notifications monthly (automated)
 - Update email templates as needed
@@ -436,6 +453,7 @@ Before deploying to production:
 - Adjust notification thresholds based on feedback
 
 **For Issues:**
+
 1. Check Supabase logs
 2. Review `notification_log` table
 3. Test with `/api/notifications/test`
@@ -445,7 +463,8 @@ Before deploying to production:
 ---
 
 ## Air Niugini B767 Pilot Management System
+
 **Papua New Guinea's National Airline Fleet Operations**
 
-*Notification System - Version 1.0*
-*Last Updated: October 1, 2025*
+_Notification System - Version 1.0_
+_Last Updated: October 1, 2025_

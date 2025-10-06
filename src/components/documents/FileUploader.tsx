@@ -254,9 +254,7 @@ export function FileUploader({
           <p className="text-lg font-semibold text-gray-900">
             {isDragActive ? 'Drop files here' : 'Drag and drop files here'}
           </p>
-          <p className="text-sm text-gray-500">
-            or click to browse your computer
-          </p>
+          <p className="text-sm text-gray-500">or click to browse your computer</p>
           <p className="text-xs text-gray-400 mt-4">
             Accepted: {acceptedFileTypes.map((type) => FILE_TYPE_LABELS[type] || type).join(', ')}
             <br />
@@ -307,26 +305,19 @@ export function FileUploader({
 
                 {/* File Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {file.name}
-                  </p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
                   <p className="text-xs text-gray-500">
                     {formatFileSize(file.size)} • {FILE_TYPE_LABELS[file.type] || file.type}
                   </p>
 
                   {/* Progress Bar */}
                   {file.uploadStatus === 'uploading' && (
-                    <Progress
-                      value={file.uploadProgress || 0}
-                      className="h-1 mt-2"
-                    />
+                    <Progress value={file.uploadProgress || 0} className="h-1 mt-2" />
                   )}
 
                   {/* Error Message */}
                   {file.uploadStatus === 'error' && file.uploadError && (
-                    <p className="text-xs text-red-600 mt-1">
-                      {file.uploadError}
-                    </p>
+                    <p className="text-xs text-red-600 mt-1">{file.uploadError}</p>
                   )}
                 </div>
 
@@ -358,7 +349,9 @@ export function FileUploader({
               disabled={isUploading || files.every((f) => f.uploadStatus === 'success')}
               className="w-full bg-[#E4002B] hover:bg-[#C00020] text-white"
             >
-              {isUploading ? 'Uploading...' : `Upload ${files.length} File${files.length > 1 ? 's' : ''}`}
+              {isUploading
+                ? 'Uploading...'
+                : `Upload ${files.length} File${files.length > 1 ? 's' : ''}`}
             </Button>
           )}
         </div>

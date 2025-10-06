@@ -7,6 +7,7 @@ A comprehensive leave eligibility system has been successfully implemented to en
 ## 🎯 What Was Implemented
 
 ### 1. **Crew Availability Checking Service**
+
 **File**: `src/lib/leave-eligibility-service.ts`
 
 - **Real-time crew counting**: Calculates available Captains and First Officers for any date range
@@ -18,13 +19,16 @@ A comprehensive leave eligibility system has been successfully implemented to en
   - `INFO` - Adequate margin maintained
 
 ### 2. **Seniority-Based Recommendation Logic**
+
 **Features**:
+
 - Fetches all pilots of same role sorted by seniority number
 - Shows current leave status for each alternative pilot
 - Priority ranking based on seniority (1 = most senior)
 - Provides reasoning for each recommendation
 
 **Example Output**:
+
 ```
 #1 - JOHN SMITH (Captain, Seniority #3) - Available for duty
 #2 - CRAIG LILLEY (Captain, Seniority #5) - Currently on approved leave
@@ -32,9 +36,11 @@ A comprehensive leave eligibility system has been successfully implemented to en
 ```
 
 ### 3. **API Endpoints**
+
 **File**: `src/app/api/leave-eligibility/route.ts`
 
 #### Check Single Request
+
 ```bash
 POST /api/leave-eligibility/check
 {
@@ -47,16 +53,19 @@ POST /api/leave-eligibility/check
 ```
 
 #### Get Crew Availability
+
 ```bash
 GET /api/leave-eligibility?action=availability&startDate=2025-12-20&endDate=2025-12-30
 ```
 
 #### Bulk Check for Roster Period
+
 ```bash
 GET /api/leave-eligibility?action=bulk&rosterPeriod=RP14/2025
 ```
 
 #### Get Crew Requirements
+
 ```bash
 GET /api/leave-eligibility?action=requirements
 # Returns: {"minimumCaptains": 14, "minimumFirstOfficers": 14, ...}
@@ -65,9 +74,11 @@ GET /api/leave-eligibility?action=requirements
 ### 4. **React UI Components**
 
 #### LeaveEligibilityAlert Component
+
 **File**: `src/components/leave/LeaveEligibilityAlert.tsx`
 
 **Features**:
+
 - Color-coded alerts (green = approve, yellow = review, red = deny)
 - Expandable conflict details section
 - Alternative pilots list with seniority rankings
@@ -75,6 +86,7 @@ GET /api/leave-eligibility?action=requirements
 - Responsive design with Air Niugini branding
 
 #### useLeaveEligibility Hook
+
 **File**: `src/hooks/useLeaveEligibility.ts`
 
 ```tsx
@@ -84,14 +96,16 @@ await checkEligibility({
   pilotId: '...',
   pilotRole: 'Captain',
   startDate: '2025-12-20',
-  endDate: '2025-12-30'
+  endDate: '2025-12-30',
 });
 ```
 
 ### 5. **Enhanced Leave Review Modal**
+
 **File**: `src/components/leave/LeaveRequestReviewModal.tsx`
 
 **Updates**:
+
 - Automatic eligibility checking when modal opens
 - Fetches pilot role from database
 - Displays real-time crew availability warnings
@@ -101,11 +115,13 @@ await checkEligibility({
 ## 📊 Business Rules Implemented
 
 ### Minimum Crew Requirements
+
 - **Per Hull**: 7 Captains + 7 First Officers
 - **Fleet Total** (2 aircraft): 14 Captains + 14 First Officers
 - **Configuration**: Stored in `settings.pilot_requirements`
 
 ### Current Fleet Status
+
 ```sql
 Captains: 19 (5 above minimum)
 First Officers: 7 (7 BELOW minimum!) ⚠️
@@ -114,12 +130,15 @@ First Officers: 7 (7 BELOW minimum!) ⚠️
 **CRITICAL NOTE**: The system currently has ZERO margin for First Officer leave. Any FO leave request will trigger warnings.
 
 ### Leave Request Evaluation
+
 The system evaluates requests against:
+
 1. **All APPROVED leave** - Already confirmed absences
 2. **All PENDING leave** - Requests awaiting decision
 3. **Minimum requirements** - Per settings configuration
 
 ### Recommendation Logic
+
 ```
 if (no conflicts):
   recommendation = APPROVE
@@ -137,6 +156,7 @@ else:
 ## 🎨 User Interface Features
 
 ### Review Modal Enhancements
+
 When a manager reviews a leave request, they now see:
 
 1. **Eligibility Alert Box** (color-coded):
@@ -178,6 +198,7 @@ When a manager reviews a leave request, they now see:
    - Identifies any conflicting dates
 
 3. **Eligibility check results**:
+
    ```
    Available Captains: 18 → 17 (after approval)
    Available First Officers: 7 → 7 (unchanged)
@@ -212,6 +233,7 @@ Affected Dates: 2025-12-23, 2025-12-24, 2025-12-25, ... +7 more
 ## 🔧 Configuration
 
 ### Settings Table Structure
+
 ```sql
 {
   "key": "pilot_requirements",
@@ -226,7 +248,9 @@ Affected Dates: 2025-12-23, 2025-12-24, 2025-12-25, ... +7 more
 ```
 
 ### Seniority Numbers
+
 All active pilots must have `seniority_number` assigned:
+
 ```sql
 UPDATE pilots
 SET seniority_number = [rank based on commencement_date]
@@ -234,6 +258,7 @@ WHERE is_active = true;
 ```
 
 Run migration if needed:
+
 ```bash
 node run-seniority-migration.js
 ```
@@ -241,6 +266,7 @@ node run-seniority-migration.js
 ## 🧪 Testing
 
 ### Test API Locally
+
 ```bash
 # Get crew requirements
 curl http://localhost:3000/api/leave-eligibility?action=requirements
@@ -257,6 +283,7 @@ curl -X POST http://localhost:3000/api/leave-eligibility/check \
 ```
 
 ### Test in UI
+
 1. Navigate to **Leave Management** page
 2. Select a **PENDING** leave request
 3. Click **Review** button
@@ -272,6 +299,7 @@ curl -X POST http://localhost:3000/api/leave-eligibility/check \
 Complete implementation guide: **LEAVE_ELIGIBILITY_GUIDE.md**
 
 Includes:
+
 - Detailed API documentation
 - Business rules and logic
 - Configuration instructions
@@ -282,16 +310,19 @@ Includes:
 ## ⚠️ Known Issues & Limitations
 
 ### Critical Issue: Insufficient First Officers
+
 **Problem**: System requires 14 First Officers (7 per hull × 2 aircraft) but only has 7 total.
 
 **Impact**: ANY First Officer leave request will trigger critical warnings because the fleet is already below minimum requirements.
 
 **Solutions**:
+
 1. **Immediate**: Adjust settings to reflect actual operational minimums
 2. **Short-term**: Hire/promote more First Officers
 3. **Alternative**: Reduce number_of_aircraft to 1 in settings (if only 1 aircraft operational)
 
 ### Recommended Settings Update
+
 ```sql
 UPDATE settings
 SET value = jsonb_set(value, '{minimum_first_officers_per_hull}', '3')
@@ -302,6 +333,7 @@ WHERE key = 'pilot_requirements';
 ## 🚀 Future Enhancements
 
 Potential improvements:
+
 1. **Email Notifications**: Alert senior pilots when conflicts detected
 2. **Automatic Approvals**: Auto-approve if seniority #1-5 and no conflicts
 3. **Leave Forecasting**: Predict shortages 60-90 days ahead
@@ -312,6 +344,7 @@ Potential improvements:
 ## 📦 Files Changed
 
 ### New Files
+
 - `src/lib/leave-eligibility-service.ts` - Core service
 - `src/app/api/leave-eligibility/route.ts` - API endpoints
 - `src/components/leave/LeaveEligibilityAlert.tsx` - UI alert
@@ -320,6 +353,7 @@ Potential improvements:
 - `LEAVE-ELIGIBILITY-SUMMARY.md` - This file
 
 ### Modified Files
+
 - `src/components/leave/LeaveRequestReviewModal.tsx` - Added eligibility checking
 - `src/lib/leave-service.ts` - Enhanced with eligibility types
 
@@ -360,6 +394,7 @@ When reviewing leave requests, you will now see:
 ## 📞 Support
 
 For questions or issues:
+
 - Check `LEAVE_ELIGIBILITY_GUIDE.md` for detailed documentation
 - Review API endpoint examples in this summary
 - Test locally using curl commands provided above

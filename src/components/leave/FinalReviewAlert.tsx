@@ -19,7 +19,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getFinalReviewAlert, type FinalReviewAlert as AlertData, formatRosterPeriod } from '@/lib/roster-utils';
+import {
+  getFinalReviewAlert,
+  type FinalReviewAlert as AlertData,
+  formatRosterPeriod,
+} from '@/lib/roster-utils';
 import { AlertTriangle, Clock, Info } from 'lucide-react';
 
 interface FinalReviewAlertProps {
@@ -36,9 +40,12 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
     setAlert(alertData);
 
     // Update every hour to keep countdown fresh
-    const interval = setInterval(() => {
-      setAlert(getFinalReviewAlert());
-    }, 60 * 60 * 1000); // 1 hour
+    const interval = setInterval(
+      () => {
+        setAlert(getFinalReviewAlert());
+      },
+      60 * 60 * 1000
+    ); // 1 hour
 
     return () => clearInterval(interval);
   }, []);
@@ -103,15 +110,14 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
             </h3>
             {alert.isWithinReviewWindow && (
               <span className={`px-4 py-2 rounded-full font-bold text-lg ${styles.badge}`}>
-                {alert.daysUntilRosterStarts} {alert.daysUntilRosterStarts === 1 ? 'DAY' : 'DAYS'} LEFT
+                {alert.daysUntilRosterStarts} {alert.daysUntilRosterStarts === 1 ? 'DAY' : 'DAYS'}{' '}
+                LEFT
               </span>
             )}
           </div>
 
           {/* Message */}
-          <p className={`text-base mb-4 ${styles.text} font-medium`}>
-            {alert.message}
-          </p>
+          <p className={`text-base mb-4 ${styles.text} font-medium`}>{alert.message}</p>
 
           {/* Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-lg p-4 shadow-sm">
@@ -133,7 +139,9 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
 
             <div>
               <p className="text-sm text-gray-600 mb-1">Pending Requests (Next Roster)</p>
-              <p className={`font-bold text-2xl ${pendingCount > 0 ? 'text-[#E4002B]' : 'text-green-600'}`}>
+              <p
+                className={`font-bold text-2xl ${pendingCount > 0 ? 'text-[#E4002B]' : 'text-green-600'}`}
+              >
                 {pendingCount}
               </p>
               <p className="text-xs text-gray-500">
@@ -146,17 +154,19 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
               <p className="font-bold text-gray-900">
                 {alert.reviewDeadlineDate.toLocaleDateString('en-AU')}
               </p>
-              <p className="text-xs text-gray-500">
-                (22 days before {alert.nextRoster.code})
-              </p>
+              <p className="text-xs text-gray-500">(22 days before {alert.nextRoster.code})</p>
             </div>
           </div>
 
           {/* Action Required (only if pending requests) */}
           {pendingCount > 0 && alert.isWithinReviewWindow && (
-            <div className={`mt-4 p-4 rounded-lg ${alert.severity === 'urgent' ? 'bg-red-100 border-2 border-red-300' : 'bg-yellow-100 border-2 border-yellow-300'}`}>
+            <div
+              className={`mt-4 p-4 rounded-lg ${alert.severity === 'urgent' ? 'bg-red-100 border-2 border-red-300' : 'bg-yellow-100 border-2 border-yellow-300'}`}
+            >
               <div className="flex items-start justify-between mb-3">
-                <p className={`font-bold ${alert.severity === 'urgent' ? 'text-red-900' : 'text-yellow-900'}`}>
+                <p
+                  className={`font-bold ${alert.severity === 'urgent' ? 'text-red-900' : 'text-yellow-900'}`}
+                >
                   ⚠️ ACTION REQUIRED:
                 </p>
                 {onViewRequests && (
@@ -172,15 +182,18 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
                   </button>
                 )}
               </div>
-              <ul className={`list-disc list-inside space-y-1 text-sm ${alert.severity === 'urgent' ? 'text-red-800' : 'text-yellow-800'}`}>
-                <li>Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code}</li>
+              <ul
+                className={`list-disc list-inside space-y-1 text-sm ${alert.severity === 'urgent' ? 'text-red-800' : 'text-yellow-800'}`}
+              >
+                <li>
+                  Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code}
+                </li>
                 <li>Check crew availability and seniority priorities</li>
                 <li>Approve or deny requests before {alert.nextRoster.code} begins</li>
                 <li>Ensure minimum 10 Captains and 10 First Officers maintained</li>
               </ul>
             </div>
           )}
-
         </div>
       </div>
     </div>

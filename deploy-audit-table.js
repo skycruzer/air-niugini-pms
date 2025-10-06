@@ -59,10 +59,7 @@ async function applyMigration() {
     console.log('\n✅ Audit logs migration completed successfully');
 
     // Verify table exists
-    const { data, error: verifyError } = await supabase
-      .from('audit_logs')
-      .select('count')
-      .limit(0);
+    const { data, error: verifyError } = await supabase.from('audit_logs').select('count').limit(0);
 
     if (verifyError) {
       console.error('\n⚠️  Warning: Could not verify table creation:', verifyError.message);

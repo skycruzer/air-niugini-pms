@@ -9,6 +9,7 @@ The shadcn MCP (Model Context Protocol) server has been successfully configured 
 ## Configuration
 
 ### MCP Server Configuration
+
 **File**: `.mcp.json`
 
 ```json
@@ -23,6 +24,7 @@ The shadcn MCP (Model Context Protocol) server has been successfully configured 
 ```
 
 ### shadcn/ui Project Configuration
+
 **File**: `components.json`
 
 ```json
@@ -53,6 +55,7 @@ The shadcn MCP (Model Context Protocol) server has been successfully configured 
 ## Currently Installed Components
 
 ### Core UI Components
+
 - ✅ **avatar** - User avatar display
 - ✅ **badge** - Status badges and labels
 - ✅ **button** - Primary action buttons
@@ -77,6 +80,7 @@ The shadcn MCP (Model Context Protocol) server has been successfully configured 
 - ✅ **toast** - Toast notifications
 
 ### Custom Components (Project-Specific)
+
 - ✅ **DataTable** - Advanced data tables
 - ✅ **EmptyState** - Empty state placeholders
 - ✅ **LazyLoader** - Lazy loading wrapper
@@ -97,6 +101,7 @@ The shadcn MCP (Model Context Protocol) server has been successfully configured 
 You can now use Claude Code to add shadcn/ui components directly:
 
 **Example Commands**:
+
 ```
 "Add the calendar component from shadcn/ui"
 "Install the accordion component"
@@ -104,6 +109,7 @@ You can now use Claude Code to add shadcn/ui components directly:
 ```
 
 Claude Code will:
+
 1. Use the MCP server to fetch the component
 2. Install it in `src/components/ui/`
 3. Update dependencies if needed
@@ -119,6 +125,7 @@ npx shadcn@latest add [component-name]
 ```
 
 **Examples**:
+
 ```bash
 npx shadcn@latest add calendar
 npx shadcn@latest add accordion
@@ -132,6 +139,7 @@ npx shadcn@latest add context-menu
 ## Available Components to Add
 
 ### Navigation
+
 - [ ] accordion
 - [ ] breadcrumb
 - [ ] command
@@ -141,6 +149,7 @@ npx shadcn@latest add context-menu
 - [ ] pagination
 
 ### Data Display
+
 - [ ] calendar
 - [ ] carousel
 - [ ] chart
@@ -149,18 +158,21 @@ npx shadcn@latest add context-menu
 - [ ] tooltip
 
 ### Forms & Input
+
 - [ ] combobox
 - [ ] datepicker
 - [ ] form
 - [ ] slider
 
 ### Feedback
+
 - [ ] alert
 - [ ] alert-dialog
 - [ ] aspect-ratio
 - [ ] sonner (toast alternative)
 
 ### Layout
+
 - [ ] resizable
 - [ ] toggle
 - [ ] toggle-group
@@ -170,6 +182,7 @@ npx shadcn@latest add context-menu
 ## Project Configuration Details
 
 ### Style Configuration
+
 - **Design System**: New York style
 - **Base Color**: Slate
 - **CSS Variables**: Enabled
@@ -177,6 +190,7 @@ npx shadcn@latest add context-menu
 - **React Server Components**: Disabled (client-side app)
 
 ### Path Aliases
+
 ```typescript
 @/components → src/components
 @/lib → src/lib
@@ -185,6 +199,7 @@ npx shadcn@latest add context-menu
 ```
 
 ### TailwindCSS Integration
+
 - **Config File**: `tailwind.config.js`
 - **Global CSS**: `src/app/globals.css`
 - **Prefix**: None (no prefix for shadcn classes)
@@ -194,6 +209,7 @@ npx shadcn@latest add context-menu
 ## Using Components in Your Code
 
 ### Import Pattern
+
 ```typescript
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -201,6 +217,7 @@ import { Input } from '@/components/ui/input';
 ```
 
 ### Example Usage
+
 ```typescript
 export function MyComponent() {
   return (
@@ -257,6 +274,7 @@ You can add Air Niugini colors to your CSS variables in `src/app/globals.css`:
 ```
 
 Then use in components:
+
 ```typescript
 <Button className="bg-[rgb(var(--air-niugini-red))]">
   Submit
@@ -268,9 +286,11 @@ Then use in components:
 ## Testing shadcn Components
 
 ### Component Testing
+
 The project includes tests for UI components in `src/components/ui/__tests__/`
 
 Example test structure:
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 import { Button } from '../button';
@@ -300,6 +320,7 @@ The shadcn MCP server provides:
 ## Troubleshooting
 
 ### Component Not Found
+
 ```bash
 # Verify shadcn CLI is working
 npx shadcn@latest --version
@@ -309,6 +330,7 @@ npx shadcn@latest add --help
 ```
 
 ### MCP Server Not Working
+
 ```bash
 # Restart Claude Code to reload MCP configuration
 # Or manually test the MCP server
@@ -316,6 +338,7 @@ npx -y @modelcontextprotocol/server-shadcn
 ```
 
 ### Component Import Errors
+
 ```typescript
 // Make sure path aliases are correct in tsconfig.json
 {
@@ -332,21 +355,25 @@ npx -y @modelcontextprotocol/server-shadcn
 ## Best Practices
 
 ### 1. Component Consistency
+
 - Always use shadcn/ui components for UI elements
 - Maintain Air Niugini branding with custom classes
 - Keep component styles in the component files
 
 ### 2. Accessibility
+
 - shadcn/ui components are built with accessibility in mind
 - Always provide proper labels and aria attributes
 - Test with screen readers
 
 ### 3. Performance
+
 - Use lazy loading for heavy components
 - Implement code splitting for large component libraries
 - Leverage the existing `LazyLoader` component
 
 ### 4. Customization
+
 - Extend components in separate files (e.g., `StatCard.tsx`)
 - Use TailwindCSS for styling customization
 - Maintain the `new-york` style consistency
@@ -379,6 +406,7 @@ The Air Niugini PMS uses shadcn/ui components extensively:
 ### Custom Extensions
 
 The project extends shadcn/ui with:
+
 - `StatCard` - Aviation-specific statistics display
 - `StatusBadge` - FAA color-coded status indicators
 - `DataTable` - Advanced table with sorting/filtering

@@ -48,7 +48,7 @@ export class BackupService {
     'users',
     'leave_requests',
     'settings',
-    'contract_types'
+    'contract_types',
   ];
 
   private constructor() {}
@@ -82,7 +82,7 @@ export class BackupService {
       recordCount: {},
       status: 'pending',
       createdBy: config.createdBy,
-      description: config.description
+      description: config.description,
     };
 
     try {
@@ -92,9 +92,7 @@ export class BackupService {
 
       // Backup each table
       for (const table of metadata.tables) {
-        const { data, error } = await supabase
-          .from(table)
-          .select('*');
+        const { data, error } = await supabase.from(table).select('*');
 
         if (error) {
           throw new Error(`Failed to backup table ${table}: ${error.message}`);
@@ -133,8 +131,9 @@ export class BackupService {
    * List all backups
    */
   listBackups(): BackupMetadata[] {
-    return Array.from(this.backups.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return Array.from(this.backups.values()).sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+    );
   }
 
   /**
@@ -180,7 +179,7 @@ export class BackupService {
       tablesRestored: [],
       recordsRestored: 0,
       errors: [],
-      duration: 0
+      duration: 0,
     };
 
     try {
@@ -249,7 +248,7 @@ export class BackupService {
     if (!backup) {
       return {
         valid: false,
-        issues: ['Backup not found']
+        issues: ['Backup not found'],
       };
     }
 
@@ -279,7 +278,7 @@ export class BackupService {
 
     return {
       valid: issues.length === 0,
-      issues
+      issues,
     };
   }
 
@@ -297,7 +296,7 @@ export class BackupService {
       try {
         await this.createBackup({
           description: 'Automated backup',
-          createdBy: config.createdBy
+          createdBy: config.createdBy,
         });
 
         // Clean old backups
@@ -316,7 +315,7 @@ export class BackupService {
     cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 
     const oldBackups = Array.from(this.backups.values()).filter(
-      backup => backup.timestamp < cutoffDate
+      (backup) => backup.timestamp < cutoffDate
     );
 
     for (const backup of oldBackups) {
@@ -338,12 +337,16 @@ export class BackupService {
     // In production, load full backup data
     // const backupData = await this.loadBackupFromStorage(backupId);
 
-    return JSON.stringify({
-      metadata: backup,
-      data: {}, // Would contain actual data
-      exportedAt: new Date().toISOString(),
-      version: '1.0'
-    }, null, 2);
+    return JSON.stringify(
+      {
+        metadata: backup,
+        data: {}, // Would contain actual data
+        exportedAt: new Date().toISOString(),
+        version: '1.0',
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -357,19 +360,20 @@ export class BackupService {
     lastBackup?: Date;
   } {
     const backups = Array.from(this.backups.values());
-    const completed = backups.filter(b => b.status === 'completed');
+    const completed = backups.filter((b) => b.status === 'completed');
 
     const totalSize = completed.reduce((sum, b) => sum + b.size, 0);
-    const lastBackup = backups.length > 0
-      ? backups.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0].timestamp
-      : undefined;
+    const lastBackup =
+      backups.length > 0
+        ? backups.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0].timestamp
+        : undefined;
 
     return {
       totalBackups: backups.length,
       totalSize,
       successRate: backups.length > 0 ? (completed.length / backups.length) * 100 : 0,
       averageSize: completed.length > 0 ? totalSize / completed.length : 0,
-      lastBackup
+      lastBackup,
     };
   }
 }

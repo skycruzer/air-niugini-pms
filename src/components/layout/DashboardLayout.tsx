@@ -75,6 +75,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       ],
     },
     {
+      name: 'Disciplinary',
+      href: '/dashboard/disciplinary',
+      icon: '⚖️',
+      description: 'Incident tracking',
+      requiresPermission: 'disciplinary',
+    },
+    {
+      name: 'Tasks',
+      href: '/dashboard/tasks',
+      icon: '✅',
+      description: 'To-Do list',
+    },
+    {
       name: 'Reports',
       href: '/dashboard/reports',
       icon: '📊',
@@ -103,6 +116,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     if (item.requiresPermission === 'reports') {
       return permissions.canViewReports(user);
+    }
+    if (item.requiresPermission === 'disciplinary') {
+      return permissions.canEdit(user); // Admin/Manager only
     }
     // Audit logs temporarily disabled
     // if (item.requiresPermission === 'audit') {

@@ -1,4 +1,5 @@
 # Air Niugini B767 Pilot Management System
+
 # Email & SMS Notification System - Implementation Summary
 
 ## Executive Summary
@@ -16,6 +17,7 @@ Successfully implemented a complete email and SMS notification system for the Ai
 ### Phase 6.1-6.2 Complete ✅
 
 **Total Implementation:**
+
 - 10 major components
 - 5 database tables with full RLS policies
 - 4 scheduled jobs for automation
@@ -30,7 +32,9 @@ Successfully implemented a complete email and SMS notification system for the Ai
 ### 1. Database Layer
 
 #### **`009_notifications.sql`** (3,500+ lines)
+
 Complete database migration with:
+
 - 5 tables: `notification_preferences`, `notification_queue`, `notification_log`, `in_app_notifications`, `notification_templates`
 - Full Row Level Security (RLS) policies
 - Automated triggers for timestamps
@@ -41,7 +45,9 @@ Complete database migration with:
 ### 2. Backend Services
 
 #### **`src/lib/email-service.ts`** (1,000+ lines)
+
 Core email service with Resend integration:
+
 - `sendCertificationExpiryAlert()` - 30/7 day alerts with urgency levels
 - `sendLeaveRequestNotification()` - New request notifications
 - `sendLeaveApprovalNotification()` - Approved/rejected notifications
@@ -52,7 +58,9 @@ Core email service with Resend integration:
 - HTML email templates with Air Niugini branding (red #E4002B, gold #FFC72C)
 
 #### **`src/lib/notification-queue.ts`** (650+ lines)
+
 Queue management system:
+
 - `queueNotification()` - Single notification queuing
 - `queueBatchNotifications()` - Bulk queuing
 - `processNotificationQueue()` - Queue processing with retry logic
@@ -63,7 +71,9 @@ Queue management system:
 - Automatic cleanup
 
 #### **`src/lib/scheduled-jobs.ts`** (550+ lines)
+
 Automated scheduled tasks:
+
 - `runDailyCertificationCheck()` - Daily expiry checks with threshold alerts
 - `runProcessNotificationQueue()` - Queue processing every 5 minutes
 - `runCleanupNotifications()` - Old notification cleanup
@@ -74,16 +84,19 @@ Automated scheduled tasks:
 ### 3. API Routes
 
 #### **`src/app/api/notifications/send/route.ts`**
+
 - POST endpoint for queuing notifications
 - Authentication verification
 - Validation and error handling
 
 #### **`src/app/api/notifications/preferences/route.ts`**
+
 - GET endpoint for user preferences
 - PUT endpoint for updating preferences
 - User-specific permission enforcement
 
 #### **`src/app/api/notifications/test/route.ts`**
+
 - POST endpoint for testing notifications
 - Multiple test types (certification, leave, system)
 - Development and troubleshooting
@@ -91,7 +104,9 @@ Automated scheduled tasks:
 ### 4. Frontend Components
 
 #### **`src/components/settings/NotificationPreferences.tsx`** (400+ lines)
+
 User preferences management UI:
+
 - Email enable/disable toggle
 - Email address configuration
 - Certification expiry alert settings
@@ -104,7 +119,9 @@ User preferences management UI:
 - Real-time preference loading and saving
 
 #### **`src/components/notifications/NotificationCenter.tsx`** (350+ lines)
+
 In-app notification center:
+
 - Bell icon with unread count badge
 - Dropdown notification list with scrolling
 - Mark as read/unread functionality
@@ -117,19 +134,24 @@ In-app notification center:
 - Air Niugini themed interface
 
 #### **`src/components/ui/scroll-area.tsx`**
+
 Radix UI scroll area component for notification list
 
 ### 5. Deployment & Documentation
 
 #### **`deploy-notifications.js`**
+
 Automated deployment script:
+
 - Database migration execution
 - Table verification
 - Environment variable validation
 - Error handling with fallback instructions
 
 #### **`NOTIFICATION_SETUP.md`** (1,500+ lines)
+
 Complete setup guide:
+
 - Database setup instructions
 - Environment configuration
 - Resend API key setup
@@ -182,10 +204,12 @@ Complete setup guide:
    - Pre-populated with 3 default templates
 
 ### Indexes Created
+
 - 10 performance indexes across all tables
 - Optimized for queue processing and user lookups
 
 ### RLS Policies
+
 - 15 security policies ensuring user data isolation
 - Admin override policies for management
 - Read/write separation by role
@@ -195,6 +219,7 @@ Complete setup guide:
 ## Features Implemented
 
 ### ✅ Email Notifications
+
 - **Certification Expiry Alerts**
   - Multi-threshold alerts: 30, 14, 7, 3, 1 days before expiry
   - Urgency indicators for 7-day warnings
@@ -221,6 +246,7 @@ Complete setup guide:
   - Secure link generation
 
 ### ✅ Queue System
+
 - **Priority Management**
   - 10-level priority system
   - Priority-based processing order
@@ -238,6 +264,7 @@ Complete setup guide:
   - Efficient database queries
 
 ### ✅ Scheduled Jobs
+
 - **Daily Certification Check** (8:00 AM)
   - Scans all active pilot certifications
   - Compares against notification thresholds
@@ -261,6 +288,7 @@ Complete setup guide:
   - Optional opt-in
 
 ### ✅ User Interface
+
 - **Notification Center**
   - Real-time bell icon with count
   - Dropdown with scrollable list
@@ -283,13 +311,16 @@ Complete setup guide:
 ## Air Niugini Branding
 
 ### Color Scheme Applied
+
 - **Primary Red:** `#E4002B` - Headers, buttons, urgent alerts
 - **Secondary Gold:** `#FFC72C` - Accents, highlights
 - **Black:** `#000000` - Text, navigation
 - **White:** `#FFFFFF` - Backgrounds
 
 ### Email Templates
+
 All email templates feature:
+
 - Air Niugini header with red background
 - Gold accent borders
 - Papua New Guinea's National Airline branding
@@ -302,6 +333,7 @@ All email templates feature:
 ## Technical Architecture
 
 ### Email Provider: Resend
+
 - Modern email API
 - High deliverability rates
 - Real-time webhook support
@@ -309,6 +341,7 @@ All email templates feature:
 - Free tier: 100 emails/day, 3,000/month
 
 ### Queue Architecture
+
 - Database-backed queue (PostgreSQL)
 - ACID-compliant operations
 - Distributed processing support
@@ -316,12 +349,14 @@ All email templates feature:
 - Horizontal scaling ready
 
 ### Real-time Notifications
+
 - Supabase real-time subscriptions
 - WebSocket connections
 - Instant notification delivery
 - Automatic reconnection
 
 ### Security
+
 - Row Level Security (RLS) on all tables
 - User-specific data isolation
 - Admin override capabilities
@@ -333,18 +368,21 @@ All email templates feature:
 ## Performance Optimizations
 
 ### Database
+
 - 10 strategic indexes
 - Efficient query patterns
 - Batch operations
 - Connection pooling via Supabase
 
 ### Frontend
+
 - Lazy loading of notification list
 - Virtual scrolling for large lists
 - Optimistic UI updates
 - Debounced API calls
 
 ### Queue Processing
+
 - Priority-based processing
 - Configurable batch sizes
 - Automatic retry backoff
@@ -355,12 +393,15 @@ All email templates feature:
 ## Testing & Quality Assurance
 
 ### Test Endpoint
+
 `POST /api/notifications/test`
+
 - System notification test
 - Certification expiry test
 - Leave request test
 
 ### Manual Testing Checklist
+
 - [ ] Email sending (all types)
 - [ ] Queue processing
 - [ ] Retry logic
@@ -373,6 +414,7 @@ All email templates feature:
 - [ ] Database cleanup
 
 ### Production Readiness
+
 - [ ] Environment variables configured
 - [ ] Database migration deployed
 - [ ] Resend API key verified
@@ -391,18 +433,21 @@ All email templates feature:
 ### Quick Start (Development)
 
 1. **Install Dependencies:**
+
    ```bash
    cd /Users/skycruzer/Desktop/Fleet\ Office\ Management/air-niugini-pms
    # Dependencies already installed
    ```
 
 2. **Deploy Database:**
+
    ```bash
    node deploy-notifications.js
    # Or manually via Supabase SQL Editor
    ```
 
 3. **Configure Environment:**
+
    ```env
    # .env.local
    RESEND_API_KEY=re_your_api_key_here
@@ -412,6 +457,7 @@ All email templates feature:
    ```
 
 4. **Test Notification:**
+
    ```bash
    curl -X POST http://localhost:3001/api/notifications/test \
      -H "Content-Type: application/json" \
@@ -436,13 +482,14 @@ All email templates feature:
    - Update environment variables
 
 2. **Vercel Configuration:**
+
    ```json
    {
      "crons": [
-       {"path": "/api/cron/daily-certification-check", "schedule": "0 8 * * *"},
-       {"path": "/api/cron/process-queue", "schedule": "*/5 * * * *"},
-       {"path": "/api/cron/cleanup-notifications", "schedule": "0 2 * * *"},
-       {"path": "/api/cron/daily-digest", "schedule": "0 7 * * *"}
+       { "path": "/api/cron/daily-certification-check", "schedule": "0 8 * * *" },
+       { "path": "/api/cron/process-queue", "schedule": "*/5 * * * *" },
+       { "path": "/api/cron/cleanup-notifications", "schedule": "0 2 * * *" },
+       { "path": "/api/cron/daily-digest", "schedule": "0 7 * * *" }
      ]
    }
    ```
@@ -477,9 +524,9 @@ await queueNotification({
     check_description: 'Proficiency Check',
     category: 'Flight Operations',
     expiry_date: '2025-10-15',
-    days_remaining: 7
+    days_remaining: 7,
   },
-  priority: 1 // Urgent
+  priority: 1, // Urgent
 });
 ```
 
@@ -495,7 +542,7 @@ await supabase.from('in_app_notifications').insert({
   notification_type: 'certification_expiry',
   action_url: '/dashboard/certifications?pilot=pilot-uuid',
   icon: 'alert',
-  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 });
 ```
 
@@ -506,15 +553,15 @@ const response = await fetch('/api/notifications/preferences', {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${userToken}`
+    Authorization: `Bearer ${userToken}`,
   },
   body: JSON.stringify({
     email_enabled: true,
     certification_expiry_alerts: true,
     certification_expiry_days: 30,
     daily_digest: true,
-    digest_time: '08:00:00'
-  })
+    digest_time: '08:00:00',
+  }),
 });
 ```
 
@@ -525,6 +572,7 @@ const response = await fetch('/api/notifications/preferences', {
 ### Key Metrics to Track
 
 1. **Delivery Rate**
+
    ```sql
    SELECT
      status,
@@ -536,6 +584,7 @@ const response = await fetch('/api/notifications/preferences', {
    ```
 
 2. **Queue Health**
+
    ```sql
    SELECT
      status,
@@ -559,16 +608,19 @@ const response = await fetch('/api/notifications/preferences', {
 ### Maintenance Tasks
 
 **Daily:**
+
 - Review failed notifications
 - Check queue processing logs
 - Monitor delivery rates in Resend
 
 **Weekly:**
+
 - Analyze notification patterns
 - Review user preferences
 - Check alert thresholds effectiveness
 
 **Monthly:**
+
 - Database cleanup verification
 - Performance optimization review
 - Cost analysis (if on paid tier)
@@ -581,11 +633,13 @@ const response = await fetch('/api/notifications/preferences', {
 ### Resend Pricing
 
 **Free Tier (Development/Testing):**
+
 - 100 emails/day
 - 3,000 emails/month
 - Sufficient for: Small deployments, testing, up to ~50 pilots
 
 **Current System Estimate:**
+
 - 27 pilots × 36 check types = 972 certifications
 - Alerts at 5 thresholds = ~4,860 potential alerts/year
 - Average: ~13 alerts/day
@@ -627,16 +681,19 @@ const response = await fetch('/api/notifications/preferences', {
 ## Support & Documentation
 
 ### Primary Documentation
+
 - `NOTIFICATION_SETUP.md` - Complete setup guide
 - `009_notifications.sql` - Database schema
 - Inline code documentation in all files
 
 ### Key Contacts
+
 - System Developer: Maurice Rondeau (PIN PNG LTD)
 - Email Provider: Resend (support@resend.com)
 - Database: Supabase (support@supabase.io)
 
 ### Troubleshooting Resources
+
 1. Check `notification_log` table for errors
 2. Review Resend dashboard
 3. Test with `/api/notifications/test`
@@ -660,6 +717,7 @@ The notification system is fully implemented, tested, and ready for production d
 ✅ Air Niugini brand compliance
 
 **Next Steps:**
+
 1. Deploy database migration
 2. Configure Resend API key
 3. Test all notification types
@@ -671,9 +729,10 @@ The notification system is fully implemented, tested, and ready for production d
 ---
 
 ## Air Niugini B767 Pilot Management System
+
 **Papua New Guinea's National Airline Fleet Operations Management**
 
-*Notification System Implementation*
-*Version 1.0 - October 1, 2025*
+_Notification System Implementation_
+_Version 1.0 - October 1, 2025_
 
 **Implementation Status: ✅ Complete**

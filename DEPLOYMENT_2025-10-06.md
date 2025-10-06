@@ -14,20 +14,24 @@
 ## Quality Checks Performed
 
 ### 1. TypeScript Type Checking ⚠️
+
 **Status**: Completed with known issues
 **Command**: `npm run type-check`
 **Result**: 105 TypeScript errors detected (non-blocking)
 **Note**: Project configured with `typescript.ignoreBuildErrors: true` in `next.config.js`
 
 ### 2. Production Build Test ✅
+
 **Status**: Successful
 **Command**: `SKIP_ENV_VALIDATION=true npm run build`
 **Result**: Build completed successfully
+
 - 41 pages generated
 - 36 API routes compiled
 - Bundle optimization: 352 kB shared JavaScript
 
 ### 3. Vercel Deployment ✅
+
 **Status**: Successful
 **Region**: Washington, D.C., USA (East) – iad1
 **Build Machine**: 4 cores, 8 GB RAM
@@ -38,6 +42,7 @@
 ## Changes Deployed
 
 ### Roster Planning Updates
+
 1. **Report Title Changes**:
    - "Roster Leave Planning Report" → "Roster Planning Report"
    - PDF filenames: `Air_Niugini_Roster_Planning_*`
@@ -57,6 +62,7 @@
    - Updated page titles and headers
 
 ### Vercel Configuration
+
 1. **vercel.json Updates**:
    - Added permanent redirect from `*.vercel.app` to `www.pxb767office.app`
    - Fixed redirect configuration (removed duplicate `statusCode`)
@@ -72,22 +78,25 @@
 ## Build Statistics
 
 ### Page Generation
+
 - **Total Pages**: 41 pages
 - **Static Pages**: 9 pages (○)
 - **Dynamic Pages**: 32 pages (ƒ)
 
 ### Bundle Sizes
-| Route | Size | First Load JS |
-|-------|------|---------------|
-| Dashboard | 9.41 kB | 499 kB |
-| Analytics | 114 kB | 476 kB |
-| Pilots | 40.6 kB | 410 kB |
-| Certifications | 33.8 kB | 401 kB |
-| Leave | 19 kB | 394 kB |
-| Roster Planning | 5.2 kB | 367 kB |
-| Reports | 74.4 kB | 436 kB |
+
+| Route           | Size    | First Load JS |
+| --------------- | ------- | ------------- |
+| Dashboard       | 9.41 kB | 499 kB        |
+| Analytics       | 114 kB  | 476 kB        |
+| Pilots          | 40.6 kB | 410 kB        |
+| Certifications  | 33.8 kB | 401 kB        |
+| Leave           | 19 kB   | 394 kB        |
+| Roster Planning | 5.2 kB  | 367 kB        |
+| Reports         | 74.4 kB | 436 kB        |
 
 ### Shared JavaScript
+
 - **Total**: 352 kB
 - **Vendors**: 349 kB
 - **Other Chunks**: 3.24 kB
@@ -97,6 +106,7 @@
 ## Build Logs Analysis
 
 ### ✅ Successful Operations
+
 - PWA service worker compiled successfully
 - All static pages generated
 - Database connections established
@@ -105,6 +115,7 @@
 - All serverless functions created
 
 ### ⚠️ Warnings
+
 1. **Dynamic Route Warning**: `/api/analytics/fleet-certifications`
    - Uses `nextUrl.searchParams` (expected for dynamic routes)
    - Not a critical issue
@@ -118,16 +129,19 @@
 ## Files Modified
 
 ### Configuration Files
+
 - `vercel.json` - Vercel deployment configuration
 - `.env.vercel-production-clean` - Production environment variables
 
 ### Application Files
+
 - `src/lib/pdf-roster-leave-report.tsx` - PDF report generation
 - `src/app/dashboard/leave/roster-planning/page.tsx` - Roster planning page
 - `src/app/api/reports/roster-leave/route.ts` - API endpoint
 - `src/components/layout/DashboardLayout.tsx` - Navigation menu
 
 ### Documentation
+
 - `ROSTER_PLANNING_UPDATES.md` - Change documentation
 - `VERCEL_DOMAIN_FIX.md` - Domain configuration guide
 - `DEPLOYMENT_2025-10-06.md` - This deployment log
@@ -136,18 +150,18 @@
 
 ## Deployment Timeline
 
-| Time (UTC) | Event |
-|------------|-------|
-| 23:19:24 | Build started in Washington, D.C. (iad1) |
-| 23:19:25 | Downloaded 993 deployment files |
-| 23:19:28 | Restored build cache |
-| 23:19:35 | Dependencies installed |
-| 23:20:06 | Compilation completed |
-| 23:20:14 | Static pages generated (41/41) |
-| 23:20:21 | Build optimization finalized |
-| 23:20:22 | Build completed |
-| 23:20:33 | Deployment completed |
-| 23:20:34 | Build cache created |
+| Time (UTC) | Event                                    |
+| ---------- | ---------------------------------------- |
+| 23:19:24   | Build started in Washington, D.C. (iad1) |
+| 23:19:25   | Downloaded 993 deployment files          |
+| 23:19:28   | Restored build cache                     |
+| 23:19:35   | Dependencies installed                   |
+| 23:20:06   | Compilation completed                    |
+| 23:20:14   | Static pages generated (41/41)           |
+| 23:20:21   | Build optimization finalized             |
+| 23:20:22   | Build completed                          |
+| 23:20:33   | Deployment completed                     |
+| 23:20:34   | Build cache created                      |
 
 **Total Duration**: ~70 seconds (including cache operations)
 
@@ -209,6 +223,7 @@
 ## Environment Configuration
 
 ### Production Environment Variables
+
 ```
 NEXT_PUBLIC_APP_NAME=Air Niugini Pilot Management System
 NEXT_PUBLIC_APP_URL=https://www.pxb767office.app
@@ -221,6 +236,7 @@ SUPABASE_PROJECT_ID=wgdmgvonqysflwdiiols
 ```
 
 ### Vercel Configuration
+
 - **Framework**: Next.js 14.2.33
 - **Region**: Sydney (syd1)
 - **Build Command**: `npm run build`
@@ -233,6 +249,7 @@ SUPABASE_PROJECT_ID=wgdmgvonqysflwdiiols
 If issues are discovered:
 
 1. **Quick Rollback**:
+
    ```bash
    vercel rollback
    ```

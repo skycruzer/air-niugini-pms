@@ -66,10 +66,12 @@ function generateMonthlyForecast(startDate: Date, months: number, data: any[]) {
     const monthStr = current.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     // Count items expiring in this month
-    const expiringCount = data.filter(item => {
+    const expiringCount = data.filter((item) => {
       const expiryDate = new Date(item.expiry_date);
-      return expiryDate.getMonth() === current.getMonth() &&
-             expiryDate.getFullYear() === current.getFullYear();
+      return (
+        expiryDate.getMonth() === current.getMonth() &&
+        expiryDate.getFullYear() === current.getFullYear()
+      );
     }).length;
 
     forecast.push({

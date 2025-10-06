@@ -8,21 +8,30 @@ const supabase = createClient(
 
 async function listTables() {
   console.log('📊 Checking Supabase schema for Air Niugini PMS...\n');
-  
+
   const tablesToCheck = [
-    'pilots', 'pilot_checks', 'check_types', 'an_users',
-    'leave_requests', 'settings', 'contract_types',
-    'an_pilots', 'an_pilot_checks', 'an_check_types',
-    'audit_logs', 'notifications', 'documents'
+    'pilots',
+    'pilot_checks',
+    'check_types',
+    'an_users',
+    'leave_requests',
+    'settings',
+    'contract_types',
+    'an_pilots',
+    'an_pilot_checks',
+    'an_check_types',
+    'audit_logs',
+    'notifications',
+    'documents',
   ];
-  
+
   console.log('📋 Checking tables:\n');
-  
+
   for (const table of tablesToCheck) {
     const { data, error, count } = await supabase
       .from(table)
       .select('*', { count: 'exact', head: true });
-    
+
     if (!error) {
       const spaces = ' '.repeat(25 - table.length);
       console.log('✅ ' + table + spaces + ' - ' + (count || 0) + ' records');

@@ -41,7 +41,7 @@ async function verifyTableExists(tableName, expectedRows = null) {
     return {
       exists: true,
       count: count || 0,
-      matchesExpected: expectedRows ? count === expectedRows : true
+      matchesExpected: expectedRows ? count === expectedRows : true,
     };
   } catch (error) {
     return { exists: false, count: 0, error: error.message };
@@ -58,12 +58,7 @@ async function main() {
   // Check that legacy tables are DELETED
   console.log('🗑️  VERIFYING LEGACY TABLES DELETED:\n');
 
-  const legacyTables = [
-    'an_leave_requests',
-    'an_pilot_checks',
-    'an_pilots',
-    'an_check_types'
-  ];
+  const legacyTables = ['an_leave_requests', 'an_pilot_checks', 'an_pilots', 'an_check_types'];
 
   for (const table of legacyTables) {
     const result = await verifyTableExists(table);
@@ -85,7 +80,7 @@ async function main() {
     { name: 'an_users', expectedRows: 3 },
     { name: 'leave_requests', expectedRows: 12 },
     { name: 'settings', expectedRows: 3 },
-    { name: 'contract_types', expectedRows: 3 }
+    { name: 'contract_types', expectedRows: 3 },
   ];
 
   for (const table of productionTables) {
@@ -136,7 +131,7 @@ async function main() {
   process.exit(allPassed ? 0 : 1);
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('❌ Verification error:', error);
   process.exit(1);
 });

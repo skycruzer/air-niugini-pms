@@ -40,7 +40,8 @@ export const queryKeys = {
     expiring: (days: number) => [...queryKeys.certifications.all, 'expiring', days] as const,
     expired: () => [...queryKeys.certifications.all, 'expired'] as const,
     byPilot: (pilotId: string) => [...queryKeys.certifications.all, 'by-pilot', pilotId] as const,
-    byCategory: (category: string) => [...queryKeys.certifications.all, 'by-category', category] as const,
+    byCategory: (category: string) =>
+      [...queryKeys.certifications.all, 'by-category', category] as const,
   },
 
   // Analytics queries
@@ -49,7 +50,8 @@ export const queryKeys = {
     dashboard: () => [...queryKeys.analytics.all, 'dashboard'] as const,
     fleetCertifications: (timeframe: number, groupBy: string) =>
       [...queryKeys.analytics.all, 'fleet-certifications', timeframe, groupBy] as const,
-    compliance: (timeRange: string) => [...queryKeys.analytics.all, 'compliance', timeRange] as const,
+    compliance: (timeRange: string) =>
+      [...queryKeys.analytics.all, 'compliance', timeRange] as const,
     trends: () => [...queryKeys.analytics.all, 'trends'] as const,
   },
 
@@ -73,7 +75,8 @@ export const queryKeys = {
   checkTypes: {
     all: ['check-types'] as const,
     list: () => [...queryKeys.checkTypes.all, 'list'] as const,
-    byCategory: (category: string) => [...queryKeys.checkTypes.all, 'by-category', category] as const,
+    byCategory: (category: string) =>
+      [...queryKeys.checkTypes.all, 'by-category', category] as const,
   },
 };
 
@@ -151,12 +154,12 @@ export const prefetchQueries = {
     await Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.pilots.stats(),
-        queryFn: () => fetch('/api/pilots/stats').then(res => res.json()),
+        queryFn: () => fetch('/api/pilots/stats').then((res) => res.json()),
         ...queryOptions.dashboard,
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.analytics.dashboard(),
-        queryFn: () => fetch('/api/analytics/dashboard').then(res => res.json()),
+        queryFn: () => fetch('/api/analytics/dashboard').then((res) => res.json()),
         ...queryOptions.dashboard,
       }),
     ]);
@@ -165,7 +168,10 @@ export const prefetchQueries = {
   analytics: async (queryClient: QueryClient) => {
     await queryClient.prefetchQuery({
       queryKey: queryKeys.analytics.fleetCertifications(30, 'status'),
-      queryFn: () => fetch('/api/analytics/fleet-certifications?timeframe=30&groupBy=status').then(res => res.json()),
+      queryFn: () =>
+        fetch('/api/analytics/fleet-certifications?timeframe=30&groupBy=status').then((res) =>
+          res.json()
+        ),
       ...queryOptions.analytics,
     });
   },
@@ -173,13 +179,17 @@ export const prefetchQueries = {
 
 // Invalidation utilities
 export const invalidateQueries = {
-  allPilots: (queryClient: QueryClient) => queryClient.invalidateQueries({ queryKey: queryKeys.pilots.all }),
+  allPilots: (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.pilots.all }),
 
-  allCertifications: (queryClient: QueryClient) => queryClient.invalidateQueries({ queryKey: queryKeys.certifications.all }),
+  allCertifications: (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.certifications.all }),
 
-  allAnalytics: (queryClient: QueryClient) => queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all }),
+  allAnalytics: (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all }),
 
-  allLeave: (queryClient: QueryClient) => queryClient.invalidateQueries({ queryKey: queryKeys.leave.all }),
+  allLeave: (queryClient: QueryClient) =>
+    queryClient.invalidateQueries({ queryKey: queryKeys.leave.all }),
 
   pilotAndRelated: (queryClient: QueryClient, pilotId: string) => {
     queryClient.invalidateQueries({ queryKey: queryKeys.pilots.detail(pilotId) });

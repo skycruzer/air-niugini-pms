@@ -8,15 +8,20 @@ const supabase = createClient(
 
 async function checkTables() {
   console.log('🔍 Checking database tables...\n');
-  
+
   // Try production tables
-  const tables = ['pilots', 'pilot_checks', 'check_types', 'an_users', 'leave_requests', 'settings'];
-  
+  const tables = [
+    'pilots',
+    'pilot_checks',
+    'check_types',
+    'an_users',
+    'leave_requests',
+    'settings',
+  ];
+
   for (const table of tables) {
-    const { count, error } = await supabase
-      .from(table)
-      .select('*', { count: 'exact', head: true });
-    
+    const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
+
     if (error) {
       console.log(`❌ ${table}: ${error.message}`);
     } else {

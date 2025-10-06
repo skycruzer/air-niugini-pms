@@ -27,11 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
 // =============================================================================
@@ -163,10 +159,7 @@ export function DocumentSearch({
           />
         </div>
 
-        <Button
-          onClick={onSearch}
-          className="h-12 px-6 bg-[#E4002B] hover:bg-[#C00020] text-white"
-        >
+        <Button onClick={onSearch} className="h-12 px-6 bg-[#E4002B] hover:bg-[#C00020] text-white">
           <Search className="w-5 h-5 mr-2" />
           Search
         </Button>
@@ -184,9 +177,7 @@ export function DocumentSearch({
               <Filter className="w-5 h-5 mr-2" />
               Filters
               {activeFiltersCount > 0 && (
-                <Badge className="ml-2 bg-[#E4002B] text-white">
-                  {activeFiltersCount}
-                </Badge>
+                <Badge className="ml-2 bg-[#E4002B] text-white">{activeFiltersCount}</Badge>
               )}
             </Button>
           </PopoverTrigger>
@@ -209,9 +200,7 @@ export function DocumentSearch({
 
               {/* Document Type */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Document Type
-                </label>
+                <label className="text-sm font-medium text-gray-700">Document Type</label>
                 <Select
                   value={filters.documentType}
                   onValueChange={(value) => handleFilterChange('documentType', value)}
@@ -251,14 +240,10 @@ export function DocumentSearch({
 
               {/* Verification Status */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Verification
-                </label>
+                <label className="text-sm font-medium text-gray-700">Verification</label>
                 <Select
                   value={filters.verificationStatus}
-                  onValueChange={(value) =>
-                    handleFilterChange('verificationStatus', value)
-                  }
+                  onValueChange={(value) => handleFilterChange('verificationStatus', value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -275,9 +260,7 @@ export function DocumentSearch({
 
               {/* Expiry Filter */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Expiry Status
-                </label>
+                <label className="text-sm font-medium text-gray-700">Expiry Status</label>
                 <Select
                   value={filters.expiryFilter}
                   onValueChange={(value) => handleFilterChange('expiryFilter', value)}
@@ -335,10 +318,7 @@ export function DocumentSearch({
 
             <Button
               onClick={() =>
-                handleFilterChange(
-                  'sortOrder',
-                  filters.sortOrder === 'asc' ? 'desc' : 'asc'
-                )
+                handleFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')
               }
               variant="outline"
               size="sm"
@@ -391,10 +371,7 @@ export function DocumentSearch({
               onClick={() => handleFilterChange('verificationStatus', 'all')}
             >
               Verification:{' '}
-              {
-                VERIFICATION_OPTIONS.find((v) => v.value === filters.verificationStatus)
-                  ?.label
-              }
+              {VERIFICATION_OPTIONS.find((v) => v.value === filters.verificationStatus)?.label}
               <X className="w-3 h-3" />
             </Badge>
           )}

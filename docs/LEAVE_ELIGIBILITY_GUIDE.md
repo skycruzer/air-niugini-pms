@@ -43,6 +43,7 @@ Stored in `settings` table under key `pilot_requirements`:
 ```
 
 **Current Fleet**:
+
 - Total Captains: 19
 - Total First Officers: 7
 - Minimum Required: 14 Captains, 14 First Officers (7 per hull × 2 aircraft)
@@ -67,6 +68,7 @@ Stored in `settings` table under key `pilot_requirements`:
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -106,14 +108,11 @@ Displays eligibility warnings in leave review modals:
 ```tsx
 import { LeaveEligibilityAlert } from '@/components/leave/LeaveEligibilityAlert';
 
-<LeaveEligibilityAlert
-  eligibility={eligibility}
-  isLoading={isLoading}
-  pilotName="John Smith"
-/>
+<LeaveEligibilityAlert eligibility={eligibility} isLoading={isLoading} pilotName="John Smith" />;
 ```
 
 **Features**:
+
 - Color-coded alerts (green/yellow/red)
 - Expandable conflict details
 - Alternative pilot recommendations
@@ -151,15 +150,18 @@ await checkEligibility({
 ### Conflict Resolution
 
 **CRITICAL Conflicts** (Immediate Deny):
+
 - Falls below minimum per-aircraft requirement (< 7 Captains or < 7 First Officers)
 - Multiple days with severe shortages
 
 **WARNING Conflicts** (Review Required):
+
 - At or just above minimum fleet requirement
 - Single day concerns
 - Junior pilot requesting during peak leave period
 
 **APPROVED** (No Conflicts):
+
 - Adequate crew margin maintained
 - No overlapping critical roles
 
@@ -277,6 +279,7 @@ ORDER BY seniority_number ASC NULLS LAST;
 **Cause**: Pilots may not have seniority numbers assigned.
 
 **Solution**: Run seniority migration:
+
 ```bash
 node run-seniority-migration.js
 ```
@@ -307,6 +310,7 @@ node run-seniority-migration.js
 ## Support
 
 For questions or issues:
+
 - Check logs: `npm run dev` console output
 - Test API endpoints directly using curl
 - Verify database settings and pilot data

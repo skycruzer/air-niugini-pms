@@ -101,13 +101,7 @@ export interface DocumentSearchOptions {
 
 const STORAGE_BUCKET = 'pilot-documents';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_FILE_TYPES = [
-  'application/pdf',
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/gif',
-];
+const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
 // =============================================================================
 // FILE VALIDATION
@@ -157,9 +151,7 @@ export function generateFilePath(
   const timestamp = Date.now();
   const uniqueId = nanoid(10);
   const extension = fileName.split('.').pop()?.toLowerCase() || 'pdf';
-  const sanitizedFileName = fileName
-    .replace(/[^a-zA-Z0-9.-]/g, '_')
-    .substring(0, 50);
+  const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_').substring(0, 50);
 
   return `pilots/${pilotId}/${documentType.toLowerCase()}/${timestamp}_${uniqueId}_${sanitizedFileName}.${extension}`;
 }
@@ -182,8 +174,7 @@ export async function ensureStorageBucket(): Promise<{
     const supabaseAdmin = getSupabaseAdmin();
 
     // Check if bucket exists
-    const { data: buckets, error: listError } =
-      await supabaseAdmin.storage.listBuckets();
+    const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets();
 
     if (listError) {
       console.error('Error listing buckets:', listError);
@@ -235,8 +226,7 @@ export async function uploadDocument(options: UploadOptions): Promise<{
   error?: string;
 }> {
   try {
-    const { pilotId, documentType, file, metadata, uploadedBy, replaceDocumentId } =
-      options;
+    const { pilotId, documentType, file, metadata, uploadedBy, replaceDocumentId } = options;
 
     // Validate file
     const validation = validateFile(file);
@@ -256,8 +246,9 @@ export async function uploadDocument(options: UploadOptions): Promise<{
     const filePath = generateFilePath(pilotId, documentType, file.name);
 
     // Upload file to storage
-    const { data: uploadData, error: uploadError } =
-      await supabaseAdmin.storage.from(STORAGE_BUCKET).upload(filePath, file, {
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false, // Never overwrite - always create new version
       });
@@ -380,14 +371,16 @@ export async function getDocumentDownloadUrl(options: DownloadOptions): Promise<
     }
 
     // Generate signed URL
-    const { data: signedUrlData, error: signedUrlError } =
-      await supabaseAdmin.storage
-        .from(STORAGE_BUCKET)
-        .createSignedUrl(document.file_path, expiresIn);
+    const { data: signedUrlData, error: signedUrlError } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(document.file_path, expiresIn);
 
     if (signedUrlError || !signedUrlData) {
       console.error('Error creating signed URL:', signedUrlError);
-      return { success: false, error: signedUrlError?.message || 'Failed to generate download URL' };
+      return {
+        success: false,
+        error: signedUrlError?.message || 'Failed to generate download URL',
+      };
     }
 
     console.log('✅ Signed URL generated for document:', documentId);
@@ -509,14 +502,17 @@ export async function getPilotDocuments(pilotId: string): Promise<{
     }
 
     // Group documents by type
-    const grouped = result.data.reduce((acc, doc) => {
-      const type = doc.document_type;
-      if (!acc[type]) {
-        acc[type] = [];
-      }
-      acc[type].push(doc);
-      return acc;
-    }, {} as Record<DocumentType, DocumentMetadata[]>);
+    const grouped = result.data.reduce(
+      (acc, doc) => {
+        const type = doc.document_type;
+        if (!acc[type]) {
+          acc[type] = [];
+        }
+        acc[type].push(doc);
+        return acc;
+      },
+      {} as Record<DocumentType, DocumentMetadata[]>
+    );
 
     return { success: true, data: grouped };
   } catch (error: any) {

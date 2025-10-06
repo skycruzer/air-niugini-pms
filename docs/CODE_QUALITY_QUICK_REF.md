@@ -31,6 +31,7 @@ npm run validate
 **Types**: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 
 **Examples**:
+
 - `feat(pilots): Add bulk update feature`
 - `fix(dashboard): Correct pilot count`
 - `docs(api): Update endpoint documentation`
@@ -38,16 +39,19 @@ npm run validate
 ## Git Hooks
 
 ### Pre-commit (automatic)
+
 - Formats staged files
 - Lints and fixes issues
 - Runs type-check
 - Speed: ~5-10s
 
 ### Commit-msg (automatic)
+
 - Validates commit message format
 - Speed: < 1s
 
 ### Pre-push (automatic)
+
 - Full type-check
 - Complete lint
 - Build verification
@@ -64,6 +68,7 @@ git push --no-verify
 ## VS Code
 
 Install recommended extensions for best experience:
+
 - Prettier
 - ESLint
 - Tailwind CSS IntelliSense

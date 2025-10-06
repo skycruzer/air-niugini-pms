@@ -1,4 +1,5 @@
 # Enterprise Features Documentation
+
 ## Air Niugini B767 Pilot Management System
 
 **Version:** 1.0.0
@@ -49,6 +50,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 ### Permission Categories
 
 #### 1. Pilot Management
+
 - `pilot:create` - Create new pilot profiles
 - `pilot:read` - View pilot information
 - `pilot:update` - Edit pilot profiles
@@ -56,6 +58,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 - `pilot:view_sensitive` - View sensitive information (salary, contracts)
 
 #### 2. Certification Management
+
 - `certification:create` - Add new certifications
 - `certification:read` - View certification records
 - `certification:update` - Update certification details
@@ -63,6 +66,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 - `certification:bulk_update` - Bulk certification operations
 
 #### 3. Leave Management
+
 - `leave:create` - Submit leave requests
 - `leave:read` - View leave requests
 - `leave:update` - Modify leave requests
@@ -71,6 +75,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 - `leave:reject` - Reject leave requests
 
 #### 4. Reports & Analytics
+
 - `reports:view` - View reports
 - `reports:export` - Export reports
 - `reports:create` - Generate custom reports
@@ -78,6 +83,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 - `analytics:advanced` - Access advanced analytics
 
 #### 5. System Administration
+
 - `system:settings` - Modify system settings
 - `system:users` - Manage user accounts
 - `system:audit` - View audit logs
@@ -87,6 +93,7 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 - `system:api_keys` - Manage API keys
 
 #### 6. Check Types Management
+
 - `check_types:create` - Create certification types
 - `check_types:update` - Update certification types
 - `check_types:delete` - Delete certification types
@@ -95,23 +102,36 @@ The RBAC system provides fine-grained access control with 30+ granular permissio
 
 ```typescript
 // Admin - Full System Access
-const adminPermissions = [/* all permissions */];
+const adminPermissions = [
+  /* all permissions */
+];
 
 // Manager - Operational Management
 const managerPermissions = [
-  'pilot:read', 'pilot:update', 'pilot:view_sensitive',
-  'certification:create', 'certification:read', 'certification:update', 'certification:bulk_update',
-  'leave:create', 'leave:read', 'leave:update', 'leave:approve', 'leave:reject',
-  'reports:view', 'reports:export',
-  'analytics:view'
+  'pilot:read',
+  'pilot:update',
+  'pilot:view_sensitive',
+  'certification:create',
+  'certification:read',
+  'certification:update',
+  'certification:bulk_update',
+  'leave:create',
+  'leave:read',
+  'leave:update',
+  'leave:approve',
+  'leave:reject',
+  'reports:view',
+  'reports:export',
+  'analytics:view',
 ];
 
 // User - Standard Access
 const userPermissions = [
   'pilot:read',
   'certification:read',
-  'leave:create', 'leave:read',
-  'reports:view'
+  'leave:create',
+  'leave:read',
+  'reports:view',
 ];
 
 // Read-Only - View Only
@@ -120,7 +140,7 @@ const readOnlyPermissions = [
   'certification:read',
   'leave:read',
   'reports:view',
-  'analytics:view'
+  'analytics:view',
 ];
 ```
 
@@ -169,12 +189,8 @@ function PilotActions() {
 
   return (
     <div>
-      {rbac.hasPermission('pilot:update') && (
-        <Button>Edit Pilot</Button>
-      )}
-      {rbac.hasPermission('pilot:delete') && (
-        <Button variant="destructive">Delete Pilot</Button>
-      )}
+      {rbac.hasPermission('pilot:update') && <Button>Edit Pilot</Button>}
+      {rbac.hasPermission('pilot:delete') && <Button variant="destructive">Delete Pilot</Button>}
     </div>
   );
 }
@@ -189,6 +205,7 @@ function PilotActions() {
 Real-time system health monitoring with comprehensive performance metrics, error tracking, and automated alerts.
 
 **Locations:**
+
 - Service: `/src/lib/system-monitoring.ts`
 - Dashboard: `/src/app/dashboard/admin/system/page.tsx`
 - Health API: `/src/app/api/health/route.ts`
@@ -196,17 +213,20 @@ Real-time system health monitoring with comprehensive performance metrics, error
 ### Monitored Metrics
 
 #### 1. CPU Metrics
+
 - Usage percentage
 - Load average (1m, 5m, 15m)
 - Core count
 
 #### 2. Memory Metrics
+
 - Total memory (MB)
 - Used memory (MB)
 - Free memory (MB)
 - Usage percentage
 
 #### 3. Database Metrics
+
 - Connection status (healthy/degraded/down)
 - Connection count
 - Average query time
@@ -215,6 +235,7 @@ Real-time system health monitoring with comprehensive performance metrics, error
 - Last backup timestamp
 
 #### 4. API Metrics
+
 - Total requests
 - Success rate (%)
 - Average response time (ms)
@@ -222,12 +243,14 @@ Real-time system health monitoring with comprehensive performance metrics, error
 - Per-endpoint statistics
 
 #### 5. Error Metrics
+
 - Total errors
 - Error rate (per minute)
 - Errors by type
 - Recent error log
 
 #### 6. Uptime Metrics
+
 - Start time
 - Uptime (seconds)
 - Uptime percentage
@@ -271,6 +294,7 @@ console.log('Sessions by role:', sessions.sessionsByRole);
 Access at: `/dashboard/admin/system`
 
 **Features:**
+
 - Real-time metrics display
 - Auto-refresh every 30 seconds
 - Health status with alerts
@@ -293,23 +317,27 @@ Event-driven webhook system for real-time notifications to external services. Su
 ### Supported Events
 
 #### Pilot Events
+
 - `pilot.created` - New pilot added
 - `pilot.updated` - Pilot information modified
 - `pilot.deleted` - Pilot removed
 
 #### Certification Events
+
 - `certification.created` - New certification added
 - `certification.updated` - Certification modified
 - `certification.expiring` - Certification expires within threshold
 - `certification.expired` - Certification has expired
 
 #### Leave Events
+
 - `leave.created` - Leave request submitted
 - `leave.updated` - Leave request modified
 - `leave.approved` - Leave request approved
 - `leave.rejected` - Leave request rejected
 
 #### System Events
+
 - `system.alert` - System alert triggered
 - `backup.completed` - Backup successfully completed
 - `backup.failed` - Backup failed
@@ -322,16 +350,12 @@ import { webhookService } from '@/lib/webhook-service';
 // Register new webhook
 const webhook = await webhookService.registerWebhook({
   url: 'https://api.example.com/webhooks/an-pms',
-  events: [
-    'certification.expiring',
-    'certification.expired',
-    'leave.approved'
-  ],
+  events: ['certification.expiring', 'certification.expired', 'leave.approved'],
   description: 'HR System Integration',
   headers: {
-    'X-API-Key': 'your-api-key'
+    'X-API-Key': 'your-api-key',
   },
-  createdBy: user.id
+  createdBy: user.id,
 });
 
 console.log('Webhook ID:', webhook.id);
@@ -340,7 +364,7 @@ console.log('Secret:', webhook.secret); // For signature verification
 // Update webhook
 await webhookService.updateWebhook(webhook.id, {
   events: ['certification.expiring', 'certification.expired', 'pilot.created'],
-  active: true
+  active: true,
 });
 
 // Test webhook
@@ -365,15 +389,15 @@ await triggerWebhookEvent('certification.expiring', {
   pilot: {
     id: pilot.id,
     name: `${pilot.first_name} ${pilot.last_name}`,
-    employee_id: pilot.employee_id
+    employee_id: pilot.employee_id,
   },
   certification: {
     id: check.id,
     type: checkType.check_code,
     description: checkType.check_description,
     expiry_date: check.expiry_date,
-    days_until_expiry: daysUntilExpiry
-  }
+    days_until_expiry: daysUntilExpiry,
+  },
 });
 
 // Trigger leave approval
@@ -384,10 +408,10 @@ await triggerWebhookEvent('leave.approved', {
     type: leave.leave_type,
     start_date: leave.start_date,
     end_date: leave.end_date,
-    roster_period: leave.roster_period
+    roster_period: leave.roster_period,
   },
   approved_by: user.email,
-  approved_at: new Date()
+  approved_at: new Date(),
 });
 ```
 
@@ -425,11 +449,7 @@ Webhooks include HMAC-SHA256 signatures for security:
 const signature = request.headers.get('X-Webhook-Signature');
 const payload = await request.json();
 
-const isValid = webhookService.verifySignature(
-  payload,
-  signature,
-  webhookSecret
-);
+const isValid = webhookService.verifySignature(payload, signature, webhookSecret);
 
 if (!isValid) {
   return new Response('Invalid signature', { status: 401 });
@@ -450,7 +470,7 @@ console.log('Avg response time:', stats.averageResponseTime, 'ms');
 
 // Get delivery logs
 const logs = webhookService.getWebhookLogs(webhookId, 50);
-logs.forEach(log => {
+logs.forEach((log) => {
   console.log(`${log.timestamp}: ${log.event} - ${log.status}`);
   if (log.error) {
     console.error('Error:', log.error);
@@ -481,10 +501,7 @@ Automated backup system with point-in-time recovery, integrity verification, and
 import { backupService, createBackup } from '@/lib/backup-service';
 
 // Create manual backup
-const backup = await createBackup(
-  'Pre-deployment backup',
-  user.id
-);
+const backup = await createBackup('Pre-deployment backup', user.id);
 
 console.log('Backup ID:', backup.id);
 console.log('Size:', backup.size, 'bytes');
@@ -495,7 +512,7 @@ console.log('Record counts:', backup.recordCount);
 const partialBackup = await backupService.createBackup({
   tables: ['pilots', 'pilot_checks'],
   description: 'Pilot data backup',
-  createdBy: user.id
+  createdBy: user.id,
 });
 ```
 
@@ -506,7 +523,7 @@ const partialBackup = await backupService.createBackup({
 const interval = backupService.scheduleAutoBackup({
   interval: 24, // Every 24 hours
   retentionDays: 30, // Keep backups for 30 days
-  createdBy: 'system'
+  createdBy: 'system',
 });
 
 // Cancel scheduled backups
@@ -518,7 +535,7 @@ clearInterval(interval);
 ```typescript
 // List available backups
 const backups = backupService.listBackups();
-backups.forEach(backup => {
+backups.forEach((backup) => {
   console.log(`${backup.timestamp}: ${backup.description}`);
   console.log(`  Status: ${backup.status}`);
   console.log(`  Size: ${formatBackupSize(backup.size)}`);
@@ -534,7 +551,7 @@ if (!verification.valid) {
 // Restore from backup
 const result = await backupService.restoreBackup(backupId, {
   tables: ['pilots', 'pilot_checks'], // Optional: specific tables
-  confirmWipe: true // Required: confirm data deletion
+  confirmWipe: true, // Required: confirm data deletion
 });
 
 if (result.success) {
@@ -568,6 +585,7 @@ const json = await backupService.exportBackup(backupId);
 ### Backup Tables
 
 Default tables included in backups:
+
 - `pilots` - All pilot records
 - `pilot_checks` - Certification records
 - `check_types` - Certification type definitions
@@ -597,6 +615,7 @@ Flexible integration API framework supporting OAuth 2.0, API keys, and basic aut
 ### Authentication Types
 
 #### 1. OAuth 2.0
+
 Best for: Cloud services (Google, Microsoft, Salesforce)
 
 ```typescript
@@ -614,13 +633,13 @@ const integration = await integrationAPI.registerIntegration({
     authorizationUrl: 'https://login.microsoftonline.com/oauth2/v2.0/authorize',
     tokenUrl: 'https://login.microsoftonline.com/oauth2/v2.0/token',
     scope: ['User.Read', 'Calendars.Read'],
-    redirectUri: 'https://yourapp.com/oauth/callback'
+    redirectUri: 'https://yourapp.com/oauth/callback',
   },
   active: true,
   description: 'Microsoft Teams integration for calendar sync',
   syncEnabled: true,
   syncInterval: 60, // minutes
-  createdBy: user.id
+  createdBy: user.id,
 });
 
 // Initiate OAuth flow
@@ -636,6 +655,7 @@ await integrationAPI.handleOAuth2Callback(
 ```
 
 #### 2. API Key
+
 Best for: REST APIs with simple authentication
 
 ```typescript
@@ -648,16 +668,17 @@ const integration = await integrationAPI.registerIntegration({
     type: 'api_key',
     key: 'your-api-key',
     headerName: 'X-API-Key',
-    prefix: '' // Optional, e.g., 'Bearer '
+    prefix: '', // Optional, e.g., 'Bearer '
   },
   active: true,
   description: 'HR system integration',
   syncEnabled: false,
-  createdBy: user.id
+  createdBy: user.id,
 });
 ```
 
 #### 3. Basic Authentication
+
 Best for: Legacy systems
 
 ```typescript
@@ -669,12 +690,12 @@ const integration = await integrationAPI.registerIntegration({
   authConfig: {
     type: 'basic_auth',
     username: 'api_user',
-    password: 'api_password'
+    password: 'api_password',
   },
   active: true,
   description: 'Legacy system integration',
   syncEnabled: false,
-  createdBy: user.id
+  createdBy: user.id,
 });
 ```
 
@@ -682,36 +703,24 @@ const integration = await integrationAPI.registerIntegration({
 
 ```typescript
 // GET request
-const data = await integrationAPI.callAPI(
-  integrationId,
-  '/users/profile',
-  { method: 'GET' }
-);
+const data = await integrationAPI.callAPI(integrationId, '/users/profile', { method: 'GET' });
 
 // POST request
-const result = await integrationAPI.callAPI(
-  integrationId,
-  '/sync/pilots',
-  {
-    method: 'POST',
-    body: {
-      pilots: pilotData
-    },
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }
-);
+const result = await integrationAPI.callAPI(integrationId, '/sync/pilots', {
+  method: 'POST',
+  body: {
+    pilots: pilotData,
+  },
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 // PUT request
-await integrationAPI.callAPI(
-  integrationId,
-  '/users/123',
-  {
-    method: 'PUT',
-    body: userData
-  }
-);
+await integrationAPI.callAPI(integrationId, '/users/123', {
+  method: 'PUT',
+  body: userData,
+});
 ```
 
 ### Data Synchronization
@@ -720,12 +729,12 @@ await integrationAPI.callAPI(
 // Enable automatic sync
 await integrationAPI.updateIntegration(integrationId, {
   syncEnabled: true,
-  syncInterval: 60 // Sync every 60 minutes
+  syncInterval: 60, // Sync every 60 minutes
 });
 
 // Get sync jobs history
 const jobs = integrationAPI.getSyncJobs(integrationId);
-jobs.forEach(job => {
+jobs.forEach((job) => {
   console.log(`${job.startTime}: ${job.status}`);
   console.log(`  Records synced: ${job.recordsSynced}`);
   if (job.errors.length > 0) {
@@ -748,8 +757,7 @@ if (test.success) {
 // Get integration statistics
 const stats = integrationAPI.getIntegrationStats(integrationId);
 console.log('Total API calls:', stats.totalCalls);
-console.log('Success rate:',
-  (stats.successfulCalls / stats.totalCalls * 100).toFixed(2), '%');
+console.log('Success rate:', ((stats.successfulCalls / stats.totalCalls) * 100).toFixed(2), '%');
 console.log('Avg response time:', stats.averageResponseTime, 'ms');
 console.log('Last call:', stats.lastCall);
 console.log('Total syncs:', stats.totalSyncs);
@@ -757,7 +765,7 @@ console.log('Last sync:', stats.lastSync);
 
 // Get API call history
 const calls = integrationAPI.getAPICallHistory(integrationId, 50);
-calls.forEach(call => {
+calls.forEach((call) => {
   console.log(`${call.timestamp}: ${call.method} ${call.endpoint}`);
   console.log(`  Response: ${call.responseCode} (${call.duration}ms)`);
   if (call.error) {
@@ -779,6 +787,7 @@ Production-ready health check endpoints for Kubernetes, Docker, and load balance
 ### Available Endpoints
 
 #### 1. Basic Health Check
+
 **Endpoint:** `GET /api/health?check=basic`
 
 Returns 200 if service is running.
@@ -793,6 +802,7 @@ Returns 200 if service is running.
 ```
 
 #### 2. Readiness Check
+
 **Endpoint:** `GET /api/health?check=readiness`
 
 Checks if service is ready to accept traffic.
@@ -810,10 +820,12 @@ Checks if service is ready to accept traffic.
 ```
 
 Returns:
+
 - `200` - Service is ready
 - `503` - Service is not ready
 
 #### 3. Liveness Check
+
 **Endpoint:** `GET /api/health?check=liveness`
 
 Simple check for orchestration systems.
@@ -826,6 +838,7 @@ Simple check for orchestration systems.
 ```
 
 #### 4. Detailed Health Check
+
 **Endpoint:** `GET /api/health?check=detailed`
 
 Comprehensive system status.
@@ -878,26 +891,26 @@ spec:
   template:
     spec:
       containers:
-      - name: an-pms
-        image: an-pms:latest
-        ports:
-        - containerPort: 3000
-        livenessProbe:
-          httpGet:
-            path: /api/health?check=liveness
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /api/health?check=readiness
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+        - name: an-pms
+          image: an-pms:latest
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet:
+              path: /api/health?check=liveness
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health?check=readiness
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
 ```
 
 ### Docker Compose
@@ -908,9 +921,9 @@ services:
   an-pms:
     image: an-pms:latest
     ports:
-      - "3000:3000"
+      - '3000:3000'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health?check=readiness"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health?check=readiness']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -949,6 +962,7 @@ server {
 ## Security Features
 
 ### Authentication & Authorization
+
 - ✅ Supabase Auth with Row Level Security (RLS)
 - ✅ JWT-based session management
 - ✅ Role-based access control (RBAC)
@@ -956,6 +970,7 @@ server {
 - ✅ Session timeout and refresh
 
 ### Data Protection
+
 - ✅ Encrypted database connections (SSL/TLS)
 - ✅ Encrypted data at rest (Supabase)
 - ✅ Input sanitization and validation
@@ -963,6 +978,7 @@ server {
 - ✅ XSS protection
 
 ### API Security
+
 - ✅ CSRF protection
 - ✅ Rate limiting
 - ✅ API key management
@@ -970,6 +986,7 @@ server {
 - ✅ CORS configuration
 
 ### Audit & Compliance
+
 - ✅ Comprehensive audit logging
 - ✅ User activity tracking
 - ✅ Change history
@@ -981,6 +998,7 @@ server {
 ## Performance Optimization
 
 ### Database Optimization
+
 - ✅ Database views for complex queries
 - ✅ Proper indexing on frequently queried columns
 - ✅ Connection pooling
@@ -988,6 +1006,7 @@ server {
 - ✅ Optimized RLS policies
 
 ### Frontend Optimization
+
 - ✅ Code splitting and lazy loading
 - ✅ Image optimization
 - ✅ Asset compression (gzip/brotli)
@@ -995,6 +1014,7 @@ server {
 - ✅ Service worker for offline support
 
 ### API Optimization
+
 - ✅ Response caching
 - ✅ Batch operations support
 - ✅ Pagination for large datasets
@@ -1002,6 +1022,7 @@ server {
 - ✅ Request deduplication
 
 ### Monitoring & Alerting
+
 - ✅ Real-time performance metrics
 - ✅ Error rate monitoring
 - ✅ Slow query detection
@@ -1013,17 +1034,20 @@ server {
 ## Support & Maintenance
 
 ### Getting Help
+
 - 📧 **Email:** support@airniugini.com.pg
 - 📞 **Phone:** +675 xxxx xxxx
 - 🌐 **Documentation:** https://docs.airniugini-pms.com
 
 ### Reporting Issues
+
 1. Check health endpoints for system status
 2. Review monitoring dashboard for metrics
 3. Check audit logs for recent changes
 4. Contact support with error details
 
 ### Regular Maintenance
+
 - Daily: Automated backups
 - Weekly: Performance review
 - Monthly: Security audit
@@ -1036,4 +1060,4 @@ server {
 **Last Updated:** October 1, 2025
 
 **Air Niugini B767 Pilot Management System**
-*Papua New Guinea's National Airline Fleet Operations Management*
+_Papua New Guinea's National Airline Fleet Operations Management_

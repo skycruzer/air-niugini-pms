@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     // Fetch all pilot checks with related data
     const { data: checks, error } = await supabase
       .from('pilot_checks')
-      .select(`
+      .select(
+        `
         id,
         expiry_date,
         pilots!inner (
@@ -45,7 +46,8 @@ export async function GET(request: NextRequest) {
           check_description,
           category
         )
-      `)
+      `
+      )
       .eq('pilots.is_active', true)
       .order('expiry_date', { ascending: true });
 
@@ -157,7 +159,8 @@ export async function GET(request: NextRequest) {
     // Calculate compliance rate
     const validChecks = stats.total - stats.noDate;
     const compliantChecks = stats.current + stats.expiring;
-    const complianceRate = validChecks > 0 ? ((compliantChecks / validChecks) * 100).toFixed(1) : '0.0';
+    const complianceRate =
+      validChecks > 0 ? ((compliantChecks / validChecks) * 100).toFixed(1) : '0.0';
 
     // Prepare response based on groupBy parameter
     let groupedData: any = {};
@@ -167,14 +170,20 @@ export async function GET(request: NextRequest) {
         groupedData = Object.entries(byCategory).map(([category, data]) => ({
           category,
           ...data,
-          complianceRate: data.total > 0 ? (((data.current + data.expiring) / data.total) * 100).toFixed(1) : '0.0',
+          complianceRate:
+            data.total > 0
+              ? (((data.current + data.expiring) / data.total) * 100).toFixed(1)
+              : '0.0',
         }));
         break;
 
       case 'pilot':
         groupedData = Object.values(byPilot).map((pilot: any) => ({
           ...pilot,
-          complianceRate: pilot.total > 0 ? (((pilot.current + pilot.expiring) / pilot.total) * 100).toFixed(1) : '0.0',
+          complianceRate:
+            pilot.total > 0
+              ? (((pilot.current + pilot.expiring) / pilot.total) * 100).toFixed(1)
+              : '0.0',
         }));
         break;
 

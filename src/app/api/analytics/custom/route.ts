@@ -55,10 +55,11 @@ export async function POST(request: NextRequest) {
             .select('expiry_date');
 
           const today = new Date();
-          const currentCount = allChecks?.filter((c: { expiry_date: string | null }) => {
-            const expiryDate = new Date(c.expiry_date || '');
-            return expiryDate >= today;
-          }).length || 0;
+          const currentCount =
+            allChecks?.filter((c: { expiry_date: string | null }) => {
+              const expiryDate = new Date(c.expiry_date || '');
+              return expiryDate >= today;
+            }).length || 0;
 
           const rate = allChecks ? (currentCount / allChecks.length) * 100 : 0;
           analyticsData.metrics.compliance_rate = Math.round(rate * 10) / 10;

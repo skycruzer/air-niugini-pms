@@ -39,23 +39,27 @@ The Advanced Analytics & Custom Report Builder system provides comprehensive dat
 ## Advanced Analytics Dashboard
 
 ### Location
+
 `/dashboard/analytics/advanced`
 
 ### Features
 
 #### 1. **Trend Analysis**
+
 - Time series visualization with historical data
 - Predictive forecasting with confidence intervals
 - Comparative analytics (Year-over-Year, Month-over-Month)
 - Interactive charts with drill-down capabilities
 
 **Available Metrics:**
+
 - Compliance Rate Trends
 - Certification Volume Trends
 - Pilot Statistics Over Time
 - Leave Utilization Patterns
 
 **Time Ranges:**
+
 - Last Month (1m)
 - Last 3 Months (3m)
 - Last 6 Months (6m)
@@ -64,48 +68,56 @@ The Advanced Analytics & Custom Report Builder system provides comprehensive dat
 - All Time (all)
 
 #### 2. **Compliance Metrics**
+
 - Overall compliance score (gauge visualization)
 - Category-specific compliance breakdown
 - Status distribution (Current/Expiring/Expired)
 - Risk indicators with actionable insights
 
 **Visualizations:**
+
 - Circular gauge for overall compliance
 - Bar charts for category comparison
 - Radar charts for multi-dimensional view
 - Pie charts for status distribution
 
 #### 3. **Pilot Analytics**
+
 - Pilot performance metrics
 - Seniority distribution
 - Certification count by pilot
 - Performance matrix (scatter plot)
 
 **Key Metrics:**
+
 - Total Pilots (Captains vs First Officers)
 - Average Certifications per Pilot
 - Average Seniority
 - Average Age
 
 #### 4. **Certification Analytics**
+
 - Renewal trends (historical and forecasted)
 - Category-specific trends
 - Expiry forecast (next 6 months)
 - Renewal rate tracking
 
 **Insights:**
+
 - Monthly renewal vs expiration rates
 - Category growth patterns
 - Predictive expiry alerts
 - Renewal efficiency metrics
 
 #### 5. **Leave Analytics**
+
 - Leave type distribution (RDO, WDO, Annual)
 - Approval rate trends
 - Utilization by pilot
 - Monthly leave patterns
 
 **Visualizations:**
+
 - Pie charts for leave type distribution
 - Line charts for approval trends
 - Bar charts for monthly patterns
@@ -120,6 +132,7 @@ The Advanced Analytics & Custom Report Builder system provides comprehensive dat
 **Location:** `/components/analytics/TrendAnalysis.tsx`
 
 **Props:**
+
 ```typescript
 interface TrendAnalysisProps {
   timeRange: string; // '1m' | '3m' | '6m' | '12m' | 'ytd' | 'all'
@@ -127,16 +140,18 @@ interface TrendAnalysisProps {
 ```
 
 **Features:**
+
 - Line and area chart toggles
 - Forecast visibility controls
 - Trend indicators (up/down with percentages)
 - Key insights panel
 
 **Usage:**
+
 ```tsx
 import TrendAnalysis from '@/components/analytics/TrendAnalysis';
 
-<TrendAnalysis timeRange="12m" />
+<TrendAnalysis timeRange="12m" />;
 ```
 
 ### ComplianceMetrics Component
@@ -144,6 +159,7 @@ import TrendAnalysis from '@/components/analytics/TrendAnalysis';
 **Location:** `/components/analytics/ComplianceMetrics.tsx`
 
 **Features:**
+
 - Overall compliance gauge
 - Category breakdown with progress bars
 - Radar chart for multi-dimensional view
@@ -151,10 +167,11 @@ import TrendAnalysis from '@/components/analytics/TrendAnalysis';
 - Risk indicator alerts
 
 **Usage:**
+
 ```tsx
 import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 
-<ComplianceMetrics timeRange="6m" />
+<ComplianceMetrics timeRange="6m" />;
 ```
 
 ### PilotAnalytics Component
@@ -162,6 +179,7 @@ import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 **Location:** `/components/analytics/PilotAnalytics.tsx`
 
 **Features:**
+
 - Quick stat cards
 - Seniority distribution bar chart
 - Top performers ranking
@@ -172,6 +190,7 @@ import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 **Location:** `/components/analytics/CertificationAnalytics.tsx`
 
 **Features:**
+
 - Certification metrics cards
 - Renewal trend composed chart
 - Category trends stacked area chart
@@ -182,6 +201,7 @@ import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 **Location:** `/components/analytics/LeaveAnalytics.tsx`
 
 **Features:**
+
 - Leave metrics summary
 - Type distribution pie chart
 - Approval rate trend
@@ -193,22 +213,26 @@ import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 ## Custom Report Builder
 
 ### Location
+
 `/components/reports/ReportBuilder.tsx`
 
 ### Features
 
 #### 1. **Drag-and-Drop Interface**
+
 - Available fields organized by category (Pilot, Certification, Leave)
 - Visual field selection with icons
 - Reorderable selected fields
 - Real-time preview
 
 #### 2. **Field Configuration**
+
 - **Sorting**: Ascending or descending order
 - **Aggregation**: None, Count, Sum, Average, Min, Max
 - **Custom Labels**: Rename fields in output
 
 #### 3. **Report Options**
+
 - **Group By**: Group results by any selected field
 - **Save Templates**: Store report configurations for reuse
 - **Export Formats**: PDF, Excel, CSV, JSON
@@ -216,16 +240,19 @@ import ComplianceMetrics from '@/components/analytics/ComplianceMetrics';
 ### Available Fields
 
 **Pilot Fields:**
+
 - Pilot Name, Employee ID, Role
 - Seniority, Contract Type, Age
 - Commencement Date
 
 **Certification Fields:**
+
 - Check Type, Check Category
 - Issue Date, Expiry Date
 - Days Until Expiry, Status
 
 **Leave Fields:**
+
 - Leave Type, Start Date, End Date
 - Duration, Leave Status
 
@@ -258,24 +285,29 @@ interface ReportTemplate {
 ## Advanced Filtering
 
 ### Location
+
 `/components/reports/AdvancedFilterBuilder.tsx`
 
 ### Filter Operators
 
 **Text Fields:**
+
 - Equals, Not Equals
 - Contains, Starts With, Ends With
 
 **Number Fields:**
+
 - Equals, Not Equals
 - Greater Than, Less Than
 - Between
 
 **Date Fields:**
+
 - Equals, Before, After
 - Between (date range)
 
 **Boolean Fields:**
+
 - Is (true/false)
 
 ### Logical Operators
@@ -286,6 +318,7 @@ interface ReportTemplate {
 ### Filter Examples
 
 **Example 1: Find Expiring Certifications**
+
 ```
 Field: expiry_date
 Operator: between
@@ -293,6 +326,7 @@ Value: 2025-10-01 to 2025-10-31
 ```
 
 **Example 2: Captains with High Seniority**
+
 ```
 Field: role
 Operator: equals
@@ -304,6 +338,7 @@ Value: 10
 ```
 
 **Example 3: Complex Leave Query**
+
 ```
 Field: leave_type
 Operator: equals
@@ -323,11 +358,13 @@ Value: Approved
 ## Export Functionality
 
 ### Location
+
 `/lib/export-advanced.ts`
 
 ### Supported Formats
 
 #### 1. **Excel (.xlsx)**
+
 - Formatted spreadsheets
 - Multiple sheets support
 - Formula support
@@ -346,6 +383,7 @@ await exportReport(data, {
 ```
 
 #### 2. **PDF (.pdf)**
+
 - Professional formatting
 - Air Niugini branding
 - Charts and graphs
@@ -360,6 +398,7 @@ await exportReport(data, {
 ```
 
 #### 3. **CSV (.csv)**
+
 - Simple tabular format
 - Excel compatible
 - Custom delimiters
@@ -373,6 +412,7 @@ await exportReport(data, {
 ```
 
 #### 4. **JSON (.json)**
+
 - Structured data format
 - API integration ready
 - Metadata included
@@ -417,23 +457,27 @@ interface ExportOptions {
 ## Scheduled Reports
 
 ### Location
+
 `/components/reports/ScheduledReports.tsx`
 
 ### Features
 
 #### 1. **Schedule Creation**
+
 - Report name and type
 - Frequency: Daily, Weekly, Monthly
 - Time of day (24-hour format)
 - Recipient email list
 
 #### 2. **Report Management**
+
 - Enable/Disable schedules
 - Edit schedules
 - Delete schedules
 - Run immediately (on-demand)
 
 #### 3. **Email Delivery**
+
 - Multiple recipients support
 - Automatic attachment generation
 - Email notifications
@@ -479,6 +523,7 @@ interface ExportOptions {
 ## Analytics API Routes
 
 ### Base URL
+
 `/api/analytics/`
 
 ### Available Endpoints
@@ -488,10 +533,12 @@ interface ExportOptions {
 Retrieve trend data for various metrics.
 
 **Query Parameters:**
+
 - `timeRange`: '1m' | '3m' | '6m' | '12m' | 'ytd' | 'all'
 - `metric`: 'compliance' | 'certifications' | 'leave' | 'pilots'
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -513,10 +560,12 @@ Retrieve trend data for various metrics.
 Generate predictive forecasts.
 
 **Query Parameters:**
+
 - `metric`: 'certifications' | 'leave' | 'compliance'
 - `months`: Number of months to forecast (default: 3)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -537,6 +586,7 @@ Generate predictive forecasts.
 Execute custom analytics queries.
 
 **Request Body:**
+
 ```json
 {
   "metrics": ["total_pilots", "total_certifications", "compliance_rate"],
@@ -556,6 +606,7 @@ Execute custom analytics queries.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -576,6 +627,7 @@ Execute custom analytics queries.
 Generate custom reports.
 
 **Request Body:**
+
 ```json
 {
   "reportType": "pilots",
@@ -594,6 +646,7 @@ Generate custom reports.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -625,6 +678,7 @@ All endpoints return errors in this format:
 ```
 
 **Common HTTP Status Codes:**
+
 - `400`: Bad Request (invalid parameters)
 - `401`: Unauthorized (authentication required)
 - `403`: Forbidden (insufficient permissions)
@@ -639,11 +693,13 @@ All endpoints return errors in this format:
 **Location:** `/components/charts/advanced/HeatmapChart.tsx`
 
 Perfect for visualizing:
+
 - Pilot availability by day/week
 - Certification expiry patterns
 - Leave utilization patterns
 
 **Usage:**
+
 ```tsx
 import { HeatmapChart } from '@/components/charts/advanced';
 
@@ -658,22 +714,25 @@ const heatmapData = [
   title="Pilot Availability Heatmap"
   description="Weekly availability patterns"
   colorScale={['#FEF3C7', '#E4002B']}
-/>
+/>;
 ```
 
 ### Other Advanced Charts
 
 **RadarChart** (via Recharts):
+
 - Multi-metric comparison
 - Performance profiling
 - Compliance across categories
 
 **TreemapChart** (requires d3.js):
+
 - Hierarchical data visualization
 - Certification distribution
 - Resource allocation
 
 **FunnelChart** (custom implementation):
+
 - Conversion tracking
 - Workflow visualization
 - Process efficiency
@@ -685,17 +744,20 @@ const heatmapData = [
 ### Performance Optimization
 
 #### 1. **Query Optimization**
+
 ```typescript
 // ✅ Good - Single query with joins
 const data = await supabase
   .from('pilots')
-  .select(`
+  .select(
+    `
     *,
     pilot_checks (
       *,
       check_types (*)
     )
-  `)
+  `
+  )
   .limit(100);
 
 // ❌ Bad - Multiple round trips
@@ -706,6 +768,7 @@ for (const pilot of pilots) {
 ```
 
 #### 2. **Caching**
+
 ```typescript
 // Use cache service for expensive queries
 import { getCachedData, setCachedData } from '@/lib/cache-service';
@@ -720,6 +783,7 @@ if (!data) {
 ```
 
 #### 3. **Pagination for Large Datasets**
+
 ```typescript
 // Implement pagination for reports with many rows
 const PAGE_SIZE = 100;
@@ -732,20 +796,20 @@ const { data, count } = await supabase
 ### Data Accuracy
 
 #### 1. **Date Handling**
+
 ```typescript
 // ✅ Correct - Use date-fns for consistency
 import { format, parseISO, differenceInDays } from 'date-fns';
 
-const daysUntilExpiry = differenceInDays(
-  parseISO(expiryDate),
-  new Date()
-);
+const daysUntilExpiry = differenceInDays(parseISO(expiryDate), new Date());
 
 // ❌ Wrong - String comparison
-if (expiryDate < todayString) { }
+if (expiryDate < todayString) {
+}
 ```
 
 #### 2. **Null Handling**
+
 ```typescript
 // Always handle null/undefined values
 const value = data?.fieldName ?? 'N/A';
@@ -755,6 +819,7 @@ const count = data?.length || 0;
 ### Security
 
 #### 1. **Input Validation**
+
 ```typescript
 // Validate all user inputs
 if (!reportName || reportName.trim().length === 0) {
@@ -767,12 +832,10 @@ if (!['daily', 'weekly', 'monthly'].includes(frequency)) {
 ```
 
 #### 2. **SQL Injection Prevention**
+
 ```typescript
 // ✅ Safe - Parameterized queries
-const { data } = await supabase
-  .from('pilots')
-  .select('*')
-  .eq('role', userInput);
+const { data } = await supabase.from('pilots').select('*').eq('role', userInput);
 
 // ❌ Dangerous - Never do this
 const query = `SELECT * FROM pilots WHERE role = '${userInput}'`;
@@ -781,6 +844,7 @@ const query = `SELECT * FROM pilots WHERE role = '${userInput}'`;
 ### User Experience
 
 #### 1. **Loading States**
+
 ```tsx
 if (isLoading) {
   return <LoadingSpinner />;
@@ -792,6 +856,7 @@ if (error) {
 ```
 
 #### 2. **Empty States**
+
 ```tsx
 if (data.length === 0) {
   return (
@@ -805,11 +870,10 @@ if (data.length === 0) {
 ```
 
 #### 3. **Responsive Design**
+
 ```tsx
 // Use responsive grid layouts
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-  {/* Cards */}
-</div>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">{/* Cards */}</div>
 ```
 
 ### Air Niugini Branding
@@ -819,17 +883,17 @@ Always use official brand colors:
 ```typescript
 // Air Niugini Brand Colors
 const COLORS = {
-  red: '#E4002B',      // Primary - buttons, headers, alerts
-  gold: '#FFC72C',     // Secondary - accents, highlights
-  black: '#000000',    // Navigation, text
-  white: '#FFFFFF',    // Background
+  red: '#E4002B', // Primary - buttons, headers, alerts
+  gold: '#FFC72C', // Secondary - accents, highlights
+  black: '#000000', // Navigation, text
+  white: '#FFFFFF', // Background
 };
 
 // Status Colors (Aviation Standard)
 const STATUS_COLORS = {
-  current: '#10B981',   // Green - valid/compliant
-  expiring: '#F59E0B',  // Amber - warning/attention
-  expired: '#EF4444',   // Red - critical/action required
+  current: '#10B981', // Green - valid/compliant
+  expiring: '#F59E0B', // Amber - warning/attention
+  expired: '#EF4444', // Red - critical/action required
 };
 ```
 
@@ -844,6 +908,7 @@ const STATUS_COLORS = {
 **Problem:** Charts appear blank or show errors
 
 **Solution:**
+
 ```typescript
 // Ensure Recharts is properly imported
 import { LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
@@ -860,6 +925,7 @@ const data = [
 **Problem:** Export downloads empty or corrupted files
 
 **Solution:**
+
 ```typescript
 // Verify data format before export
 const exportData = formatExportData(rows, fields, metadata);
@@ -875,16 +941,13 @@ console.log('Blob size:', blob.size);
 **Problem:** Analytics dashboard loads slowly
 
 **Solution:**
+
 ```typescript
 // Use React Query for caching
-const { data, isLoading } = useQuery(
-  ['analytics', timeRange],
-  () => fetchAnalytics(timeRange),
-  {
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
-  }
-);
+const { data, isLoading } = useQuery(['analytics', timeRange], () => fetchAnalytics(timeRange), {
+  staleTime: 5 * 60 * 1000, // 5 minutes
+  cacheTime: 10 * 60 * 1000, // 10 minutes
+});
 
 // Implement progressive loading
 const [page, setPage] = useState(1);
@@ -896,24 +959,28 @@ const pageSize = 50;
 ## Support and Resources
 
 ### Documentation
+
 - Main project documentation: `CLAUDE.md`
 - Technical specification: `SPEC.md`
 - Implementation plan: `PLAN.md`
 
 ### API Reference
+
 - Supabase Documentation: https://supabase.com/docs
 - Recharts Documentation: https://recharts.org/
 - TanStack Query: https://tanstack.com/query/
 
 ### Contact
+
 For technical support or questions:
+
 - Email: operations@airniugini.com.pg
 - Internal Wiki: [Company Intranet]
 
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Papua New Guinea's National Airline Fleet Operations Management*
+_Papua New Guinea's National Airline Fleet Operations Management_
 Version 1.0 - Advanced Analytics & Custom Report Builder
 
 **Generated:** October 1, 2025

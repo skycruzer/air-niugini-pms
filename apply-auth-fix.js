@@ -17,8 +17,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function applyAuthFix() {
@@ -67,10 +67,10 @@ $function$;
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': supabaseServiceKey,
-          'Authorization': `Bearer ${supabaseServiceKey}`
+          apikey: supabaseServiceKey,
+          Authorization: `Bearer ${supabaseServiceKey}`,
         },
-        body: JSON.stringify({ query: functionSql })
+        body: JSON.stringify({ query: functionSql }),
       });
 
       const result = await response.json();
@@ -104,7 +104,6 @@ $function$;
       console.log('   Expected role: admin');
       console.log('   The function should now return "admin" for this user');
     }
-
   } catch (error) {
     console.error('❌ Fatal error:', error);
     console.log('\n📋 Please apply fix-auth-role-function.sql manually in Supabase Dashboard');

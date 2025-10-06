@@ -116,11 +116,9 @@ export async function PUT(request: NextRequest) {
     }));
 
     // Use service role to bypass RLS and perform upsert
-    const { error } = await getSupabaseAdmin()
-      .from('pilot_checks')
-      .upsert(updates, {
-        onConflict: 'pilot_id,check_type_id',
-      });
+    const { error } = await getSupabaseAdmin().from('pilot_checks').upsert(updates, {
+      onConflict: 'pilot_id,check_type_id',
+    });
 
     if (error) {
       console.error('🚨 API /certifications PUT: Database error:', error);
@@ -133,7 +131,10 @@ export async function PUT(request: NextRequest) {
       .from('pilot_checks')
       .select()
       .eq('pilot_id', pilotId)
-      .in('check_type_id', updates.map(u => u.check_type_id));
+      .in(
+        'check_type_id',
+        updates.map((u) => u.check_type_id)
+      );
 
     if (fetchError) {
       console.error('🚨 API /certifications PUT: Error fetching updated data:', fetchError);

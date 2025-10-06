@@ -152,11 +152,7 @@ export function apiError(
 export function apiValidationError(
   errors: Record<string, string | string[]>
 ): NextResponse<ApiErrorResponse> {
-  return apiError(
-    ApiErrorCode.VALIDATION_ERROR,
-    'Validation failed',
-    { fields: errors }
-  );
+  return apiError(ApiErrorCode.VALIDATION_ERROR, 'Validation failed', { fields: errors });
 }
 
 /**
@@ -171,22 +167,15 @@ export function apiUnauthorized(
 /**
  * Create a forbidden error response
  */
-export function apiForbidden(
-  message = 'Insufficient permissions'
-): NextResponse<ApiErrorResponse> {
+export function apiForbidden(message = 'Insufficient permissions'): NextResponse<ApiErrorResponse> {
   return apiError(ApiErrorCode.FORBIDDEN, message);
 }
 
 /**
  * Create a not found error response
  */
-export function apiNotFound(
-  resource: string,
-  id?: string
-): NextResponse<ApiErrorResponse> {
-  const message = id
-    ? `${resource} with ID '${id}' not found`
-    : `${resource} not found`;
+export function apiNotFound(resource: string, id?: string): NextResponse<ApiErrorResponse> {
+  const message = id ? `${resource} with ID '${id}' not found` : `${resource} not found`;
   return apiError(ApiErrorCode.NOT_FOUND, message);
 }
 
@@ -222,11 +211,7 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<NextResp
       }
 
       // Default to internal error
-      return apiError(
-        ApiErrorCode.INTERNAL_ERROR,
-        'An unexpected error occurred',
-        error
-      );
+      return apiError(ApiErrorCode.INTERNAL_ERROR, 'An unexpected error occurred', error);
     }
   }) as T;
 }
@@ -234,17 +219,13 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<NextResp
 /**
  * Type guard to check if response is success
  */
-export function isApiSuccess<T>(
-  response: ApiResponse<T>
-): response is ApiSuccessResponse<T> {
+export function isApiSuccess<T>(response: ApiResponse<T>): response is ApiSuccessResponse<T> {
   return response.success === true;
 }
 
 /**
  * Type guard to check if response is error
  */
-export function isApiError(
-  response: ApiResponse
-): response is ApiErrorResponse {
+export function isApiError(response: ApiResponse): response is ApiErrorResponse {
   return response.success === false;
 }

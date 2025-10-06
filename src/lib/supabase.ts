@@ -22,13 +22,7 @@ function getSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Add debugging to see what's happening
-  console.log('Environment check:', {
-    hasUrl: !!supabaseUrl,
-    hasKey: !!supabaseAnonKey,
-    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
-    key: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'undefined',
-  });
+  // Environment validation - silent in production
 
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error('❌ Critical: Missing required Supabase environment variables!');
@@ -71,13 +65,7 @@ function createSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  console.log('🔧 Admin client environment check:', {
-    hasUrl: !!supabaseUrl,
-    hasServiceKey: !!supabaseServiceKey,
-    url: supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'undefined',
-    serviceKeyLength: supabaseServiceKey ? supabaseServiceKey.length : 0,
-    serviceKeyStart: supabaseServiceKey ? supabaseServiceKey.substring(0, 20) + '...' : 'undefined',
-  });
+  // Admin client validation - silent in production
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('❌ Critical: Missing Supabase environment variables in production');
@@ -92,12 +80,11 @@ function createSupabaseAdmin() {
     },
     global: {
       headers: {
-        'Prefer': 'return=representation',
+        Prefer: 'return=representation',
       },
     },
   });
 
-  console.log('✅ Admin client created successfully');
   return client;
 }
 

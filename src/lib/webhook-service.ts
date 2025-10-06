@@ -121,7 +121,7 @@ export class WebhookService {
       retryCount: 3,
       createdAt: new Date(),
       updatedAt: new Date(),
-      createdBy: config.createdBy
+      createdBy: config.createdBy,
     };
 
     this.webhooks.set(webhook.id, webhook);
@@ -147,7 +147,7 @@ export class WebhookService {
     const updated: Webhook = {
       ...webhook,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.webhooks.set(id, updated);
@@ -181,7 +181,7 @@ export class WebhookService {
   async triggerEvent(event: WebhookEvent, data: any): Promise<void> {
     // Find all webhooks subscribed to this event
     const subscribedWebhooks = Array.from(this.webhooks.values()).filter(
-      webhook => webhook.active && webhook.events.includes(event)
+      (webhook) => webhook.active && webhook.events.includes(event)
     );
 
     if (subscribedWebhooks.length === 0) {
@@ -194,7 +194,7 @@ export class WebhookService {
       event,
       timestamp: new Date(),
       data,
-      signature: '' // Will be set per webhook
+      signature: '', // Will be set per webhook
     };
 
     // Queue deliveries for each webhook
@@ -205,11 +205,11 @@ export class WebhookService {
         event,
         payload: {
           ...payload,
-          signature: this.generateSignature(payload, webhook.secret)
+          signature: this.generateSignature(payload, webhook.secret),
         },
         status: 'pending',
         attempts: 0,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       this.deliveryQueue.push(delivery);
@@ -234,7 +234,7 @@ export class WebhookService {
    */
   private async processQueue(): Promise<void> {
     const pendingDeliveries = this.deliveryQueue.filter(
-      d => d.status === 'pending' || d.status === 'retrying'
+      (d) => d.status === 'pending' || d.status === 'retrying'
     );
 
     for (const delivery of pendingDeliveries) {
@@ -266,9 +266,9 @@ export class WebhookService {
           'X-Webhook-Signature': delivery.payload.signature,
           'X-Webhook-Event': delivery.event,
           'X-Webhook-ID': delivery.id,
-          ...webhook.headers
+          ...webhook.headers,
         },
-        body: JSON.stringify(delivery.payload)
+        body: JSON.stringify(delivery.payload),
       });
 
       const duration = Date.now() - startTime;
@@ -327,7 +327,7 @@ export class WebhookService {
       duration,
       statusCode: delivery.responseCode,
       error: delivery.error,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.logs.push(log);
@@ -343,7 +343,7 @@ export class WebhookService {
    */
   getWebhookLogs(webhookId: string, limit: number = 50): WebhookLog[] {
     return this.logs
-      .filter(log => log.webhookId === webhookId)
+      .filter((log) => log.webhookId === webhookId)
       .slice(-limit)
       .reverse();
   }
@@ -359,7 +359,7 @@ export class WebhookService {
    * Get delivery status
    */
   getDeliveryStatus(deliveryId: string): WebhookDelivery | undefined {
-    return this.deliveryQueue.find(d => d.id === deliveryId);
+    return this.deliveryQueue.find((d) => d.id === deliveryId);
   }
 
   /**
@@ -372,21 +372,22 @@ export class WebhookService {
     averageResponseTime: number;
     successRate: number;
   } {
-    const logs = this.logs.filter(log => log.webhookId === webhookId);
+    const logs = this.logs.filter((log) => log.webhookId === webhookId);
 
-    const successful = logs.filter(log => log.status === 'success');
-    const failed = logs.filter(log => log.status === 'failed');
+    const successful = logs.filter((log) => log.status === 'success');
+    const failed = logs.filter((log) => log.status === 'failed');
 
-    const averageResponseTime = successful.length > 0
-      ? successful.reduce((sum, log) => sum + log.duration, 0) / successful.length
-      : 0;
+    const averageResponseTime =
+      successful.length > 0
+        ? successful.reduce((sum, log) => sum + log.duration, 0) / successful.length
+        : 0;
 
     return {
       totalDeliveries: logs.length,
       successfulDeliveries: successful.length,
       failedDeliveries: failed.length,
       averageResponseTime,
-      successRate: logs.length > 0 ? (successful.length / logs.length) * 100 : 0
+      successRate: logs.length > 0 ? (successful.length / logs.length) * 100 : 0,
     };
   }
 
@@ -407,7 +408,7 @@ export class WebhookService {
       id: payload.id,
       event: payload.event,
       timestamp: payload.timestamp,
-      data: payload.data
+      data: payload.data,
     });
 
     // Simplified signature (use crypto.createHmac in production)
@@ -436,7 +437,7 @@ export class WebhookService {
       return {
         success: false,
         responseTime: 0,
-        error: 'Webhook not found'
+        error: 'Webhook not found',
       };
     }
 
@@ -445,14 +446,17 @@ export class WebhookService {
       event: 'system.alert',
       timestamp: new Date(),
       data: {
-        message: 'This is a test webhook delivery'
+        message: 'This is a test webhook delivery',
       },
-      signature: this.generateSignature({
-        id: 'test',
-        event: 'system.alert',
-        timestamp: new Date(),
-        data: { message: 'test' }
-      } as WebhookPayload, webhook.secret)
+      signature: this.generateSignature(
+        {
+          id: 'test',
+          event: 'system.alert',
+          timestamp: new Date(),
+          data: { message: 'test' },
+        } as WebhookPayload,
+        webhook.secret
+      ),
     };
 
     const startTime = Date.now();
@@ -465,9 +469,9 @@ export class WebhookService {
           'X-Webhook-Signature': testPayload.signature,
           'X-Webhook-Event': 'system.alert',
           'X-Webhook-ID': 'test',
-          ...webhook.headers
+          ...webhook.headers,
         },
-        body: JSON.stringify(testPayload)
+        body: JSON.stringify(testPayload),
       });
 
       const responseTime = Date.now() - startTime;
@@ -476,13 +480,13 @@ export class WebhookService {
         success: response.ok,
         responseTime,
         statusCode: response.status,
-        error: response.ok ? undefined : `HTTP ${response.status}`
+        error: response.ok ? undefined : `HTTP ${response.status}`,
       };
     } catch (error: any) {
       return {
         success: false,
         responseTime: Date.now() - startTime,
-        error: error.message
+        error: error.message,
       };
     }
   }

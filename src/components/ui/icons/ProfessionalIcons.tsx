@@ -35,10 +35,7 @@ export function PilotIcon({ size = 24, className = '', ...props }: IconProps) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M12 2L14 4L12 6L10 4L12 2Z"
-        fill="currentColor"
-      />
+      <path d="M12 2L14 4L12 6L10 4L12 2Z" fill="currentColor" />
     </svg>
   );
 }
@@ -255,8 +252,19 @@ export function ExportIcon({ size = 24, className = '', ...props }: IconProps) {
       className={className}
       {...props}
     >
-      <path d="M12 3V15M12 3L8 7M12 3L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M3 15V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M12 3V15M12 3L8 7M12 3L16 7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M3 15V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V15"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -272,10 +280,7 @@ export function FilterIcon({ size = 24, className = '', ...props }: IconProps) {
       className={className}
       {...props}
     >
-      <path
-        d="M3 4H21V6H3V4ZM7 11H17V13H7V11ZM11 18H13V20H11V18Z"
-        fill="currentColor"
-      />
+      <path d="M3 4H21V6H3V4ZM7 11H17V13H7V11ZM11 18H13V20H11V18Z" fill="currentColor" />
     </svg>
   );
 }

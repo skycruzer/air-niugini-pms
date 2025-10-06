@@ -22,7 +22,8 @@ import { differenceInDays, format } from 'date-fns';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_123');
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Air Niugini Fleet Operations <notifications@airniugini.com>';
+const FROM_EMAIL =
+  process.env.EMAIL_FROM || 'Air Niugini Fleet Operations <notifications@airniugini.com>';
 const REPLY_TO_EMAIL = process.env.EMAIL_REPLY_TO || 'fleetops@airniugini.com.pg';
 
 // Air Niugini Brand Colors

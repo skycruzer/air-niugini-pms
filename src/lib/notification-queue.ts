@@ -144,9 +144,7 @@ export async function queueBatchNotifications(
 // PROCESS NOTIFICATION QUEUE
 // ============================================================================
 
-export async function processNotificationQueue(
-  limit: number = 50
-): Promise<ProcessQueueResult> {
+export async function processNotificationQueue(limit: number = 50): Promise<ProcessQueueResult> {
   const supabaseAdmin = getSupabaseAdmin();
   let processed = 0;
   let successful = 0;

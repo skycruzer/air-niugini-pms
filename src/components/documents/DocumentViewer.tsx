@@ -148,9 +148,7 @@ export function DocumentViewer({
                   >
                     <ZoomOut className="w-4 h-4" />
                   </Button>
-                  <span className="text-sm text-gray-600 min-w-[3rem] text-center">
-                    {zoom}%
-                  </span>
+                  <span className="text-sm text-gray-600 min-w-[3rem] text-center">{zoom}%</span>
                   <Button
                     onClick={handleZoomIn}
                     variant="ghost"
@@ -176,12 +174,7 @@ export function DocumentViewer({
               </Button>
 
               {/* Print Button */}
-              <Button
-                onClick={handlePrint}
-                variant="ghost"
-                size="sm"
-                className="hover:bg-gray-100"
-              >
+              <Button onClick={handlePrint} variant="ghost" size="sm" className="hover:bg-gray-100">
                 <Printer className="w-4 h-4 mr-2" />
                 Print
               </Button>
@@ -189,12 +182,7 @@ export function DocumentViewer({
               <div className="w-px h-6 bg-gray-300 mx-2" />
 
               {/* Close Button */}
-              <Button
-                onClick={onClose}
-                variant="ghost"
-                size="sm"
-                className="hover:bg-gray-100"
-              >
+              <Button onClick={onClose} variant="ghost" size="sm" className="hover:bg-gray-100">
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -269,9 +257,7 @@ export function DocumentViewer({
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-3">
                 <FileText className="w-16 h-16 text-gray-400 mx-auto" />
-                <p className="text-gray-600">
-                  Preview not available for this document type
-                </p>
+                <p className="text-gray-600">Preview not available for this document type</p>
                 <Button
                   onClick={handleDownload}
                   className="bg-[#E4002B] hover:bg-[#C00020] text-white"

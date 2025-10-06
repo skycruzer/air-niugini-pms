@@ -30,14 +30,14 @@ This project uses **Jest 29** and **React Testing Library 14** for unit and inte
 
 ## Test Stack
 
-| Package                        | Version | Purpose                                  |
-|--------------------------------|---------|------------------------------------------|
-| jest                           | ^29.7.0 | Test runner and framework                |
-| @testing-library/react         | ^14.3.1 | React component testing utilities        |
-| @testing-library/jest-dom      | ^6.9.0  | Custom Jest matchers for DOM assertions  |
-| @testing-library/user-event    | ^14.6.1 | Simulate user interactions               |
-| jest-environment-jsdom         | ^30.2.0 | Browser-like environment for Jest        |
-| @types/jest                    | ^30.0.0 | TypeScript definitions for Jest          |
+| Package                     | Version | Purpose                                 |
+| --------------------------- | ------- | --------------------------------------- |
+| jest                        | ^29.7.0 | Test runner and framework               |
+| @testing-library/react      | ^14.3.1 | React component testing utilities       |
+| @testing-library/jest-dom   | ^6.9.0  | Custom Jest matchers for DOM assertions |
+| @testing-library/user-event | ^14.6.1 | Simulate user interactions              |
+| jest-environment-jsdom      | ^30.2.0 | Browser-like environment for Jest       |
+| @types/jest                 | ^30.0.0 | TypeScript definitions for Jest         |
 
 ---
 
@@ -211,16 +211,16 @@ it('displays pilot information', () => {
 Located in `src/test-utils/mock-supabase.ts`:
 
 ```typescript
-import { createMockSupabaseClient } from '@/test-utils/mock-supabase'
+import { createMockSupabaseClient } from '@/test-utils/mock-supabase';
 
 jest.mock('@/lib/supabase', () => ({
-  supabase: createMockSupabaseClient()
-}))
+  supabase: createMockSupabaseClient(),
+}));
 
 it('fetches pilots from database', async () => {
-  const { data } = await supabase.from('pilots').select('*')
-  expect(data).toHaveLength(3) // Returns mock data
-})
+  const { data } = await supabase.from('pilots').select('*');
+  expect(data).toHaveLength(3); // Returns mock data
+});
 ```
 
 ### Test Helpers
@@ -232,18 +232,18 @@ import {
   waitForElementToBeRemoved,
   mockDate,
   mockLocalStorage,
-  assertAirNiuginiBranding
-} from '@/test-utils/test-helpers'
+  assertAirNiuginiBranding,
+} from '@/test-utils/test-helpers';
 
 it('handles date-dependent logic', () => {
-  const restoreDate = mockDate('2025-10-01T00:00:00Z')
+  const restoreDate = mockDate('2025-10-01T00:00:00Z');
 
   // Test with fixed date
-  const period = getCurrentRosterPeriod()
-  expect(period.code).toBe('RP11/2025')
+  const period = getCurrentRosterPeriod();
+  expect(period.code).toBe('RP11/2025');
 
-  restoreDate() // Clean up
-})
+  restoreDate(); // Clean up
+});
 ```
 
 ---
@@ -257,15 +257,15 @@ it('calculates compliance percentage correctly', () => {
   // Arrange: Set up test data
   const certifications = [
     { expiry_date: '2026-01-01' }, // current
-    { expiry_date: '2024-01-01' }  // expired
-  ]
+    { expiry_date: '2024-01-01' }, // expired
+  ];
 
   // Act: Execute the function
-  const percentage = calculateCompliancePercentage(certifications)
+  const percentage = calculateCompliancePercentage(certifications);
 
   // Assert: Verify the result
-  expect(percentage).toBe(50)
-})
+  expect(percentage).toBe(50);
+});
 ```
 
 ### 2. Test User Behavior
@@ -293,10 +293,10 @@ it('sets error state', () => {
 
 ```typescript
 // ✅ Good - clear and specific
-it('returns red status for certifications expired more than 1 day ago', () => {})
+it('returns red status for certifications expired more than 1 day ago', () => {});
 
 // ❌ Bad - vague
-it('works correctly', () => {})
+it('works correctly', () => {});
 ```
 
 ### 4. Mock External Dependencies
@@ -306,29 +306,29 @@ it('works correctly', () => {})
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
-    pathname: '/'
-  })
-}))
+    pathname: '/',
+  }),
+}));
 
 // Mock API calls
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
-    json: () => Promise.resolve({ data: [] })
+    json: () => Promise.resolve({ data: [] }),
   })
-) as jest.Mock
+) as jest.Mock;
 ```
 
 ### 5. Clean Up After Tests
 
 ```typescript
 afterEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});
 
 afterAll(() => {
-  jest.restoreAllMocks()
-})
+  jest.restoreAllMocks();
+});
 ```
 
 ### 6. Test Error Scenarios
@@ -365,17 +365,20 @@ coverageThresholds: {
 ### What to Test
 
 **High Priority (80%+ coverage)**:
+
 - Core business logic (`certification-utils.ts`, `roster-utils.ts`)
 - Critical UI components (`StatusBadge`, `StatCard`)
 - Service layer functions (`pilot-service.ts`)
 - Form validation logic
 
 **Medium Priority (60%+ coverage)**:
+
 - UI components with complex interactions
 - Hooks with state management
 - API route handlers
 
 **Lower Priority**:
+
 - Simple presentational components
 - Type definitions
 - Configuration files
@@ -412,28 +415,28 @@ describe('StatusBadge', () => {
 ### Utility Function Test Example
 
 ```typescript
-import { getCertificationStatus } from '../certification-utils'
-import { addDays, subDays } from 'date-fns'
+import { getCertificationStatus } from '../certification-utils';
+import { addDays, subDays } from 'date-fns';
 
 describe('getCertificationStatus', () => {
   it('returns expired status for past dates', () => {
-    const expiredDate = subDays(new Date(), 10)
-    const status = getCertificationStatus(expiredDate)
+    const expiredDate = subDays(new Date(), 10);
+    const status = getCertificationStatus(expiredDate);
 
-    expect(status.color).toBe('red')
-    expect(status.label).toBe('Expired')
-    expect(status.daysUntilExpiry).toBeLessThan(0)
-  })
+    expect(status.color).toBe('red');
+    expect(status.label).toBe('Expired');
+    expect(status.daysUntilExpiry).toBeLessThan(0);
+  });
 
   it('returns expiring status within 30 days', () => {
-    const expiringDate = addDays(new Date(), 15)
-    const status = getCertificationStatus(expiringDate)
+    const expiringDate = addDays(new Date(), 15);
+    const status = getCertificationStatus(expiringDate);
 
-    expect(status.color).toBe('yellow')
-    expect(status.label).toBe('Expiring Soon')
-    expect(status.daysUntilExpiry).toBe(15)
-  })
-})
+    expect(status.color).toBe('yellow');
+    expect(status.label).toBe('Expiring Soon');
+    expect(status.daysUntilExpiry).toBe(15);
+  });
+});
 ```
 
 ### Async Test Example
@@ -502,25 +505,25 @@ it('uses Air Niugini primary red color', () => {
 
 ```typescript
 it('follows FAA color coding for certification status', () => {
-  const expired = getCertificationStatus(subDays(new Date(), 1))
-  const expiring = getCertificationStatus(addDays(new Date(), 15))
-  const current = getCertificationStatus(addDays(new Date(), 90))
+  const expired = getCertificationStatus(subDays(new Date(), 1));
+  const expiring = getCertificationStatus(addDays(new Date(), 15));
+  const current = getCertificationStatus(addDays(new Date(), 90));
 
-  expect(expired.color).toBe('red')    // Critical - not safe to operate
-  expect(expiring.color).toBe('yellow') // Warning - action required
-  expect(current.color).toBe('green')   // Safe - compliant
-})
+  expect(expired.color).toBe('red'); // Critical - not safe to operate
+  expect(expiring.color).toBe('yellow'); // Warning - action required
+  expect(current.color).toBe('green'); // Safe - compliant
+});
 ```
 
 ### Roster Period Testing
 
 ```typescript
 it('calculates 28-day roster periods correctly', () => {
-  const period = getCurrentRosterPeriod()
+  const period = getCurrentRosterPeriod();
 
-  expect(period.code).toMatch(/^RP\d{1,2}\/\d{4}$/) // e.g., RP11/2025
-  expect(differenceInDays(period.endDate, period.startDate)).toBe(27) // 28 days inclusive
-})
+  expect(period.code).toMatch(/^RP\d{1,2}\/\d{4}$/); // e.g., RP11/2025
+  expect(differenceInDays(period.endDate, period.startDate)).toBe(27); // 28 days inclusive
+});
 ```
 
 ---
@@ -571,5 +574,5 @@ it('debugs component output', () => {
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Testing Guide - Version 1.0*
-*Last Updated: October 2025*
+_Testing Guide - Version 1.0_
+_Last Updated: October 2025_

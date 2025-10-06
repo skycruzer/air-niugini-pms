@@ -3,7 +3,24 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Cell, PieChart, Pie } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Cell,
+  PieChart,
+  Pie,
+} from 'recharts';
 import { CheckCircle2, AlertTriangle, XCircle, Activity } from 'lucide-react';
 import { CertificationStatusChart } from '@/components/shared/CertificationStatusChart';
 import { ComplianceGauge } from '@/components/shared/ComplianceGauge';
@@ -24,30 +41,50 @@ interface ComplianceMetricsProps {
  */
 export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps) {
   // Sample compliance data by category
-  const categoryData = useMemo(() => [
-    { category: 'License & Type', compliance: 98, total: 27, current: 26, expiring: 1, expired: 0 },
-    { category: 'Medical', compliance: 100, total: 27, current: 27, expiring: 0, expired: 0 },
-    { category: 'Proficiency', compliance: 96, total: 108, current: 104, expiring: 3, expired: 1 },
-    { category: 'Recurrent', compliance: 94, total: 162, current: 152, expiring: 8, expired: 2 },
-    { category: 'Security', compliance: 100, total: 54, current: 54, expiring: 0, expired: 0 },
-    { category: 'Safety', compliance: 92, total: 81, current: 75, expiring: 4, expired: 2 },
-    { category: 'Operations', compliance: 89, total: 54, current: 48, expiring: 4, expired: 2 },
-    { category: 'CRM', compliance: 97, total: 27, current: 26, expiring: 1, expired: 0 },
-  ], []);
+  const categoryData = useMemo(
+    () => [
+      {
+        category: 'License & Type',
+        compliance: 98,
+        total: 27,
+        current: 26,
+        expiring: 1,
+        expired: 0,
+      },
+      { category: 'Medical', compliance: 100, total: 27, current: 27, expiring: 0, expired: 0 },
+      {
+        category: 'Proficiency',
+        compliance: 96,
+        total: 108,
+        current: 104,
+        expiring: 3,
+        expired: 1,
+      },
+      { category: 'Recurrent', compliance: 94, total: 162, current: 152, expiring: 8, expired: 2 },
+      { category: 'Security', compliance: 100, total: 54, current: 54, expiring: 0, expired: 0 },
+      { category: 'Safety', compliance: 92, total: 81, current: 75, expiring: 4, expired: 2 },
+      { category: 'Operations', compliance: 89, total: 54, current: 48, expiring: 4, expired: 2 },
+      { category: 'CRM', compliance: 97, total: 27, current: 26, expiring: 1, expired: 0 },
+    ],
+    []
+  );
 
   // Radar chart data for compliance across categories
-  const radarData = categoryData.map(cat => ({
+  const radarData = categoryData.map((cat) => ({
     category: cat.category,
     compliance: cat.compliance,
   }));
 
   // Pie chart data for overall status
   const statusData = useMemo(() => {
-    const totals = categoryData.reduce((acc, cat) => ({
-      current: acc.current + cat.current,
-      expiring: acc.expiring + cat.expiring,
-      expired: acc.expired + cat.expired,
-    }), { current: 0, expiring: 0, expired: 0 });
+    const totals = categoryData.reduce(
+      (acc, cat) => ({
+        current: acc.current + cat.current,
+        expiring: acc.expiring + cat.expiring,
+        expired: acc.expired + cat.expired,
+      }),
+      { current: 0, expiring: 0, expired: 0 }
+    );
 
     return [
       { name: 'Current', value: totals.current, color: '#10B981' },
@@ -84,27 +121,21 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
               <div className="flex items-center justify-center mb-2">
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600">
-                {statusData[0].value}
-              </div>
+              <div className="text-2xl font-bold text-green-600">{statusData[0].value}</div>
               <div className="text-xs text-gray-600">Current</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
               </div>
-              <div className="text-2xl font-bold text-amber-600">
-                {statusData[1].value}
-              </div>
+              <div className="text-2xl font-bold text-amber-600">{statusData[1].value}</div>
               <div className="text-xs text-gray-600">Expiring Soon</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <XCircle className="h-5 w-5 text-red-600" />
               </div>
-              <div className="text-2xl font-bold text-red-600">
-                {statusData[2].value}
-              </div>
+              <div className="text-2xl font-bold text-red-600">{statusData[2].value}</div>
               <div className="text-xs text-gray-600">Expired</div>
             </div>
           </div>
@@ -206,7 +237,9 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
                         {cat.expiring} expiring
                       </span>
                     )}
-                    <span className={`font-bold ${cat.compliance >= 95 ? 'text-green-600' : cat.compliance >= 90 ? 'text-amber-600' : 'text-red-600'}`}>
+                    <span
+                      className={`font-bold ${cat.compliance >= 95 ? 'text-green-600' : cat.compliance >= 90 ? 'text-amber-600' : 'text-red-600'}`}
+                    >
                       {cat.compliance}%
                     </span>
                   </div>
@@ -239,7 +272,9 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
               <div>
                 <p className="font-semibold text-amber-900">Medium Risk</p>
                 <p className="text-sm text-amber-700">
-                  Operations category has {categoryData.find(c => c.category === 'Operations')?.expiring || 0} certifications expiring soon
+                  Operations category has{' '}
+                  {categoryData.find((c) => c.category === 'Operations')?.expiring || 0}{' '}
+                  certifications expiring soon
                 </p>
               </div>
             </div>

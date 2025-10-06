@@ -2,7 +2,21 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { Calendar, TrendingUp, Users, Clock } from 'lucide-react';
 
 interface LeaveAnalyticsProps {
@@ -10,50 +24,64 @@ interface LeaveAnalyticsProps {
 }
 
 export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
-  const leaveMetrics = useMemo(() => ({
-    totalRequests: 142,
-    approved: 128,
-    pending: 8,
-    rejected: 6,
-    utilizationRate: 68,
-    avgDuration: 5.2,
-  }), []);
+  const leaveMetrics = useMemo(
+    () => ({
+      totalRequests: 142,
+      approved: 128,
+      pending: 8,
+      rejected: 6,
+      utilizationRate: 68,
+      avgDuration: 5.2,
+    }),
+    []
+  );
 
-  const leaveByType = useMemo(() => [
-    { type: 'RDO', count: 85, color: '#E4002B' },
-    { type: 'WDO', count: 32, color: '#4F46E5' },
-    { type: 'Annual', count: 25, color: '#10B981' },
-  ], []);
+  const leaveByType = useMemo(
+    () => [
+      { type: 'RDO', count: 85, color: '#E4002B' },
+      { type: 'WDO', count: 32, color: '#4F46E5' },
+      { type: 'Annual', count: 25, color: '#10B981' },
+    ],
+    []
+  );
 
-  const leaveTrend = useMemo(() => [
-    { month: 'Jan', rdo: 12, wdo: 4, annual: 3 },
-    { month: 'Feb', rdo: 10, wdo: 3, annual: 2 },
-    { month: 'Mar', rdo: 11, wdo: 5, annual: 4 },
-    { month: 'Apr', rdo: 13, wdo: 4, annual: 3 },
-    { month: 'May', rdo: 9, wdo: 2, annual: 2 },
-    { month: 'Jun', rdo: 14, wdo: 6, annual: 5 },
-    { month: 'Jul', rdo: 8, wdo: 3, annual: 2 },
-    { month: 'Aug', rdo: 8, wdo: 5, annual: 4 },
-  ], []);
+  const leaveTrend = useMemo(
+    () => [
+      { month: 'Jan', rdo: 12, wdo: 4, annual: 3 },
+      { month: 'Feb', rdo: 10, wdo: 3, annual: 2 },
+      { month: 'Mar', rdo: 11, wdo: 5, annual: 4 },
+      { month: 'Apr', rdo: 13, wdo: 4, annual: 3 },
+      { month: 'May', rdo: 9, wdo: 2, annual: 2 },
+      { month: 'Jun', rdo: 14, wdo: 6, annual: 5 },
+      { month: 'Jul', rdo: 8, wdo: 3, annual: 2 },
+      { month: 'Aug', rdo: 8, wdo: 5, annual: 4 },
+    ],
+    []
+  );
 
-  const utilizationByPilot = useMemo(() =>
-    Array.from({ length: 10 }, (_, i) => ({
-      pilot: `Pilot ${i + 1}`,
-      utilization: 50 + Math.floor(Math.random() * 40),
-      days: 8 + Math.floor(Math.random() * 12),
-    })).sort((a, b) => b.utilization - a.utilization),
-  []);
+  const utilizationByPilot = useMemo(
+    () =>
+      Array.from({ length: 10 }, (_, i) => ({
+        pilot: `Pilot ${i + 1}`,
+        utilization: 50 + Math.floor(Math.random() * 40),
+        days: 8 + Math.floor(Math.random() * 12),
+      })).sort((a, b) => b.utilization - a.utilization),
+    []
+  );
 
-  const approvalRate = useMemo(() => [
-    { month: 'Jan', rate: 92 },
-    { month: 'Feb', rate: 88 },
-    { month: 'Mar', rate: 94 },
-    { month: 'Apr', rate: 90 },
-    { month: 'May', rate: 95 },
-    { month: 'Jun', rate: 91 },
-    { month: 'Jul', rate: 93 },
-    { month: 'Aug', rate: 96 },
-  ], []);
+  const approvalRate = useMemo(
+    () => [
+      { month: 'Jan', rate: 92 },
+      { month: 'Feb', rate: 88 },
+      { month: 'Mar', rate: 94 },
+      { month: 'Apr', rate: 90 },
+      { month: 'May', rate: 95 },
+      { month: 'Jun', rate: 91 },
+      { month: 'Jul', rate: 93 },
+      { month: 'Aug', rate: 96 },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -125,7 +153,9 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ type, count, percent }) => `${type}: ${count} (${(percent * 100).toFixed(0)}%)`}
+                  label={({ type, count, percent }) =>
+                    `${type}: ${count} (${(percent * 100).toFixed(0)}%)`
+                  }
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="count"
@@ -152,7 +182,14 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
                 <XAxis dataKey="month" />
                 <YAxis domain={[80, 100]} />
                 <Tooltip />
-                <Line type="monotone" dataKey="rate" stroke="#10B981" strokeWidth={2} name="Approval Rate %" dot={{ r: 4 }} />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                  name="Approval Rate %"
+                  dot={{ r: 4 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -194,7 +231,16 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
               <Tooltip />
               <Bar dataKey="utilization" name="Utilization %">
                 {utilizationByPilot.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.utilization >= 80 ? '#EF4444' : entry.utilization >= 60 ? '#F59E0B' : '#10B981'} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={
+                      entry.utilization >= 80
+                        ? '#EF4444'
+                        : entry.utilization >= 60
+                          ? '#F59E0B'
+                          : '#10B981'
+                    }
+                  />
                 ))}
               </Bar>
             </BarChart>

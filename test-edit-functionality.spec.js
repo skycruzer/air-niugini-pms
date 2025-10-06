@@ -26,9 +26,12 @@ test.describe('Edit Functionality Tests', () => {
     await page.waitForLoadState('networkidle');
 
     // Wait for pilots to load
-    await page.waitForSelector('[data-testid="pilot-row"], .pilot-card, text=/Captain|First Officer/', {
-      timeout: 10000,
-    });
+    await page.waitForSelector(
+      '[data-testid="pilot-row"], .pilot-card, text=/Captain|First Officer/',
+      {
+        timeout: 10000,
+      }
+    );
 
     // Find and click the first edit button
     const editButton = page.locator('button:has-text("Edit"), button[aria-label*="Edit"]').first();
@@ -43,7 +46,9 @@ test.describe('Edit Functionality Tests', () => {
     console.log('🧪 Test: Modal opened, looking for form fields...');
 
     // Get the current first name value
-    const firstNameInput = page.locator('input[name="first_name"], input[placeholder*="First"]').first();
+    const firstNameInput = page
+      .locator('input[name="first_name"], input[placeholder*="First"]')
+      .first();
     await firstNameInput.waitFor({ state: 'visible', timeout: 5000 });
     const originalFirstName = await firstNameInput.inputValue();
 
@@ -56,9 +61,9 @@ test.describe('Edit Functionality Tests', () => {
     console.log('🧪 Test: Changed first name to:', newFirstName);
 
     // Find and click the save/update button
-    const saveButton = page.locator(
-      'button:has-text("Update Pilot"), button:has-text("Save"), button[type="submit"]'
-    ).last();
+    const saveButton = page
+      .locator('button:has-text("Update Pilot"), button:has-text("Save"), button[type="submit"]')
+      .last();
 
     await saveButton.waitFor({ state: 'visible', timeout: 5000 });
 
@@ -85,7 +90,10 @@ test.describe('Edit Functionality Tests', () => {
       ]);
 
       // Check if modal is still open (indicates error)
-      const modalVisible = await page.locator('[role="dialog"]').isVisible().catch(() => false);
+      const modalVisible = await page
+        .locator('[role="dialog"]')
+        .isVisible()
+        .catch(() => false);
 
       if (modalVisible) {
         console.log('❌ Test: Modal still open - checking for errors...');
@@ -137,7 +145,9 @@ test.describe('Edit Functionality Tests', () => {
     await page.waitForLoadState('networkidle');
 
     // Click on first pilot to view details
-    const pilotLink = page.locator('a[href*="/dashboard/pilots/"], text=/Captain|First Officer/').first();
+    const pilotLink = page
+      .locator('a[href*="/dashboard/pilots/"], text=/Captain|First Officer/')
+      .first();
     await pilotLink.click();
 
     console.log('🧪 Test: Navigated to pilot detail page');
@@ -147,9 +157,11 @@ test.describe('Edit Functionality Tests', () => {
     await page.waitForLoadState('networkidle');
 
     // Find and click "Manage Certifications" button
-    const manageCertsButton = page.locator(
-      'button:has-text("Manage Certifications"), a:has-text("Manage Certifications"), text=/Manage Certifications/i'
-    ).first();
+    const manageCertsButton = page
+      .locator(
+        'button:has-text("Manage Certifications"), a:has-text("Manage Certifications"), text=/Manage Certifications/i'
+      )
+      .first();
 
     await manageCertsButton.waitFor({ state: 'visible', timeout: 5000 });
     await manageCertsButton.click();

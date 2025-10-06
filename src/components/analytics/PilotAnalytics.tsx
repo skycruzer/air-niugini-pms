@@ -2,7 +2,19 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, Cell } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  Cell,
+} from 'recharts';
 import { Users, Award, TrendingUp, Clock } from 'lucide-react';
 
 interface PilotAnalyticsProps {
@@ -10,30 +22,38 @@ interface PilotAnalyticsProps {
 }
 
 export default function PilotAnalytics({ timeRange }: PilotAnalyticsProps) {
-  const pilotMetrics = useMemo(() => ({
-    total: 27,
-    captains: 15,
-    firstOfficers: 12,
-    avgCertifications: 20.7,
-    avgAge: 42,
-    avgSeniority: 8.5,
-  }), []);
+  const pilotMetrics = useMemo(
+    () => ({
+      total: 27,
+      captains: 15,
+      firstOfficers: 12,
+      avgCertifications: 20.7,
+      avgAge: 42,
+      avgSeniority: 8.5,
+    }),
+    []
+  );
 
-  const seniorityData = useMemo(() => [
-    { range: '0-2 years', count: 3 },
-    { range: '3-5 years', count: 5 },
-    { range: '6-10 years', count: 8 },
-    { range: '11-15 years', count: 7 },
-    { range: '16+ years', count: 4 },
-  ], []);
+  const seniorityData = useMemo(
+    () => [
+      { range: '0-2 years', count: 3 },
+      { range: '3-5 years', count: 5 },
+      { range: '6-10 years', count: 8 },
+      { range: '11-15 years', count: 7 },
+      { range: '16+ years', count: 4 },
+    ],
+    []
+  );
 
-  const certificationByPilot = useMemo(() =>
-    Array.from({ length: 10 }, (_, i) => ({
-      pilot: `Pilot ${i + 1}`,
-      certifications: 18 + Math.floor(Math.random() * 6),
-      compliance: 90 + Math.floor(Math.random() * 10),
-    })).sort((a, b) => b.certifications - a.certifications),
-  []);
+  const certificationByPilot = useMemo(
+    () =>
+      Array.from({ length: 10 }, (_, i) => ({
+        pilot: `Pilot ${i + 1}`,
+        certifications: 18 + Math.floor(Math.random() * 6),
+        compliance: 90 + Math.floor(Math.random() * 10),
+      })).sort((a, b) => b.certifications - a.certifications),
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -47,7 +67,9 @@ export default function PilotAnalytics({ timeRange }: PilotAnalyticsProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pilotMetrics.total}</div>
-            <p className="text-xs text-gray-500">{pilotMetrics.captains} Captains, {pilotMetrics.firstOfficers} FOs</p>
+            <p className="text-xs text-gray-500">
+              {pilotMetrics.captains} Captains, {pilotMetrics.firstOfficers} FOs
+            </p>
           </CardContent>
         </Card>
 
@@ -143,7 +165,16 @@ export default function PilotAnalytics({ timeRange }: PilotAnalyticsProps) {
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Scatter name="Pilots" data={certificationByPilot} fill="#E4002B">
                 {certificationByPilot.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.compliance >= 95 ? '#10B981' : entry.compliance >= 90 ? '#F59E0B' : '#EF4444'} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={
+                      entry.compliance >= 95
+                        ? '#10B981'
+                        : entry.compliance >= 90
+                          ? '#F59E0B'
+                          : '#EF4444'
+                    }
+                  />
                 ))}
               </Scatter>
             </ScatterChart>

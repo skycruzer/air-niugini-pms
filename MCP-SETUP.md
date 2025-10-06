@@ -7,6 +7,7 @@ The project now has Supabase MCP configured correctly with proper authentication
 ## Configuration Details
 
 ### Supabase MCP Server
+
 - **Type**: Command-based (npx)
 - **Package**: `@supabase/mcp-server-supabase`
 - **Project**: wgdmgvonqysflwdiiols
@@ -22,14 +23,17 @@ Both files are now synchronized with correct authentication.
 ## MCP Servers Status
 
 ✅ **Connected**:
+
 - `exa` - Web search and research
 - `playwright` - Browser automation
 - `filesystem` - File system operations
 
 🔧 **Fixed**:
+
 - `supabase` - Changed from HTTP to command-based with proper auth
 
 ❌ **Failed** (not required):
+
 - `database` - Generic database (not needed, using Supabase)
 - `vercel` - Deployment (can be configured later)
 - `context7` - Documentation (can be configured later)
@@ -54,6 +58,7 @@ node test-connection.js
 ## Available MCP Tools
 
 When Supabase MCP is connected, you'll have access to:
+
 - Database table operations
 - Schema migrations
 - SQL execution

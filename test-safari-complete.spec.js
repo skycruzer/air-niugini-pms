@@ -41,7 +41,7 @@ test('Complete Safari Test - Login and Dashboard Navigation', async ({ page }) =
   console.log('📊 Statistics found:', { has26Pilots, has556Certs });
 
   // Verify navigation elements
-  const hasNavigation = await page.locator('nav').count() > 0;
+  const hasNavigation = (await page.locator('nav').count()) > 0;
   console.log('✅ Navigation present:', hasNavigation);
 
   // Test clicking on Pilots page

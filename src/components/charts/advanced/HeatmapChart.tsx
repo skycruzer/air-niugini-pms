@@ -31,12 +31,12 @@ export default function HeatmapChart({
   colorScale = ['#FEF3C7', '#E4002B'],
 }: HeatmapChartProps) {
   // Get unique x and y values
-  const xValues = useMemo(() => Array.from(new Set(data.map(d => d.x))), [data]);
-  const yValues = useMemo(() => Array.from(new Set(data.map(d => d.y))), [data]);
+  const xValues = useMemo(() => Array.from(new Set(data.map((d) => d.x))), [data]);
+  const yValues = useMemo(() => Array.from(new Set(data.map((d) => d.y))), [data]);
 
   // Get min and max values for color scaling
   const [minValue, maxValue] = useMemo(() => {
-    const values = data.map(d => d.value);
+    const values = data.map((d) => d.value);
     return [Math.min(...values), Math.max(...values)];
   }, [data]);
 
@@ -63,7 +63,7 @@ export default function HeatmapChart({
 
   // Get value for specific x, y
   const getValue = (x: string, y: string) => {
-    const item = data.find(d => d.x === x && d.y === y);
+    const item = data.find((d) => d.x === x && d.y === y);
     return item?.value ?? 0;
   };
 
@@ -79,7 +79,7 @@ export default function HeatmapChart({
             <thead>
               <tr>
                 <th className="p-2 text-sm font-medium text-left border"></th>
-                {xValues.map(x => (
+                {xValues.map((x) => (
                   <th key={x} className="p-2 text-sm font-medium text-center border">
                     {x}
                   </th>
@@ -87,10 +87,10 @@ export default function HeatmapChart({
               </tr>
             </thead>
             <tbody>
-              {yValues.map(y => (
+              {yValues.map((y) => (
                 <tr key={y}>
                   <td className="p-2 text-sm font-medium border">{y}</td>
-                  {xValues.map(x => {
+                  {xValues.map((x) => {
                     const value = getValue(x, y);
                     const color = getColor(value);
                     return (

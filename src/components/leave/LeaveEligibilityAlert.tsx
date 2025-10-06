@@ -73,12 +73,13 @@ export function LeaveEligibilityAlert({
   }
 
   // Show ONLY if there are MULTIPLE conflicting requests (more than 1 pilot)
-  const hasConflictingRequests = eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 1;
+  const hasConflictingRequests =
+    eligibility?.conflictingRequests && eligibility.conflictingRequests.length > 1;
 
   console.log('📊 ALERT: Eligibility data received:', {
     hasConflictingRequests: hasConflictingRequests,
     conflictingRequestsCount: eligibility.conflictingRequests?.length,
-    recommendation: eligibility.recommendation
+    recommendation: eligibility.recommendation,
   });
 
   if (!hasConflictingRequests) {
@@ -86,12 +87,17 @@ export function LeaveEligibilityAlert({
     return null;
   }
 
-  console.log('📊 ALERT: Showing comparison with', eligibility.conflictingRequests.length, 'pilots');
+  console.log(
+    '📊 ALERT: Showing comparison with',
+    eligibility.conflictingRequests.length,
+    'pilots'
+  );
 
   // Determine if this is a crew shortage scenario or sufficient crew
   // When seniorityRecommendation is empty AND there are multiple conflicting requests, it means sufficient crew
   // When seniorityRecommendation contains "CREW SHORTAGE RISK", it means crew shortage
-  const hasSufficientCrew = !eligibility.seniorityRecommendation ||
+  const hasSufficientCrew =
+    !eligibility.seniorityRecommendation ||
     !eligibility.seniorityRecommendation.includes('CREW SHORTAGE RISK');
 
   // Always use blue theme for seniority comparison (informational)
@@ -129,17 +135,23 @@ export function LeaveEligibilityAlert({
               <div className="flex-1">
                 <h5 className="font-bold text-green-900 text-base mb-2">SUMMARY</h5>
                 <p className="text-green-800 mb-2">
-                  <strong>{pilotName}&apos;s</strong> leave request can be approved. Sufficient {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} available to maintain minimum crew requirements (≥10).
+                  <strong>{pilotName}&apos;s</strong> leave request can be approved. Sufficient{' '}
+                  {eligibility.conflictingRequests?.[0]?.role === 'Captain'
+                    ? 'Captains'
+                    : 'First Officers'}{' '}
+                  available to maintain minimum crew requirements (≥10).
                 </p>
                 <div className="bg-white rounded p-3 text-green-900">
                   <p className="mb-2">
                     <strong>✅ RECOMMENDATION: APPROVE</strong>
                   </p>
                   <p className="text-sm mb-1">
-                    Multiple pilots of the same rank are requesting overlapping dates, but crew levels allow all approvals without operational impact.
+                    Multiple pilots of the same rank are requesting overlapping dates, but crew
+                    levels allow all approvals without operational impact.
                   </p>
                   <p className="text-sm text-green-700">
-                    No crew availability issues. All requests can be approved while maintaining minimum requirements.
+                    No crew availability issues. All requests can be approved while maintaining
+                    minimum requirements.
                   </p>
                 </div>
               </div>
@@ -152,7 +164,12 @@ export function LeaveEligibilityAlert({
               <div className="flex-1">
                 <h5 className="font-bold text-yellow-900 text-base mb-2">SUMMARY</h5>
                 <p className="text-yellow-800 mb-2">
-                  <strong>{pilotName}&apos;s</strong> leave request requires review. Approving all conflicting requests may reduce {eligibility.conflictingRequests?.[0]?.role === 'Captain' ? 'Captains' : 'First Officers'} below minimum requirement (10).
+                  <strong>{pilotName}&apos;s</strong> leave request requires review. Approving all
+                  conflicting requests may reduce{' '}
+                  {eligibility.conflictingRequests?.[0]?.role === 'Captain'
+                    ? 'Captains'
+                    : 'First Officers'}{' '}
+                  below minimum requirement (10).
                 </p>
 
                 <div className="bg-white rounded p-3 text-yellow-900 mb-3">
@@ -160,41 +177,59 @@ export function LeaveEligibilityAlert({
                     <strong>⚠️ RECOMMENDATION: REVIEW REQUIRED</strong>
                   </p>
                   <p className="text-sm mb-2">
-                    Multiple pilots of the same rank are requesting overlapping dates, but approving all would cause crew shortage.
+                    Multiple pilots of the same rank are requesting overlapping dates, but approving
+                    all would cause crew shortage.
                   </p>
                   <p className="text-sm text-yellow-800 font-semibold">
-                    Use seniority priority below to determine which requests to approve. Higher seniority pilots (lower seniority number) should be approved first.
+                    Use seniority priority below to determine which requests to approve. Higher
+                    seniority pilots (lower seniority number) should be approved first.
                   </p>
                 </div>
 
                 {/* Display detailed spreading recommendations ONLY when crew shortage exists */}
-                {eligibility.reasons && eligibility.reasons.length > 0 && eligibility.reasons.some(r => r.includes('CREW SHORTAGE RISK')) && (
-                  <div className="bg-white rounded p-4 text-yellow-900 mb-3">
-                    <p className="text-xs font-bold mb-2 text-yellow-800">📋 ALTERNATIVE DATE RECOMMENDATIONS:</p>
-                    {eligibility.reasons.map((reason, idx) => {
-                      // Only show spreading recommendations when there's an actual crew shortage
-                      if (reason.includes('CREW SHORTAGE RISK') && reason.includes('SENIORITY-BASED SPREADING')) {
-                        return (
-                          <div key={idx} className="whitespace-pre-wrap font-mono text-xs leading-relaxed">
-                            {reason}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                )}
+                {eligibility.reasons &&
+                  eligibility.reasons.length > 0 &&
+                  eligibility.reasons.some((r) => r.includes('CREW SHORTAGE RISK')) && (
+                    <div className="bg-white rounded p-4 text-yellow-900 mb-3">
+                      <p className="text-xs font-bold mb-2 text-yellow-800">
+                        📋 ALTERNATIVE DATE RECOMMENDATIONS:
+                      </p>
+                      {eligibility.reasons.map((reason, idx) => {
+                        // Only show spreading recommendations when there's an actual crew shortage
+                        if (
+                          reason.includes('CREW SHORTAGE RISK') &&
+                          reason.includes('SENIORITY-BASED SPREADING')
+                        ) {
+                          return (
+                            <div
+                              key={idx}
+                              className="whitespace-pre-wrap font-mono text-xs leading-relaxed"
+                            >
+                              {reason}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                  )}
 
                 <div className="bg-white rounded p-3 text-yellow-900">
                   <p className="mb-2">
                     <strong>⚖️ Priority Determination Rules (Within Same Rank):</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm ml-2">
-                    <li><strong>1st:</strong> Seniority Number (Lower number = Higher priority)</li>
-                    <li><strong>2nd:</strong> Request Submission Date (Earlier submission = Higher priority)</li>
+                    <li>
+                      <strong>1st:</strong> Seniority Number (Lower number = Higher priority)
+                    </li>
+                    <li>
+                      <strong>2nd:</strong> Request Submission Date (Earlier submission = Higher
+                      priority)
+                    </li>
                   </ul>
                   <p className="text-xs mt-2 text-yellow-700">
-                    Note: Captains and First Officers are evaluated separately with independent minimums (10 each).
+                    Note: Captains and First Officers are evaluated separately with independent
+                    minimums (10 each).
                   </p>
                 </div>
               </div>
@@ -207,17 +242,26 @@ export function LeaveEligibilityAlert({
           <div className="flex items-start mb-2">
             <span className="text-xl mr-2">⚖️</span>
             <div className="flex-1">
-              <h5 className="font-bold text-blue-900 text-base mb-2">Seniority Priority Rules (Within Same Rank)</h5>
+              <h5 className="font-bold text-blue-900 text-base mb-2">
+                Seniority Priority Rules (Within Same Rank)
+              </h5>
               <div className="bg-white rounded p-3 text-blue-900">
                 <p className="mb-2">
                   <strong>Priority Determination:</strong>
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-sm ml-2">
-                  <li><strong>1st:</strong> Seniority Number (Lower number = Higher priority)</li>
-                  <li><strong>2nd:</strong> Request Submission Date (Earlier submission = Higher priority)</li>
+                  <li>
+                    <strong>1st:</strong> Seniority Number (Lower number = Higher priority)
+                  </li>
+                  <li>
+                    <strong>2nd:</strong> Request Submission Date (Earlier submission = Higher
+                    priority)
+                  </li>
                 </ul>
                 <p className="text-xs mt-3 text-blue-700">
-                  Note: Captains and First Officers are evaluated separately with independent minimums (10 each). All requests below are sorted by seniority priority within their rank.
+                  Note: Captains and First Officers are evaluated separately with independent
+                  minimums (10 each). All requests below are sorted by seniority priority within
+                  their rank.
                 </p>
               </div>
             </div>
@@ -226,13 +270,17 @@ export function LeaveEligibilityAlert({
 
         {eligibility.conflictingRequests && eligibility.conflictingRequests.length > 0 && (
           <div className="text-sm font-bold text-blue-900 bg-blue-100 rounded p-3 mb-3 border-2 border-blue-500">
-            🏆 <strong>HIGHEST PRIORITY:</strong> {eligibility.conflictingRequests[0]?.role} - Seniority #{eligibility.conflictingRequests[0]?.seniorityNumber}: {eligibility.conflictingRequests[0]?.pilotName}
-            {eligibility.conflictingRequests[0]?.pilotName === pilotName && <span className="ml-2">(Current Request)</span>}
+            🏆 <strong>HIGHEST PRIORITY:</strong> {eligibility.conflictingRequests[0]?.role} -
+            Seniority #{eligibility.conflictingRequests[0]?.seniorityNumber}:{' '}
+            {eligibility.conflictingRequests[0]?.pilotName}
+            {eligibility.conflictingRequests[0]?.pilotName === pilotName && (
+              <span className="ml-2">(Current Request)</span>
+            )}
           </div>
         )}
 
-        {eligibility.conflictingRequests && eligibility.conflictingRequests
-          .map((conflictReq, index) => {
+        {eligibility.conflictingRequests &&
+          eligibility.conflictingRequests.map((conflictReq, index) => {
             const isCurrentPilot = conflictReq.pilotName === pilotName;
 
             // Color based on overlap type
@@ -264,8 +312,13 @@ export function LeaveEligibilityAlert({
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-bold text-base text-gray-900">
-                    {index === 0 ? '🏆' : '📍'} {conflictReq.role} - Seniority #{conflictReq.seniorityNumber}: {conflictReq.pilotName}
-                    {isCurrentPilot && <span className="ml-2 text-xs text-blue-700 font-bold">(Current Request)</span>}
+                    {index === 0 ? '🏆' : '📍'} {conflictReq.role} - Seniority #
+                    {conflictReq.seniorityNumber}: {conflictReq.pilotName}
+                    {isCurrentPilot && (
+                      <span className="ml-2 text-xs text-blue-700 font-bold">
+                        (Current Request)
+                      </span>
+                    )}
                   </div>
                   <div className={`text-xs px-3 py-1.5 rounded-full font-bold ${badgeColor}`}>
                     {conflictReq.overlapType}
@@ -273,14 +326,32 @@ export function LeaveEligibilityAlert({
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 mb-3 bg-white p-3 rounded">
-                  <div><strong>Overall Priority:</strong> #{index + 1}</div>
-                  <div><strong>Employee ID:</strong> {conflictReq.employeeId}</div>
-                  <div><strong>Rank:</strong> {conflictReq.role}</div>
-                  <div><strong>Seniority #:</strong> {conflictReq.seniorityNumber}</div>
-                  <div><strong>Request Type:</strong> {conflictReq.requestType || 'N/A'}</div>
-                  <div><strong>Duration:</strong> {conflictReq.overlappingDays} days</div>
-                  <div className="col-span-2"><strong>Requested Dates:</strong> {new Date(conflictReq.startDate).toLocaleDateString('en-AU')} to {new Date(conflictReq.endDate).toLocaleDateString('en-AU')}</div>
-                  <div className="col-span-2"><strong>Overlap:</strong> {conflictReq.overlapMessage}</div>
+                  <div>
+                    <strong>Overall Priority:</strong> #{index + 1}
+                  </div>
+                  <div>
+                    <strong>Employee ID:</strong> {conflictReq.employeeId}
+                  </div>
+                  <div>
+                    <strong>Rank:</strong> {conflictReq.role}
+                  </div>
+                  <div>
+                    <strong>Seniority #:</strong> {conflictReq.seniorityNumber}
+                  </div>
+                  <div>
+                    <strong>Request Type:</strong> {conflictReq.requestType || 'N/A'}
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {conflictReq.overlappingDays} days
+                  </div>
+                  <div className="col-span-2">
+                    <strong>Requested Dates:</strong>{' '}
+                    {new Date(conflictReq.startDate).toLocaleDateString('en-AU')} to{' '}
+                    {new Date(conflictReq.endDate).toLocaleDateString('en-AU')}
+                  </div>
+                  <div className="col-span-2">
+                    <strong>Overlap:</strong> {conflictReq.overlapMessage}
+                  </div>
                   {conflictReq.reason && (
                     <div className="col-span-2">
                       <strong>Reason:</strong> {conflictReq.reason}
@@ -288,13 +359,15 @@ export function LeaveEligibilityAlert({
                   )}
                 </div>
 
-                <div className={`text-sm font-semibold p-3 rounded border ${
-                  conflictReq.overlapType === 'EXACT'
-                    ? 'bg-orange-100 text-orange-900 border-orange-300'
-                    : conflictReq.overlapType === 'PARTIAL'
-                    ? 'bg-yellow-100 text-yellow-900 border-yellow-300'
-                    : 'bg-gray-100 text-gray-800 border-gray-300'
-                }`}>
+                <div
+                  className={`text-sm font-semibold p-3 rounded border ${
+                    conflictReq.overlapType === 'EXACT'
+                      ? 'bg-orange-100 text-orange-900 border-orange-300'
+                      : conflictReq.overlapType === 'PARTIAL'
+                        ? 'bg-yellow-100 text-yellow-900 border-yellow-300'
+                        : 'bg-gray-100 text-gray-800 border-gray-300'
+                  }`}
+                >
                   {conflictReq.recommendation}
                 </div>
 

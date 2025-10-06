@@ -47,47 +47,67 @@ const REPORT_TYPES = [
   {
     id: 'compliance-dashboard',
     title: 'Compliance Dashboard',
-    description: 'Comprehensive compliance status, risk assessment, and operational readiness with detailed analytics and immediate action items',
+    description:
+      'Comprehensive compliance status, risk assessment, and operational readiness with detailed analytics and immediate action items',
     icon: '📊',
     color: 'blue',
     pdfSupported: true,
-    features: ['Certification compliance rates', 'Risk analysis', 'Operational capacity', 'Critical alerts']
+    features: [
+      'Certification compliance rates',
+      'Risk analysis',
+      'Operational capacity',
+      'Critical alerts',
+    ],
   },
   {
     id: 'pilot-management',
     title: 'Pilot Management Report',
-    description: 'Complete pilot roster, qualifications, succession planning, and performance metrics for fleet management',
+    description:
+      'Complete pilot roster, qualifications, succession planning, and performance metrics for fleet management',
     icon: '👨‍✈️',
     color: 'green',
     pdfSupported: true,
-    features: ['Pilot roster', 'Qualifications tracking', 'Succession planning', 'Performance metrics']
+    features: [
+      'Pilot roster',
+      'Qualifications tracking',
+      'Succession planning',
+      'Performance metrics',
+    ],
   },
   {
     id: 'certification-planning',
     title: 'Certification Planning',
-    description: 'Certification expiry forecast (7, 14, 28, 60, 90 days), upcoming renewals, and pilot requirements planning',
+    description:
+      'Certification expiry forecast (7, 14, 28, 60, 90 days), upcoming renewals, and pilot requirements planning',
     icon: '📅',
     color: 'purple',
     pdfSupported: true,
-    features: ['Expiry forecast', 'Renewal planning', 'Pilot requirements', 'Roster analysis']
+    features: ['Expiry forecast', 'Renewal planning', 'Pilot requirements', 'Roster analysis'],
   },
   {
     id: 'operational-status',
     title: 'Operational Status Report',
-    description: 'Real-time operational capacity, crew availability, readiness assessment, and fleet utilization metrics',
+    description:
+      'Real-time operational capacity, crew availability, readiness assessment, and fleet utilization metrics',
     icon: '✈️',
     color: 'indigo',
     pdfSupported: true,
-    features: ['Crew availability', 'Readiness assessment', 'Fleet utilization', 'Leave status']
+    features: ['Crew availability', 'Readiness assessment', 'Fleet utilization', 'Leave status'],
   },
   {
     id: 'fleet-analytics',
     title: 'Fleet Analytics',
-    description: 'Advanced performance metrics, trends analysis, and data-driven insights for strategic decision making',
+    description:
+      'Advanced performance metrics, trends analysis, and data-driven insights for strategic decision making',
     icon: '📈',
     color: 'teal',
     pdfSupported: true,
-    features: ['Performance trends', 'Comparative analysis', 'Predictive insights', 'Strategic metrics']
+    features: [
+      'Performance trends',
+      'Comparative analysis',
+      'Predictive insights',
+      'Strategic metrics',
+    ],
   },
 ];
 

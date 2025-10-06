@@ -1,9 +1,11 @@
 # URGENT FIX INSTRUCTIONS - Pilot & Certification Edit Not Saving
 
 ## Root Cause
+
 The `auth_get_user_role()` function reads role from JWT `user_metadata` which has `"role": "user"`, but the actual admin role is stored in the `an_users` table as `"role": "admin"`. This causes RLS policies to fail for admin users.
 
 **Evidence:**
+
 - auth.users.raw_user_meta_data.role = **"user"** (wrong)
 - an_users.role = **"admin"** (correct)
 - RLS policy checks: `auth_get_user_role() = 'admin'` (fails because function returns "user")
@@ -26,22 +28,22 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $function$
 BEGIN
-  -- Check if user is authenticated
-  IF auth.uid() IS NULL THEN
-    RETURN 'anonymous';
-  END IF;
+-- Check if user is authenticated
+IF auth.uid() IS NULL THEN
+RETURN 'anonymous';
+END IF;
 
-  -- Get role from an_users table based on auth.uid()
-  -- This is the source of truth for user roles
-  RETURN COALESCE(
-    (
-      SELECT role
-      FROM public.an_users
-      WHERE id::text = auth.uid()::text
-      LIMIT 1
-    ),
-    'user'
-  );
+-- Get role from an_users table based on auth.uid()
+-- This is the source of truth for user roles
+RETURN COALESCE(
+(
+SELECT role
+FROM public.an_users
+WHERE id::text = auth.uid()::text
+LIMIT 1
+),
+'user'
+);
 END;
 $function$;
 
@@ -76,16 +78,19 @@ After applying the fix:
 ## Technical Details
 
 **Before Fix:**
+
 - Function reads: `auth.jwt() -> 'user_metadata' ->> 'role'`
 - Returns: `"user"` (from JWT)
 - RLS check fails: `"user" ≠ "admin"`
 
 **After Fix:**
+
 - Function reads: `SELECT role FROM an_users WHERE id = auth.uid()`
 - Returns: `"admin"` (from database)
 - RLS check passes: `"admin" = "admin"` ✅
 
 ## Files Created
+
 - \`fix-auth-role-function.sql\` - SQL to fix the function
 - \`apply-auth-fix.js\` - Automated script (failed due to API limitations)
 - \`URGENT-FIX-INSTRUCTIONS.md\` - This file

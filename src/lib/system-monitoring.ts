@@ -142,14 +142,14 @@ export class SystemMonitoringService {
         timestamp: new Date(),
         metric: 'api_response_time',
         value: metrics.api.averageResponseTime,
-        unit: 'ms'
+        unit: 'ms',
       });
 
       this.metricsHistory.push({
         timestamp: new Date(),
         metric: 'database_query_time',
         value: metrics.database.averageQueryTime,
-        unit: 'ms'
+        unit: 'ms',
       });
 
       // Trim history if needed
@@ -171,7 +171,7 @@ export class SystemMonitoringService {
       this.getDatabaseMetrics(),
       this.getAPIMetrics(),
       this.getErrorMetrics(),
-      this.getUptimeMetrics()
+      this.getUptimeMetrics(),
     ]);
 
     return {
@@ -181,7 +181,7 @@ export class SystemMonitoringService {
       database,
       api,
       errors,
-      uptime
+      uptime,
     };
   }
 
@@ -193,7 +193,7 @@ export class SystemMonitoringService {
     return {
       usage: Math.random() * 30 + 10, // 10-40% usage
       loadAverage: [0.5, 0.6, 0.7],
-      cores: 2
+      cores: 2,
     };
   }
 
@@ -210,7 +210,7 @@ export class SystemMonitoringService {
         total: totalMB,
         used: usedMB,
         free: totalMB - usedMB,
-        percentage: (usedMB / totalMB) * 100
+        percentage: (usedMB / totalMB) * 100,
       };
     }
 
@@ -219,7 +219,7 @@ export class SystemMonitoringService {
       total: 512,
       used: 128,
       free: 384,
-      percentage: 25
+      percentage: 25,
     };
   }
 
@@ -232,10 +232,7 @@ export class SystemMonitoringService {
 
       // Test database connection with simple query
       const startTime = Date.now();
-      const { error } = await supabase
-        .from('pilots')
-        .select('id')
-        .limit(1);
+      const { error } = await supabase.from('pilots').select('id').limit(1);
       const queryTime = Date.now() - startTime;
 
       if (error) {
@@ -244,7 +241,7 @@ export class SystemMonitoringService {
           connectionCount: 0,
           averageQueryTime: 0,
           slowQueries: 0,
-          activeConnections: 0
+          activeConnections: 0,
         };
       }
 
@@ -255,7 +252,7 @@ export class SystemMonitoringService {
         averageQueryTime: queryTime,
         slowQueries: 0,
         activeConnections: 5,
-        lastBackup: new Date()
+        lastBackup: new Date(),
       };
     } catch (error) {
       return {
@@ -263,7 +260,7 @@ export class SystemMonitoringService {
         connectionCount: 0,
         averageQueryTime: 0,
         slowQueries: 0,
-        activeConnections: 0
+        activeConnections: 0,
       };
     }
   }
@@ -286,7 +283,7 @@ export class SystemMonitoringService {
           requestCount: 450,
           averageResponseTime: 120,
           errorRate: 0.5,
-          lastAccessed: new Date()
+          lastAccessed: new Date(),
         },
         {
           path: '/api/certifications',
@@ -294,7 +291,7 @@ export class SystemMonitoringService {
           requestCount: 380,
           averageResponseTime: 180,
           errorRate: 1.2,
-          lastAccessed: new Date()
+          lastAccessed: new Date(),
         },
         {
           path: '/api/dashboard',
@@ -302,9 +299,9 @@ export class SystemMonitoringService {
           requestCount: 320,
           averageResponseTime: 250,
           errorRate: 0.8,
-          lastAccessed: new Date()
-        }
-      ]
+          lastAccessed: new Date(),
+        },
+      ],
     };
   }
 
@@ -317,22 +314,22 @@ export class SystemMonitoringService {
       total: 15,
       rate: 0.3,
       byType: {
-        'DatabaseError': 5,
-        'ValidationError': 7,
-        'AuthenticationError': 3
+        DatabaseError: 5,
+        ValidationError: 7,
+        AuthenticationError: 3,
       },
       recent: [
         {
           timestamp: new Date(Date.now() - 300000),
           type: 'ValidationError',
-          message: 'Invalid employee ID format'
+          message: 'Invalid employee ID format',
         },
         {
           timestamp: new Date(Date.now() - 600000),
           type: 'DatabaseError',
-          message: 'Connection timeout'
-        }
-      ]
+          message: 'Connection timeout',
+        },
+      ],
     };
   }
 
@@ -347,7 +344,7 @@ export class SystemMonitoringService {
       startTime: this.startTime,
       uptime: uptimeSeconds,
       uptimePercentage: 99.9,
-      lastDowntime: undefined
+      lastDowntime: undefined,
     };
   }
 
@@ -367,15 +364,15 @@ export class SystemMonitoringService {
         sessionsByRole: {
           admin: 2,
           manager: 5,
-          user: 5
-        }
+          user: 5,
+        },
       };
     } catch (error) {
       return {
         activeUsers: 0,
         activeSessions: 0,
         averageSessionDuration: 0,
-        sessionsByRole: {}
+        sessionsByRole: {},
       };
     }
   }
@@ -384,9 +381,9 @@ export class SystemMonitoringService {
    * Get metrics history for charts
    */
   getMetricsHistory(metric: string, hours: number = 24): PerformanceMetric[] {
-    const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
+    const cutoffTime = Date.now() - hours * 60 * 60 * 1000;
     return this.metricsHistory.filter(
-      m => m.metric === metric && m.timestamp.getTime() >= cutoffTime
+      (m) => m.metric === metric && m.timestamp.getTime() >= cutoffTime
     );
   }
 
@@ -394,10 +391,8 @@ export class SystemMonitoringService {
    * Get all metrics history
    */
   getAllMetricsHistory(hours: number = 24): PerformanceMetric[] {
-    const cutoffTime = Date.now() - (hours * 60 * 60 * 1000);
-    return this.metricsHistory.filter(
-      m => m.timestamp.getTime() >= cutoffTime
-    );
+    const cutoffTime = Date.now() - hours * 60 * 60 * 1000;
+    return this.metricsHistory.filter((m) => m.timestamp.getTime() >= cutoffTime);
   }
 
   /**
@@ -441,7 +436,7 @@ export class SystemMonitoringService {
     return {
       healthy: issues.length === 0,
       issues,
-      warnings
+      warnings,
     };
   }
 
@@ -480,20 +475,20 @@ export async function getSystemStatus(): Promise<{
   if (!health.healthy) {
     return {
       status: 'down',
-      message: `System issues detected: ${health.issues.join(', ')}`
+      message: `System issues detected: ${health.issues.join(', ')}`,
     };
   }
 
   if (health.warnings.length > 0) {
     return {
       status: 'degraded',
-      message: `System warnings: ${health.warnings.join(', ')}`
+      message: `System warnings: ${health.warnings.join(', ')}`,
     };
   }
 
   return {
     status: 'healthy',
-    message: 'All systems operational'
+    message: 'All systems operational',
   };
 }
 
@@ -504,7 +499,7 @@ export async function getDashboardMetrics() {
   return {
     system: metrics,
     sessions,
-    health: await systemMonitoring.checkSystemHealth()
+    health: await systemMonitoring.checkSystemHealth(),
   };
 }
 

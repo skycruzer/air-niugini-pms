@@ -231,10 +231,8 @@ export async function PATCH(request: Request) {
     }
 
     if (updateData.start_date && updateData.end_date) {
-      const daysCount = differenceInDays(
-        new Date(updateData.end_date),
-        new Date(updateData.start_date)
-      ) + 1;
+      const daysCount =
+        differenceInDays(new Date(updateData.end_date), new Date(updateData.start_date)) + 1;
       updates.days_count = daysCount;
     }
 

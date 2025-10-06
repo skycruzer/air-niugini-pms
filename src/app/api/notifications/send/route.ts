@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Missing required fields: email_address, notification_type, subject, template_data',
+          error:
+            'Missing required fields: email_address, notification_type, subject, template_data',
         },
         { status: 400 }
       );

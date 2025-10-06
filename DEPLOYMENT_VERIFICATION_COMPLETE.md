@@ -29,6 +29,7 @@ However, a **critical environment variable issue** was discovered that requires 
 - All assets load from custom domain
 
 **Evidence**:
+
 - Page title: "Air Niugini Pilot Management System"
 - Successfully authenticated and accessed dashboard
 - All navigation working correctly
@@ -39,11 +40,13 @@ However, a **critical environment variable issue** was discovered that requires 
 
 **Test**: Verify all terminology changes in Roster Planning module
 **Pages Tested**:
+
 - `/dashboard/leave/roster-planning` (web UI)
 - PDF Report Generation
-**Result**: ✅ **PASS** - All changes implemented correctly
+  **Result**: ✅ **PASS** - All changes implemented correctly
 
 #### 2.1 Page Title Update ✅
+
 - **Old**: "Roster Leave Planning"
 - **New**: "Roster Planning"
 - **Status**: ✅ Verified in production
@@ -54,6 +57,7 @@ However, a **critical environment variable issue** was discovered that requires 
   - Footer: "Roster Planning Module"
 
 #### 2.2 Navigation Description Update ✅
+
 - **Old**: "Future roster leave planning"
 - **New**: "Future roster planning"
 - **Status**: ✅ Verified in production
@@ -62,11 +66,13 @@ However, a **critical environment variable issue** was discovered that requires 
 #### 2.3 Leave Type Labels ✅
 
 **Table Display (Web UI)**:
+
 - ✅ "RDO Request" (not "RDO Leave Requests" or "RDO")
 - ✅ "Annual Leave" (not "ANNUAL")
 - ✅ All leave types properly formatted
 
 **PDF Report**:
+
 - ✅ Page 2: "RDO Request" (section header)
 - ✅ Page 3: "Annual Leave" (section header)
 - ✅ Summary: Shows "RDO" and "ANNUAL" in statistics (correct - this is abbreviation context)
@@ -74,17 +80,21 @@ However, a **critical environment variable issue** was discovered that requires 
 #### 2.4 Request Date Column ✅
 
 **Web UI Table Columns**:
+
 ```
 Pilot | Dates | Days | Status | Requested | Method | Reason
 ```
+
 - ✅ "Requested" column present
 - ✅ Dates formatted as "dd MMM yyyy" (e.g., "22 Sep 2025")
 - ✅ All 3 requests show request dates correctly
 
 **PDF Report Table Columns**:
+
 ```
 Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 ```
+
 - ✅ "Requested" column present on all pages (Page 2 & 3)
 - ✅ Dates formatted as "dd MMM yyyy"
 - ✅ Examples verified:
@@ -93,12 +103,14 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
   - CRAIG AARON LILLEY (Annual): "27 Sep 2025"
 
 #### 2.5 PDF Filename ✅
+
 - **Old Pattern**: `Air_Niugini_Leave_Planning_*`
 - **New Pattern**: `Air_Niugini_Roster_Planning_*`
 - **Status**: ✅ Verified in production
 - **Example**: `Air_Niugini_Roster_Planning_RP12_2025_20251005_2338.pdf`
 
 #### 2.6 PDF Report Title ✅
+
 - **Old**: "Roster Leave Planning Report"
 - **New**: "Roster Planning Report"
 - **Status**: ✅ Verified in PDF (all 3 pages)
@@ -113,11 +125,13 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 **Result**: ✅ **PASS** - Working correctly
 
 #### 3.1 Configuration Migration ✅
+
 - **Old**: NPX-based package (`@supabase/mcp-server-supabase`)
 - **New**: Cloud-hosted URL (`https://mcp.supabase.com/mcp`)
 - **Status**: ✅ Successfully migrated
 
 **New Configuration**:
+
 ```json
 {
   "supabase": {
@@ -127,6 +141,7 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 ```
 
 #### 3.2 Enabled Features ✅
+
 - ✅ `docs` - Documentation search
 - ✅ `account` - Account management
 - ✅ `database` - Database operations
@@ -137,8 +152,10 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 - ✅ `storage` - Storage management
 
 #### 3.3 Functionality Test ✅
+
 **Command**: List all tables
 **Result**: ✅ Successfully returned all tables:
+
 - `pilots` (27 rows)
 - `pilot_checks` (571 rows)
 - `check_types` (34 rows)
@@ -148,6 +165,7 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 - `contract_types` (3 rows)
 
 **Database Schema Verification**:
+
 - ✅ All tables have RLS enabled
 - ✅ Foreign key constraints intact
 - ✅ Column types and constraints correct
@@ -162,6 +180,7 @@ Pilot Name | Employee ID | Dates | Days | Status | Requested | Method | Reason
 **Result**: ✅ **PRESERVED** - No changes made (working as expected)
 
 **Configuration**:
+
 ```json
 {
   "shadcn": {
@@ -183,12 +202,14 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 **Issue**: `SUPABASE_SERVICE_ROLE_KEY` not configured in Vercel production
 **Severity**: HIGH
 **Impact**:
+
 - ❌ Cache warm-up failing
 - ❌ Admin operations degraded
 - ✅ Authentication working (uses anon key)
 - ✅ Basic queries working
 
 **Evidence** (Browser Console):
+
 ```
 ❌ Critical: Missing Supabase environment variables in production
 ❌ URL: true ServiceKey: false
@@ -199,6 +220,7 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 **Documentation**: See `CRITICAL_PRODUCTION_ISSUE.md`
 
 **Environment Variables Needed**:
+
 1. `SUPABASE_SERVICE_ROLE_KEY` (REQUIRED)
 2. `SUPABASE_PROJECT_ID` (Optional)
 
@@ -206,21 +228,21 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 
 ## 📊 Test Results Summary
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Custom Domain Access | ✅ PASS | SSL valid, no redirects |
-| Roster Planning Page Title | ✅ PASS | "Roster Planning" everywhere |
-| Navigation Description | ✅ PASS | "Future roster planning" |
-| Leave Type Labels (Web) | ✅ PASS | "RDO Request", "Annual Leave" |
-| Leave Type Labels (PDF) | ✅ PASS | All sections correct |
-| Requested Column (Web) | ✅ PASS | Present with formatted dates |
-| Requested Column (PDF) | ✅ PASS | All pages show column |
-| PDF Report Title | ✅ PASS | "Roster Planning Report" |
-| PDF Filename | ✅ PASS | `Air_Niugini_Roster_Planning_*` |
-| Supabase MCP Update | ✅ PASS | Cloud-hosted working |
-| Database Connectivity | ✅ PASS | All queries successful |
-| shadcn MCP | ✅ PASS | Unchanged and working |
-| Environment Variables | ❌ FAIL | Service role key missing |
+| Feature                    | Status  | Notes                           |
+| -------------------------- | ------- | ------------------------------- |
+| Custom Domain Access       | ✅ PASS | SSL valid, no redirects         |
+| Roster Planning Page Title | ✅ PASS | "Roster Planning" everywhere    |
+| Navigation Description     | ✅ PASS | "Future roster planning"        |
+| Leave Type Labels (Web)    | ✅ PASS | "RDO Request", "Annual Leave"   |
+| Leave Type Labels (PDF)    | ✅ PASS | All sections correct            |
+| Requested Column (Web)     | ✅ PASS | Present with formatted dates    |
+| Requested Column (PDF)     | ✅ PASS | All pages show column           |
+| PDF Report Title           | ✅ PASS | "Roster Planning Report"        |
+| PDF Filename               | ✅ PASS | `Air_Niugini_Roster_Planning_*` |
+| Supabase MCP Update        | ✅ PASS | Cloud-hosted working            |
+| Database Connectivity      | ✅ PASS | All queries successful          |
+| shadcn MCP                 | ✅ PASS | Unchanged and working           |
+| Environment Variables      | ❌ FAIL | Service role key missing        |
 
 **Overall Score**: 12/13 tests passed (92.3%)
 
@@ -231,11 +253,13 @@ avatar, badge, button, card, checkbox, dialog, dropdown-menu, input, label, popo
 ### Web UI Screenshots (Playwright)
 
 **Roster Planning Page** (RP12/2025):
+
 - Header: "Roster Planning" ✅
 - Navigation: "Future roster planning" ✅
 - Footer: "Roster Planning Module" ✅
 
 **Leave Requests Table**:
+
 ```
 RDO Request - 2 Requests
 ┌─────────────────────┬──────────┬────────┬──────────┬──────────────┬─────────┬──────────────────┐
@@ -258,15 +282,18 @@ Annual Leave - 1 Request
 **File**: `Air_Niugini_Roster_Planning_RP12_2025_20251005_2338.pdf` (3 pages, 10.7KB)
 
 **Page 1** - Executive Summary:
+
 - Title: "Roster Planning Report" ✅
 - Breakdown by Leave Type: "2 RDO", "1 ANNUAL" ✅
 
 **Page 2** - RDO Request Details:
+
 - Section: "RDO Request" ✅
 - Table includes "Requested" column ✅
 - Dates: "22 Sep 2025", "03 Sep 2025" ✅
 
 **Page 3** - Annual Leave Details:
+
 - Section: "Annual Leave" ✅
 - Table includes "Requested" column ✅
 - Date: "27 Sep 2025" ✅
@@ -298,11 +325,11 @@ Annual Leave - 1 Request
 
 ## 📝 Documentation Created
 
-| File | Purpose | Status |
-|------|---------|--------|
-| `CRITICAL_PRODUCTION_ISSUE.md` | Environment variable fix guide | ✅ Complete |
-| `POST_DEPLOYMENT_VERIFICATION.md` | Comprehensive test checklist | ✅ Complete |
-| `MCP_SUPABASE_UPDATE.md` | MCP migration documentation | ✅ Complete |
+| File                                  | Purpose                          | Status      |
+| ------------------------------------- | -------------------------------- | ----------- |
+| `CRITICAL_PRODUCTION_ISSUE.md`        | Environment variable fix guide   | ✅ Complete |
+| `POST_DEPLOYMENT_VERIFICATION.md`     | Comprehensive test checklist     | ✅ Complete |
+| `MCP_SUPABASE_UPDATE.md`              | MCP migration documentation      | ✅ Complete |
 | `DEPLOYMENT_VERIFICATION_COMPLETE.md` | This file - verification summary | ✅ Complete |
 
 ---
@@ -349,18 +376,21 @@ Annual Leave - 1 Request
 ## ✅ Deployment Checklist
 
 ### Pre-Deployment ✅
+
 - [x] TypeScript type-check completed
 - [x] Production build successful
 - [x] Environment variables configured (partial - issue found)
 - [x] vercel.json configuration correct
 
 ### Deployment ✅
+
 - [x] Deployed to production
 - [x] Build completed successfully (~70 seconds)
 - [x] Custom domain accessible
 - [x] SSL certificate valid
 
 ### Post-Deployment ✅
+
 - [x] Custom domain verified
 - [x] Roster Planning terminology verified
 - [x] PDF generation tested
@@ -370,6 +400,7 @@ Annual Leave - 1 Request
 - [x] Critical issue documented
 
 ### Outstanding ⏳
+
 - [ ] Fix environment variable issue
 - [ ] Verify cache warm-up after fix
 - [ ] Complete Safari download alert testing
@@ -380,16 +411,19 @@ Annual Leave - 1 Request
 ## 🔐 Security Notes
 
 ### Environment Variables
+
 - ⚠️ **Service Role Key**: Missing in Vercel (critical)
 - ✅ **Anon Key**: Present and working
 - ✅ **Project URL**: Present and working
 
 ### Authentication
+
 - ✅ Login functionality working
 - ✅ Protected routes enforcing authentication
 - ✅ Role-based access control functioning
 
 ### Data Security
+
 - ✅ RLS policies active on all tables
 - ✅ No sensitive data exposed in client
 - ✅ Service role operations (when working) use admin client
@@ -399,16 +433,19 @@ Annual Leave - 1 Request
 ## 📊 Performance Metrics
 
 ### Page Load Times
+
 - Dashboard: < 3 seconds (degraded due to cache issue)
 - Roster Planning: < 2 seconds
 - PDF Generation: ~1 second
 
 ### Database Queries
+
 - Table list: Instant (via MCP)
 - Leave requests: < 500ms
 - Pilot data: < 1 second
 
 ### Build Statistics
+
 - Total Pages: 41
 - Static Pages: 9
 - Dynamic Pages: 32

@@ -65,7 +65,7 @@ export class ReportDataCache {
       }
     });
 
-    keysToDelete.forEach(key => this.cache.delete(key));
+    keysToDelete.forEach((key) => this.cache.delete(key));
   }
 
   /**
@@ -83,7 +83,7 @@ export class ReportDataCache {
     let valid = 0;
     let expired = 0;
 
-    this.cache.forEach(entry => {
+    this.cache.forEach((entry) => {
       const age = now - entry.timestamp;
       if (age > entry.ttl) {
         expired++;
@@ -113,7 +113,7 @@ export class ReportDataCache {
       }
     });
 
-    keysToDelete.forEach(key => this.cache.delete(key));
+    keysToDelete.forEach((key) => this.cache.delete(key));
   }
 }
 
@@ -122,9 +122,12 @@ export const reportDataCache = new ReportDataCache();
 
 // Auto cleanup every 10 minutes
 if (typeof window !== 'undefined') {
-  setInterval(() => {
-    reportDataCache.cleanup();
-  }, 10 * 60 * 1000);
+  setInterval(
+    () => {
+      reportDataCache.cleanup();
+    },
+    10 * 60 * 1000
+  );
 }
 
 // Cache key generators

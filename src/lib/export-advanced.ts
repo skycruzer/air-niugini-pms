@@ -47,14 +47,17 @@ export async function exportToExcel(data: ExportData, options: ExportOptions): P
   csvContent += data.headers.join(',') + '\n';
 
   // Add rows
-  data.rows.forEach(row => {
-    csvContent += row.map(cell => {
-      // Escape cells containing commas or quotes
-      if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-        return `"${cell.replace(/"/g, '""')}"`;
-      }
-      return cell;
-    }).join(',') + '\n';
+  data.rows.forEach((row) => {
+    csvContent +=
+      row
+        .map((cell) => {
+          // Escape cells containing commas or quotes
+          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        })
+        .join(',') + '\n';
   });
 
   return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -72,13 +75,16 @@ export async function exportToCSV(data: ExportData, options: ExportOptions): Pro
   csvContent += data.headers.join(',') + '\n';
 
   // Add rows
-  data.rows.forEach(row => {
-    csvContent += row.map(cell => {
-      if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-        return `"${cell.replace(/"/g, '""')}"`;
-      }
-      return cell;
-    }).join(',') + '\n';
+  data.rows.forEach((row) => {
+    csvContent +=
+      row
+        .map((cell) => {
+          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
+            return `"${cell.replace(/"/g, '""')}"`;
+          }
+          return cell;
+        })
+        .join(',') + '\n';
   });
 
   return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -91,7 +97,7 @@ export async function exportToJSON(data: ExportData, options: ExportOptions): Pr
   const { includeMetadata = true } = options;
 
   // Convert rows to objects using headers
-  const jsonData = data.rows.map(row => {
+  const jsonData = data.rows.map((row) => {
     const obj: Record<string, any> = {};
     data.headers.forEach((header, index) => {
       obj[header] = row[index];
@@ -117,11 +123,17 @@ export async function exportToPDF(data: ExportData, options: ExportOptions): Pro
 Air Niugini B767 Pilot Management System
 Generated Report
 
-${data.metadata ? Object.entries(data.metadata).map(([k, v]) => `${k}: ${v}`).join('\n') : ''}
+${
+  data.metadata
+    ? Object.entries(data.metadata)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join('\n')
+    : ''
+}
 
 ${data.headers.join(' | ')}
 ${'-'.repeat(data.headers.join(' | ').length)}
-${data.rows.map(row => row.join(' | ')).join('\n')}
+${data.rows.map((row) => row.join(' | ')).join('\n')}
   `.trim();
 
   return new Blob([pdfContent], { type: 'text/plain' });
@@ -164,11 +176,13 @@ export async function exportReport(data: ExportData, options: ExportOptions): Pr
 /**
  * Bulk export multiple reports
  */
-export async function bulkExport(reports: Array<{ data: ExportData; options: ExportOptions }>): Promise<void> {
+export async function bulkExport(
+  reports: Array<{ data: ExportData; options: ExportOptions }>
+): Promise<void> {
   for (const report of reports) {
     await exportReport(report.data, report.options);
     // Add a small delay between downloads
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 }
 
@@ -180,9 +194,9 @@ export function formatExportData(
   fields: Array<{ key: string; label: string }>,
   metadata?: Record<string, any>
 ): ExportData {
-  const headers = fields.map(f => f.label);
-  const exportRows = rows.map(row =>
-    fields.map(field => {
+  const headers = fields.map((f) => f.label);
+  const exportRows = rows.map((row) =>
+    fields.map((field) => {
       const value = row[field.key];
       // Format dates, numbers, etc.
       if (value instanceof Date) {

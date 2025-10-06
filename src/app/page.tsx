@@ -86,7 +86,8 @@ async function getDashboardStats() {
 
     const totalPilots = pilots?.length || 0;
     const captains = pilots?.filter((p: { role: string }) => p.role === 'Captain').length || 0;
-    const firstOfficers = pilots?.filter((p: { role: string }) => p.role === 'First Officer').length || 0;
+    const firstOfficers =
+      pilots?.filter((p: { role: string }) => p.role === 'First Officer').length || 0;
 
     return {
       totalPilots,
@@ -147,7 +148,9 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="ml-6">
-                  <h1 className="text-display-medium text-white font-black drop-shadow-lg">Air Niugini</h1>
+                  <h1 className="text-display-medium text-white font-black drop-shadow-lg">
+                    Air Niugini
+                  </h1>
                   <p className="text-body-large text-blue-100 mt-1 drop-shadow-md">
                     Papua New Guinea&apos;s National Airline
                   </p>

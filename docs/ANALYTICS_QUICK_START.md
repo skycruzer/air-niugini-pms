@@ -8,6 +8,7 @@
 ## Quick Access
 
 ### Dashboard URLs
+
 ```
 Main Dashboard:     /dashboard
 Advanced Analytics: /dashboard/analytics/advanced
@@ -15,6 +16,7 @@ Report Builder:     (Available from Analytics page)
 ```
 
 ### Login Credentials (Development)
+
 ```
 Email: skycruzer@icloud.com
 Password: mron2393
@@ -44,6 +46,7 @@ Password: mron2393
 5. Check key insights panel at bottom
 
 **What you'll see:**
+
 - Compliance rate over time
 - Trend direction (up/down)
 - Forecast confidence (87%)
@@ -61,6 +64,7 @@ Password: mron2393
 4. Check risk indicators at bottom
 
 **Actionable Items:**
+
 - Green alerts: Low risk areas
 - Amber alerts: Attention needed
 - Red alerts: Immediate action required
@@ -93,12 +97,14 @@ Password: mron2393
 ### Task 1: Find Expiring Certifications
 
 **Steps:**
+
 1. Go to **Certifications** tab
 2. View "Expiry Forecast" chart
 3. See predicted expirations for next 6 months
 4. Click "Export" to download list
 
 **Expected Result:**
+
 - Chart showing expiration timeline
 - Numbers for each month
 - Historical comparison
@@ -106,6 +112,7 @@ Password: mron2393
 ### Task 2: Check Pilot Performance
 
 **Steps:**
+
 1. Go to **Pilots** tab
 2. View "Performance Matrix" scatter plot
 3. Green dots = high performers (>95% compliance)
@@ -113,6 +120,7 @@ Password: mron2393
 5. Red dots = attention needed (<90%)
 
 **Action Items:**
+
 - Identify pilots needing support
 - Review top performers
 - Plan training activities
@@ -120,12 +128,14 @@ Password: mron2393
 ### Task 3: Analyze Leave Patterns
 
 **Steps:**
+
 1. Go to **Leave** tab
 2. View "Leave Type Distribution" pie chart
 3. Check "Approval Rate Trend" line chart
 4. Review "Utilization by Pilot" bar chart
 
 **Insights:**
+
 - RDO most common (60%)
 - Approval rate ~93%
 - Average utilization 68%
@@ -133,6 +143,7 @@ Password: mron2393
 ### Task 4: Schedule Automated Report
 
 **Steps:**
+
 1. Navigate to **Scheduled Reports** (from main menu)
 2. Click "New Schedule"
 3. Fill form:
@@ -147,6 +158,7 @@ Password: mron2393
 5. Toggle "Active" if needed
 
 **Result:**
+
 - Report automatically generated daily at 8 AM
 - Sent to specified email addresses
 - Can run immediately with "Run Now" button
@@ -223,6 +235,7 @@ Esc             Close modal / Cancel action
 ### Issue: Charts Not Showing
 
 **Solution:**
+
 ```
 1. Refresh page (Ctrl/Cmd + R)
 2. Clear browser cache
@@ -233,6 +246,7 @@ Esc             Close modal / Cancel action
 ### Issue: Export Taking Too Long
 
 **Solution:**
+
 ```
 1. Reduce dataset size with filters
 2. Export smaller time ranges
@@ -243,6 +257,7 @@ Esc             Close modal / Cancel action
 ### Issue: Report Shows No Data
 
 **Solution:**
+
 ```
 1. Check filter criteria (too restrictive?)
 2. Verify date range includes data
@@ -254,6 +269,7 @@ Esc             Close modal / Cancel action
 ### Issue: Scheduled Report Not Delivered
 
 **Solution:**
+
 ```
 1. Check schedule is "Active" (toggle)
 2. Verify recipient email addresses
@@ -306,6 +322,7 @@ curl -X POST http://localhost:3000/api/reports/generate \
 ## Support
 
 ### Documentation
+
 - Full Guide: `ANALYTICS_GUIDE.md`
 - Implementation: `PHASE_6.3_IMPLEMENTATION_SUMMARY.md`
 - Main Docs: `CLAUDE.md`
@@ -377,18 +394,21 @@ A: Yes, save templates and they're available to all users
 ## Next Steps
 
 ### For Administrators
+
 1. Set up 3-5 scheduled reports for daily operations
 2. Create report templates for common requests
 3. Configure email distribution lists
 4. Train team on report builder
 
 ### For Managers
+
 1. Review daily compliance reports
 2. Monitor pilot performance metrics
 3. Track certification expiry forecasts
 4. Analyze leave utilization patterns
 
 ### For Pilots
+
 1. View personal certification status
 2. Check upcoming renewals
 3. Review leave balances
@@ -399,6 +419,7 @@ A: Yes, save templates and they're available to all users
 ## Updates & Changelog
 
 ### Version 1.0 (October 1, 2025)
+
 - ✅ Initial release
 - ✅ 5 analytics views
 - ✅ Custom report builder
@@ -409,6 +430,7 @@ A: Yes, save templates and they're available to all users
 - ✅ Complete documentation
 
 ### Coming Soon (Phase 6.4)
+
 - TreeMap and Sankey charts
 - Machine learning forecasts
 - Mobile app
@@ -426,11 +448,12 @@ A: Yes, save templates and they're available to all users
 5. Schedule a daily report
 
 **Need Help?**
+
 - Read full guide: `ANALYTICS_GUIDE.md`
 - Contact support: operations@airniugini.com.pg
 
 ---
 
 **Air Niugini B767 Pilot Management System**
-*Advanced Analytics & Custom Report Builder*
+_Advanced Analytics & Custom Report Builder_
 **Version 1.0 - Production Ready**

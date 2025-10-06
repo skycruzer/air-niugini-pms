@@ -3,7 +3,18 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { TrendingUp, TrendingDown, Activity, Download } from 'lucide-react';
 
 interface TrendAnalysisProps {
@@ -26,7 +37,20 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
 
   // Generate sample data with forecast
   const data = useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const historical = months.slice(0, 10).map((month, index) => ({
       month,
       compliance: 92 + Math.random() * 8,
@@ -49,7 +73,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
 
   // Calculate trends
   const trends = useMemo(() => {
-    const complianceData = data.filter(d => d.compliance !== null).map(d => d.compliance!);
+    const complianceData = data.filter((d) => d.compliance !== null).map((d) => d.compliance!);
     const recentAvg = complianceData.slice(-3).reduce((a, b) => a + b, 0) / 3;
     const previousAvg = complianceData.slice(-6, -3).reduce((a, b) => a + b, 0) / 3;
     const change = ((recentAvg - previousAvg) / previousAvg) * 100;
@@ -77,13 +101,17 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                 <div className="text-2xl font-bold">{trends.compliance.value}%</div>
                 <p className="text-xs text-gray-500">Current average</p>
               </div>
-              <div className={`flex items-center ${trends.compliance.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+              <div
+                className={`flex items-center ${trends.compliance.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {trends.compliance.trend === 'up' ? (
                   <TrendingUp className="h-5 w-5 mr-1" />
                 ) : (
                   <TrendingDown className="h-5 w-5 mr-1" />
                 )}
-                <span className="font-semibold">{Math.abs(parseFloat(trends.compliance.change))}%</span>
+                <span className="font-semibold">
+                  {Math.abs(parseFloat(trends.compliance.change))}%
+                </span>
               </div>
             </div>
           </CardContent>
@@ -141,11 +169,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowForecast(!showForecast)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowForecast(!showForecast)}>
             {showForecast ? 'Hide' : 'Show'} Forecast
           </Button>
           <Button variant="outline" size="sm">
@@ -159,9 +183,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
       <Card>
         <CardHeader>
           <CardTitle>Compliance Trend Analysis</CardTitle>
-          <CardDescription>
-            Historical data with predictive forecasting
-          </CardDescription>
+          <CardDescription>Historical data with predictive forecasting</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -228,13 +250,11 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
       <Card>
         <CardHeader>
           <CardTitle>Certification Volume Trend</CardTitle>
-          <CardDescription>
-            Total certifications over time with growth indicators
-          </CardDescription>
+          <CardDescription>Total certifications over time with growth indicators</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data.filter(d => d.certifications !== null)}>
+            <AreaChart data={data.filter((d) => d.certifications !== null)}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
@@ -265,7 +285,8 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
               <div>
                 <p className="font-semibold text-green-900">Positive Trend</p>
                 <p className="text-sm text-green-700">
-                  Compliance rate has improved by {Math.abs(parseFloat(trends.compliance.change))}% over the last quarter
+                  Compliance rate has improved by {Math.abs(parseFloat(trends.compliance.change))}%
+                  over the last quarter
                 </p>
               </div>
             </div>

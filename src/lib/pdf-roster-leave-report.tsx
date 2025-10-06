@@ -344,7 +344,16 @@ const LeaveRequestsTable: React.FC<LeaveRequestsTableProps> = ({ requests, title
       subtitle={`${requests.length} request${requests.length !== 1 ? 's' : ''}`}
     >
       <PDFTable
-        headers={['Pilot Name', 'Employee ID', 'Dates', 'Days', 'Status', 'Requested', 'Method', 'Reason']}
+        headers={[
+          'Pilot Name',
+          'Employee ID',
+          'Dates',
+          'Days',
+          'Status',
+          'Requested',
+          'Method',
+          'Reason',
+        ]}
         data={tableData}
         columnWidths={['16%', '11%', '16%', '7%', '11%', '11%', '10%', '18%']}
         statusColumn={4}
@@ -475,15 +484,22 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
       {/* Additional pages for detailed leave requests by type */}
       {Object.entries(groupedRequests).map(([type, requests], index) => {
         // Format leave type labels
-        const typeLabel = type === 'RDO' || type === 'SDO'
-          ? `${type} Request`
-          : type === 'ANNUAL' ? 'Annual Leave'
-          : type === 'SICK' ? 'Sick Leave'
-          : type === 'LSL' ? 'Long Service Leave'
-          : type === 'LWOP' ? 'Leave Without Pay'
-          : type === 'MATERNITY' ? 'Maternity Leave'
-          : type === 'COMPASSIONATE' ? 'Compassionate Leave'
-          : `${type} Request`;
+        const typeLabel =
+          type === 'RDO' || type === 'SDO'
+            ? `${type} Request`
+            : type === 'ANNUAL'
+              ? 'Annual Leave'
+              : type === 'SICK'
+                ? 'Sick Leave'
+                : type === 'LSL'
+                  ? 'Long Service Leave'
+                  : type === 'LWOP'
+                    ? 'Leave Without Pay'
+                    : type === 'MATERNITY'
+                      ? 'Maternity Leave'
+                      : type === 'COMPASSIONATE'
+                        ? 'Compassionate Leave'
+                        : `${type} Request`;
 
         return (
           <Page key={type} size="A4" style={pdfStyles.page}>
@@ -491,7 +507,10 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
 
             <LeaveRequestsTable requests={requests} title={typeLabel} />
 
-            <PDFFooter pageNumber={index + 2} totalPages={Object.keys(groupedRequests).length + 1} />
+            <PDFFooter
+              pageNumber={index + 2}
+              totalPages={Object.keys(groupedRequests).length + 1}
+            />
           </Page>
         );
       })}

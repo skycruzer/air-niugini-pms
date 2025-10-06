@@ -10,40 +10,42 @@ Successfully removed 4 legacy development tables from the Air Niugini Pilot Mana
 
 ## Tables Removed
 
-| Table Name | Rows Deleted | Purpose |
-|------------|--------------|---------|
-| `an_leave_requests` | 0 | Empty legacy table |
-| `an_pilot_checks` | 18 | Legacy development certification data |
-| `an_pilots` | 5 | Legacy development pilot data |
-| `an_check_types` | 10 | Legacy development check types |
-| **TOTAL** | **33 rows** | **4 tables** |
+| Table Name          | Rows Deleted | Purpose                               |
+| ------------------- | ------------ | ------------------------------------- |
+| `an_leave_requests` | 0            | Empty legacy table                    |
+| `an_pilot_checks`   | 18           | Legacy development certification data |
+| `an_pilots`         | 5            | Legacy development pilot data         |
+| `an_check_types`    | 10           | Legacy development check types        |
+| **TOTAL**           | **33 rows**  | **4 tables**                          |
 
 ---
 
 ## Tables Kept (Production)
 
-| Table Name | Rows | Status |
-|------------|------|--------|
-| `pilots` | 27 | ✅ Intact |
-| `pilot_checks` | 571 | ✅ Intact |
-| `check_types` | 34 | ✅ Intact |
-| `an_users` | 3 | ✅ Intact (Active Auth) |
-| `leave_requests` | 12 | ✅ Intact |
-| `settings` | 3 | ✅ Intact |
-| `contract_types` | 3 | ✅ Intact |
-| **TOTAL** | **653 rows** | **7 tables** |
+| Table Name       | Rows         | Status                  |
+| ---------------- | ------------ | ----------------------- |
+| `pilots`         | 27           | ✅ Intact               |
+| `pilot_checks`   | 571          | ✅ Intact               |
+| `check_types`    | 34           | ✅ Intact               |
+| `an_users`       | 3            | ✅ Intact (Active Auth) |
+| `leave_requests` | 12           | ✅ Intact               |
+| `settings`       | 3            | ✅ Intact               |
+| `contract_types` | 3            | ✅ Intact               |
+| **TOTAL**        | **653 rows** | **7 tables**            |
 
 ---
 
 ## Verification Results
 
 ### ✅ Database Verification
+
 - **Legacy tables deleted**: 4 of 4 (100%)
 - **Production tables intact**: 7 of 7 (100%)
 - **Data integrity**: Verified
 - **Foreign key constraints**: No issues
 
 ### ✅ Application Testing
+
 - **Build status**: Success (Next.js 14.2.33)
 - **All routes compiled**: 24 pages, 0 errors
 - **TypeScript validation**: Passed
@@ -51,6 +53,7 @@ Successfully removed 4 legacy development tables from the Air Niugini Pilot Mana
 - **Data operations**: Verified (pilots, certifications, leave)
 
 ### ✅ Code Review
+
 - **Files using legacy tables**: 0
 - **Files using `an_users`**: 3 (auth-utils.ts, supabase-service.ts, leave-service.ts)
 - **Code changes required**: None
@@ -61,28 +64,33 @@ Successfully removed 4 legacy development tables from the Air Niugini Pilot Mana
 ## What Was Accomplished
 
 ### 1. Complete Codebase Review
+
 - Analyzed all TypeScript/JavaScript files
 - Identified that NO code uses the 4 legacy tables
 - Confirmed `an_users` is the active authentication table
 
 ### 2. Data Backup
+
 - Exported all legacy table data to JSON format
 - Documented legacy pilot records (PNG001-PNG005)
 - Saved 18 certification records
 - Preserved 10 check type definitions
 
 ### 3. Safe Deletion
+
 - Executed DROP TABLE commands via Supabase Dashboard
 - Used CASCADE to remove foreign key constraints
 - Verified deletion via MCP tools and SQL queries
 
 ### 4. Post-Cleanup Verification
+
 - Confirmed production data intact (653 rows across 7 tables)
 - Tested application build (successful)
 - Verified authentication works
 - Confirmed all features functional
 
 ### 5. Documentation Updates
+
 - Updated CLAUDE.md with new table structure
 - Created MCP-SETUP.md for project-specific configuration
 - Documented cleanup process and results
@@ -96,6 +104,7 @@ Successfully removed 4 legacy development tables from the Air Niugini Pilot Mana
 **Before**: Global MCP configuration pointed to wrong project
 
 **After**:
+
 - ✅ Project-specific `.mcp.json` created
 - ✅ Configured for Air Niugini project (`wgdmgvonqysflwdiiols`)
 - ✅ Added to `.gitignore` for security
@@ -151,16 +160,19 @@ This ensures API keys are isolated per-project and not shared globally.
 ## Rollback Information
 
 **Point-in-Time Recovery Available:**
+
 - Supabase provides automatic backups
 - Can restore to any point before cleanup if needed
 - Dashboard: https://supabase.com/dashboard/project/wgdmgvonqysflwdiiols/database/backups
 
 **Manual Backup:**
+
 - Legacy data exported to JSON (see backup files)
 - Can manually restore tables if absolutely necessary
 - Schema definitions preserved in old SQL files
 
 **Likelihood of Rollback Needed:** 0%
+
 - Zero code dependencies
 - Zero production data affected
 - Zero issues identified in testing
@@ -202,19 +214,23 @@ This ensures API keys are isolated per-project and not shared globally.
 ## Next Steps
 
 ### Immediate (Already Done)
+
 - ✅ Cleanup executed
 - ✅ Verification complete
 - ✅ Documentation updated
 - ✅ Application tested
 
 ### Recommended Follow-up
+
 1. Monitor application for 24-48 hours
 2. Inform team about cleanup
 3. Update onboarding docs if needed
 4. Archive backup files after 30 days
 
 ### Future Cleanups
+
 When adding new tables, use clear naming:
+
 - ✅ **Good**: `pilots`, `pilot_checks`, `check_types`
 - ❌ **Avoid**: `an_*` prefix (confusing legacy marker)
 - Use migrations for all schema changes
@@ -224,20 +240,21 @@ When adding new tables, use clear naming:
 
 ## Success Metrics
 
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| Legacy tables removed | 4 | 4 | ✅ 100% |
-| Production data intact | 100% | 100% | ✅ Perfect |
-| Code changes required | 0 | 0 | ✅ As planned |
-| Build success | Yes | Yes | ✅ Passed |
-| Application working | Yes | Yes | ✅ Verified |
-| Documentation updated | Yes | Yes | ✅ Complete |
+| Metric                 | Target | Actual | Status        |
+| ---------------------- | ------ | ------ | ------------- |
+| Legacy tables removed  | 4      | 4      | ✅ 100%       |
+| Production data intact | 100%   | 100%   | ✅ Perfect    |
+| Code changes required  | 0      | 0      | ✅ As planned |
+| Build success          | Yes    | Yes    | ✅ Passed     |
+| Application working    | Yes    | Yes    | ✅ Verified   |
+| Documentation updated  | Yes    | Yes    | ✅ Complete   |
 
 ---
 
 ## Conclusion
 
 The legacy table cleanup was executed successfully with:
+
 - **Zero** production impact
 - **Zero** code changes required
 - **Zero** application downtime

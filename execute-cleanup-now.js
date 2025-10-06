@@ -25,7 +25,7 @@ const dropStatements = [
   'DROP TABLE IF EXISTS an_leave_requests CASCADE',
   'DROP TABLE IF EXISTS an_pilot_checks CASCADE',
   'DROP TABLE IF EXISTS an_pilots CASCADE',
-  'DROP TABLE IF EXISTS an_check_types CASCADE'
+  'DROP TABLE IF EXISTS an_check_types CASCADE',
 ];
 
 async function executeSQL(sql) {
@@ -35,10 +35,10 @@ async function executeSQL(sql) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseServiceKey,
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-        'Prefer': 'return=representation'
-      }
+        apikey: supabaseServiceKey,
+        Authorization: `Bearer ${supabaseServiceKey}`,
+        Prefer: 'return=representation',
+      },
     };
 
     const postData = JSON.stringify({ query: sql });
@@ -76,19 +76,21 @@ async function executeSQLDirect(sql) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': supabaseServiceKey,
-        'Authorization': `Bearer ${supabaseServiceKey}`
-      }
+        apikey: supabaseServiceKey,
+        Authorization: `Bearer ${supabaseServiceKey}`,
+      },
     };
 
     const req = https.request(url, options, (res) => {
       let data = '';
-      res.on('data', (chunk) => { data += chunk; });
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
       res.on('end', () => {
         resolve({
           success: res.statusCode >= 200 && res.statusCode < 300,
           statusCode: res.statusCode,
-          data: data
+          data: data,
         });
       });
     });
@@ -124,7 +126,7 @@ async function main() {
   console.log('URL: https://supabase.com/dashboard/project/wgdmgvonqysflwdiiols/sql\n');
   console.log('Paste this SQL:');
   console.log('─'.repeat(52));
-  dropStatements.forEach(stmt => console.log(stmt + ';'));
+  dropStatements.forEach((stmt) => console.log(stmt + ';'));
   console.log('─'.repeat(52));
   console.log('');
 
@@ -132,7 +134,9 @@ async function main() {
   console.log('─'.repeat(52));
   console.log('If you have Supabase CLI installed:');
   console.log('');
-  console.log('supabase db execute --db-url="postgresql://postgres:[password]@db.wgdmgvonqysflwdiiols.supabase.co:5432/postgres" \\');
+  console.log(
+    'supabase db execute --db-url="postgresql://postgres:[password]@db.wgdmgvonqysflwdiiols.supabase.co:5432/postgres" \\'
+  );
   console.log('  -f cleanup-legacy-tables-final.sql');
   console.log('');
 
@@ -144,7 +148,7 @@ async function main() {
   console.log('   Then run: node verify-cleanup.js\n');
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('❌ Error:', error);
   process.exit(1);
 });

@@ -57,9 +57,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
           <div className="flex items-start gap-4">
             <span className="text-3xl">⚠️</span>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Error Loading Section
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Section</h3>
               <p className="text-gray-600 mb-4">
                 {this.state.error.message || 'An unexpected error occurred'}
               </p>

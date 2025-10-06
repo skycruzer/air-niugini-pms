@@ -32,10 +32,10 @@ const options = {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
-    'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-    'Prefer': 'return=representation'
-  }
+    apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+    Prefer: 'return=representation',
+  },
 };
 
 const data = JSON.stringify({ query: sql });

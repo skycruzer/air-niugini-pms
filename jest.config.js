@@ -51,15 +51,12 @@ const customJestConfig = {
   },
 
   // Test match patterns
-  testMatch: [
-    '**/__tests__/**/*.test.[jt]s?(x)',
-    '**/?(*.)+(spec|test).[jt]s?(x)',
-  ],
+  testMatch: ['**/__tests__/**/*.test.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
 
   // Exclude Playwright E2E tests
   testPathIgnorePatterns: [
     '/node_modules/',
-    'test-*.spec.js', // Exclude Playwright E2E tests in root
+    '<rootDir>/test-.*\\.spec\\.js$', // Exclude Playwright E2E tests in root
     'playwright.config.js',
   ],
 

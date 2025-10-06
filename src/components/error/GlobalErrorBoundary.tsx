@@ -86,9 +86,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <div className="mb-6 p-4 bg-gray-100 rounded-lg border border-gray-300">
                 <h3 className="font-semibold text-gray-900 mb-2">Error Details:</h3>
-                <p className="text-sm text-red-600 font-mono mb-2">
-                  {this.state.error.message}
-                </p>
+                <p className="text-sm text-red-600 font-mono mb-2">{this.state.error.message}</p>
                 {this.state.error.stack && (
                   <details className="mt-2">
                     <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -111,7 +109,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 Try Again
               </button>
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => (window.location.href = '/dashboard')}
                 className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
               >
                 Return to Dashboard

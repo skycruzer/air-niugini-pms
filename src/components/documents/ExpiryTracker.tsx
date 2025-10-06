@@ -215,9 +215,7 @@ export function ExpiryTracker({
                 <FileWarning className="w-8 h-8 text-gray-400" />
               </div>
               <p className="text-gray-600 font-medium">No documents in this category</p>
-              <p className="text-sm text-gray-500 mt-1">
-                All documents are compliant
-              </p>
+              <p className="text-sm text-gray-500 mt-1">All documents are compliant</p>
             </div>
           ) : (
             <div className="divide-y">
@@ -234,9 +232,7 @@ export function ExpiryTracker({
                       {/* Document Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-gray-900 truncate">
-                            {doc.pilot_name}
-                          </h4>
+                          <h4 className="font-semibold text-gray-900 truncate">{doc.pilot_name}</h4>
                           <Badge variant="outline" className="text-xs">
                             {doc.employee_id}
                           </Badge>
@@ -253,20 +249,14 @@ export function ExpiryTracker({
                               Expires: {format(new Date(doc.expiry_date), 'MMM dd, yyyy')}
                             </span>
                           </div>
-                          {doc.document_number && (
-                            <span>#{doc.document_number}</span>
-                          )}
+                          {doc.document_number && <span>#{doc.document_number}</span>}
                         </div>
                       </div>
 
                       {/* Status Badge */}
                       <div className="flex-shrink-0 text-right">
                         <Badge
-                          className={cn(
-                            'font-semibold',
-                            expiryInfo.bgColor,
-                            expiryInfo.color
-                          )}
+                          className={cn('font-semibold', expiryInfo.bgColor, expiryInfo.color)}
                         >
                           {expiryInfo.label}
                         </Badge>

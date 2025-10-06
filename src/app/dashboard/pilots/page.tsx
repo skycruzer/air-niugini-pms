@@ -711,7 +711,10 @@ export default function PilotsPage() {
                   captains: pilots.filter((p) => p.role === 'Captain').length,
                   firstOfficers: pilots.filter((p) => p.role === 'First Officer').length,
                   active: pilots.filter((p) => p.is_active).length,
-                  expiredCertifications: pilots.reduce((sum, p) => sum + p.certificationStatus.expired, 0),
+                  expiredCertifications: pilots.reduce(
+                    (sum, p) => sum + p.certificationStatus.expired,
+                    0
+                  ),
                 }}
                 variant="detailed"
                 showTrends={false}

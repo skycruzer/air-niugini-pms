@@ -437,7 +437,8 @@ export function getFinalReviewAlert(): FinalReviewAlert {
   const daysRemainingInWindow = Math.max(0, daysUntilRosterStarts);
 
   // Within review window = 22 days or less before NEXT roster starts
-  const isWithinReviewWindow = daysUntilRosterStarts <= REVIEW_WINDOW_DAYS && daysUntilRosterStarts >= 0;
+  const isWithinReviewWindow =
+    daysUntilRosterStarts <= REVIEW_WINDOW_DAYS && daysUntilRosterStarts >= 0;
 
   // Calculate the review deadline (22 days before NEXT roster starts)
   const reviewDeadlineDate = addDays(next.startDate, -REVIEW_WINDOW_DAYS);

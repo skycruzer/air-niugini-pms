@@ -1,4 +1,5 @@
 # Production Deployment Guide
+
 ## Air Niugini B767 Pilot Management System
 
 **Version:** 1.0.0
@@ -25,6 +26,7 @@
 ## Prerequisites
 
 ### Required Accounts & Services
+
 - ✅ Vercel account (or alternative hosting)
 - ✅ Supabase project (already configured: wgdmgvonqysflwdiiols)
 - ✅ Domain name with DNS access
@@ -32,6 +34,7 @@
 - ✅ SSL certificate (provided by Vercel)
 
 ### Required Tools
+
 ```bash
 # Install required CLI tools
 npm install -g vercel
@@ -45,6 +48,7 @@ npm --version
 ```
 
 ### System Requirements
+
 - **Node.js:** 18.x or higher
 - **Memory:** Minimum 512MB, recommended 1GB
 - **Storage:** Minimum 1GB for application
@@ -295,24 +299,25 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: an-pms
-    livenessProbe:
-      httpGet:
-        path: /api/health?check=liveness
-        port: 3000
-      initialDelaySeconds: 30
-      periodSeconds: 10
-    readinessProbe:
-      httpGet:
-        path: /api/health?check=readiness
-        port: 3000
-      initialDelaySeconds: 10
-      periodSeconds: 5
+    - name: an-pms
+      livenessProbe:
+        httpGet:
+          path: /api/health?check=liveness
+          port: 3000
+        initialDelaySeconds: 30
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /api/health?check=readiness
+          port: 3000
+        initialDelaySeconds: 10
+        periodSeconds: 5
 ```
 
 ### 2. Monitoring Dashboard Access
 
 After deployment, access monitoring at:
+
 - System Monitoring: `https://your-domain.com/dashboard/admin/system`
 - Required: Admin role
 
@@ -325,20 +330,20 @@ const alerts = [
     name: 'High Error Rate',
     condition: 'error_rate > 5',
     severity: 'critical',
-    notify: ['ops@airniugini.com.pg']
+    notify: ['ops@airniugini.com.pg'],
   },
   {
     name: 'Database Slow Queries',
     condition: 'avg_query_time > 1000',
     severity: 'warning',
-    notify: ['dev@airniugini.com.pg']
+    notify: ['dev@airniugini.com.pg'],
   },
   {
     name: 'Low Memory',
     condition: 'memory_usage > 90',
     severity: 'warning',
-    notify: ['ops@airniugini.com.pg']
-  }
+    notify: ['ops@airniugini.com.pg'],
+  },
 ];
 ```
 
@@ -356,7 +361,7 @@ import { backupService } from '@/lib/backup-service';
 const backupSchedule = backupService.scheduleAutoBackup({
   interval: 24, // hours
   retentionDays: 30,
-  createdBy: 'system'
+  createdBy: 'system',
 });
 
 // Store backup schedule ID for monitoring
@@ -419,10 +424,10 @@ module.exports = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload'
-          }
-        ]
-      }
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+        ],
+      },
     ];
   },
   async redirects() {
@@ -433,14 +438,14 @@ module.exports = {
           {
             type: 'header',
             key: 'x-forwarded-proto',
-            value: 'http'
-          }
+            value: 'http',
+          },
         ],
         destination: 'https://:host/:path*',
-        permanent: true
-      }
+        permanent: true,
+      },
     ];
-  }
+  },
 };
 ```
 
@@ -485,12 +490,12 @@ export CORS_ALLOWED_ORIGINS=https://your-domain.com
 const authConfig = {
   session: {
     expiryMargin: 10, // seconds
-    autoRefreshToken: true
+    autoRefreshToken: true,
   },
   autoRefreshToken: true,
   persistSession: true,
   detectSessionInUrl: true,
-  flowType: 'pkce' // Use PKCE flow for enhanced security
+  flowType: 'pkce', // Use PKCE flow for enhanced security
 };
 ```
 
@@ -511,13 +516,13 @@ module.exports = {
 
   // Optimize packages
   experimental: {
-    optimizePackageImports: ['lucide-react', '@tanstack/react-query']
+    optimizePackageImports: ['lucide-react', '@tanstack/react-query'],
   },
 
   // Image optimization
   images: {
     domains: ['wgdmgvonqysflwdiiols.supabase.co'],
-    formats: ['image/avif', 'image/webp']
+    formats: ['image/avif', 'image/webp'],
   },
 
   // Output configuration
@@ -529,7 +534,7 @@ module.exports = {
   // Generate build ID
   generateBuildId: async () => {
     return process.env.BUILD_ID || Date.now().toString();
-  }
+  },
 };
 ```
 
@@ -543,15 +548,15 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // Enable connection pooling
 const supabase = createClient(supabaseUrl, supabaseKey, {
   db: {
-    schema: 'public'
+    schema: 'public',
   },
   auth: {
     autoRefreshToken: true,
-    persistSession: false
+    persistSession: false,
   },
   global: {
-    fetch: fetch
-  }
+    fetch: fetch,
+  },
 });
 ```
 
@@ -673,6 +678,7 @@ node verify-data.js
 ### Full Rollback Procedure
 
 1. **Notify Stakeholders:**
+
    ```bash
    # Send notification
    echo "Initiating rollback due to: [REASON]" | \
@@ -680,16 +686,19 @@ node verify-data.js
    ```
 
 2. **Rollback Application:**
+
    ```bash
    vercel rollback [previous-url]
    ```
 
 3. **Rollback Database (if needed):**
+
    ```bash
    node restore-backup.js [backup-id] --confirm
    ```
 
 4. **Verify System:**
+
    ```bash
    # Check health
    curl https://your-domain.com/api/health?check=detailed
@@ -699,6 +708,7 @@ node verify-data.js
    ```
 
 5. **Monitor Logs:**
+
    ```bash
    vercel logs https://your-domain.com --follow
    ```
@@ -775,22 +785,26 @@ npm run test:auth
 ## Maintenance Schedule
 
 ### Daily
+
 - Monitor health check endpoints
 - Review error logs
 - Check automated backup completion
 
 ### Weekly
+
 - Review performance metrics
 - Analyze slow queries
 - Update dependencies if needed
 
 ### Monthly
+
 - Security audit
 - Backup verification test
 - Performance testing
 - Capacity planning review
 
 ### Quarterly
+
 - Disaster recovery drill
 - Full system audit
 - User access review
@@ -801,16 +815,19 @@ npm run test:auth
 ## Support Contacts
 
 ### Technical Support
+
 - **Email:** ops@airniugini.com.pg
 - **Phone:** +675 xxxx xxxx
 - **On-Call:** [On-call rotation schedule]
 
 ### Escalation Path
+
 1. **Level 1:** DevOps Team
 2. **Level 2:** Senior Engineer
 3. **Level 3:** CTO / Tech Lead
 
 ### External Support
+
 - **Vercel Support:** vercel.com/support
 - **Supabase Support:** supabase.com/support
 - **Email Service:** resend.com/support
@@ -831,4 +848,4 @@ npm run test:auth
 **Last Updated:** October 1, 2025
 
 **Air Niugini B767 Pilot Management System**
-*Production Deployment Guide*
+_Production Deployment Guide_

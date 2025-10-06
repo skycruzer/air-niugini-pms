@@ -2,7 +2,20 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Bar } from 'recharts';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+} from 'recharts';
 import { FileCheck, AlertCircle, Calendar, TrendingUp } from 'lucide-react';
 
 interface CertificationAnalyticsProps {
@@ -10,43 +23,55 @@ interface CertificationAnalyticsProps {
 }
 
 export default function CertificationAnalytics({ timeRange }: CertificationAnalyticsProps) {
-  const certMetrics = useMemo(() => ({
-    total: 556,
-    current: 523,
-    expiring: 26,
-    expired: 7,
-    renewalRate: 94.1,
-  }), []);
+  const certMetrics = useMemo(
+    () => ({
+      total: 556,
+      current: 523,
+      expiring: 26,
+      expired: 7,
+      renewalRate: 94.1,
+    }),
+    []
+  );
 
-  const renewalTrend = useMemo(() => [
-    { month: 'Jan', renewals: 45, expirations: 42, rate: 107 },
-    { month: 'Feb', renewals: 38, expirations: 40, rate: 95 },
-    { month: 'Mar', renewals: 52, expirations: 48, rate: 108 },
-    { month: 'Apr', renewals: 41, expirations: 38, rate: 108 },
-    { month: 'May', renewals: 49, expirations: 45, rate: 109 },
-    { month: 'Jun', renewals: 43, expirations: 41, rate: 105 },
-    { month: 'Jul', renewals: 47, expirations: 44, rate: 107 },
-    { month: 'Aug', renewals: 50, expirations: 46, rate: 109 },
-    { month: 'Sep', renewals: 44, expirations: 43, rate: 102 },
-  ], []);
+  const renewalTrend = useMemo(
+    () => [
+      { month: 'Jan', renewals: 45, expirations: 42, rate: 107 },
+      { month: 'Feb', renewals: 38, expirations: 40, rate: 95 },
+      { month: 'Mar', renewals: 52, expirations: 48, rate: 108 },
+      { month: 'Apr', renewals: 41, expirations: 38, rate: 108 },
+      { month: 'May', renewals: 49, expirations: 45, rate: 109 },
+      { month: 'Jun', renewals: 43, expirations: 41, rate: 105 },
+      { month: 'Jul', renewals: 47, expirations: 44, rate: 107 },
+      { month: 'Aug', renewals: 50, expirations: 46, rate: 109 },
+      { month: 'Sep', renewals: 44, expirations: 43, rate: 102 },
+    ],
+    []
+  );
 
-  const categoryTrend = useMemo(() => [
-    { month: 'Jan', license: 27, medical: 27, proficiency: 105, recurrent: 158 },
-    { month: 'Feb', license: 27, medical: 27, proficiency: 106, recurrent: 160 },
-    { month: 'Mar', license: 27, medical: 27, proficiency: 107, recurrent: 161 },
-    { month: 'Apr', license: 27, medical: 27, proficiency: 107, recurrent: 162 },
-    { month: 'May', license: 27, medical: 27, proficiency: 108, recurrent: 162 },
-    { month: 'Jun', license: 27, medical: 27, proficiency: 108, recurrent: 162 },
-  ], []);
+  const categoryTrend = useMemo(
+    () => [
+      { month: 'Jan', license: 27, medical: 27, proficiency: 105, recurrent: 158 },
+      { month: 'Feb', license: 27, medical: 27, proficiency: 106, recurrent: 160 },
+      { month: 'Mar', license: 27, medical: 27, proficiency: 107, recurrent: 161 },
+      { month: 'Apr', license: 27, medical: 27, proficiency: 107, recurrent: 162 },
+      { month: 'May', license: 27, medical: 27, proficiency: 108, recurrent: 162 },
+      { month: 'Jun', license: 27, medical: 27, proficiency: 108, recurrent: 162 },
+    ],
+    []
+  );
 
-  const expiryForecast = useMemo(() => [
-    { month: 'Oct', expiring: 8, forecast: null },
-    { month: 'Nov', expiring: 12, forecast: null },
-    { month: 'Dec', expiring: 15, forecast: null },
-    { month: 'Jan', expiring: null, forecast: 14 },
-    { month: 'Feb', expiring: null, forecast: 11 },
-    { month: 'Mar', expiring: null, forecast: 13 },
-  ], []);
+  const expiryForecast = useMemo(
+    () => [
+      { month: 'Oct', expiring: 8, forecast: null },
+      { month: 'Nov', expiring: 12, forecast: null },
+      { month: 'Dec', expiring: 15, forecast: null },
+      { month: 'Jan', expiring: null, forecast: 14 },
+      { month: 'Feb', expiring: null, forecast: 11 },
+      { month: 'Mar', expiring: null, forecast: 13 },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -120,7 +145,14 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
               <Legend />
               <Bar yAxisId="left" dataKey="renewals" fill="#10B981" name="Renewals" />
               <Bar yAxisId="left" dataKey="expirations" fill="#EF4444" name="Expirations" />
-              <Line yAxisId="right" type="monotone" dataKey="rate" stroke="#E4002B" strokeWidth={2} name="Renewal Rate %" />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="rate"
+                stroke="#E4002B"
+                strokeWidth={2}
+                name="Renewal Rate %"
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </CardContent>
@@ -139,10 +171,42 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
               <YAxis />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="recurrent" stackId="1" stroke="#E4002B" fill="#E4002B" fillOpacity={0.8} name="Recurrent" />
-              <Area type="monotone" dataKey="proficiency" stackId="1" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.8} name="Proficiency" />
-              <Area type="monotone" dataKey="medical" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.8} name="Medical" />
-              <Area type="monotone" dataKey="license" stackId="1" stroke="#FFC72C" fill="#FFC72C" fillOpacity={0.8} name="License" />
+              <Area
+                type="monotone"
+                dataKey="recurrent"
+                stackId="1"
+                stroke="#E4002B"
+                fill="#E4002B"
+                fillOpacity={0.8}
+                name="Recurrent"
+              />
+              <Area
+                type="monotone"
+                dataKey="proficiency"
+                stackId="1"
+                stroke="#4F46E5"
+                fill="#4F46E5"
+                fillOpacity={0.8}
+                name="Proficiency"
+              />
+              <Area
+                type="monotone"
+                dataKey="medical"
+                stackId="1"
+                stroke="#10B981"
+                fill="#10B981"
+                fillOpacity={0.8}
+                name="Medical"
+              />
+              <Area
+                type="monotone"
+                dataKey="license"
+                stackId="1"
+                stroke="#FFC72C"
+                fill="#FFC72C"
+                fillOpacity={0.8}
+                name="License"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -161,8 +225,23 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="expiring" stroke="#E4002B" strokeWidth={2} name="Historical" dot={{ r: 5 }} />
-              <Line type="monotone" dataKey="forecast" stroke="#FFC72C" strokeWidth={2} strokeDasharray="5 5" name="Forecast" dot={{ r: 5 }} />
+              <Line
+                type="monotone"
+                dataKey="expiring"
+                stroke="#E4002B"
+                strokeWidth={2}
+                name="Historical"
+                dot={{ r: 5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="forecast"
+                stroke="#FFC72C"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                name="Forecast"
+                dot={{ r: 5 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

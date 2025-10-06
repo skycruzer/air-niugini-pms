@@ -3,6 +3,7 @@
 ## Problem
 
 Safari (and other browsers) show download permission dialogs that include both:
+
 - `vercel.com` (Vercel deployment platform)
 - `www.pxb767office.app` (your custom domain)
 
@@ -17,6 +18,7 @@ We've implemented a comprehensive fix with three key components:
 **File**: `vercel.json`
 
 This configuration ensures:
+
 - **Automatic Redirects**: All Vercel default URLs (`*.vercel.app`) redirect to your custom domain
 - **Permanent Redirect (308)**: Search engines and browsers remember the redirect
 - **Custom Domain Only**: Only `www.pxb767office.app` will appear in browser dialogs
@@ -24,6 +26,7 @@ This configuration ensures:
 - **Security Headers**: Enhanced security headers for all routes
 
 **Key Configuration**:
+
 ```json
 {
   "redirects": [
@@ -48,6 +51,7 @@ This configuration ensures:
 **File**: `.env.vercel-production-clean`
 
 Changed:
+
 - **Before**: `NEXT_PUBLIC_APP_URL=https://air-niugini-pms.vercel.app`
 - **After**: `NEXT_PUBLIC_APP_URL=https://www.pxb767office.app`
 
@@ -71,6 +75,7 @@ To fully apply these changes, you must:
 #### Step 2: Redeploy the Application
 
 **Option A: Deploy via Git (Recommended)**
+
 ```bash
 # From your project directory
 git add vercel.json .env.vercel-production-clean
@@ -87,6 +92,7 @@ git push origin main
 Vercel will automatically deploy the changes.
 
 **Option B: Deploy via Vercel CLI**
+
 ```bash
 # From your project directory
 cd "/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms"
@@ -94,6 +100,7 @@ vercel --prod
 ```
 
 **Option C: Manual Redeploy**
+
 1. Go to Vercel dashboard
 2. Navigate to **Deployments**
 3. Click **Redeploy** on the latest deployment
@@ -126,6 +133,7 @@ After deployment, test the fix:
 ## How It Works
 
 ### Before Fix
+
 ```
 User → https://air-niugini-pms.vercel.app/dashboard/reports
        ↓
@@ -135,6 +143,7 @@ User → https://air-niugini-pms.vercel.app/dashboard/reports
 ```
 
 ### After Fix
+
 ```
 User → https://air-niugini-pms.vercel.app/dashboard/reports
        ↓ (Automatic 308 Redirect)
@@ -167,6 +176,7 @@ User → https://air-niugini-pms.vercel.app/dashboard/reports
 ### Environment Variable Update
 
 The `NEXT_PUBLIC_APP_URL` variable is used throughout the application:
+
 - File download blob URLs
 - PDF generation endpoints
 - API route absolute URLs
@@ -179,6 +189,7 @@ By setting this to your custom domain, all operations reference `www.pxb767offic
 ### Issue: Still Seeing vercel.com in Dialog
 
 **Solution**:
+
 1. Clear browser cache completely
 2. Use Private/Incognito mode for testing
 3. Verify environment variable is updated in Vercel dashboard
@@ -187,6 +198,7 @@ By setting this to your custom domain, all operations reference `www.pxb767offic
 ### Issue: Downloads Not Working
 
 **Solution**:
+
 1. Check browser console for CORS errors
 2. Verify `vercel.json` was deployed (check deployment files)
 3. Ensure all environment variables are set in Production environment
@@ -194,6 +206,7 @@ By setting this to your custom domain, all operations reference `www.pxb767offic
 ### Issue: Redirect Loop
 
 **Solution**:
+
 1. Verify regex in `vercel.json` excludes your custom domain
 2. Check custom domain DNS settings in Vercel
 3. Ensure domain is properly configured in Vercel project settings

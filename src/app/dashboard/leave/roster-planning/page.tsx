@@ -620,7 +620,9 @@ Recipients: ${recipients.split(',').join(', ')}`);
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  {request.request_date ? format(parseISO(request.request_date), 'dd MMM yyyy') : 'N/A'}
+                                  {request.request_date
+                                    ? format(parseISO(request.request_date), 'dd MMM yyyy')
+                                    : 'N/A'}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   <div className="flex items-center">

@@ -39,9 +39,7 @@ export async function POST(request: NextRequest) {
         break;
       case 'certifications':
         tableName = 'pilot_checks';
-        query = supabaseAdmin
-          .from('pilot_checks')
-          .select(`
+        query = supabaseAdmin.from('pilot_checks').select(`
             *,
             pilots (first_name, last_name, employee_id),
             check_types (check_code, check_description, category)
@@ -49,18 +47,13 @@ export async function POST(request: NextRequest) {
         break;
       case 'leave':
         tableName = 'leave_requests';
-        query = supabaseAdmin
-          .from('leave_requests')
-          .select(`
+        query = supabaseAdmin.from('leave_requests').select(`
             *,
             pilots (first_name, last_name, employee_id)
           `);
         break;
       default:
-        return NextResponse.json(
-          { success: false, error: 'Invalid report type' },
-          { status: 400 }
-        );
+        return NextResponse.json({ success: false, error: 'Invalid report type' }, { status: 400 });
     }
 
     // Apply filters

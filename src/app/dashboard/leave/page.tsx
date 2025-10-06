@@ -75,7 +75,7 @@ export default function LeaveRequestsPage() {
     if (!stats) return 0;
 
     // Get all pending leave requests (status is lowercase 'pending' in LeaveEvent type)
-    const pendingRequests = leaveRequests.filter(req => req.status.toLowerCase() === 'pending');
+    const pendingRequests = leaveRequests.filter((req) => req.status.toLowerCase() === 'pending');
 
     // Get next roster period boundaries
     const currentRoster = getCurrentRosterPeriod();
@@ -86,7 +86,7 @@ export default function LeaveRequestsPage() {
     nextRosterEndDate.setDate(nextRosterEndDate.getDate() + 27); // 28-day roster period (0-27 days)
 
     // Count only requests that START within the NEXT roster period (not following rosters)
-    const nextRosterPendingCount = pendingRequests.filter(req => {
+    const nextRosterPendingCount = pendingRequests.filter((req) => {
       return req.startDate >= nextRosterStartDate && req.startDate <= nextRosterEndDate;
     }).length;
 

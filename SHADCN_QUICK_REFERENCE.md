@@ -3,6 +3,7 @@
 ## Quick Commands
 
 ### Add Components (via Claude Code)
+
 ```
 "Add the calendar component"
 "Install shadcn accordion"
@@ -10,6 +11,7 @@
 ```
 
 ### Add Components (Manual CLI)
+
 ```bash
 cd "/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms"
 
@@ -36,24 +38,28 @@ npx shadcn@latest add
 ### High Priority for Air Niugini PMS
 
 **Forms & Input**
+
 - [ ] `calendar` - Date picker for leave requests
 - [ ] `form` - Form wrapper with validation
 - [ ] `combobox` - Searchable select for pilots
 - [ ] `slider` - Range inputs
 
 **Data Display**
+
 - [ ] `tooltip` - Helpful hints and info
 - [ ] `hover-card` - Pilot info on hover
 - [ ] `accordion` - Collapsible sections
 - [ ] `carousel` - Image/cert galleries
 
 **Navigation**
+
 - [ ] `command` - Quick command palette (⌘K)
 - [ ] `context-menu` - Right-click menus
 - [ ] `breadcrumb` - Navigation breadcrumbs
 - [ ] `pagination` - Table pagination
 
 **Feedback**
+
 - [ ] `alert` - Important notifications
 - [ ] `alert-dialog` - Confirmation dialogs
 - [ ] `sonner` - Advanced toast notifications
@@ -63,11 +69,13 @@ npx shadcn@latest add
 ## Common Usage Patterns
 
 ### Import
+
 ```typescript
 import { ComponentName } from '@/components/ui/component-name';
 ```
 
 ### Air Niugini Branded Button
+
 ```typescript
 <Button className="bg-[#E4002B] hover:bg-[#C00020] text-white">
   Submit
@@ -75,6 +83,7 @@ import { ComponentName } from '@/components/ui/component-name';
 ```
 
 ### Status Badge (FAA Colors)
+
 ```typescript
 import { Badge } from '@/components/ui/badge';
 
@@ -89,6 +98,7 @@ import { Badge } from '@/components/ui/badge';
 ```
 
 ### Card Layout
+
 ```typescript
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
@@ -103,6 +113,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 ```
 
 ### Form Input
+
 ```typescript
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -114,6 +125,7 @@ import { Label } from '@/components/ui/label';
 ```
 
 ### Dialog (Modal)
+
 ```typescript
 import {
   Dialog,
@@ -154,17 +166,17 @@ The shadcn MCP provides these capabilities:
 ```typescript
 // Primary Colors
 const colors = {
-  red: '#E4002B',      // Primary brand color
-  gold: '#FFC72C',     // Secondary/accent
-  black: '#000000',    // Text/navigation
-  white: '#FFFFFF',    // Backgrounds
+  red: '#E4002B', // Primary brand color
+  gold: '#FFC72C', // Secondary/accent
+  black: '#000000', // Text/navigation
+  white: '#FFFFFF', // Backgrounds
 };
 
 // Status Colors (FAA Standard)
 const statusColors = {
-  current: 'bg-green-100 text-green-800',   // Valid certifications
+  current: 'bg-green-100 text-green-800', // Valid certifications
   expiring: 'bg-yellow-100 text-yellow-800', // Expiring soon (≤30 days)
-  expired: 'bg-red-100 text-red-800',        // Expired certifications
+  expired: 'bg-red-100 text-red-800', // Expired certifications
 };
 ```
 
@@ -209,16 +221,19 @@ describe('Button', () => {
 ## Recommended Components to Add Next
 
 ### Priority 1 (Essential)
+
 - `calendar` - For leave request date selection
 - `tooltip` - For inline help and certification details
 - `command` - Quick navigation and search (⌘K)
 
 ### Priority 2 (Helpful)
+
 - `accordion` - Collapsible certification lists
 - `hover-card` - Pilot info popups
 - `alert` - Important system notifications
 
 ### Priority 3 (Nice to Have)
+
 - `breadcrumb` - Better navigation
 - `context-menu` - Right-click actions
 - `pagination` - Better table navigation

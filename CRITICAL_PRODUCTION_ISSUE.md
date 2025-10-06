@@ -21,30 +21,33 @@ The production deployment at **https://www.pxb767office.app** is missing the `SU
 
 ### Environment Variable Status
 
-| Variable | Status | Impact |
-|----------|--------|--------|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ Present | API connection works |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Present | Authentication works |
-| `SUPABASE_SERVICE_ROLE_KEY` | ❌ **MISSING** | Admin operations fail |
-| `SUPABASE_PROJECT_ID` | ❌ **MISSING** | Optional but recommended |
+| Variable                        | Status         | Impact                   |
+| ------------------------------- | -------------- | ------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`      | ✅ Present     | API connection works     |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Present     | Authentication works     |
+| `SUPABASE_SERVICE_ROLE_KEY`     | ❌ **MISSING** | Admin operations fail    |
+| `SUPABASE_PROJECT_ID`           | ❌ **MISSING** | Optional but recommended |
 
 ---
 
 ## Impact Assessment
 
 ### ❌ Broken Functionality
+
 1. **Cache Warm-up**: Failing on page load (check types, contract types, settings)
 2. **Admin Operations**: Any server-side admin operations will fail
 3. **Background Jobs**: Cannot perform scheduled admin tasks
 4. **Data Seeding**: Cannot populate or modify data via admin client
 
 ### ✅ Working Functionality
+
 1. **Authentication**: Login works (uses anon key)
 2. **Basic Queries**: Read operations using anon key work
 3. **Frontend**: UI renders correctly
 4. **Custom Domain**: Domain and SSL working
 
 ### ⚠️ Degraded Functionality
+
 - User operations work but performance degraded (no cache)
 - Some admin features may fail silently
 - Background processes not running
@@ -94,6 +97,7 @@ Environment: Production
 After adding the environment variables, you must redeploy:
 
 **Option A - Trigger Redeploy (Recommended)**
+
 1. Go to **Deployments** tab in Vercel
 2. Find the latest deployment
 3. Click three dots (...) → **Redeploy**
@@ -101,6 +105,7 @@ After adding the environment variables, you must redeploy:
 5. Click **Redeploy** button
 
 **Option B - Git Push (Alternative)**
+
 ```bash
 cd "/Users/skycruzer/Desktop/Fleet Office Management/air-niugini-pms"
 git commit --allow-empty -m "Trigger redeploy with environment variables"
@@ -125,12 +130,14 @@ After redeployment completes (~1-2 minutes):
 After applying the fix:
 
 ### Browser Console Checks
+
 - [ ] No "Missing Supabase environment variables" errors
 - [ ] "Cache warm-up completed successfully" appears
 - [ ] No "ServiceKey: false" errors
 - [ ] Check types, contract types, settings load from cache
 
 ### Functional Testing
+
 - [ ] Login works
 - [ ] Dashboard loads with statistics
 - [ ] Pilot list displays correctly
@@ -140,6 +147,7 @@ After applying the fix:
 - [ ] Admin operations succeed (if admin user)
 
 ### Performance Checks
+
 - [ ] Initial page load <3 seconds
 - [ ] Cache hits logged in console
 - [ ] No repeated database queries for static data
@@ -151,6 +159,7 @@ After applying the fix:
 ### Pre-Deployment Checklist
 
 1. **Environment Variable Audit**
+
    ```bash
    # Compare local .env with Vercel settings
    cat .env.local
@@ -204,8 +213,8 @@ export function getSupabaseAdmin() {
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 ```
@@ -222,6 +231,7 @@ The cache warm-up runs on every page load to populate frequently accessed data:
 ```
 
 Without the service role key, these operations fail, causing:
+
 - Slower page loads (no cache)
 - Repeated database queries
 - Degraded user experience
@@ -241,6 +251,7 @@ Without the service role key, these operations fail, causing:
 ## Status Updates
 
 ### Discovery (October 6, 2025)
+
 - **Time**: Post-deployment verification
 - **Method**: Browser console inspection
 - **Reporter**: Claude Code automated verification
@@ -248,22 +259,26 @@ Without the service role key, these operations fail, causing:
 ### Troubleshooting Attempts (October 6, 2025)
 
 **Attempt 1** - Initial variable addition:
+
 - User added `SUPABASE_SERVICE_ROLE_KEY` to Vercel
 - User redeployed application
 - **Result**: Still showing `hasServiceKey: false`
 
 **Attempt 2** - Environment scope correction:
+
 - Discovered variable was set to "All Environments" instead of "Production"
 - User changed to "Production" scope
 - User redeployed again
 - **Result**: STILL showing `hasServiceKey: false`
 
 **Latest Test (October 6, 2025, ~23:45 UTC)**:
+
 - Console continues to show: `❌ URL: true ServiceKey: false`
 - Cache warm-up still failing
 - Admin operations still degraded
 
 ### Resolution
+
 - **Status**: ❌ **STILL UNRESOLVED**
 - **Issue Persists**: Environment variable not active after multiple redeploys
 - **Action Required**: User must verify in Vercel dashboard that variable is correctly configured

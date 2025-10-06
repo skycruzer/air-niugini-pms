@@ -36,9 +36,8 @@ export function PilotStatsGrid({
   stats,
   variant = 'summary',
   showTrends = false,
-  trends
+  trends,
 }: PilotStatsGridProps) {
-
   if (variant === 'detailed') {
     // Detailed view for pilots page with full breakdown
     return (
@@ -61,7 +60,9 @@ export function PilotStatsGrid({
                 <div>• {stats.trainingCaptains} Training (TRI)</div>
                 {stats.examiners && <div>• {stats.examiners} Examiners (TRE)</div>}
               </div>
-            ) : 'Command crew'
+            ) : (
+              'Command crew'
+            )
           }
           icon={Star}
           variant="secondary"
@@ -100,18 +101,24 @@ export function PilotStatsGrid({
         subtitle={`${stats.captains} Captains • ${stats.firstOfficers} First Officers`}
         icon={Users}
         variant="primary"
-        trend={showTrends && trends?.pilots ? {
-          value: Math.abs(trends.pilots),
-          direction: trends.pilots >= 0 ? 'up' : 'down',
-          label: 'vs last period'
-        } : undefined}
+        trend={
+          showTrends && trends?.pilots
+            ? {
+                value: Math.abs(trends.pilots),
+                direction: trends.pilots >= 0 ? 'up' : 'down',
+                label: 'vs last period',
+              }
+            : undefined
+        }
         animated
       />
 
       <StatCard
         title="Captains"
         value={stats.captains}
-        subtitle={stats.trainingCaptains ? `${stats.trainingCaptains} TRI certified` : 'Command crew'}
+        subtitle={
+          stats.trainingCaptains ? `${stats.trainingCaptains} TRI certified` : 'Command crew'
+        }
         icon={Star}
         variant="secondary"
         animated

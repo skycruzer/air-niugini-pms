@@ -295,7 +295,10 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
     e.preventDefault();
 
     if (!pilotId || saving) {
-      console.log('🔧 PilotEditModal: Early return - no pilotId or already saving', { pilotId, saving });
+      console.log('🔧 PilotEditModal: Early return - no pilotId or already saving', {
+        pilotId,
+        saving,
+      });
       return;
     }
 

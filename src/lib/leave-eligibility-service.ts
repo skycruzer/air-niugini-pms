@@ -177,7 +177,8 @@ export async function getCrewRequirements(): Promise<CrewRequirements> {
   const reqs = settings.value as any;
   return {
     minimumCaptains: (reqs.minimum_captains_per_hull || 5) * (reqs.number_of_aircraft || 2),
-    minimumFirstOfficers: (reqs.minimum_first_officers_per_hull || 5) * (reqs.number_of_aircraft || 2),
+    minimumFirstOfficers:
+      (reqs.minimum_first_officers_per_hull || 5) * (reqs.number_of_aircraft || 2),
     numberOfAircraft: reqs.number_of_aircraft || 2,
     captainsPerHull: reqs.minimum_captains_per_hull || 5,
     firstOfficersPerHull: reqs.minimum_first_officers_per_hull || 5,
@@ -369,13 +370,13 @@ export async function getConflictingPendingRequests(
         alternativeEnd2.setDate(alternativeEnd2.getDate() - gapDays);
 
         spreadSuggestion = `💡 Suggested alternative dates: ${alternativeStart1.toLocaleDateString('en-AU')} - ${alternativeEnd1.toLocaleDateString('en-AU')} OR ${alternativeStart2.toLocaleDateString('en-AU')} - ${alternativeEnd2.toLocaleDateString('en-AU')}`;
-
       } else if (reqStart <= requestEnd && reqEnd >= requestStart) {
         overlapType = 'PARTIAL';
-        const actualOverlapDays = differenceInDays(
-          reqEnd < requestEnd ? reqEnd : requestEnd,
-          reqStart > requestStart ? reqStart : requestStart
-        ) + 1;
+        const actualOverlapDays =
+          differenceInDays(
+            reqEnd < requestEnd ? reqEnd : requestEnd,
+            reqStart > requestStart ? reqStart : requestStart
+          ) + 1;
         overlapMessage = `${actualOverlapDays} days overlap`;
 
         // Suggest moving to avoid overlap
@@ -386,7 +387,6 @@ export async function getConflictingPendingRequests(
         moveAfterEnd.setDate(moveAfterEnd.getDate() + totalDays - 1);
 
         spreadSuggestion = `💡 To avoid overlap, suggest moving to: ${moveAfter.toLocaleDateString('en-AU')} - ${moveAfterEnd.toLocaleDateString('en-AU')} (${actualOverlapDays + gapDays} days separation)`;
-
       } else {
         const daysBetween = Math.abs(differenceInDays(reqStart, requestEnd));
         if (daysBetween <= 3) {
@@ -457,7 +457,7 @@ export async function getConflictingPendingRequests(
       if (overlapCompare !== 0) return overlapCompare;
 
       // Then by rank (Captain = 0, First Officer = 1)
-      const rankPriority: Record<string, number> = { 'Captain': 0, 'First Officer': 1 };
+      const rankPriority: Record<string, number> = { Captain: 0, 'First Officer': 1 };
       const rankCompare = rankPriority[a.role!] - rankPriority[b.role!];
       if (rankCompare !== 0) return rankCompare;
 
@@ -504,7 +504,7 @@ function generateSpreadingRecommendations(
   // Sort conflicting requests by priority (already sorted, but ensure correct order)
   const sortedRequests = [...conflictingRequests].sort((a, b) => {
     // Rank priority: Captain > First Officer
-    const rankPriority: Record<string, number> = { 'Captain': 0, 'First Officer': 1 };
+    const rankPriority: Record<string, number> = { Captain: 0, 'First Officer': 1 };
     const rankCompare = rankPriority[a.role!] - rankPriority[b.role!];
     if (rankCompare !== 0) return rankCompare;
 
@@ -640,9 +640,7 @@ export async function checkLeaveEligibility(
     const isFirstOfficerRequest = request.pilotRole === 'First Officer';
 
     // Calculate what availability would be if this request is approved
-    const projectedCaptains = isCaptainRequest
-      ? day.availableCaptains - 1
-      : day.availableCaptains;
+    const projectedCaptains = isCaptainRequest ? day.availableCaptains - 1 : day.availableCaptains;
     const projectedFirstOfficers = isFirstOfficerRequest
       ? day.availableFirstOfficers - 1
       : day.availableFirstOfficers;
@@ -703,8 +701,10 @@ export async function checkLeaveEligibility(
   const hasCriticalConflicts = conflicts.some((c) => c.severity === 'CRITICAL');
 
   // Get conflicting PENDING requests for same dates
-  const { conflictingRequests: allConflictingRequests, seniorityRecommendation: initialSeniorityRec } =
-    await getConflictingPendingRequests(request);
+  const {
+    conflictingRequests: allConflictingRequests,
+    seniorityRecommendation: initialSeniorityRec,
+  } = await getConflictingPendingRequests(request);
 
   // Now check if approving ALL conflicting requests would cause crew shortage
   // Only show seniority comparison if collective approval would violate minimums
@@ -715,8 +715,8 @@ export async function checkLeaveEligibility(
   if (allConflictingRequests.length > 0) {
     console.log('🔍 ELIGIBILITY CHECK: Found conflicting requests', {
       count: allConflictingRequests.length,
-      pilots: allConflictingRequests.map(r => `${r.pilotName} (${r.role})`),
-      dates: `${request.startDate} to ${request.endDate}`
+      pilots: allConflictingRequests.map((r) => `${r.pilotName} (${r.role})`),
+      dates: `${request.startDate} to ${request.endDate}`,
     });
 
     // STEP 1: Check if we have minimum crew available
@@ -724,34 +724,37 @@ export async function checkLeaveEligibility(
     const supabase = getSupabaseAdmin();
 
     // Get total active pilots
-    const { data: pilots } = await supabase
-      .from('pilots')
-      .select('id, role')
-      .eq('is_active', true);
+    const { data: pilots } = await supabase.from('pilots').select('id, role').eq('is_active', true);
 
     // Get already approved leave for these dates (excluding current conflicting requests)
-    const conflictingRequestIds = allConflictingRequests.map(r => r.requestId).filter(id => id);
+    const conflictingRequestIds = allConflictingRequests.map((r) => r.requestId).filter((id) => id);
     let existingLeaveQuery = supabase
       .from('leave_requests')
-      .select(`
+      .select(
+        `
         id,
         pilot_id,
         pilots!inner (id, role)
-      `)
+      `
+      )
       .eq('status', 'APPROVED')
       .gte('end_date', request.startDate)
       .lte('start_date', request.endDate);
 
     // Exclude the conflicting request IDs if any exist
     if (conflictingRequestIds.length > 0) {
-      existingLeaveQuery = existingLeaveQuery.not('id', 'in', `(${conflictingRequestIds.join(',')})`);
+      existingLeaveQuery = existingLeaveQuery.not(
+        'id',
+        'in',
+        `(${conflictingRequestIds.join(',')})`
+      );
     }
 
     const { data: existingLeave } = await existingLeaveQuery;
 
     console.log('📊 CREW DATA:', {
       conflictingRequestIds,
-      existingLeaveCount: existingLeave?.length || 0
+      existingLeaveCount: existingLeave?.length || 0,
     });
 
     if (pilots) {
@@ -759,8 +762,12 @@ export async function checkLeaveEligibility(
       const totalFirstOfficers = pilots.filter((p) => p.role === 'First Officer').length;
 
       // Count already on APPROVED leave
-      const onLeaveCaptains = (existingLeave || []).filter((lr: any) => lr.pilots?.role === 'Captain').length;
-      const onLeaveFirstOfficers = (existingLeave || []).filter((lr: any) => lr.pilots?.role === 'First Officer').length;
+      const onLeaveCaptains = (existingLeave || []).filter(
+        (lr: any) => lr.pilots?.role === 'Captain'
+      ).length;
+      const onLeaveFirstOfficers = (existingLeave || []).filter(
+        (lr: any) => lr.pilots?.role === 'First Officer'
+      ).length;
 
       // Calculate CURRENTLY available crew (before approving new requests)
       const availableCaptains = totalCaptains - onLeaveCaptains;
@@ -774,7 +781,7 @@ export async function checkLeaveEligibility(
         availableCaptains,
         availableFirstOfficers,
         minimumRequired: requirements.minimumCaptains,
-        requestingRole: request.pilotRole
+        requestingRole: request.pilotRole,
       });
 
       // STEP 2: Decision based on the role being requested
@@ -787,7 +794,7 @@ export async function checkLeaveEligibility(
         console.log('🎯 CAPTAIN REQUEST:', {
           availableCaptains,
           minimumRequired: requirements.minimumCaptains,
-          hasMinimumCrew: hasMinimumCrewForRole
+          hasMinimumCrew: hasMinimumCrewForRole,
         });
       } else if (request.pilotRole === 'First Officer') {
         // Multiple First Officers requesting - check if we have minimum First Officers available
@@ -795,7 +802,7 @@ export async function checkLeaveEligibility(
         console.log('🎯 FIRST OFFICER REQUEST:', {
           availableFirstOfficers,
           minimumRequired: requirements.minimumFirstOfficers,
-          hasMinimumCrew: hasMinimumCrewForRole
+          hasMinimumCrew: hasMinimumCrewForRole,
         });
       }
 
@@ -819,8 +826,12 @@ export async function checkLeaveEligibility(
 
         // Count how many pilots can be approved while maintaining minimum crew
         const requestingRole = request.pilotRole;
-        const currentAvailable = requestingRole === 'Captain' ? availableCaptains : availableFirstOfficers;
-        const minimumRequired = requestingRole === 'Captain' ? requirements.minimumCaptains : requirements.minimumFirstOfficers;
+        const currentAvailable =
+          requestingRole === 'Captain' ? availableCaptains : availableFirstOfficers;
+        const minimumRequired =
+          requestingRole === 'Captain'
+            ? requirements.minimumCaptains
+            : requirements.minimumFirstOfficers;
         const totalRequesting = allConflictingRequests.length;
 
         // CORRECTED LOGIC: Calculate remaining crew after approving all requests
@@ -828,7 +839,9 @@ export async function checkLeaveEligibility(
         // Otherwise, maxApprovable = currentAvailable - minimumRequired
         const remainingAfterAllApprovals = currentAvailable - totalRequesting;
         const canApproveAll = remainingAfterAllApprovals >= minimumRequired;
-        const maxApprovable = canApproveAll ? totalRequesting : Math.max(0, currentAvailable - minimumRequired);
+        const maxApprovable = canApproveAll
+          ? totalRequesting
+          : Math.max(0, currentAvailable - minimumRequired);
 
         console.log('📊 SENIORITY APPROVAL CALCULATION:', {
           requestingRole,
@@ -837,44 +850,56 @@ export async function checkLeaveEligibility(
           totalRequesting: totalRequesting,
           remainingAfterAllApprovals: remainingAfterAllApprovals,
           canApproveAll: canApproveAll,
-          maxCanApprove: maxApprovable
+          maxCanApprove: maxApprovable,
         });
 
         if (maxApprovable >= allConflictingRequests.length) {
           // SCENARIO 2a: Above minimum crew - ALL can be approved, no spreading needed
           console.log('✅ SUFFICIENT CREW - All requests can be approved');
           seniorityRecommendation = ''; // No spreading recommendations needed when all can be approved
-
         } else if (maxApprovable > 0) {
           // SCENARIO 2b: Can approve some, but not all - use seniority to determine who gets approved
           console.log('⚠️ PARTIAL APPROVAL - Only top seniority pilots can be approved');
           const canApprove = allConflictingRequests.slice(0, maxApprovable);
           const mustReschedule = allConflictingRequests.slice(maxApprovable);
 
-          seniorityRecommendation = `⚠️ CREW SHORTAGE RISK\n\n` +
+          seniorityRecommendation =
+            `⚠️ CREW SHORTAGE RISK\n\n` +
             `Current ${requestingRole}s Available: ${currentAvailable}\n` +
             `Minimum Required: ${minimumRequired}\n` +
             `Total Requesting Leave: ${totalRequesting} ${requestingRole}${totalRequesting > 1 ? 's' : ''}\n` +
             `If All Approved, Remaining: ${remainingAfterAllApprovals} (❌ BELOW minimum of ${minimumRequired})\n` +
             `Maximum Can Approve: ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''} (to maintain minimum crew)\n\n` +
             `✅ APPROVE (Highest Seniority - ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''}):\n` +
-            canApprove.map((req, index) =>
-              `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
-              `     • Employee ID: ${req.employeeId}\n` +
-              `     • Dates: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n`
-            ).join('\n') +
+            canApprove
+              .map(
+                (req, index) =>
+                  `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
+                  `     • Employee ID: ${req.employeeId}\n` +
+                  `     • Dates: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n`
+              )
+              .join('\n') +
             `\n🔄 REQUEST TO RESCHEDULE (Lower Seniority - ${mustReschedule.length} pilot${mustReschedule.length > 1 ? 's' : ''}):\n` +
-            mustReschedule.map((req, index) => {
-              const spreadingOptions = generateDateSpreadingSuggestions(req.startDate, req.endDate, allConflictingRequests);
-              const remainingIfApproved = currentAvailable - maxApprovable - 1;
-              return `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
-              `     • Employee ID: ${req.employeeId}\n` +
-              `     • Current Request: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n` +
-              `     • Reason: Approving would drop crew below minimum (${remainingIfApproved}/${minimumRequired})\n` +
-              `     • Suggested Alternative Dates:\n` +
-              spreadingOptions.map((option, optIndex) => `        ${optIndex + 1}) ${option}\n`).join('');
-            }).join('\n');
-
+            mustReschedule
+              .map((req, index) => {
+                const spreadingOptions = generateDateSpreadingSuggestions(
+                  req.startDate,
+                  req.endDate,
+                  allConflictingRequests
+                );
+                const remainingIfApproved = currentAvailable - maxApprovable - 1;
+                return (
+                  `  ${index + 1}. ${req.role} - Seniority #${req.seniorityNumber}: ${req.pilotName}\n` +
+                  `     • Employee ID: ${req.employeeId}\n` +
+                  `     • Current Request: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n` +
+                  `     • Reason: Approving would drop crew below minimum (${remainingIfApproved}/${minimumRequired})\n` +
+                  `     • Suggested Alternative Dates:\n` +
+                  spreadingOptions
+                    .map((option, optIndex) => `        ${optIndex + 1}) ${option}\n`)
+                    .join('')
+                );
+              })
+              .join('\n');
         } else {
           // SCENARIO 2c: At or below minimum already - need spreading recommendations for ALL
           console.log('❌ CREW SHORTAGE - All requests need rescheduling or sequential approval');
@@ -1047,9 +1072,7 @@ export async function getAlternativePilotRecommendations(
  * Check multiple leave requests and return priority recommendations
  * Useful for reviewing all pending requests for a roster period
  */
-export async function checkBulkLeaveEligibility(
-  rosterPeriod: string
-): Promise<{
+export async function checkBulkLeaveEligibility(rosterPeriod: string): Promise<{
   eligible: string[]; // Request IDs
   requiresReview: string[];
   shouldDeny: string[];

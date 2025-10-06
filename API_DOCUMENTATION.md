@@ -1,4 +1,5 @@
 # API Documentation
+
 ## Air Niugini B767 Pilot Management System
 
 **Version:** 1.0.0
@@ -26,6 +27,7 @@
 All API requests require authentication using JWT tokens from Supabase Auth.
 
 ### Authentication Header
+
 ```http
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
@@ -36,7 +38,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 // Using Supabase client
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'user@example.com',
-  password: 'password'
+  password: 'password',
 });
 
 const token = data.session.access_token;
@@ -62,6 +64,7 @@ GET /api/pilots
 ```
 
 **Query Parameters:**
+
 - `page` (number, optional): Page number (default: 1)
 - `limit` (number, optional): Items per page (default: 50)
 - `search` (string, optional): Search by name or employee ID
@@ -69,6 +72,7 @@ GET /api/pilots
 - `role` (string, optional): Filter by pilot role (Captain/First Officer)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -109,9 +113,11 @@ GET /api/pilots/{id}
 ```
 
 **Path Parameters:**
+
 - `id` (string): Pilot UUID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -158,6 +164,7 @@ POST /api/pilots
 **Required Permission:** `pilot:create`
 
 **Request Body:**
+
 ```json
 {
   "employee_id": "PX028",
@@ -176,6 +183,7 @@ POST /api/pilots
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -211,9 +219,11 @@ PATCH /api/pilots/{id}
 **Required Permission:** `pilot:update`
 
 **Path Parameters:**
+
 - `id` (string): Pilot UUID
 
 **Request Body:**
+
 ```json
 {
   "role": "Captain",
@@ -227,6 +237,7 @@ PATCH /api/pilots/{id}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -256,9 +267,11 @@ DELETE /api/pilots/{id}
 **Required Permission:** `pilot:delete`
 
 **Path Parameters:**
+
 - `id` (string): Pilot UUID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -277,13 +290,16 @@ GET /api/pilots/{pilotId}/certifications
 ```
 
 **Path Parameters:**
+
 - `pilotId` (string): Pilot UUID
 
 **Query Parameters:**
+
 - `status` (string, optional): Filter by status (current/expiring/expired)
 - `category` (string, optional): Filter by category
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -315,10 +331,12 @@ GET /api/certifications/expiring
 ```
 
 **Query Parameters:**
+
 - `days` (number, optional): Days ahead to check (default: 60)
 - `pilot_id` (string, optional): Filter by specific pilot
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -355,6 +373,7 @@ POST /api/certifications
 **Required Permission:** `certification:create`
 
 **Request Body:**
+
 ```json
 {
   "pilot_id": "uuid",
@@ -365,6 +384,7 @@ POST /api/certifications
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -388,6 +408,7 @@ PUT /api/certifications/{id}
 **Required Permission:** `certification:update`
 
 **Request Body:**
+
 ```json
 {
   "check_date": "2024-10-05",
@@ -404,6 +425,7 @@ POST /api/certifications/bulk
 **Required Permission:** `certification:bulk_update`
 
 **Request Body:**
+
 ```json
 {
   "certifications": [
@@ -422,6 +444,7 @@ POST /api/certifications/bulk
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -442,11 +465,13 @@ GET /api/leave
 ```
 
 **Query Parameters:**
+
 - `roster_period` (string, optional): Filter by roster period (e.g., RP11/2025)
 - `status` (string, optional): Filter by status (pending/approved/rejected)
 - `pilot_id` (string, optional): Filter by pilot
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -482,6 +507,7 @@ POST /api/leave
 **Required Permission:** `leave:create`
 
 **Request Body:**
+
 ```json
 {
   "pilot_id": "uuid",
@@ -494,6 +520,7 @@ POST /api/leave
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -521,6 +548,7 @@ POST /api/leave/{id}/approve
 **Required Permission:** `leave:approve`
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -542,6 +570,7 @@ POST /api/leave/{id}/reject
 **Required Permission:** `leave:reject`
 
 **Request Body:**
+
 ```json
 {
   "reason": "Insufficient coverage for this period"
@@ -549,6 +578,7 @@ POST /api/leave/{id}/reject
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -573,6 +603,7 @@ GET /api/dashboard/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -610,6 +641,7 @@ GET /api/dashboard/compliance
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -653,6 +685,7 @@ POST /api/reports/generate
 **Required Permission:** `reports:create`
 
 **Request Body:**
+
 ```json
 {
   "type": "certification_expiry",
@@ -665,6 +698,7 @@ POST /api/reports/generate
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -685,6 +719,7 @@ POST /api/reports/export
 **Required Permission:** `reports:export`
 
 **Request Body:**
+
 ```json
 {
   "type": "pilots",
@@ -697,6 +732,7 @@ POST /api/reports/export
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -719,6 +755,7 @@ GET /api/health?check=basic
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -735,6 +772,7 @@ GET /api/health?check=detailed
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -778,13 +816,11 @@ POST /api/webhooks
 **Required Permission:** `system:webhooks`
 
 **Request Body:**
+
 ```json
 {
   "url": "https://api.example.com/webhooks",
-  "events": [
-    "certification.expiring",
-    "leave.approved"
-  ],
+  "events": ["certification.expiring", "leave.approved"],
   "description": "External system integration",
   "headers": {
     "X-API-Key": "your-api-key"
@@ -793,6 +829,7 @@ POST /api/webhooks
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -800,10 +837,7 @@ POST /api/webhooks
     "id": "uuid",
     "url": "https://api.example.com/webhooks",
     "secret": "webhook_secret_key",
-    "events": [
-      "certification.expiring",
-      "leave.approved"
-    ],
+    "events": ["certification.expiring", "leave.approved"],
     "active": true,
     "created_at": "2025-10-01T12:00:00.000Z"
   }
@@ -817,6 +851,7 @@ POST /api/webhooks/{id}/test
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -898,6 +933,7 @@ Breaking changes will increment the major version. The current version will be m
 ## Support
 
 For API support and questions:
+
 - 📧 **Email:** api-support@airniugini.com.pg
 - 📚 **Documentation:** https://docs.airniugini-pms.com
 - 🐛 **Issues:** https://github.com/airniugini/pms/issues

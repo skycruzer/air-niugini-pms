@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,9 +13,9 @@ import {
   PointElement,
   LineElement,
   RadialLinearScale,
-  Filler
-} from 'chart.js'
-import { Bar, Doughnut, Line, Pie, Radar, PolarArea } from 'react-chartjs-2'
+  Filler,
+} from 'chart.js';
+import { Bar, Doughnut, Line, Pie, Radar, PolarArea } from 'react-chartjs-2';
 import type {
   PilotAnalytics,
   CertificationAnalytics,
@@ -24,8 +24,8 @@ import type {
   TrendAnalytics,
   AIR_NIUGINI_COLORS,
   ChartFilter,
-  ExportOptions
-} from '@/types/analytics'
+  ExportOptions,
+} from '@/types/analytics';
 
 ChartJS.register(
   CategoryScale,
@@ -39,18 +39,18 @@ ChartJS.register(
   LineElement,
   RadialLinearScale,
   Filler
-)
+);
 
 // Air Niugini brand colors with extended palette
 const COLORS = {
-  primary: '#E4002B',      // Air Niugini Red
-  secondary: '#FFC72C',    // Air Niugini Gold
-  success: '#059669',      // Green for current/good status
-  warning: '#D97706',      // Amber for expiring/warning
-  danger: '#DC2626',       // Red for expired/critical
-  info: '#0EA5E9',         // Blue for information
-  dark: '#1F2937',         // Dark gray for text
-  light: '#F3F4F6',        // Light gray for backgrounds
+  primary: '#E4002B', // Air Niugini Red
+  secondary: '#FFC72C', // Air Niugini Gold
+  success: '#059669', // Green for current/good status
+  warning: '#D97706', // Amber for expiring/warning
+  danger: '#DC2626', // Red for expired/critical
+  info: '#0EA5E9', // Blue for information
+  dark: '#1F2937', // Dark gray for text
+  light: '#F3F4F6', // Light gray for backgrounds
   white: '#FFFFFF',
   // Extended palette for diverse charts
   purple: '#8B5CF6',
@@ -68,18 +68,18 @@ const COLORS = {
     600: '#4B5563',
     700: '#374151',
     800: '#1F2937',
-    900: '#111827'
-  }
-}
+    900: '#111827',
+  },
+};
 
 interface ExpiryTimelineChartProps {
   data: {
-    next7Days: number
-    next14Days: number
-    next28Days: number
-    next60Days: number
-    next90Days: number
-  }
+    next7Days: number;
+    next14Days: number;
+    next28Days: number;
+    next60Days: number;
+    next90Days: number;
+  };
 }
 
 export function ExpiryTimelineChart({ data }: ExpiryTimelineChartProps) {
@@ -90,24 +90,18 @@ export function ExpiryTimelineChart({ data }: ExpiryTimelineChartProps) {
         label: 'Certifications Expiring',
         data: [data.next7Days, data.next14Days, data.next28Days, data.next60Days, data.next90Days],
         backgroundColor: [
-          COLORS.danger,    // 7 days - critical
-          COLORS.warning,   // 14 days - urgent
-          COLORS.info,      // 28 days - important
-          '#8B5CF6',        // 60 days - planning
-          '#6366F1'         // 90 days - forecast
+          COLORS.danger, // 7 days - critical
+          COLORS.warning, // 14 days - urgent
+          COLORS.info, // 28 days - important
+          '#8B5CF6', // 60 days - planning
+          '#6366F1', // 90 days - forecast
         ],
-        borderColor: [
-          COLORS.danger,
-          COLORS.warning,
-          COLORS.info,
-          '#8B5CF6',
-          '#6366F1'
-        ],
+        borderColor: [COLORS.danger, COLORS.warning, COLORS.info, '#8B5CF6', '#6366F1'],
         borderWidth: 2,
         borderRadius: 8,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -134,21 +128,21 @@ export function ExpiryTimelineChart({ data }: ExpiryTimelineChartProps) {
         },
       },
     },
-  }
+  };
 
   return (
     <div className="h-80">
       <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface ComplianceDonutChartProps {
   data: {
-    current: number
-    expiring: number
-    expired: number
-  }
+    current: number;
+    expiring: number;
+    expired: number;
+  };
 }
 
 export function ComplianceDonutChart({ data }: ComplianceDonutChartProps) {
@@ -157,20 +151,12 @@ export function ComplianceDonutChart({ data }: ComplianceDonutChartProps) {
     datasets: [
       {
         data: [data.current, data.expiring, data.expired],
-        backgroundColor: [
-          COLORS.success,
-          COLORS.warning,
-          COLORS.danger,
-        ],
-        borderColor: [
-          COLORS.success,
-          COLORS.warning,
-          COLORS.danger,
-        ],
+        backgroundColor: [COLORS.success, COLORS.warning, COLORS.danger],
+        borderColor: [COLORS.success, COLORS.warning, COLORS.danger],
         borderWidth: 2,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -193,20 +179,20 @@ export function ComplianceDonutChart({ data }: ComplianceDonutChartProps) {
         color: COLORS.dark,
       },
     },
-  }
+  };
 
   return (
     <div className="h-80">
       <Doughnut data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface PilotRequirementsChartProps {
   data: {
-    current: { captains: number; firstOfficers: number }
-    required: { captains: number; firstOfficers: number }
-  }
+    current: { captains: number; firstOfficers: number };
+    required: { captains: number; firstOfficers: number };
+  };
 }
 
 export function PilotRequirementsChart({ data }: PilotRequirementsChartProps) {
@@ -230,7 +216,7 @@ export function PilotRequirementsChart({ data }: PilotRequirementsChartProps) {
         borderRadius: 8,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -257,21 +243,21 @@ export function PilotRequirementsChart({ data }: PilotRequirementsChartProps) {
         },
       },
     },
-  }
+  };
 
   return (
     <div className="h-80">
       <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface RiskTrendChartProps {
   data: {
-    periods: string[]
-    expiredCounts: number[]
-    expiringCounts: number[]
-  }
+    periods: string[];
+    expiredCounts: number[];
+    expiringCounts: number[];
+  };
 }
 
 export function RiskTrendChart({ data }: RiskTrendChartProps) {
@@ -295,7 +281,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         tension: 0.4,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -322,30 +308,30 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         },
       },
     },
-  }
+  };
 
   return (
     <div className="h-80">
       <Line data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface CategoryBreakdownChartProps {
   data: Array<{
-    category: string
-    count: number
-    pilotsAffected: number
-  }>
+    category: string;
+    count: number;
+    pilotsAffected: number;
+  }>;
 }
 
 export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   const chartData = {
-    labels: data.map(item => item.category),
+    labels: data.map((item) => item.category),
     datasets: [
       {
         label: 'Certifications',
-        data: data.map(item => item.count),
+        data: data.map((item) => item.count),
         backgroundColor: [
           COLORS.primary,
           COLORS.secondary,
@@ -354,13 +340,13 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
           COLORS.warning,
           '#8B5CF6',
           '#EC4899',
-          '#06B6D4'
+          '#06B6D4',
         ].slice(0, data.length),
         borderWidth: 2,
         borderRadius: 8,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -388,18 +374,18 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
         },
       },
     },
-  }
+  };
 
   return (
     <div className="h-80">
       <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface AvailabilityGaugeProps {
-  percentage: number
-  label: string
+  percentage: number;
+  label: string;
 }
 
 export function AvailabilityGauge({ percentage, label }: AvailabilityGaugeProps) {
@@ -409,15 +395,14 @@ export function AvailabilityGauge({ percentage, label }: AvailabilityGaugeProps)
       {
         data: [percentage, 100 - percentage],
         backgroundColor: [
-          percentage >= 90 ? COLORS.success :
-          percentage >= 75 ? COLORS.warning : COLORS.danger,
+          percentage >= 90 ? COLORS.success : percentage >= 75 ? COLORS.warning : COLORS.danger,
           COLORS.light,
         ],
         borderWidth: 0,
         cutout: '70%',
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -436,30 +421,35 @@ export function AvailabilityGauge({ percentage, label }: AvailabilityGaugeProps)
         color: COLORS.dark,
       },
     },
-  }
+  };
 
   return (
     <div className="h-40 relative">
       <Doughnut data={chartData} options={options} />
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className={`text-2xl font-bold ${
-            percentage >= 90 ? 'text-green-600' :
-            percentage >= 75 ? 'text-yellow-600' : 'text-red-600'
-          }`}>
+          <div
+            className={`text-2xl font-bold ${
+              percentage >= 90
+                ? 'text-green-600'
+                : percentage >= 75
+                  ? 'text-yellow-600'
+                  : 'text-red-600'
+            }`}
+          >
             {percentage}%
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Enhanced Interactive Charts for Air Niugini Dashboard
 
 interface PilotRoleDistributionChartProps {
-  data: PilotAnalytics
-  onClick?: (role: string) => void
+  data: PilotAnalytics;
+  onClick?: (role: string) => void;
 }
 
 export function PilotRoleDistributionChart({ data, onClick }: PilotRoleDistributionChartProps) {
@@ -468,18 +458,13 @@ export function PilotRoleDistributionChart({ data, onClick }: PilotRoleDistribut
     datasets: [
       {
         data: [data.captains, data.firstOfficers, data.trainingCaptains, data.examiners],
-        backgroundColor: [
-          COLORS.primary,
-          COLORS.secondary,
-          COLORS.info,
-          COLORS.purple
-        ],
+        backgroundColor: [COLORS.primary, COLORS.secondary, COLORS.info, COLORS.purple],
         borderColor: COLORS.white,
         borderWidth: 3,
         hoverOffset: 10,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -493,9 +478,9 @@ export function PilotRoleDistributionChart({ data, onClick }: PilotRoleDistribut
           pointStyle: 'circle',
           font: {
             size: 12,
-            weight: 'normal' as const
+            weight: 'normal' as const,
           },
-          color: COLORS.dark
+          color: COLORS.dark,
         },
       },
       title: {
@@ -506,43 +491,43 @@ export function PilotRoleDistributionChart({ data, onClick }: PilotRoleDistribut
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
-            const total = data.total
-            const value = context.parsed
-            const percentage = total > 0 ? Math.round((value / total) * 100) : 0
-            return `${context.label}: ${value} pilots (${percentage}%)`
-          }
+          label: function (context: any) {
+            const total = data.total;
+            const value = context.parsed;
+            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+            return `${context.label}: ${value} pilots (${percentage}%)`;
+          },
         },
         backgroundColor: COLORS.dark,
         titleColor: COLORS.white,
         bodyColor: COLORS.white,
         borderColor: COLORS.primary,
-        borderWidth: 1
-      }
+        borderWidth: 1,
+      },
     },
     onClick: (event: any, elements: any) => {
       if (elements.length > 0 && onClick) {
-        const index = elements[0].index
-        const roles = ['captain', 'first_officer', 'training_captain', 'examiner']
-        onClick(roles[index])
+        const index = elements[0].index;
+        const roles = ['captain', 'first_officer', 'training_captain', 'examiner'];
+        onClick(roles[index]);
       }
-    }
-  }
+    },
+  };
 
   return (
     <div className="h-96 bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <Pie data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface AgeDistributionChartProps {
-  data: PilotAnalytics
-  interactive?: boolean
+  data: PilotAnalytics;
+  interactive?: boolean;
 }
 
 export function AgeDistributionChart({ data, interactive = true }: AgeDistributionChartProps) {
@@ -556,14 +541,14 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
           data.ageDistribution.age30to40,
           data.ageDistribution.age40to50,
           data.ageDistribution.age50to60,
-          data.ageDistribution.over60
+          data.ageDistribution.over60,
         ],
         backgroundColor: [
           COLORS.info,
           COLORS.secondary,
           COLORS.success,
           COLORS.warning,
-          COLORS.danger
+          COLORS.danger,
         ],
         borderColor: COLORS.dark,
         borderWidth: 1,
@@ -573,18 +558,18 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
           COLORS.secondary + '80',
           COLORS.success + '80',
           COLORS.warning + '80',
-          COLORS.danger + '80'
-        ]
+          COLORS.danger + '80',
+        ],
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
       intersect: false,
-      mode: 'index' as const
+      mode: 'index' as const,
     },
     plugins: {
       legend: {
@@ -598,7 +583,7 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         backgroundColor: COLORS.dark,
@@ -607,49 +592,49 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterLabel: function(context: any) {
-            const total = data.total
-            const percentage = total > 0 ? Math.round((context.parsed.y / total) * 100) : 0
-            return `${percentage}% of total pilots`
-          }
-        }
-      }
+          afterLabel: function (context: any) {
+            const total = data.total;
+            const percentage = total > 0 ? Math.round((context.parsed.y / total) * 100) : 0;
+            return `${percentage}% of total pilots`;
+          },
+        },
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
           stepSize: 1,
-          color: COLORS.gray[600]
+          color: COLORS.gray[600],
         },
         grid: {
-          color: COLORS.gray[200]
-        }
+          color: COLORS.gray[200],
+        },
       },
       x: {
         ticks: {
-          color: COLORS.gray[600]
+          color: COLORS.gray[600],
         },
         grid: {
-          display: false
-        }
-      }
+          display: false,
+        },
+      },
     },
     animation: {
       duration: 1000,
-      easing: 'easeInOutQuart' as const
-    }
-  }
+      easing: 'easeInOutQuart' as const,
+    },
+  };
 
   return (
     <div className="h-80 bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface RetirementPlanningChartProps {
-  data: PilotAnalytics
+  data: PilotAnalytics;
 }
 
 export function RetirementPlanningChart({ data }: RetirementPlanningChartProps) {
@@ -660,19 +645,15 @@ export function RetirementPlanningChart({ data }: RetirementPlanningChartProps) 
         data: [
           data.retirementPlanning.retiringIn1Year,
           data.retirementPlanning.retiringIn2Years,
-          data.retirementPlanning.retiringIn5Years
+          data.retirementPlanning.retiringIn5Years,
         ],
-        backgroundColor: [
-          COLORS.danger,
-          COLORS.warning,
-          COLORS.info
-        ],
+        backgroundColor: [COLORS.danger, COLORS.warning, COLORS.info],
         borderColor: COLORS.white,
         borderWidth: 2,
-        hoverOffset: 8
+        hoverOffset: 8,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -685,9 +666,9 @@ export function RetirementPlanningChart({ data }: RetirementPlanningChartProps) 
           usePointStyle: true,
           pointStyle: 'rect',
           font: {
-            size: 12
+            size: 12,
           },
-          color: COLORS.dark
+          color: COLORS.dark,
         },
       },
       title: {
@@ -698,31 +679,34 @@ export function RetirementPlanningChart({ data }: RetirementPlanningChartProps) 
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         backgroundColor: COLORS.dark,
         titleColor: COLORS.white,
         bodyColor: COLORS.white,
         borderColor: COLORS.primary,
-        borderWidth: 1
-      }
-    }
-  }
+        borderWidth: 1,
+      },
+    },
+  };
 
   return (
     <div className="h-80 bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <Doughnut data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface CertificationTrendChartProps {
-  data: TrendAnalytics
-  timeframe?: 'month' | 'quarter' | 'year'
+  data: TrendAnalytics;
+  timeframe?: 'month' | 'quarter' | 'year';
 }
 
-export function CertificationTrendChart({ data, timeframe = 'month' }: CertificationTrendChartProps) {
+export function CertificationTrendChart({
+  data,
+  timeframe = 'month',
+}: CertificationTrendChartProps) {
   const chartData = {
     labels: data.periods,
     datasets: [
@@ -737,7 +721,7 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
         pointBorderColor: COLORS.white,
         pointBorderWidth: 2,
         pointRadius: 6,
-        pointHoverRadius: 8
+        pointHoverRadius: 8,
       },
       {
         label: 'Expired',
@@ -750,7 +734,7 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
         pointBorderColor: COLORS.white,
         pointBorderWidth: 2,
         pointRadius: 4,
-        pointHoverRadius: 6
+        pointHoverRadius: 6,
       },
       {
         label: 'Expiring Soon',
@@ -763,17 +747,17 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
         pointBorderColor: COLORS.white,
         pointBorderWidth: 2,
         pointRadius: 4,
-        pointHoverRadius: 6
-      }
+        pointHoverRadius: 6,
+      },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
       intersect: false,
-      mode: 'index' as const
+      mode: 'index' as const,
     },
     plugins: {
       legend: {
@@ -782,10 +766,10 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
           padding: 20,
           usePointStyle: true,
           font: {
-            size: 12
+            size: 12,
           },
-          color: COLORS.dark
-        }
+          color: COLORS.dark,
+        },
       },
       title: {
         display: true,
@@ -795,7 +779,7 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         backgroundColor: COLORS.dark,
@@ -804,86 +788,88 @@ export function CertificationTrendChart({ data, timeframe = 'month' }: Certifica
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterLabel: function(context: any) {
+          afterLabel: function (context: any) {
             if (context.datasetIndex === 0) {
-              const expired = data.certifications.expired[context.dataIndex] || 0
-              const expiring = data.certifications.expiring[context.dataIndex] || 0
-              const compliance = context.parsed.y > 0 ?
-                Math.round(((context.parsed.y - expired - expiring) / context.parsed.y) * 100) : 100
-              return `Compliance Rate: ${compliance}%`
+              const expired = data.certifications.expired[context.dataIndex] || 0;
+              const expiring = data.certifications.expiring[context.dataIndex] || 0;
+              const compliance =
+                context.parsed.y > 0
+                  ? Math.round(((context.parsed.y - expired - expiring) / context.parsed.y) * 100)
+                  : 100;
+              return `Compliance Rate: ${compliance}%`;
             }
-            return ''
-          }
-        }
-      }
+            return '';
+          },
+        },
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          color: COLORS.gray[600]
+          color: COLORS.gray[600],
         },
         grid: {
-          color: COLORS.gray[200]
-        }
+          color: COLORS.gray[200],
+        },
       },
       x: {
         ticks: {
           color: COLORS.gray[600],
-          maxRotation: 45
+          maxRotation: 45,
         },
         grid: {
-          display: false
-        }
-      }
+          display: false,
+        },
+      },
     },
     animation: {
       duration: 1500,
-      easing: 'easeInOutCubic' as const
-    }
-  }
+      easing: 'easeInOutCubic' as const,
+    },
+  };
 
   return (
     <div className="h-96 bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <Line data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface LeaveRequestTrendsChartProps {
-  data: LeaveAnalytics
+  data: LeaveAnalytics;
 }
 
 export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) {
   const chartData = {
-    labels: data.trends.monthlyRequests.map(m => m.month),
+    labels: data.trends.monthlyRequests.map((m) => m.month),
     datasets: [
       {
         label: 'Total Requests',
-        data: data.trends.monthlyRequests.map(m => m.total),
+        data: data.trends.monthlyRequests.map((m) => m.total),
         backgroundColor: COLORS.info,
         borderColor: COLORS.info,
         borderWidth: 2,
-        borderRadius: 6
+        borderRadius: 6,
       },
       {
         label: 'Approved',
-        data: data.trends.monthlyRequests.map(m => m.approved),
+        data: data.trends.monthlyRequests.map((m) => m.approved),
         backgroundColor: COLORS.success,
         borderColor: COLORS.success,
         borderWidth: 2,
-        borderRadius: 6
+        borderRadius: 6,
       },
       {
         label: 'Denied',
-        data: data.trends.monthlyRequests.map(m => m.denied),
+        data: data.trends.monthlyRequests.map((m) => m.denied),
         backgroundColor: COLORS.danger,
         borderColor: COLORS.danger,
         borderWidth: 2,
-        borderRadius: 6
-      }
+        borderRadius: 6,
+      },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -895,10 +881,10 @@ export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) 
           padding: 20,
           usePointStyle: true,
           font: {
-            size: 12
+            size: 12,
           },
-          color: COLORS.dark
-        }
+          color: COLORS.dark,
+        },
       },
       title: {
         display: true,
@@ -908,7 +894,7 @@ export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) 
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         backgroundColor: COLORS.dark,
@@ -917,14 +903,14 @@ export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) 
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterBody: function(context: any) {
-            const monthData = data.trends.monthlyRequests[context[0].dataIndex]
-            const approvalRate = monthData.total > 0 ?
-              Math.round((monthData.approved / monthData.total) * 100) : 0
-            return [`Approval Rate: ${approvalRate}%`]
-          }
-        }
-      }
+          afterBody: function (context: any) {
+            const monthData = data.trends.monthlyRequests[context[0].dataIndex];
+            const approvalRate =
+              monthData.total > 0 ? Math.round((monthData.approved / monthData.total) * 100) : 0;
+            return [`Approval Rate: ${approvalRate}%`];
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -932,37 +918,37 @@ export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) 
         stacked: false,
         ticks: {
           stepSize: 1,
-          color: COLORS.gray[600]
+          color: COLORS.gray[600],
         },
         grid: {
-          color: COLORS.gray[200]
-        }
+          color: COLORS.gray[200],
+        },
       },
       x: {
         ticks: {
           color: COLORS.gray[600],
-          maxRotation: 45
+          maxRotation: 45,
         },
         grid: {
-          display: false
-        }
-      }
+          display: false,
+        },
+      },
     },
     animation: {
       duration: 1200,
-      easing: 'easeInOutQuart' as const
-    }
-  }
+      easing: 'easeInOutQuart' as const,
+    },
+  };
 
   return (
     <div className="h-80 bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <Bar data={chartData} options={options} />
     </div>
-  )
+  );
 }
 
 interface FleetReadinessGaugeProps {
-  data: FleetAnalytics
+  data: FleetAnalytics;
 }
 
 export function FleetReadinessGauge({ data }: FleetReadinessGaugeProps) {
@@ -974,18 +960,13 @@ export function FleetReadinessGauge({ data }: FleetReadinessGaugeProps) {
           data.complianceStatus.fullyCompliant,
           data.complianceStatus.minorIssues,
           data.complianceStatus.majorIssues,
-          data.complianceStatus.grounded
+          data.complianceStatus.grounded,
         ],
-        backgroundColor: [
-          COLORS.success,
-          COLORS.secondary,
-          COLORS.warning,
-          COLORS.danger
-        ],
+        backgroundColor: [COLORS.success, COLORS.secondary, COLORS.warning, COLORS.danger],
         borderWidth: 0,
       },
     ],
-  }
+  };
 
   const options = {
     responsive: true,
@@ -998,9 +979,9 @@ export function FleetReadinessGauge({ data }: FleetReadinessGaugeProps) {
           usePointStyle: true,
           pointStyle: 'circle',
           font: {
-            size: 11
+            size: 11,
           },
-          color: COLORS.dark
+          color: COLORS.dark,
         },
       },
       title: {
@@ -1011,19 +992,19 @@ export function FleetReadinessGauge({ data }: FleetReadinessGaugeProps) {
           weight: 'bold' as const,
         },
         color: COLORS.dark,
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         backgroundColor: COLORS.dark,
         titleColor: COLORS.white,
         bodyColor: COLORS.white,
         borderColor: COLORS.primary,
-        borderWidth: 1
-      }
-    }
-  }
+        borderWidth: 1,
+      },
+    },
+  };
 
-  const readinessScore = data.readiness
+  const readinessScore = data.readiness;
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
@@ -1033,53 +1014,58 @@ export function FleetReadinessGauge({ data }: FleetReadinessGaugeProps) {
       <div className="mt-4 text-center">
         <div className="flex items-center justify-center space-x-4">
           <div className="text-center">
-            <div className={`text-3xl font-bold ${
-              readinessScore >= 90 ? 'text-green-600' :
-              readinessScore >= 75 ? 'text-yellow-600' : 'text-red-600'
-            }`}>
+            <div
+              className={`text-3xl font-bold ${
+                readinessScore >= 90
+                  ? 'text-green-600'
+                  : readinessScore >= 75
+                    ? 'text-yellow-600'
+                    : 'text-red-600'
+              }`}
+            >
               {readinessScore}%
             </div>
             <div className="text-sm text-gray-600 font-medium">Fleet Readiness</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {data.utilization}%
-            </div>
+            <div className="text-2xl font-bold text-blue-600">{data.utilization}%</div>
             <div className="text-sm text-gray-600 font-medium">Utilization</div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Chart Export Functionality
 export const exportChart = (chartRef: any, options: ExportOptions) => {
-  if (!chartRef.current) return
+  if (!chartRef.current) return;
 
-  const chart = chartRef.current
-  const canvas = chart.canvas
+  const chart = chartRef.current;
+  const canvas = chart.canvas;
 
   // Create download link
-  const link = document.createElement('a')
-  link.download = options.filename || `chart-${Date.now()}.${options.format}`
+  const link = document.createElement('a');
+  link.download = options.filename || `chart-${Date.now()}.${options.format}`;
 
   if (options.format === 'png' || options.format === 'jpg') {
-    link.href = canvas.toDataURL(`image/${options.format}`,
-      options.resolution === 'high' ? 1.0 : options.resolution === 'medium' ? 0.8 : 0.6)
+    link.href = canvas.toDataURL(
+      `image/${options.format}`,
+      options.resolution === 'high' ? 1.0 : options.resolution === 'medium' ? 0.8 : 0.6
+    );
   }
 
-  link.click()
-}
+  link.click();
+};
 
 // Interactive Chart Container with Export
 interface InteractiveChartContainerProps {
-  children: React.ReactNode
-  title: string
-  subtitle?: string
-  exportable?: boolean
-  onExport?: () => void
-  className?: string
+  children: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  exportable?: boolean;
+  onExport?: () => void;
+  className?: string;
 }
 
 export function InteractiveChartContainer({
@@ -1088,23 +1074,25 @@ export function InteractiveChartContainer({
   subtitle,
   exportable = true,
   onExport,
-  className = ''
+  className = '',
 }: InteractiveChartContainerProps) {
-  const [isExporting, setIsExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = useCallback(async () => {
     if (onExport) {
-      setIsExporting(true)
+      setIsExporting(true);
       try {
-        await onExport()
+        await onExport();
       } finally {
-        setIsExporting(false)
+        setIsExporting(false);
       }
     }
-  }, [onExport])
+  }, [onExport]);
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow ${className}`}>
+    <div
+      className={`bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow ${className}`}
+    >
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -1123,9 +1111,7 @@ export function InteractiveChartContainer({
         )}
       </div>
 
-      <div className="p-6">
-        {children}
-      </div>
+      <div className="p-6">{children}</div>
     </div>
-  )
+  );
 }

@@ -5,6 +5,7 @@
 **The database WAS saving correctly**, but **Supabase connection pooler was returning cached/stale data** on SELECT queries after UPDATE operations.
 
 ### Evidence
+
 ```
 ✅ Database value: last_name = "PORTER" (CORRECT)
 ❌ API query returns: last_name = "PORTERss" (STALE CACHED DATA)
@@ -14,40 +15,39 @@
 ## 🔧 FIXES APPLIED
 
 ### 1. **Cache-Busting Headers Added** ✅
+
 **File:** `src/lib/supabase.ts` (lines 106-112)
 
 Added headers to force fresh data from Supabase:
+
 ```typescript
 const headers = {
   ...(options.headers || {}),
-  'Prefer': 'return=representation',        // Force fresh data
+  Prefer: 'return=representation', // Force fresh data
   'Cache-Control': 'no-cache, no-store, must-revalidate',
-  'Pragma': 'no-cache',
+  Pragma: 'no-cache',
 };
 ```
 
 ### 2. **Separate Update and Select Queries** ✅
+
 **Files:**
+
 - `src/app/api/pilots/route.ts` (lines 212-260)
 - `src/app/api/certifications/route.ts` (lines 119-155)
 
 Changed from chained queries to separate operations:
+
 ```typescript
 // Update WITHOUT .select()
-const { error } = await supabaseAdmin
-  .from('pilots')
-  .update(cleanedBody)
-  .eq('id', pilotId);
+const { error } = await supabaseAdmin.from('pilots').update(cleanedBody).eq('id', pilotId);
 
 // THEN fetch fresh data separately
-const { data: freshData } = await supabaseAdmin
-  .from('pilots')
-  .select()
-  .eq('id', pilotId)
-  .single();
+const { data: freshData } = await supabaseAdmin.from('pilots').select().eq('id', pilotId).single();
 ```
 
 ### 3. **UI Hard Refresh After Edit** ✅
+
 **File:** `src/app/dashboard/pilots/page.tsx` (lines 213-217)
 
 ```typescript
@@ -60,7 +60,9 @@ const handleEditPilotSuccess = async () => {
 ## 📊 DATABASE CLEANUP
 
 ### Tables to Remove (Manual Step Required)
+
 Legacy `an_*` tables no longer used:
+
 - `an_pilots` (5 rows) - legacy dev data
 - `an_check_types` (10 rows) - legacy dev data
 - `an_pilot_checks` (18 rows) - legacy dev data
@@ -69,10 +71,12 @@ Legacy `an_*` tables no longer used:
 **Keep:** `an_users` (3 rows) - THIS IS THE ACTIVE AUTH TABLE!
 
 ### How to Remove Legacy Tables
+
 1. Open Supabase SQL Editor: https://supabase.com/dashboard/project/wgdmgvonqysflwdiiols/sql
 2. Run: `cleanup-legacy-tables.sql`
 
 Or manually:
+
 ```sql
 DROP TABLE IF EXISTS an_leave_requests CASCADE;
 DROP TABLE IF EXISTS an_pilot_checks CASCADE;
@@ -85,6 +89,7 @@ DROP TABLE IF EXISTS an_check_types CASCADE;
 **Server running:** http://localhost:3000
 
 ### Test 1: Pilot Edit
+
 1. Navigate to Pilots page
 2. Click Edit on any pilot
 3. Change a field (e.g., last name)
@@ -92,6 +97,7 @@ DROP TABLE IF EXISTS an_check_types CASCADE;
 5. ✅ **Expected:** Data saves AND page refreshes with updated value
 
 ### Test 2: Certification Edit
+
 1. Navigate to pilot detail page
 2. Click "Manage Certifications"
 3. Update any expiry date
@@ -99,6 +105,7 @@ DROP TABLE IF EXISTS an_check_types CASCADE;
 5. ✅ **Expected:** Data saves AND redirects to pilot detail with updated date
 
 ### Test 3: Leave Request Edit
+
 1. Navigate to leave requests
 2. Edit any leave request
 3. Click Save
@@ -121,12 +128,14 @@ DROP TABLE IF EXISTS an_check_types CASCADE;
 ## ⚠️ KNOWN ISSUES (From Supabase Advisors)
 
 ### Security (25 issues)
+
 - 13 Security Definer views
 - 5 Functions with mutable search_path
 - 3 Extensions in public schema
 - Auth security features disabled
 
 ### Performance (27 issues)
+
 - 10 RLS policies with InitPlan issues
 - 4 Unindexed foreign keys
 - 13 Multiple permissive policies
@@ -137,12 +146,14 @@ DROP TABLE IF EXISTS an_check_types CASCADE;
 ## ✨ EXPECTED RESULTS
 
 **Before Fix:**
+
 - ❌ Pilot edit saves to DB but UI shows old data
 - ❌ Certification edit saves to DB but UI shows old data
-- ❌ Confusion about which tables to use (an_* vs production)
+- ❌ Confusion about which tables to use (an\_\* vs production)
 - ❌ Supabase returning cached data
 
 **After Fix:**
+
 - ✅ Pilot edit saves AND UI updates immediately
 - ✅ Certification edit saves AND UI updates immediately
 - ✅ Clear data model (7 production tables)
