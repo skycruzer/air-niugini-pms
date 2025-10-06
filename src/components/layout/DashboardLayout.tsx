@@ -70,7 +70,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         {
           name: 'Roster Planning',
           href: '/dashboard/leave/roster-planning',
-          description: 'Future roster leave planning',
+          description: 'Future roster planning',
         },
       ],
     },

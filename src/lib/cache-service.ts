@@ -9,7 +9,24 @@
  * @since 2025-09-27
  */
 
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin, supabase } from '@/lib/supabase';
+
+/**
+ * Helper function to get appropriate Supabase client based on environment
+ * Server-side: Use admin client (bypasses RLS, requires service role key)
+ * Client-side: Use regular client (RLS enforced, uses anonymous key)
+ */
+function getSupabaseClient() {
+  // Check if running in browser
+  if (typeof window !== 'undefined') {
+    console.log('🌐 Cache Service: Using client-side Supabase (browser context)');
+    return supabase;
+  }
+
+  // Server-side - use admin client
+  console.log('🔧 Cache Service: Using server-side admin client');
+  return getSupabaseAdmin();
+}
 
 /**
  * Interface for cached data entry with timestamp tracking
@@ -155,9 +172,9 @@ class CacheService {
 
     if (!checkTypes) {
       console.log('🔄 Cache miss: Fetching check types from database');
-      const supabaseAdmin = getSupabaseAdmin();
+      const supabaseClient = getSupabaseClient();
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabaseClient
         .from('check_types')
         .select('*')
         .order('check_code');
@@ -188,9 +205,9 @@ class CacheService {
 
     if (!contractTypes) {
       console.log('🔄 Cache miss: Fetching contract types from database');
-      const supabaseAdmin = getSupabaseAdmin();
+      const supabaseClient = getSupabaseClient();
 
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabaseClient
         .from('contract_types')
         .select('*')
         .eq('is_active', true)
@@ -222,9 +239,9 @@ class CacheService {
 
     if (!settings) {
       console.log('🔄 Cache miss: Fetching settings from database');
-      const supabaseAdmin = getSupabaseAdmin();
+      const supabaseClient = getSupabaseClient();
 
-      const { data, error } = await supabaseAdmin.from('settings').select('*');
+      const { data, error } = await supabaseClient.from('settings').select('*');
 
       if (error) {
         console.error('❌ Cache Service: Error fetching settings:', error);
@@ -252,19 +269,19 @@ class CacheService {
 
     if (!stats) {
       console.log('🔄 Cache miss: Calculating pilot statistics from database');
-      const supabaseAdmin = getSupabaseAdmin();
+      const supabaseClient = getSupabaseClient();
 
       try {
         // Execute multiple queries in parallel for better performance
         const [pilotsResult, checksResult, checkTypesResult] = await Promise.all([
-          supabaseAdmin
+          supabaseClient
             .from('pilots')
             .select('id, is_active, role, captain_qualifications, date_of_birth')
             .eq('is_active', true),
 
-          supabaseAdmin.from('pilot_checks').select('expiry_date'),
+          supabaseClient.from('pilot_checks').select('expiry_date'),
 
-          supabaseAdmin.from('check_types').select('id'),
+          supabaseClient.from('check_types').select('id'),
         ]);
 
         if (pilotsResult.error) throw pilotsResult.error;

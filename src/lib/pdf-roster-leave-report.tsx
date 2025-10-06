@@ -1,6 +1,6 @@
 /**
- * @fileoverview Roster Leave Planning PDF Report Generator
- * Professional PDF reports for Air Niugini roster leave planning distribution
+ * @fileoverview Roster Planning PDF Report Generator
+ * Professional PDF reports for Air Niugini roster planning distribution
  *
  * @author Air Niugini Development Team
  * @version 1.0.0
@@ -333,6 +333,7 @@ const LeaveRequestsTable: React.FC<LeaveRequestsTableProps> = ({ requests, title
     formatDateRange(request.start_date, request.end_date),
     request.days_count.toString(),
     request.status,
+    request.request_date ? format(parseISO(request.request_date), 'dd MMM yyyy') : 'N/A',
     request.request_method || 'N/A',
     request.reason || '-',
   ]);
@@ -343,9 +344,9 @@ const LeaveRequestsTable: React.FC<LeaveRequestsTableProps> = ({ requests, title
       subtitle={`${requests.length} request${requests.length !== 1 ? 's' : ''}`}
     >
       <PDFTable
-        headers={['Pilot Name', 'Employee ID', 'Dates', 'Days', 'Status', 'Method', 'Reason']}
+        headers={['Pilot Name', 'Employee ID', 'Dates', 'Days', 'Status', 'Requested', 'Method', 'Reason']}
         data={tableData}
-        columnWidths={['18%', '12%', '18%', '8%', '12%', '12%', '20%']}
+        columnWidths={['16%', '11%', '16%', '7%', '11%', '11%', '10%', '18%']}
         statusColumn={4}
         highlightColumn={0}
       />
@@ -435,9 +436,9 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
   const { rosterPeriod, leaveRequests, generatedBy, generatedAt } = data;
 
   const metadata: PDFReportMetadata = {
-    reportType: 'roster-leave-planning',
-    title: 'Roster Leave Planning Report',
-    subtitle: `Leave requests for ${rosterPeriod.code}`,
+    reportType: 'roster-planning',
+    title: 'Roster Planning Report',
+    subtitle: `${rosterPeriod.code}`,
     companyName: 'Air Niugini',
     fleetType: 'B767',
     generatedAt: generatedAt.toISOString(),
@@ -472,15 +473,28 @@ export function createRosterLeaveReportDocument(data: RosterLeaveReportData) {
       </Page>
 
       {/* Additional pages for detailed leave requests by type */}
-      {Object.entries(groupedRequests).map(([type, requests], index) => (
-        <Page key={type} size="A4" style={pdfStyles.page}>
-          <PDFHeader metadata={metadata} />
+      {Object.entries(groupedRequests).map(([type, requests], index) => {
+        // Format leave type labels
+        const typeLabel = type === 'RDO' || type === 'SDO'
+          ? `${type} Request`
+          : type === 'ANNUAL' ? 'Annual Leave'
+          : type === 'SICK' ? 'Sick Leave'
+          : type === 'LSL' ? 'Long Service Leave'
+          : type === 'LWOP' ? 'Leave Without Pay'
+          : type === 'MATERNITY' ? 'Maternity Leave'
+          : type === 'COMPASSIONATE' ? 'Compassionate Leave'
+          : `${type} Request`;
 
-          <LeaveRequestsTable requests={requests} title={`${type} Leave Requests`} />
+        return (
+          <Page key={type} size="A4" style={pdfStyles.page}>
+            <PDFHeader metadata={metadata} />
 
-          <PDFFooter pageNumber={index + 2} totalPages={Object.keys(groupedRequests).length + 1} />
-        </Page>
-      ))}
+            <LeaveRequestsTable requests={requests} title={typeLabel} />
+
+            <PDFFooter pageNumber={index + 2} totalPages={Object.keys(groupedRequests).length + 1} />
+          </Page>
+        );
+      })}
     </Document>
   );
 }
@@ -495,11 +509,11 @@ export const RosterLeaveReportDocument = createRosterLeaveReportDocument;
 // =============================================================================
 
 /**
- * Generate PDF filename for the roster leave report
+ * Generate PDF filename for the roster planning report
  */
 export function generateRosterLeaveReportFilename(rosterPeriod: string): string {
   const timestamp = format(new Date(), 'yyyyMMdd_HHmm');
-  return `Air_Niugini_Leave_Planning_${rosterPeriod}_${timestamp}.pdf`;
+  return `Air_Niugini_Roster_Planning_${rosterPeriod}_${timestamp}.pdf`;
 }
 
 /**

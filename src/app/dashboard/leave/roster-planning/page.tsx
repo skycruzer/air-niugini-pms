@@ -168,8 +168,8 @@ export default function RosterPlanningPage() {
       const contentDisposition = response.headers.get('Content-Disposition');
       const filename = contentDisposition
         ? (contentDisposition.split('filename=')[1]?.replace(/"/g, '') ??
-          `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`)
-        : `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
+          `Air_Niugini_Roster_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`)
+        : `Air_Niugini_Roster_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
 
       // Create download link
       const url = window.URL.createObjectURL(pdfBlob);
@@ -225,11 +225,11 @@ export default function RosterPlanningPage() {
 
       // Prepare email content
       const subject = encodeURIComponent(
-        `Air Niugini B767 Leave Planning - ${state.selectedRosterPeriod}`
+        `Air Niugini B767 Roster Planning - ${state.selectedRosterPeriod}`
       );
       const body = encodeURIComponent(`Dear Roster Planning Team,
 
-Please find attached the leave planning report for roster period ${state.selectedRosterPeriod}.
+Please find attached the roster planning report for roster period ${state.selectedRosterPeriod}.
 
 SUMMARY:
 - Total leave requests: ${state.stats?.totalRequests || 0}
@@ -268,7 +268,7 @@ Air Niugini B767 Fleet Operations`);
       // Instead, we'll also trigger a download so they can manually attach it
       const link = document.createElement('a');
       link.href = pdfUrl;
-      link.download = `Air_Niugini_Leave_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      link.download = `Air_Niugini_Roster_Planning_${state.selectedRosterPeriod}_${new Date().toISOString().slice(0, 10)}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -381,6 +381,29 @@ Recipients: ${recipients.split(',').join(', ')}`);
     {} as Record<string, LeaveRequest[]>
   );
 
+  // Format leave type labels
+  const formatLeaveTypeLabel = (type: string) => {
+    switch (type) {
+      case 'RDO':
+      case 'SDO':
+        return `${type} Request`;
+      case 'ANNUAL':
+        return 'Annual Leave';
+      case 'SICK':
+        return 'Sick Leave';
+      case 'LSL':
+        return 'Long Service Leave';
+      case 'LWOP':
+        return 'Leave Without Pay';
+      case 'MATERNITY':
+        return 'Maternity Leave';
+      case 'COMPASSIONATE':
+        return 'Compassionate Leave';
+      default:
+        return `${type} Request`;
+    }
+  };
+
   return (
     <ProtectedRoute>
       <DashboardLayout>
@@ -393,7 +416,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
                   <span className="text-white text-xl">📋</span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Roster Leave Planning</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">Roster Planning</h1>
                   <p className="text-gray-600">
                     Manage and review leave requests for future roster periods
                   </p>
@@ -536,7 +559,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
                             <span
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-3 ${getTypeBadgeClass(type)}`}
                             >
-                              {type}
+                              {formatLeaveTypeLabel(type)}
                             </span>
                             {requests.length} Request{requests.length !== 1 ? 's' : ''}
                           </h3>
@@ -558,6 +581,9 @@ Recipients: ${recipients.split(',').join(', ')}`);
                               </th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Requested
                               </th>
                               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Method
@@ -594,6 +620,9 @@ Recipients: ${recipients.split(',').join(', ')}`);
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {request.request_date ? format(parseISO(request.request_date), 'dd MMM yyyy') : 'N/A'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   <div className="flex items-center">
                                     <span className="mr-1">
                                       {getSubmissionMethodIcon(request.request_method)}
@@ -622,7 +651,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
               <span>✈️</span>
               <span>Air Niugini B767 Pilot Management System</span>
               <span>•</span>
-              <span>Roster Leave Planning Module</span>
+              <span>Roster Planning Module</span>
             </div>
           </div>
         </div>

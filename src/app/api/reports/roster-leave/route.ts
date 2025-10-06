@@ -10,11 +10,11 @@ import {
 } from '@/lib/pdf-roster-leave-report';
 
 /**
- * Generate and download Roster Leave Planning PDF Report
+ * Generate and download Roster Planning PDF Report
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('🎯 Starting roster leave PDF report generation...');
+    console.log('🎯 Starting roster planning PDF report generation...');
 
     const body = await request.json();
     const { rosterPeriod, generatedBy } = body;
@@ -57,10 +57,10 @@ export async function POST(request: NextRequest) {
     const reportData = createRosterLeaveReportData(selectedRoster, leaveRequests, generatedBy);
 
     // Generate PDF
-    console.log('🔄 Generating PDF document...');
+    console.log('🔄 Generating roster planning PDF document...');
     const pdfBuffer = await renderToBuffer(createRosterLeaveReportDocument(reportData));
 
-    console.log('✅ PDF generated successfully');
+    console.log('✅ Roster planning PDF generated successfully');
 
     // Generate filename
     const filename = generateRosterLeaveReportFilename(rosterPeriod);
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Error generating roster leave PDF report:', error);
+    console.error('❌ Error generating roster planning PDF report:', error);
 
     return NextResponse.json(
       {
