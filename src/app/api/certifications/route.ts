@@ -73,10 +73,17 @@ export async function GET(request: NextRequest) {
       count: result.length,
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: result,
     });
+
+    // Add cache control headers to prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     logger.error('API /certifications: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
@@ -159,10 +166,17 @@ export async function PUT(request: NextRequest) {
     revalidatePath('/dashboard/certifications');
     logger.debug('Next.js paths revalidated for pilot', { pilotId });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: freshData,
     });
+
+    // Add cache control headers to prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     logger.error('API /certifications PUT: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
