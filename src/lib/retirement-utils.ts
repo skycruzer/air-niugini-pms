@@ -98,7 +98,7 @@ export function calculateRetirementInfo(
   return {
     retirementDate,
     yearsToRetirement,
-    monthsToRetirement: monthsToRetirement,
+    monthsToRetirement,
     daysToRetirement: finalDaysToRetirement,
     isNearingRetirement,
     retirementStatus,

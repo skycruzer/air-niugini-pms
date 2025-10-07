@@ -233,7 +233,7 @@ const certificationExpiryStyles = StyleSheet.create({
   },
 
   rosterPeriodTag: {
-    backgroundColor: airNiuginiStyles.colors.primary + '20',
+    backgroundColor: `${airNiuginiStyles.colors.primary  }20`,
     color: airNiuginiStyles.colors.primary,
     borderRadius: 2,
     paddingHorizontal: 4,

@@ -88,6 +88,16 @@ export default function SystemMonitoringPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
+  useEffect(() => {
+    loadMetrics();
+
+    if (autoRefresh) {
+      const interval = setInterval(loadMetrics, 30000); // Refresh every 30 seconds
+      return () => clearInterval(interval);
+    }
+    return undefined;
+  }, [autoRefresh]);
+
   // Check admin permission
   if (user?.role !== 'admin') {
     return (
@@ -104,15 +114,6 @@ export default function SystemMonitoringPage() {
     );
   }
 
-  useEffect(() => {
-    loadMetrics();
-
-    if (autoRefresh) {
-      const interval = setInterval(loadMetrics, 30000); // Refresh every 30 seconds
-      return () => clearInterval(interval);
-    }
-    return undefined;
-  }, [autoRefresh]);
 
   async function loadMetrics() {
     try {

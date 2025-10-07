@@ -27,7 +27,7 @@ function SectionErrorFallback({
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-[#E4002B] mb-1">{sectionName} Error</h3>
           <p className="text-sm text-neutral-700 mb-4">
-            We encountered a problem loading this section. This won't affect other parts of the
+            We encountered a problem loading this section. This won&apos;t affect other parts of the
             application.
           </p>
 

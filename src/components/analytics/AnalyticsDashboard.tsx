@@ -114,13 +114,13 @@ export function AnalyticsDashboard() {
     return (
       <div className="p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-32 bg-gray-200 rounded" />
             ))}
           </div>
-          <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="h-96 bg-gray-200 rounded" />
         </div>
       </div>
     );
@@ -487,11 +487,11 @@ export function AnalyticsDashboard() {
                 }}
                 variant="doughnut"
                 height={320}
-                showLegend={true}
+                showLegend
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>
@@ -505,7 +505,7 @@ export function AnalyticsDashboard() {
               <Bar data={pilotRoleData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>
@@ -521,7 +521,7 @@ export function AnalyticsDashboard() {
               <Line data={certificationTrendData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>
@@ -535,7 +535,7 @@ export function AnalyticsDashboard() {
               <Doughnut data={ageDistributionData} options={doughnutOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>
@@ -549,7 +549,7 @@ export function AnalyticsDashboard() {
               <Line data={leaveRequestsData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>
@@ -563,7 +563,7 @@ export function AnalyticsDashboard() {
               <Bar data={categoryBreakdownData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
               </div>
             )}
           </div>

@@ -33,7 +33,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4"></div>
+          <div className="loading-spinner mx-auto mb-4" />
           <p className="text-gray-600">Loading Air Niugini PMS...</p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
         <div className="text-center p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-6">
-            You don't have permission to access this page. Required role: {requiredRole}
+            You don&apos;t have permission to access this page. Required role: {requiredRole}
           </p>
           <button onClick={() => router.push('/dashboard')} className="btn-primary">
             Go to Dashboard

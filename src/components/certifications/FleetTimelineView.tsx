@@ -160,7 +160,7 @@ export function FleetTimelineView() {
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
           <p className="text-gray-600 mt-2">Loading fleet timeline...</p>
         </div>
       </div>
@@ -311,7 +311,7 @@ export function FleetTimelineView() {
       <CertificationTimeline
         certifications={timelineEvents}
         onCertificationClick={handleCertificationClick}
-        showPilotNames={true}
+        showPilotNames
       />
 
       {/* Critical Attention Section */}

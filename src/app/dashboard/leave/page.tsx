@@ -448,14 +448,14 @@ export default function LeaveRequestsPage() {
                   <RosterPeriodNavigator
                     currentPeriod={currentRoster}
                     onPeriodChange={handleRosterPeriodChange}
-                    showCountdown={true}
-                    showTimeline={true}
+                    showCountdown
+                    showTimeline
                   />
 
                   {/* Interactive Calendar with Drag-Drop */}
                   {loading ? (
                     <div className="flex items-center justify-center p-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
                       <span className="ml-3 text-gray-600">Loading calendar...</span>
                     </div>
                   ) : (
@@ -475,14 +475,14 @@ export default function LeaveRequestsPage() {
                   <RosterPeriodNavigator
                     currentPeriod={currentRoster}
                     onPeriodChange={handleRosterPeriodChange}
-                    showCountdown={true}
+                    showCountdown
                     showTimeline={false}
                   />
 
                   {/* Team Availability View */}
                   {loading ? (
                     <div className="flex items-center justify-center p-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
                       <span className="ml-3 text-gray-600">Loading availability data...</span>
                     </div>
                   ) : (

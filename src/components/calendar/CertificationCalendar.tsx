@@ -397,23 +397,23 @@ export function CertificationCalendar({
       <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
         <div className="flex flex-wrap gap-6 text-sm">
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-red-500 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-red-500 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Expired</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-yellow-400 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-yellow-400 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Expiring Soon</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-orange-400 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-orange-400 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Due Soon</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-green-400 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-green-400 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Current</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-50 border-2 border-blue-500 rounded-lg"></div>
+            <div className="w-4 h-4 bg-blue-50 border-2 border-blue-500 rounded-lg" />
             <span className="text-gray-700 font-medium">Today</span>
           </div>
         </div>

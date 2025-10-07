@@ -192,7 +192,7 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Access Denied</h2>
               <p className="text-gray-600">
-                You don't have permission to access system settings. Only administrators can modify
+                You don&apos;t have permission to access system settings. Only administrators can modify
                 system configuration.
               </p>
             </div>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
-                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-gray-600">Loading settings...</p>
               </div>
             </div>
@@ -335,7 +335,7 @@ export default function SettingsPage() {
                         >
                           {saving === 'app_title' ? (
                             <>
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                               Saving...
                             </>
                           ) : (
@@ -501,7 +501,7 @@ export default function SettingsPage() {
                       >
                         {saving === 'alerts' ? (
                           <>
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                             Saving...
                           </>
                         ) : (
@@ -705,7 +705,7 @@ export default function SettingsPage() {
                       >
                         {saving === 'requirements' ? (
                           <>
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                             Saving...
                           </>
                         ) : (

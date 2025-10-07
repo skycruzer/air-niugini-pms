@@ -126,7 +126,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
             {/* Timeline */}
             <div className="relative pl-8 space-y-6">
               {/* Vertical Line */}
-              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300" />
 
               {logsForDate.map((log, index) => {
                 const colors = getActionColor(log.action);
@@ -282,7 +282,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
 
                     {/* Connector Line (except for last item) */}
                     {!isLast && (
-                      <div className="absolute left-[-16px] top-8 w-0.5 h-full bg-gray-300"></div>
+                      <div className="absolute left-[-16px] top-8 w-0.5 h-full bg-gray-300" />
                     )}
                   </div>
                 );

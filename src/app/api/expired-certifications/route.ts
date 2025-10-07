@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         if (!pilotsMap.has(pilotId)) {
           pilotsMap.set(pilotId, {
             id: pilotId,
-            name: `${check.pilots.first_name || ''} ${check.pilots.middle_name ? check.pilots.middle_name + ' ' : ''}${check.pilots.last_name || ''}`.trim(),
+            name: `${check.pilots.first_name || ''} ${check.pilots.middle_name ? `${check.pilots.middle_name  } ` : ''}${check.pilots.last_name || ''}`.trim(),
             employeeId: check.pilots.employee_id || '',
             expiredCertifications: [],
           });

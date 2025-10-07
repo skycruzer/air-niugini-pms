@@ -231,7 +231,7 @@ export function AuditLogCharts({ stats }: AuditLogChartsProps) {
                     backgroundColor:
                       ACTION_COLORS[entry.name as keyof typeof ACTION_COLORS] || '#6b7280',
                   }}
-                ></div>
+                 />
                 <span className="text-xs font-medium text-gray-700">
                   {entry.name}: {entry.value}
                 </span>

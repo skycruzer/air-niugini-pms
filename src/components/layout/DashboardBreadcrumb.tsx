@@ -130,7 +130,7 @@ export function generateBreadcrumbs(
 function formatSegment(segment: string): string {
   // Handle UUIDs and numeric IDs
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) {
-    return segment.slice(0, 8) + '...'; // Truncate UUIDs
+    return `${segment.slice(0, 8)  }...`; // Truncate UUIDs
   }
 
   if (/^\d+$/.test(segment)) {

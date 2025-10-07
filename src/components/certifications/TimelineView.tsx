@@ -101,7 +101,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
           <p className="text-gray-600 mt-2">Loading timeline...</p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
           <span className="text-6xl block mb-4">📅</span>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Certifications</h3>
           <p className="text-gray-600 mb-4">
-            This pilot doesn't have any certifications with expiry dates yet.
+            This pilot doesn&apos;t have any certifications with expiry dates yet.
           </p>
           <button
             onClick={() => router.push(`/dashboard/pilots/${pilotId}/certifications`)}

@@ -43,7 +43,7 @@ export async function GET() {
       return {
         ...request,
         pilot_name: pilot
-          ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+          ? `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`
           : 'Unknown Pilot',
         employee_id: pilot?.employee_id || 'N/A',
         pilot_role: pilot?.role || null,
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     const responseData = {
       ...data,
       pilot_name: pilot
-        ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+        ? `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
       pilot_role: pilot?.role || null,
@@ -188,7 +188,7 @@ export async function PUT(request: Request) {
     const responseData = {
       ...data,
       pilot_name: pilot
-        ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+        ? `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
       pilot_role: pilot?.role || null,
@@ -224,7 +224,7 @@ export async function PATCH(request: Request) {
     }
 
     // Calculate roster period and days if dates are provided
-    let updates: any = { ...updateData };
+    const updates: any = { ...updateData };
 
     if (updateData.start_date) {
       const startDateRoster = getRosterPeriodFromDate(new Date(updateData.start_date));
@@ -266,7 +266,7 @@ export async function PATCH(request: Request) {
     const responseData = {
       ...data,
       pilot_name: pilot
-        ? `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`
+        ? `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`
         : 'Unknown Pilot',
       employee_id: pilot?.employee_id || 'N/A',
       pilot_role: pilot?.role || null,

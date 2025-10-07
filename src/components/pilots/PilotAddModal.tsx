@@ -401,7 +401,7 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
             className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
             ) : (
               <span className="mr-2">💾</span>
             )}

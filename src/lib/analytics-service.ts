@@ -212,8 +212,8 @@ class AnalyticsService {
       if (certificationAnalytics.expired > 5) {
         criticalAlerts.push({
           id: 'expired-certs-critical',
-          type: 'certification' as 'certification',
-          severity: 'critical' as 'critical',
+          type: 'certification' as const,
+          severity: 'critical' as const,
           title: 'Critical: Multiple Expired Certifications',
           description: `${certificationAnalytics.expired} certifications have expired and require immediate attention`,
           affectedItems: certificationAnalytics.expired,
@@ -224,8 +224,8 @@ class AnalyticsService {
       if (certificationAnalytics.expiring > 15) {
         criticalAlerts.push({
           id: 'expiring-certs-high',
-          type: 'certification' as 'certification',
-          severity: 'high' as 'high',
+          type: 'certification' as const,
+          severity: 'high' as const,
           title: 'High Priority: Multiple Expiring Certifications',
           description: `${certificationAnalytics.expiring} certifications expiring within 30 days`,
           affectedItems: certificationAnalytics.expiring,

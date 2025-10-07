@@ -247,7 +247,7 @@ export function RosterPeriodNavigator({
                       w-2 h-2 rounded-full
                       ${isActive ? 'bg-[#FFC72C]' : isCurrent ? 'bg-white' : 'bg-gray-400'}
                     `}
-                    ></div>
+                     />
 
                     <div className="text-left">
                       <div className="font-semibold">{period.code}</div>

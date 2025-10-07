@@ -1054,7 +1054,7 @@ export default function ReportsPage() {
                     ([month, certs]: [string, any]) => (
                       <div key={month} className="bg-gray-50 rounded-lg p-4">
                         <h4 className="font-medium text-gray-900 mb-2">
-                          {new Date(month + '-01').toLocaleDateString('en-US', {
+                          {new Date(`${month  }-01`).toLocaleDateString('en-US', {
                             month: 'long',
                             year: 'numeric',
                           })}
@@ -1267,8 +1267,8 @@ export default function ReportsPage() {
                                 >
                                   {(reportData as any).pilotRequirements.compliance.captains
                                     ? '✓ Compliant'
-                                    : '✗ Short by ' +
-                                      (reportData as any).pilotRequirements.shortfall.captains}
+                                    : `✗ Short by ${ 
+                                      (reportData as any).pilotRequirements.shortfall.captains}`}
                                 </span>
                               </div>
                               <div>
@@ -1278,8 +1278,8 @@ export default function ReportsPage() {
                                 >
                                   {(reportData as any).pilotRequirements.compliance.firstOfficers
                                     ? '✓ Compliant'
-                                    : '✗ Short by ' +
-                                      (reportData as any).pilotRequirements.shortfall.firstOfficers}
+                                    : `✗ Short by ${ 
+                                      (reportData as any).pilotRequirements.shortfall.firstOfficers}`}
                                 </span>
                               </div>
                               <div>
@@ -1454,15 +1454,15 @@ export default function ReportsPage() {
             </p>
             <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
                 <span>Real-time data</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span className="w-2 h-2 bg-blue-500 rounded-full" />
                 <span>Export capabilities</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                <span className="w-2 h-2 bg-purple-500 rounded-full" />
                 <span>Compliance tracking</span>
               </div>
             </div>

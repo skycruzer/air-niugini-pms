@@ -46,7 +46,7 @@ export function RosterPeriodSelector({
       <div className={`relative ${className}`}>
         <div className="border border-gray-300 rounded-lg px-4 py-3 bg-gray-50">
           <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#E4002B]"></div>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#E4002B]" />
             <span className="text-sm text-gray-600">Loading roster periods...</span>
           </div>
         </div>
@@ -94,12 +94,12 @@ export function RosterPeriodSelector({
             <div className="text-gray-600">
               {selectedRoster.daysRemaining > 0 ? (
                 <span className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2" />
                   {selectedRoster.daysRemaining} days remaining
                 </span>
               ) : (
                 <span className="flex items-center">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full mr-2" />
                   Future period
                 </span>
               )}

@@ -67,12 +67,12 @@ class CSVExporter extends BaseExporter {
 
     // Add headers
     if (options.includeHeaders !== false) {
-      csv += headers.map((h) => this.escapeCSV(h.label)).join(',') + '\n';
+      csv += `${headers.map((h) => this.escapeCSV(h.label)).join(',')  }\n`;
     }
 
     // Add data rows
     data.forEach((row) => {
-      csv += headers.map((h) => this.escapeCSV(row[h.key])).join(',') + '\n';
+      csv += `${headers.map((h) => this.escapeCSV(row[h.key])).join(',')  }\n`;
     });
 
     this.downloadFile(csv, filename, 'text/csv;charset=utf-8;');
@@ -213,7 +213,7 @@ export class UnifiedExportService {
   ): void {
     this.csvExporter.export(data, headers, {
       format: 'csv',
-      filename: filename,
+      filename,
       includeTimestamp: options.includeTimestamp ?? true,
       includeHeaders: options.includeHeaders ?? true,
     });

@@ -144,7 +144,7 @@ export function QuickActions({
             className={`group relative p-5 bg-white rounded-xl border-2 ${colors.border} hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-left overflow-hidden`}
           >
             {/* Background gradient on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             <div className="relative z-10 flex items-start">
               <div
@@ -177,7 +177,7 @@ export function QuickActions({
             </div>
 
             {/* Animated border on hover */}
-            <div className="absolute inset-0 border-2 border-transparent group-hover:border-gray-200 rounded-xl transition-colors duration-300 pointer-events-none"></div>
+            <div className="absolute inset-0 border-2 border-transparent group-hover:border-gray-200 rounded-xl transition-colors duration-300 pointer-events-none" />
           </button>
         );
       })}

@@ -105,7 +105,7 @@ export default function NotificationPreferences() {
         },
         body: JSON.stringify({
           ...preferences,
-          digest_time: preferences.digest_time + ':00',
+          digest_time: `${preferences.digest_time  }:00`,
         }),
       });
 

@@ -140,7 +140,7 @@ export default function CertificationCalendarPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Certifications
               </Link>
-              <div className="h-6 w-px bg-gray-300"></div>
+              <div className="h-6 w-px bg-gray-300" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                   <Calendar className="w-7 h-7 text-[#E4002B] mr-3" />
@@ -230,7 +230,7 @@ export default function CertificationCalendarPage() {
                 employeeId: cert.employeeId,
               }))}
               onCertificationClick={handleCertificationClick}
-              showPilotNames={true}
+              showPilotNames
             />
           )}
         </div>

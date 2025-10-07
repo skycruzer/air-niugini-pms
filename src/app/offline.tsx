@@ -32,7 +32,7 @@ export default function Offline() {
                 No Internet Connection
               </h1>
               <p className="text-white/90 text-center">
-                You're currently offline. Please check your connection.
+                You&apos;re currently offline. Please check your connection.
               </p>
             </div>
 
@@ -68,7 +68,7 @@ export default function Offline() {
                         Check your Wi-Fi or network connection
                       </p>
                       <p className="text-neutral-600">
-                        Make sure you're connected to a network and the signal is strong
+                        Make sure you&apos;re connected to a network and the signal is strong
                       </p>
                     </div>
                   </li>
@@ -107,7 +107,7 @@ export default function Offline() {
                         Contact your network administrator
                       </p>
                       <p className="text-neutral-600">
-                        If you're on a corporate network, IT may need to assist
+                        If you&apos;re on a corporate network, IT may need to assist
                       </p>
                     </div>
                   </li>
@@ -180,7 +180,7 @@ export default function Offline() {
             <div className="bg-gradient-to-r from-neutral-100 to-neutral-50 px-8 py-4 border-t border-neutral-200">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
                 <p className="text-neutral-600">Air Niugini B767 Pilot Management System</p>
-                <p className="text-[#E4002B] font-bold">Papua New Guinea's National Airline</p>
+                <p className="text-[#E4002B] font-bold">Papua New Guinea&apos;s National Airline</p>
               </div>
             </div>
           </div>

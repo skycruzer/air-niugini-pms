@@ -63,7 +63,7 @@ function AnalyticsError() {
           Analytics Temporarily Unavailable
         </h2>
         <p className="text-red-600 mb-6">
-          We're experiencing technical difficulties loading the analytics dashboard. Please try
+          We&apos;re experiencing technical difficulties loading the analytics dashboard. Please try
           refreshing the page or contact support if the problem persists.
         </p>
         <div className="flex justify-center space-x-4">

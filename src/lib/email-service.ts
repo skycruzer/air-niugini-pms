@@ -266,7 +266,7 @@ export async function sendCertificationExpiryAlert(
             <p><strong>Days Remaining:</strong> <span style="color: ${BRAND_COLORS.red}; font-weight: 700;">${data.daysRemaining} days</span></p>
         </div>
 
-        <p>${data.daysRemaining <= 7 ? '<strong style="color: ' + BRAND_COLORS.red + ';">URGENT ACTION REQUIRED:</strong> ' : ''}Please ensure that renewal is scheduled before the expiry date to maintain compliance.</p>
+        <p>${data.daysRemaining <= 7 ? `<strong style="color: ${  BRAND_COLORS.red  };">URGENT ACTION REQUIRED:</strong> ` : ''}Please ensure that renewal is scheduled before the expiry date to maintain compliance.</p>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/certifications?pilot=${data.pilotId}" class="button">
             View Certification Details

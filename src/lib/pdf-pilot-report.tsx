@@ -68,7 +68,7 @@ export const IndividualPilotPDFDocument: React.FC<IndividualPilotPDFProps> = ({
                 <View style={{ marginTop: 8 }}>
                   <Text style={pdfStyles.bulletText}>
                     <Text style={pdfStyles.bold}>Full Name:</Text> {pilot.first_name}{' '}
-                    {pilot.middle_name ? pilot.middle_name + ' ' : ''}
+                    {pilot.middle_name ? `${pilot.middle_name  } ` : ''}
                     {pilot.last_name}
                   </Text>
                   <Text style={pdfStyles.bulletText}>

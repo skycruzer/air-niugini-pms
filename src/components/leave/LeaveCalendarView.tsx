@@ -45,7 +45,7 @@ export function LeaveCalendarView() {
             }));
             setLeaveRequests(transformedRequests);
           } else {
-            setError('Failed to load leave requests: ' + result.error);
+            setError(`Failed to load leave requests: ${  result.error}`);
           }
         } else {
           // Production mode - use service function directly
@@ -78,7 +78,7 @@ export function LeaveCalendarView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
         <span className="ml-2 text-gray-600">Loading leave calendar...</span>
       </div>
     );

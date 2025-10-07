@@ -82,7 +82,7 @@ export function getCurrentRosterPeriod(): RosterPeriod {
       return {
         code: `RP${rosterNumber}/${year}`,
         number: rosterNumber,
-        year: year,
+        year,
         startDate,
         endDate,
         daysRemaining,
@@ -119,7 +119,7 @@ export function getCurrentRosterPeriod(): RosterPeriod {
   return {
     code: `RP${rosterNumber}/${year}`,
     number: rosterNumber,
-    year: year,
+    year,
     startDate,
     endDate,
     daysRemaining,
@@ -167,7 +167,7 @@ export function getRosterPeriodFromDate(date: Date): RosterPeriod {
     return {
       code: `RP${rosterNumber}/${year}`,
       number: rosterNumber,
-      year: year,
+      year,
       startDate,
       endDate,
       daysRemaining: Math.max(0, differenceInDays(endDate, new Date())),
@@ -228,7 +228,7 @@ export function getRosterPeriodFromDate(date: Date): RosterPeriod {
   return {
     code: `RP${rosterNumber}/${year}`,
     number: rosterNumber,
-    year: year,
+    year,
     startDate,
     endDate,
     daysRemaining: Math.max(0, differenceInDays(endDate, new Date())),

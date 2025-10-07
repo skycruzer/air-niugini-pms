@@ -160,7 +160,7 @@ export function AuditLogTable({
       <div className="card">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            <div key={i} className="h-16 bg-gray-200 rounded" />
           ))}
         </div>
       </div>
@@ -286,7 +286,7 @@ export function AuditLogTable({
                                   className="text-xs text-gray-900 truncate"
                                   title={log.user_agent || undefined}
                                 >
-                                  {log.user_agent ? log.user_agent.substring(0, 30) + '...' : 'N/A'}
+                                  {log.user_agent ? `${log.user_agent.substring(0, 30)  }...` : 'N/A'}
                                 </div>
                               </div>
                               <div>

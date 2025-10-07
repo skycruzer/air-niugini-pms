@@ -181,13 +181,13 @@ export default function CertificationExpiryPlanningPage() {
 
       // Ensure .pdf extension
       if (!filename.toLowerCase().endsWith('.pdf')) {
-        filename = filename + '.pdf';
+        filename = `${filename  }.pdf`;
       }
 
       console.log('📋 PDF Details:', {
         size: pdfBlob.size,
         type: pdfBlob.type,
-        filename: filename,
+        filename,
       });
 
       // Create a properly typed PDF blob to ensure browser recognition
@@ -400,7 +400,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E4002B]"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E4002B]" />
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-blue-800">Loading...</h3>
@@ -426,7 +426,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">Access Denied</h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>You don't have permission to access certification expiry planning features.</p>
+                <p>You don&apos;t have permission to access certification expiry planning features.</p>
                 {user && (
                   <p className="mt-1">Current role: {user.role}. Required: admin or manager.</p>
                 )}
@@ -579,7 +579,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
           {state.isLoading && (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
                 <span className="ml-3 text-gray-600">Loading certification data...</span>
               </div>
             </div>

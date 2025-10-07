@@ -374,7 +374,7 @@ export function ComplianceReport({ onClose }: ComplianceReportProps) {
           <div className="text-6xl mb-4">📋</div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to Generate Report</h3>
           <p className="text-gray-600">
-            Configure report parameters above and click "Generate Report" to create a compliance
+            Configure report parameters above and click &quot;Generate Report&quot; to create a compliance
             audit report.
           </p>
         </div>

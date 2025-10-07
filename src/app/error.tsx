@@ -49,7 +49,7 @@ export default function Error({ error, reset }: ErrorProps) {
               </div>
               <h1 className="text-4xl font-bold text-white text-center mb-2">Application Error</h1>
               <p className="text-white/90 text-center">
-                We're sorry, but something unexpected happened
+                We&apos;re sorry, but something unexpected happened
               </p>
             </div>
 
@@ -175,7 +175,7 @@ export default function Error({ error, reset }: ErrorProps) {
             <div className="bg-gradient-to-r from-neutral-100 to-neutral-50 px-8 py-4 border-t border-neutral-200">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
                 <p className="text-neutral-600">Air Niugini B767 Pilot Management System</p>
-                <p className="text-[#E4002B] font-bold">Papua New Guinea's National Airline</p>
+                <p className="text-[#E4002B] font-bold">Papua New Guinea&apos;s National Airline</p>
               </div>
             </div>
           </div>

@@ -231,7 +231,7 @@ export default function DocumentsPage() {
           {/* Documents Display */}
           {documentsLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
               <p className="mt-4 text-gray-600">Loading documents...</p>
             </div>
           ) : filteredDocuments.length === 0 ? (
@@ -285,7 +285,7 @@ export default function DocumentsPage() {
                           <span
                             className="px-2 py-1 text-xs font-medium rounded-full"
                             style={{
-                              backgroundColor: doc.category.color + '20',
+                              backgroundColor: `${doc.category.color  }20`,
                               color: doc.category.color,
                             }}
                           >
@@ -380,7 +380,7 @@ function DocumentCard({ document }: { document: any }) {
           <span
             className="px-2 py-1 text-xs font-medium rounded-full"
             style={{
-              backgroundColor: document.category.color + '20',
+              backgroundColor: `${document.category.color  }20`,
               color: document.category.color,
             }}
           >

@@ -176,7 +176,7 @@ export default function CertificationsPage() {
         <DashboardLayout>
           <div className="p-6">
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
               <p className="text-gray-600 mt-2">Loading certification data...</p>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function CertificationsPage() {
                   <FileEdit className="w-4 h-4 mr-2" />
                   Bulk Update
                 </button>
-                <div className="h-6 w-px bg-gray-300 mx-1"></div>
+                <div className="h-6 w-px bg-gray-300 mx-1" />
                 <button
                   onClick={() => setCurrentView('list')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${

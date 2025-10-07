@@ -103,7 +103,7 @@ export function EnhancedDashboard({
                     : 'disconnected'
               }`}
             >
-              <div className="w-2 h-2 rounded-full bg-current animate-pulse-slow"></div>
+              <div className="w-2 h-2 rounded-full bg-current animate-pulse-slow" />
               <span>Pilots</span>
             </div>
 
@@ -116,7 +116,7 @@ export function EnhancedDashboard({
                     : 'disconnected'
               }`}
             >
-              <div className="w-2 h-2 rounded-full bg-current animate-pulse-slow"></div>
+              <div className="w-2 h-2 rounded-full bg-current animate-pulse-slow" />
               <span>Certs</span>
             </div>
           </div>
@@ -252,7 +252,7 @@ export function EnhancedDashboard({
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 animate-fade-in">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse-slow"></div>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse-slow" />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-blue-900">

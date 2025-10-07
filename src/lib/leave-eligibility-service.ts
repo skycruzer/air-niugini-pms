@@ -846,10 +846,10 @@ export async function checkLeaveEligibility(
         console.log('📊 SENIORITY APPROVAL CALCULATION:', {
           requestingRole,
           currentlyAvailable: currentAvailable,
-          minimumRequired: minimumRequired,
-          totalRequesting: totalRequesting,
-          remainingAfterAllApprovals: remainingAfterAllApprovals,
-          canApproveAll: canApproveAll,
+          minimumRequired,
+          totalRequesting,
+          remainingAfterAllApprovals,
+          canApproveAll,
           maxCanApprove: maxApprovable,
         });
 
@@ -870,7 +870,7 @@ export async function checkLeaveEligibility(
             `Total Requesting Leave: ${totalRequesting} ${requestingRole}${totalRequesting > 1 ? 's' : ''}\n` +
             `If All Approved, Remaining: ${remainingAfterAllApprovals} (❌ BELOW minimum of ${minimumRequired})\n` +
             `Maximum Can Approve: ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''} (to maintain minimum crew)\n\n` +
-            `✅ APPROVE (Highest Seniority - ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''}):\n` +
+            `✅ APPROVE (Highest Seniority - ${maxApprovable} pilot${maxApprovable > 1 ? 's' : ''}):\n${ 
             canApprove
               .map(
                 (req, index) =>
@@ -878,8 +878,8 @@ export async function checkLeaveEligibility(
                   `     • Employee ID: ${req.employeeId}\n` +
                   `     • Dates: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n`
               )
-              .join('\n') +
-            `\n🔄 REQUEST TO RESCHEDULE (Lower Seniority - ${mustReschedule.length} pilot${mustReschedule.length > 1 ? 's' : ''}):\n` +
+              .join('\n') 
+            }\n🔄 REQUEST TO RESCHEDULE (Lower Seniority - ${mustReschedule.length} pilot${mustReschedule.length > 1 ? 's' : ''}):\n${ 
             mustReschedule
               .map((req, index) => {
                 const spreadingOptions = generateDateSpreadingSuggestions(
@@ -893,13 +893,13 @@ export async function checkLeaveEligibility(
                   `     • Employee ID: ${req.employeeId}\n` +
                   `     • Current Request: ${new Date(req.startDate).toLocaleDateString('en-AU')} to ${new Date(req.endDate).toLocaleDateString('en-AU')} (${req.overlappingDays} days)\n` +
                   `     • Reason: Approving would drop crew below minimum (${remainingIfApproved}/${minimumRequired})\n` +
-                  `     • Suggested Alternative Dates:\n` +
+                  `     • Suggested Alternative Dates:\n${ 
                   spreadingOptions
                     .map((option, optIndex) => `        ${optIndex + 1}) ${option}\n`)
-                    .join('')
+                    .join('')}`
                 );
               })
-              .join('\n');
+              .join('\n')}`;
         } else {
           // SCENARIO 2c: At or below minimum already - need spreading recommendations for ALL
           console.log('❌ CREW SHORTAGE - All requests need rescheduling or sequential approval');

@@ -118,7 +118,7 @@ export async function getLeaveRequestById(requestId: string): Promise<LeaveReque
     return {
       ...request,
       pilot_name: request.pilots
-        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? `${request.pilots.middle_name  } ` : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
       pilot_role: request.pilots?.role || null,
@@ -354,7 +354,7 @@ export async function getPendingLeaveRequests(): Promise<LeaveRequest[]> {
     return (requests || []).map((request) => ({
       ...request,
       pilot_name: request.pilots
-        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? `${request.pilots.middle_name  } ` : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
     }));
@@ -401,7 +401,7 @@ export async function checkLeaveConflicts(
     return (conflicts || []).map((request) => ({
       ...request,
       pilot_name: request.pilots
-        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? `${request.pilots.middle_name  } ` : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
     }));
@@ -440,7 +440,7 @@ export async function getLeaveRequestsByRosterPeriod(
     return (requests || []).map((request) => ({
       ...request,
       pilot_name: request.pilots
-        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? `${request.pilots.middle_name  } ` : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
       reviewer_name: request.reviewer?.name || null,
@@ -487,7 +487,7 @@ export async function getLeaveRequestsByRosterPeriodAdmin(
     return (requests || []).map((request: any) => ({
       ...request,
       pilot_name: request.pilots
-        ? `${request.pilots.first_name} ${request.pilots.middle_name ? request.pilots.middle_name + ' ' : ''}${request.pilots.last_name}`
+        ? `${request.pilots.first_name} ${request.pilots.middle_name ? `${request.pilots.middle_name  } ` : ''}${request.pilots.last_name}`
         : 'Unknown Pilot',
       employee_id: request.pilots?.employee_id || 'N/A',
       reviewer_name: request.reviewer?.name || null,

@@ -270,7 +270,7 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
       </div>
 
       {/* Hover effect background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
     </a>
   );
 }
@@ -480,7 +480,7 @@ export default function DashboardPage() {
                       Live Data
                     </div>
                     <div className="flex items-center text-body-small text-gray-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow"></div>
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow" />
                       All Systems Operational
                     </div>
                   </div>
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                       <div className="text-center lg:text-right">
                         <p className="text-body-small text-red-100 mb-2">Days Remaining</p>
                         <div className="relative">
-                          <div className="absolute inset-0 bg-[#FFC72C]/20 rounded-3xl blur-2xl"></div>
+                          <div className="absolute inset-0 bg-[#FFC72C]/20 rounded-3xl blur-2xl" />
                           <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl px-8 py-6 border border-white/20">
                             <p className="text-5xl lg:text-6xl font-black text-white mb-1">
                               {currentRoster?.daysRemaining || 0}
@@ -670,8 +670,8 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Scroll indicators */}
-                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
                   </div>
 
                   {/* Help text */}
@@ -919,7 +919,7 @@ export default function DashboardPage() {
                       }}
                       variant="pie"
                       height={250}
-                      showLegend={true}
+                      showLegend
                     />
                   </div>
 
@@ -933,7 +933,7 @@ export default function DashboardPage() {
                       complianceRate={complianceRate}
                       variant="svg-circle"
                       size="md"
-                      showLabel={true}
+                      showLabel
                       showStatus={false}
                     />
                     <div className="mt-4 text-center">
@@ -942,7 +942,7 @@ export default function DashboardPage() {
                         variant="simple"
                         size="sm"
                         showLabel={false}
-                        showStatus={true}
+                        showStatus
                       />
                     </div>
                   </div>
@@ -965,7 +965,7 @@ export default function DashboardPage() {
                           <div
                             className="bg-blue-500 h-2 rounded-full transition-all duration-500"
                             style={{ width: `${fleetStats?.utilization || 78}%` }}
-                          ></div>
+                           />
                         </div>
                       </div>
 
@@ -974,7 +974,7 @@ export default function DashboardPage() {
                           complianceRate={complianceRate}
                           variant="bar"
                           size="sm"
-                          showLabel={true}
+                          showLabel
                           showStatus={false}
                         />
                       </div>
@@ -992,7 +992,7 @@ export default function DashboardPage() {
                             style={{
                               width: `${Math.round((complianceRate + (fleetStats?.utilization || 78)) / 2)}%`,
                             }}
-                          ></div>
+                           />
                         </div>
                       </div>
                     </div>
@@ -1056,7 +1056,7 @@ export default function DashboardPage() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse-slow"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse-slow" />
                         <div>
                           <p className="font-medium text-gray-900">Database Connection</p>
                           <p className="text-xs text-gray-600">PostgreSQL Supabase</p>
@@ -1069,7 +1069,7 @@ export default function DashboardPage() {
 
                     <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse-slow"></div>
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse-slow" />
                         <div>
                           <p className="font-medium text-gray-900">Roster Calculations</p>
                           <p className="text-xs text-gray-600">Automated 28-day cycles</p>
@@ -1082,7 +1082,7 @@ export default function DashboardPage() {
 
                     <div className="flex items-center justify-between p-3 bg-white/50 rounded-xl">
                       <div className="flex items-center">
-                        <div className="w-3 h-3 bg-amber-500 rounded-full mr-3 animate-pulse-slow"></div>
+                        <div className="w-3 h-3 bg-amber-500 rounded-full mr-3 animate-pulse-slow" />
                         <div>
                           <p className="font-medium text-gray-900">Authentication</p>
                           <p className="text-xs text-gray-600">Development environment</p>
@@ -1150,7 +1150,7 @@ export default function DashboardPage() {
                           >
                             <div
                               className={`w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 ${dotColors[activity.color as keyof typeof dotColors]}`}
-                            ></div>
+                             />
                             <div className="flex-1">
                               <p
                                 className={`text-sm font-medium ${textColors[activity.color as keyof typeof textColors]}`}

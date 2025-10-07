@@ -376,7 +376,7 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
     <ModalSheet isOpen={isOpen} onClose={onClose} title="Edit Pilot" size="xl">
       {loading ? (
         <div className="p-6 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
           <p className="text-gray-600 mt-2">Loading pilot data...</p>
         </div>
       ) : (
@@ -564,7 +564,7 @@ export function PilotEditModal({ isOpen, onClose, onSuccess, pilotId }: PilotEdi
               className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
               ) : (
                 <span className="mr-2">💾</span>
               )}

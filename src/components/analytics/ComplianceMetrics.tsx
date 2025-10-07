@@ -113,7 +113,7 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
             complianceRate={parseFloat(overallCompliance)}
             variant="svg-circle"
             size="lg"
-            showLabel={true}
+            showLabel
             showStatus={false}
           />
           <div className="mt-6 grid grid-cols-3 gap-4">
@@ -202,7 +202,7 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
             }}
             variant="pie"
             height={300}
-            showLegend={true}
+            showLegend
           />
         </CardContent>
       </Card>

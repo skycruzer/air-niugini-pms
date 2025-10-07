@@ -155,7 +155,7 @@ export function CertificationTimeline({
               <ChevronRight className="w-4 h-4" />
             </button>
 
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
+            <div className="h-6 w-px bg-gray-300 mx-2" />
 
             {/* Zoom Controls */}
             <button
@@ -178,7 +178,7 @@ export function CertificationTimeline({
               <ZoomIn className="w-4 h-4" />
             </button>
 
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
+            <div className="h-6 w-px bg-gray-300 mx-2" />
 
             {/* Filter Toggle */}
             <button
@@ -274,7 +274,7 @@ export function CertificationTimeline({
             </div>
 
             {/* Timeline Base Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 rounded-full"></div>
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 rounded-full" />
 
             {/* Certification Events */}
             {filteredCertifications.map((cert, index) => {
@@ -306,7 +306,7 @@ export function CertificationTimeline({
                             ? 'bg-green-500 border-green-600'
                             : 'bg-gray-400 border-gray-500'
                     } ${isHovered ? 'scale-150' : 'scale-100'}`}
-                  ></div>
+                   />
 
                   {/* Hover Card */}
                   <AnimatePresence>
@@ -378,15 +378,15 @@ export function CertificationTimeline({
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center justify-center space-x-6 text-sm">
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+              <div className="w-3 h-3 rounded-full bg-red-500 mr-2" />
               <span className="text-gray-700">Expired</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2" />
               <span className="text-gray-700">Expiring Soon (≤30 days)</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500 mr-2" />
               <span className="text-gray-700">Current</span>
             </div>
           </div>

@@ -166,7 +166,7 @@ export default function BulkUpdatePage() {
       <DashboardLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B] mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B] mx-auto" />
             <p className="mt-4 text-gray-600">Loading pilots and check types...</p>
           </div>
         </div>
@@ -395,7 +395,7 @@ export default function BulkUpdatePage() {
               >
                 {submitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                     <span>Updating...</span>
                   </>
                 ) : (

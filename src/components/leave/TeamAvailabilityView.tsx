@@ -295,7 +295,7 @@ export function TeamAvailabilityView({
               <div
                 className="bg-green-600 h-2 rounded-full"
                 style={{ width: `${(stats.highDays / 28) * 100}%` }}
-              ></div>
+               />
             </div>
           </div>
 
@@ -306,7 +306,7 @@ export function TeamAvailabilityView({
               <div
                 className="bg-yellow-600 h-2 rounded-full"
                 style={{ width: `${(stats.mediumDays / 28) * 100}%` }}
-              ></div>
+               />
             </div>
           </div>
 
@@ -317,7 +317,7 @@ export function TeamAvailabilityView({
               <div
                 className="bg-orange-600 h-2 rounded-full"
                 style={{ width: `${(stats.lowDays / 28) * 100}%` }}
-              ></div>
+               />
             </div>
           </div>
 
@@ -328,7 +328,7 @@ export function TeamAvailabilityView({
               <div
                 className="bg-red-600 h-2 rounded-full"
                 style={{ width: `${(stats.criticalDays / 28) * 100}%` }}
-              ></div>
+               />
             </div>
           </div>
         </div>
@@ -380,7 +380,7 @@ export function TeamAvailabilityView({
             { range: '<50%', color: 'bg-red-500', label: 'Critical' },
           ].map(({ range, color, label }) => (
             <div key={range} className="flex items-center space-x-2">
-              <div className={`w-4 h-4 rounded ${color}`}></div>
+              <div className={`w-4 h-4 rounded ${color}`} />
               <div>
                 <div className="text-xs font-medium text-gray-900">{label}</div>
                 <div className="text-xs text-gray-500">{range}</div>

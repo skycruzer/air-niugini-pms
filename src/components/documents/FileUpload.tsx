@@ -217,7 +217,7 @@ export function FileUpload({
                       <AlertCircle className="h-5 w-5 text-red-500" />
                     )}
                     {uploadFile.status === 'uploading' && (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
                     )}
                     <button
                       onClick={() => removeFile(index)}
@@ -239,7 +239,7 @@ export function FileUpload({
                     <div
                       className="bg-blue-600 h-1 rounded-full transition-all duration-300"
                       style={{ width: `${uploadFile.progress}%` }}
-                    ></div>
+                     />
                   </div>
                 )}
               </div>

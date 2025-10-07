@@ -422,19 +422,19 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
       <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-green-500 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-green-500 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Approved</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-yellow-400 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-yellow-400 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Pending</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-red-500 rounded-lg shadow"></div>
+            <div className="w-4 h-4 bg-red-500 rounded-lg shadow" />
             <span className="text-gray-700 font-medium">Denied</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-50 border-2 border-blue-500 rounded-lg"></div>
+            <div className="w-4 h-4 bg-blue-50 border-2 border-blue-500 rounded-lg" />
             <span className="text-gray-700 font-medium">Today</span>
           </div>
         </div>

@@ -20,7 +20,7 @@ interface MockSupabaseResponse<T> {
 export function createMockSupabaseClient() {
   const mockFrom = (table: string) => {
     let selectedData: any[] = [];
-    let filters: any[] = [];
+    const filters: any[] = [];
     let selectColumns = '*';
     let orderByField: string | null = null;
     let orderDirection: 'asc' | 'desc' = 'asc';

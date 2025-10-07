@@ -192,7 +192,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="aviation-header p-6">
                 <div className="flex items-center">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30"></div>
+                    <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30" />
                     <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
                       <img
                         src="/images/air-niugini-logo.jpg"
@@ -278,7 +278,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
                       <span className="h-5 w-5 text-white text-lg">👤</span>
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                   </div>
                   <div className="ml-3 flex-1">
                     <p className="text-sm font-medium text-gray-900">{user?.name}</p>
@@ -316,7 +316,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center justify-between">
               <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''}`}>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30"></div>
+                  <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30" />
                   <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
                     <img
                       src="/images/air-niugini-logo.jpg"
@@ -409,7 +409,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
                     {/* Active indicator for collapsed state */}
                     {sidebarCollapsed && isActive && (
-                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full"></div>
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full" />
                     )}
                   </Link>
 
@@ -446,15 +446,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </h4>
                 <div className="space-y-2">
                   <div className="flex items-center text-xs">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow" />
                     <span className="text-gray-700">Database Online</span>
                   </div>
                   <div className="flex items-center text-xs">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-slow" />
                     <span className="text-gray-700">Roster Sync Active</span>
                   </div>
                   <div className="flex items-center text-xs">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse-slow"></div>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-2 animate-pulse-slow" />
                     <span className="text-gray-700">Dev Mode</span>
                   </div>
                 </div>
@@ -476,7 +476,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       Air Niugini B767 PMS
                     </h5>
                     <p className="text-xs opacity-80 leading-relaxed">
-                      Professional pilot management system for Papua New Guinea's national airline
+                      Professional pilot management system for Papua New Guinea&apos;s national airline
                       fleet operations.
                     </p>
                   </div>
@@ -509,7 +509,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
                   <span className="h-5 w-5 text-white text-lg">👤</span>
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
               </div>
 
               {!sidebarCollapsed && (
@@ -536,7 +536,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div className="absolute left-full ml-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                   <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
                     {user?.name}
-                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-gray-900"></div>
+                    <div className="absolute left-2 top-1/2 transform -translate-y-1/2 -translate-x-full border-4 border-transparent border-r-gray-900" />
                   </div>
                 </div>
               )}

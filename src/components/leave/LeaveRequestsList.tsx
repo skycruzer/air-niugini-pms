@@ -259,7 +259,7 @@ export function LeaveRequestsList({
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
         <p className="text-gray-600 mt-2">Loading leave requests...</p>
       </div>
     );
@@ -408,7 +408,7 @@ export function LeaveRequestsList({
                     className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {deletingId === request.id ? (
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
                     ) : (
                       'Delete'
                     )}

@@ -268,7 +268,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         label: 'Expired',
         data: data.expiredCounts,
         borderColor: COLORS.danger,
-        backgroundColor: COLORS.danger + '20',
+        backgroundColor: `${COLORS.danger  }20`,
         fill: true,
         tension: 0.4,
       },
@@ -276,7 +276,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         label: 'Expiring Soon',
         data: data.expiringCounts,
         borderColor: COLORS.warning,
-        backgroundColor: COLORS.warning + '20',
+        backgroundColor: `${COLORS.warning  }20`,
         fill: true,
         tension: 0.4,
       },
@@ -495,7 +495,7 @@ export function PilotRoleDistributionChart({ data, onClick }: PilotRoleDistribut
       },
       tooltip: {
         callbacks: {
-          label: function (context: any) {
+          label (context: any) {
             const total = data.total;
             const value = context.parsed;
             const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
@@ -554,11 +554,11 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
         borderWidth: 1,
         borderRadius: 8,
         hoverBackgroundColor: [
-          COLORS.info + '80',
-          COLORS.secondary + '80',
-          COLORS.success + '80',
-          COLORS.warning + '80',
-          COLORS.danger + '80',
+          `${COLORS.info  }80`,
+          `${COLORS.secondary  }80`,
+          `${COLORS.success  }80`,
+          `${COLORS.warning  }80`,
+          `${COLORS.danger  }80`,
         ],
       },
     ],
@@ -592,7 +592,7 @@ export function AgeDistributionChart({ data, interactive = true }: AgeDistributi
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterLabel: function (context: any) {
+          afterLabel (context: any) {
             const total = data.total;
             const percentage = total > 0 ? Math.round((context.parsed.y / total) * 100) : 0;
             return `${percentage}% of total pilots`;
@@ -714,7 +714,7 @@ export function CertificationTrendChart({
         label: 'Total Certifications',
         data: data.certifications.total,
         borderColor: COLORS.primary,
-        backgroundColor: COLORS.primary + '20',
+        backgroundColor: `${COLORS.primary  }20`,
         fill: true,
         tension: 0.4,
         pointBackgroundColor: COLORS.primary,
@@ -727,7 +727,7 @@ export function CertificationTrendChart({
         label: 'Expired',
         data: data.certifications.expired,
         borderColor: COLORS.danger,
-        backgroundColor: COLORS.danger + '20',
+        backgroundColor: `${COLORS.danger  }20`,
         fill: true,
         tension: 0.4,
         pointBackgroundColor: COLORS.danger,
@@ -740,7 +740,7 @@ export function CertificationTrendChart({
         label: 'Expiring Soon',
         data: data.certifications.expiring,
         borderColor: COLORS.warning,
-        backgroundColor: COLORS.warning + '20',
+        backgroundColor: `${COLORS.warning  }20`,
         fill: true,
         tension: 0.4,
         pointBackgroundColor: COLORS.warning,
@@ -788,7 +788,7 @@ export function CertificationTrendChart({
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterLabel: function (context: any) {
+          afterLabel (context: any) {
             if (context.datasetIndex === 0) {
               const expired = data.certifications.expired[context.dataIndex] || 0;
               const expiring = data.certifications.expiring[context.dataIndex] || 0;
@@ -903,7 +903,7 @@ export function LeaveRequestTrendsChart({ data }: LeaveRequestTrendsChartProps) 
         borderColor: COLORS.primary,
         borderWidth: 1,
         callbacks: {
-          afterBody: function (context: any) {
+          afterBody (context: any) {
             const monthData = data.trends.monthlyRequests[context[0].dataIndex];
             const approvalRate =
               monthData.total > 0 ? Math.round((monthData.approved / monthData.total) * 100) : 0;

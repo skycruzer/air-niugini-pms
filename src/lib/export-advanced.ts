@@ -44,12 +44,12 @@ export async function exportToExcel(data: ExportData, options: ExportOptions): P
   }
 
   // Add headers
-  csvContent += data.headers.join(',') + '\n';
+  csvContent += `${data.headers.join(',')  }\n`;
 
   // Add rows
   data.rows.forEach((row) => {
     csvContent +=
-      row
+      `${row
         .map((cell) => {
           // Escape cells containing commas or quotes
           if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
@@ -57,7 +57,7 @@ export async function exportToExcel(data: ExportData, options: ExportOptions): P
           }
           return cell;
         })
-        .join(',') + '\n';
+        .join(',')  }\n`;
   });
 
   return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -72,19 +72,19 @@ export async function exportToCSV(data: ExportData, options: ExportOptions): Pro
   let csvContent = '';
 
   // Add headers
-  csvContent += data.headers.join(',') + '\n';
+  csvContent += `${data.headers.join(',')  }\n`;
 
   // Add rows
   data.rows.forEach((row) => {
     csvContent +=
-      row
+      `${row
         .map((cell) => {
           if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
             return `"${cell.replace(/"/g, '""')}"`;
           }
           return cell;
         })
-        .join(',') + '\n';
+        .join(',')  }\n`;
   });
 
   return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

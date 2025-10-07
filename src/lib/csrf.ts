@@ -62,7 +62,7 @@ export function generateCsrfToken(userId?: string): string {
   });
 
   logger.debug('Generated new CSRF token', {
-    token: token.substring(0, 8) + '...',
+    token: `${token.substring(0, 8)  }...`,
     userId: userId || 'anonymous',
   });
 

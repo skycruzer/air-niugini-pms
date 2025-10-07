@@ -322,7 +322,7 @@ export default function AuditLogsPage() {
                 logs={logs}
                 isLoading={isLoading}
                 onRowClick={handleLogClick}
-                showPagination={true}
+                showPagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}

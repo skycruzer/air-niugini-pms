@@ -52,7 +52,7 @@ function getCurrentRosterPeriod() {
   return {
     code: `RP${totalPeriods}/${year}`,
     number: totalPeriods,
-    year: year,
+    year,
     startDate,
     endDate,
     daysRemaining,
@@ -127,13 +127,13 @@ export default async function HomePage() {
               <div className="flex items-center justify-center lg:justify-start mb-6">
                 <div className="relative group">
                   {/* Animated glow effect */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-air-niugini-red via-air-niugini-gold to-air-niugini-red rounded-full blur-xl opacity-75 group-hover:opacity-100 animate-pulse"></div>
-                  <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-air-niugini-red via-air-niugini-gold to-air-niugini-red rounded-full blur-xl opacity-75 group-hover:opacity-100 animate-pulse" />
+                  <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
 
                   {/* Logo container with enhanced styling */}
                   <div className="relative bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md rounded-2xl p-5 border-2 border-white/30 shadow-2xl group-hover:scale-105 transition-transform duration-300">
                     {/* Inner glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/20 to-transparent rounded-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/20 to-transparent rounded-2xl" />
 
                     {/* Logo image */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -267,7 +267,7 @@ export default async function HomePage() {
               <div className="text-center lg:text-right">
                 <p className="text-body-small text-red-100 mb-2">Days Remaining</p>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-air-niugini-gold/20 rounded-2xl blur-xl"></div>
+                  <div className="absolute inset-0 bg-air-niugini-gold/20 rounded-2xl blur-xl" />
                   <p className="relative text-5xl lg:text-6xl font-black text-white bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/20">
                     {currentRoster.daysRemaining}
                   </p>
@@ -353,7 +353,7 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow"></div>
+                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow" />
                 <div className="text-center">
                   <p className="font-semibold text-gray-900">Database Connected</p>
                   <p className="text-sm text-gray-600">PostgreSQL</p>
@@ -361,7 +361,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow"></div>
+                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow" />
                 <div className="text-center">
                   <p className="font-semibold text-gray-900">Roster Calculations</p>
                   <p className="text-sm text-gray-600">Active & Synchronized</p>
@@ -369,7 +369,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow"></div>
+                <div className="w-4 h-4 bg-green-500 rounded-full mr-4 animate-pulse-slow" />
                 <div className="text-center">
                   <p className="font-semibold text-gray-900">Server-Side Rendering</p>
                   <p className="text-sm text-gray-600">Optimized Performance</p>
@@ -421,7 +421,7 @@ export default async function HomePage() {
             <div className="flex items-center mb-6 group">
               <div className="relative">
                 {/* Subtle glow for footer */}
-                <div className="absolute inset-0 bg-air-niugini-gold/30 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-air-niugini-gold/30 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative bg-white/5 backdrop-blur-sm rounded-lg p-2 border border-white/10 group-hover:border-air-niugini-gold/50 transition-colors">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img

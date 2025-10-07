@@ -151,12 +151,12 @@ export async function getExpiringCertifications(daysAhead: number = 60) {
 
         return {
           pilotName:
-            `${check.pilots?.first_name || ''} ${check.pilots?.middle_name ? check.pilots.middle_name + ' ' : ''}${check.pilots?.last_name || ''}`.trim(),
+            `${check.pilots?.first_name || ''} ${check.pilots?.middle_name ? `${check.pilots.middle_name  } ` : ''}${check.pilots?.last_name || ''}`.trim(),
           employeeId: check.pilots?.employee_id || '',
           checkCode: check.check_types?.check_code || '',
           checkDescription: check.check_types?.check_description || '',
           category: check.check_types?.category || '',
-          expiryDate: expiryDate,
+          expiryDate,
           status: getCertificationStatus(expiryDate),
           expiry_roster_period: rosterPeriod,
           expiry_roster_display: rosterDisplay,

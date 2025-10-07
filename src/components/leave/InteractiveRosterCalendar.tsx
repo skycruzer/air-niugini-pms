@@ -517,7 +517,7 @@ export function InteractiveRosterCalendar({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
           {Object.entries(LEAVE_TYPE_COLORS).map(([type, colors]) => (
             <div key={type} className="flex items-center space-x-2">
-              <div className={`w-4 h-4 rounded ${colors.darkBg}`}></div>
+              <div className={`w-4 h-4 rounded ${colors.darkBg}`} />
               <span>{type}</span>
             </div>
           ))}
@@ -527,19 +527,19 @@ export function InteractiveRosterCalendar({
           <p className="text-xs text-gray-600 mb-2">Availability Indicators:</p>
           <div className="flex items-center space-x-4 text-xs">
             <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-green-50 border border-gray-300 rounded"></div>
+              <div className="w-4 h-4 bg-green-50 border border-gray-300 rounded" />
               <span>High (≥80%)</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-yellow-50 border border-gray-300 rounded"></div>
+              <div className="w-4 h-4 bg-yellow-50 border border-gray-300 rounded" />
               <span>Medium (60-79%)</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-orange-50 border border-gray-300 rounded"></div>
+              <div className="w-4 h-4 bg-orange-50 border border-gray-300 rounded" />
               <span>Low (40-59%)</span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-4 h-4 bg-red-50 border border-gray-300 rounded"></div>
+              <div className="w-4 h-4 bg-red-50 border border-gray-300 rounded" />
               <span>Critical (&lt;40%)</span>
             </div>
           </div>

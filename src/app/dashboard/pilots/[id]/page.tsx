@@ -248,7 +248,7 @@ export default function PilotDetailPage() {
         <DashboardLayout>
           <div className="p-6">
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-air-niugini-red mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-air-niugini-red mx-auto" />
               <p className="text-gray-600 mt-2">Loading pilot details...</p>
             </div>
           </div>
@@ -553,7 +553,7 @@ export default function PilotDetailPage() {
                 >
                   {deleting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                       Deleting...
                     </>
                   ) : (

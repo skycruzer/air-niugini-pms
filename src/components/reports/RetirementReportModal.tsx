@@ -108,7 +108,7 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
             <span className="ml-3 text-gray-600">Loading retirement data...</span>
           </div>
         )}

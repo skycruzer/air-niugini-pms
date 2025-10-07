@@ -119,7 +119,7 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
         <div className="bg-neutral-100 px-8 py-4 border-t border-neutral-200">
           <div className="flex items-center justify-between text-xs text-neutral-600">
             <p>Air Niugini Pilot Management System</p>
-            <p className="text-[#E4002B] font-semibold">Papua New Guinea's National Airline</p>
+            <p className="text-[#E4002B] font-semibold">Papua New Guinea&apos;s National Airline</p>
           </div>
         </div>
       </div>

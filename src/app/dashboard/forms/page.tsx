@@ -94,7 +94,7 @@ export default function FormsManagementPage() {
       null,
       2
     );
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${  encodeURIComponent(dataStr)}`;
     const exportFileDefaultName = `form-${submission.id}-${Date.now()}.json`;
 
     const linkElement = document.createElement('a');

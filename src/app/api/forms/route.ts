@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
 
       // Map form leave types to system leave types
       const leaveTypeMapping: Record<string, string> = {
-        'RDO': 'RDO',
-        'WDO': 'SDO',
+        RDO: 'RDO',
+        WDO: 'SDO',
         'Annual Leave': 'ANNUAL',
         'Sick Leave': 'SICK',
         'Compassionate Leave': 'COMPASSIONATE',

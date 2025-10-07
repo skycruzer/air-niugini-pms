@@ -87,7 +87,7 @@ export default function LeaveCalendarPage() {
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Leave Management
               </Link>
-              <div className="h-6 w-px bg-gray-300"></div>
+              <div className="h-6 w-px bg-gray-300" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                   <Calendar className="w-7 h-7 text-[#E4002B] mr-3" />
@@ -102,14 +102,14 @@ export default function LeaveCalendarPage() {
           <RosterPeriodNavigator
             currentPeriod={currentRoster}
             onPeriodChange={handleRosterPeriodChange}
-            showCountdown={true}
-            showTimeline={true}
+            showCountdown
+            showTimeline
           />
 
           {/* Calendar Component */}
           {loading ? (
             <div className="flex items-center justify-center p-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
               <span className="ml-3 text-gray-600">Loading calendar...</span>
             </div>
           ) : (

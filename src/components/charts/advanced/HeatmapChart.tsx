@@ -78,7 +78,7 @@ export default function HeatmapChart({
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="p-2 text-sm font-medium text-left border"></th>
+                <th className="p-2 text-sm font-medium text-left border" />
                 {xValues.map((x) => (
                   <th key={x} className="p-2 text-sm font-medium text-center border">
                     {x}

@@ -197,7 +197,7 @@ export function exportPilotsToCSV(pilots: PilotExportData[], filtered = false): 
     'First Name': pilot.first_name,
     'Middle Name': pilot.middle_name || '',
     'Last Name': pilot.last_name,
-    'Full Name': `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`,
+    'Full Name': `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`,
     Role: pilot.role,
     'Contract Type': pilot.contract_type || '',
     Nationality: pilot.nationality || '',
@@ -440,7 +440,7 @@ export function exportComplianceReport(pilots: PilotExportData[]): void {
 
   const exportData = nonCompliantPilots.map((pilot) => ({
     'Employee ID': pilot.employee_id,
-    'Pilot Name': `${pilot.first_name} ${pilot.middle_name ? pilot.middle_name + ' ' : ''}${pilot.last_name}`,
+    'Pilot Name': `${pilot.first_name} ${pilot.middle_name ? `${pilot.middle_name  } ` : ''}${pilot.last_name}`,
     Role: pilot.role,
     Status: pilot.is_active ? 'Active' : 'Inactive',
     'Expired Certifications': pilot.certificationStatus.expired,

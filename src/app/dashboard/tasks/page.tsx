@@ -298,7 +298,7 @@ function TasksListView({ tasks, isLoading }: { tasks: any[]; isLoading: boolean 
                     <span
                       className="px-2 py-1 text-xs font-medium rounded-full"
                       style={{
-                        backgroundColor: task.category.color + '20',
+                        backgroundColor: `${task.category.color  }20`,
                         color: task.category.color,
                       }}
                     >
@@ -381,7 +381,7 @@ function TasksKanbanView({ tasks, isLoading }: { tasks: any[]; isLoading: boolea
                     <span
                       className="inline-block px-2 py-1 text-xs font-medium rounded-full mb-2"
                       style={{
-                        backgroundColor: task.category.color + '20',
+                        backgroundColor: `${task.category.color  }20`,
                         color: task.category.color,
                       }}
                     >

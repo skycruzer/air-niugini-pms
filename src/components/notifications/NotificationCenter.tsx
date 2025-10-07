@@ -280,7 +280,7 @@ export default function NotificationCenter() {
                       <p className="text-sm font-semibold text-gray-900">
                         {notification.title}
                         {!notification.is_read && (
-                          <span className="ml-2 inline-block w-2 h-2 bg-[#E4002B] rounded-full"></span>
+                          <span className="ml-2 inline-block w-2 h-2 bg-[#E4002B] rounded-full" />
                         )}
                       </p>
                       <Button

@@ -585,7 +585,7 @@ export default function PilotsPage() {
           <main role="main" aria-label="Pilots listing">
             {loading ? (
               <div className="text-center py-8 md:py-12">
-                <div className="loading-spinner-lg mx-auto"></div>
+                <div className="loading-spinner-lg mx-auto" />
                 <p
                   className="text-gray-600 mt-4 text-sm md:text-base"
                   role="status"
@@ -594,8 +594,8 @@ export default function PilotsPage() {
                   Loading pilots...
                 </p>
                 <div className="mt-4 space-y-2">
-                  <div className="skeleton h-4 w-32 mx-auto"></div>
-                  <div className="skeleton h-4 w-24 mx-auto"></div>
+                  <div className="skeleton h-4 w-32 mx-auto" />
+                  <div className="skeleton h-4 w-24 mx-auto" />
                 </div>
               </div>
             ) : filteredPilots.length === 0 ? (

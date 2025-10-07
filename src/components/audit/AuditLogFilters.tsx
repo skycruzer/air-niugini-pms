@@ -380,7 +380,7 @@ export function AuditLogFilters({
 
             {searchQuery && (
               <span className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium border border-purple-300">
-                Search: "{searchQuery}"
+                Search: &quot;{searchQuery}&quot;
                 <button
                   onClick={() => setSearchQuery('')}
                   className="ml-2 text-purple-800 hover:text-purple-900"

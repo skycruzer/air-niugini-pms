@@ -60,12 +60,12 @@ export default function LoginPage() {
             <div className="flex items-center text-white group">
               <div className="relative mr-4">
                 {/* Enhanced glow effects */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity" />
 
                 {/* Logo container */}
                 <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md rounded-xl p-3 border-2 border-white/25 shadow-xl group-hover:scale-105 transition-transform duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/10 to-transparent rounded-xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-air-niugini-gold/10 to-transparent rounded-xl" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/air-niugini-logo.jpg"
@@ -168,7 +168,7 @@ export default function LoginPage() {
               <div className="card-premium bg-white/95 backdrop-blur-md border border-white/20 shadow-2xl">
                 <div className="text-center mb-8">
                   <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-blue-600/20 rounded-2xl blur-lg"></div>
+                    <div className="absolute inset-0 bg-blue-600/20 rounded-2xl blur-lg" />
                     <div className="relative w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
                       <Shield className="text-white w-8 h-8" />
                     </div>
@@ -248,7 +248,7 @@ export default function LoginPage() {
                   >
                     {isLoading ? (
                       <>
-                        <div className="loading-spinner-lg mr-3"></div>
+                        <div className="loading-spinner-lg mr-3" />
                         Authenticating...
                       </>
                     ) : (

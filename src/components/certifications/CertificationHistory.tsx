@@ -79,7 +79,7 @@ export function CertificationHistory({
           mockHistory.push({
             id: 'current',
             date: new Date(), // Date updated/created
-            expiryDate: expiryDate,
+            expiryDate,
             updatedBy: 'System',
             notes: 'Current certification',
           });
@@ -137,7 +137,7 @@ export function CertificationHistory({
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
           <p className="text-gray-600 mt-2">Loading certification history...</p>
         </div>
       </div>
@@ -264,7 +264,7 @@ export function CertificationHistory({
 
         <div className="relative">
           {/* Timeline Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200" />
 
           {/* Timeline Entries */}
           <div className="space-y-6">
@@ -290,7 +290,7 @@ export function CertificationHistory({
                           ? 'bg-green-500 border-green-600'
                           : 'bg-gray-300 border-gray-400'
                     }`}
-                  ></div>
+                   />
 
                   {/* Entry Card */}
                   <div

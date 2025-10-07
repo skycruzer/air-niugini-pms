@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
           title: 'Test Notification',
           message:
             'This is a test notification from the Air Niugini Fleet Operations system. If you receive this email, the notification system is working correctly.',
-          actionUrl: process.env.NEXT_PUBLIC_APP_URL + '/dashboard',
+          actionUrl: `${process.env.NEXT_PUBLIC_APP_URL  }/dashboard`,
           priority: 'medium',
         };
         result = await sendSystemNotification(recipient, testData);
