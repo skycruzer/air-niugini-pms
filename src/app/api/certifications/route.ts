@@ -109,9 +109,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    logger.debug('API /certifications PUT: Updating certifications', {
+    logger.info('API /certifications PUT: Starting update process', {
       pilotId,
       certificationsCount: certifications.length,
+      timestamp: new Date().toISOString(),
     });
 
     // Convert the data format expected by the database
@@ -122,18 +123,51 @@ export async function PUT(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }));
 
+    // Log the exact data being sent to database
+    logger.info('API /certifications PUT: Prepared upsert data', {
+      updateCount: updates.length,
+      sampleUpdate: updates[0], // Log first update as sample
+      allCheckTypeIds: updates.map((u) => u.check_type_id),
+    });
+
     // Use service role to bypass RLS and perform upsert
-    const { error } = await getSupabaseAdmin().from('pilot_checks').upsert(updates, {
-      onConflict: 'pilot_id,check_type_id',
+    logger.info('API /certifications PUT: Executing upsert operation...');
+    const { data: upsertData, error, status, statusText } = await getSupabaseAdmin()
+      .from('pilot_checks')
+      .upsert(updates, {
+        onConflict: 'pilot_id,check_type_id',
+      })
+      .select(); // CRITICAL: Add .select() to get the upserted data back
+
+    // Log complete upsert result
+    logger.info('API /certifications PUT: Upsert operation completed', {
+      hasError: !!error,
+      hasData: !!upsertData,
+      dataCount: upsertData?.length || 0,
+      status,
+      statusText,
     });
 
     if (error) {
-      logger.error('API /certifications PUT: Database error', error);
+      logger.error('API /certifications PUT: Database error', {
+        error,
+        errorMessage: error.message,
+        errorCode: error.code,
+        errorDetails: error.details,
+        errorHint: error.hint,
+      });
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    // Fetch fresh data after upsert to avoid cache issues
-    logger.debug('Fetching fresh certification data after update');
+    // Log if upsert succeeded but returned no data
+    if (!upsertData || upsertData.length === 0) {
+      logger.warn('API /certifications PUT: Upsert succeeded but returned no data', {
+        expectedCount: updates.length,
+      });
+    }
+
+    // Fetch fresh data after upsert to verify database persistence
+    logger.info('API /certifications PUT: Fetching fresh data to verify database update');
     const { data: freshData, error: fetchError } = await getSupabaseAdmin()
       .from('pilot_checks')
       .select()
@@ -144,11 +178,53 @@ export async function PUT(request: NextRequest) {
       );
 
     if (fetchError) {
-      logger.error('API /certifications PUT: Error fetching updated data', fetchError);
+      logger.error('API /certifications PUT: Error fetching updated data', {
+        fetchError,
+        errorMessage: fetchError.message,
+      });
       return NextResponse.json(
         { success: false, error: 'Update succeeded but failed to fetch updated data' },
         { status: 500 }
       );
+    }
+
+    // Compare fresh data with what we sent
+    logger.info('API /certifications PUT: Verification query completed', {
+      sentCount: updates.length,
+      retrievedCount: freshData?.length || 0,
+      sampleRetrieved: freshData?.[0], // Log first retrieved record
+    });
+
+    // Check if data actually persisted
+    if (freshData && freshData.length > 0) {
+      const comparisonResults = updates.map((update) => {
+        const retrieved = freshData.find((f: any) => f.check_type_id === update.check_type_id);
+        return {
+          checkTypeId: update.check_type_id,
+          sentExpiryDate: update.expiry_date,
+          retrievedExpiryDate: retrieved?.expiry_date,
+          matched: update.expiry_date === retrieved?.expiry_date,
+        };
+      });
+
+      const mismatchCount = comparisonResults.filter((r) => !r.matched).length;
+
+      logger.info('API /certifications PUT: Data verification results', {
+        totalChecked: comparisonResults.length,
+        matched: comparisonResults.length - mismatchCount,
+        mismatched: mismatchCount,
+        sampleComparison: comparisonResults[0],
+      });
+
+      if (mismatchCount > 0) {
+        logger.error('API /certifications PUT: DATA PERSISTENCE FAILURE DETECTED', {
+          mismatches: comparisonResults.filter((r) => !r.matched),
+        });
+      }
+    } else {
+      logger.error('API /certifications PUT: CRITICAL - No data retrieved after update', {
+        expectedCount: updates.length,
+      });
     }
 
     logger.info('API /certifications PUT: Successfully updated certification records', {
