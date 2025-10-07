@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -135,86 +136,97 @@ function CertificationCard({ cert }: { cert: Certification }) {
 export default function PilotDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [pilot, setPilot] = useState<PilotDetail | null>(null);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
   const [retirementInfo, setRetirementInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const pilotId = params.id as string;
+  const refreshParam = searchParams.get('refresh');
 
-  useEffect(() => {
-    const fetchPilotData = async () => {
-      try {
-        setLoading(true);
+  // Fetch pilot data using TanStack Query
+  const {
+    data: pilotData,
+    isLoading: pilotLoading,
+    error: pilotError,
+  } = useQuery({
+    queryKey: ['pilot', pilotId, refreshParam],
+    queryFn: () => getPilotById(pilotId),
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: true,
+  });
 
-        // Fetch pilot details and certifications in parallel
-        const [pilotData, certData] = await Promise.all([
-          getPilotById(pilotId),
-          getPilotCertifications(pilotId),
-        ]);
+  // Fetch certifications using TanStack Query
+  const {
+    data: certData,
+    isLoading: certLoading,
+    error: certError,
+  } = useQuery({
+    queryKey: ['pilot-certifications', pilotId, refreshParam],
+    queryFn: () => getPilotCertifications(pilotId),
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: true,
+  });
 
-        if (pilotData) {
-          setPilot({
-            id: pilotData.id,
-            employeeId: pilotData.employee_id,
-            firstName: pilotData.first_name,
-            middleName: pilotData.middle_name,
-            lastName: pilotData.last_name,
-            role: pilotData.role,
-            contractType: pilotData.contract_type,
-            nationality: pilotData.nationality,
-            passportNumber: pilotData.passport_number,
-            passportExpiry: pilotData.passport_expiry
-              ? new Date(pilotData.passport_expiry)
-              : undefined,
-            dateOfBirth: pilotData.date_of_birth ? new Date(pilotData.date_of_birth) : undefined,
-            commencementDate: pilotData.commencement_date
-              ? new Date(pilotData.commencement_date)
-              : undefined,
-            seniorityNumber: pilotData.seniority_number,
-            isActive: pilotData.is_active,
-            email: pilotData.email,
-            phone: pilotData.phone,
-            address: pilotData.address,
-            emergencyContact: pilotData.emergencyContact,
-          });
-        }
-
-        setCertifications(certData || []);
-
-        // Calculate retirement information if pilot has date of birth
-        if (pilotData?.date_of_birth) {
-          try {
-            const retirementAge = await getRetirementAge();
-            const retirement = calculateRetirementInfo(pilotData.date_of_birth, retirementAge);
-            setRetirementInfo(retirement);
-          } catch (error) {
-            console.error('Error calculating retirement info:', error);
-            // Use default retirement age if settings fail to load
-            const retirement = calculateRetirementInfo(pilotData.date_of_birth, 65);
-            setRetirementInfo(retirement);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching pilot data:', error);
-        // Keep pilot as null to show "not found" message
-      } finally {
-        setLoading(false);
+  // Transform pilot data for display
+  const pilot: PilotDetail | null = pilotData
+    ? {
+        id: pilotData.id,
+        employeeId: pilotData.employee_id,
+        firstName: pilotData.first_name,
+        middleName: pilotData.middle_name,
+        lastName: pilotData.last_name,
+        role: pilotData.role,
+        contractType: pilotData.contract_type,
+        nationality: pilotData.nationality,
+        passportNumber: pilotData.passport_number,
+        passportExpiry: pilotData.passport_expiry
+          ? new Date(pilotData.passport_expiry)
+          : undefined,
+        dateOfBirth: pilotData.date_of_birth ? new Date(pilotData.date_of_birth) : undefined,
+        commencementDate: pilotData.commencement_date
+          ? new Date(pilotData.commencement_date)
+          : undefined,
+        seniorityNumber: pilotData.seniority_number,
+        isActive: pilotData.is_active,
+        email: pilotData.email,
+        phone: pilotData.phone,
+        address: pilotData.address,
+        emergencyContact: pilotData.emergencyContact,
       }
-    };
+    : null;
 
-    // Check if we should force a refresh (from query params or page navigation)
-    const shouldRefresh = new URLSearchParams(window.location.search).get('refresh');
-    if (shouldRefresh) {
+  const certifications = certData || [];
+
+  // Clean up the refresh param from URL after data is fetched
+  useEffect(() => {
+    if (refreshParam && !pilotLoading && !certLoading) {
       // Remove the refresh param from URL without reloading
       window.history.replaceState({}, '', window.location.pathname);
     }
+  }, [refreshParam, pilotLoading, certLoading]);
 
-    fetchPilotData();
-  }, [pilotId]);
+  // Calculate retirement information when pilot data is available
+  useEffect(() => {
+    const calculateRetirement = async () => {
+      if (pilotData?.date_of_birth) {
+        try {
+          const retirementAge = await getRetirementAge();
+          const retirement = calculateRetirementInfo(pilotData.date_of_birth, retirementAge);
+          setRetirementInfo(retirement);
+        } catch (error) {
+          console.error('Error calculating retirement info:', error);
+          // Use default retirement age if settings fail to load
+          const retirement = calculateRetirementInfo(pilotData.date_of_birth, 65);
+          setRetirementInfo(retirement);
+        }
+      }
+    };
+
+    calculateRetirement();
+  }, [pilotData]);
 
   const handleDeletePilot = async () => {
     if (!pilot) return;
@@ -231,6 +243,9 @@ export default function PilotDetailPage() {
         throw new Error(result.error || 'Failed to delete pilot');
       }
 
+      // Invalidate queries before redirect
+      queryClient.invalidateQueries({ queryKey: ['pilots'] });
+
       // Redirect to pilots list after successful deletion
       router.push('/dashboard/pilots');
     } catch (error) {
@@ -241,6 +256,8 @@ export default function PilotDetailPage() {
       setShowDeleteConfirm(false);
     }
   };
+
+  const loading = pilotLoading || certLoading;
 
   if (loading) {
     return (
@@ -284,9 +301,9 @@ export default function PilotDetailPage() {
 
   const certificationStats = {
     total: certifications.length,
-    current: certifications.filter((c) => c.status.color === 'green').length,
-    expiring: certifications.filter((c) => c.status.color === 'yellow').length,
-    expired: certifications.filter((c) => c.status.color === 'red').length,
+    current: certifications.filter((c: Certification) => c.status.color === 'green').length,
+    expiring: certifications.filter((c: Certification) => c.status.color === 'yellow').length,
+    expired: certifications.filter((c: Certification) => c.status.color === 'red').length,
   };
 
   return (
@@ -473,7 +490,7 @@ export default function PilotDetailPage() {
                 {(() => {
                   // Group certifications by category
                   const categorizedCertifications = certifications.reduce(
-                    (acc, cert) => {
+                    (acc: Record<string, Certification[]>, cert: Certification) => {
                       if (!acc[cert.category]) {
                         acc[cert.category] = [];
                       }
@@ -501,7 +518,7 @@ export default function PilotDetailPage() {
                       </div>
                       <div className="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {categorizedCertifications[category]?.map((cert) => (
+                          {categorizedCertifications[category]?.map((cert: Certification) => (
                             <CertificationCard key={cert.id} cert={cert} />
                           ))}
                         </div>

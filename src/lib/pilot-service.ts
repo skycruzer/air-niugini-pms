@@ -100,7 +100,14 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
       // Client-side - use API route
       console.log('🔍 getAllPilots: Client-side - using API route...');
 
-      const response = await fetch('/api/pilots');
+      // CRITICAL FIX: Disable Next.js fetch caching to always get fresh data
+      const response = await fetch('/api/pilots', {
+        cache: 'no-store', // Disable Next.js fetch cache
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       console.log('🔍 getAllPilots: API response status:', response.status);
 
@@ -206,7 +213,14 @@ export async function getPilotById(pilotId: string): Promise<PilotWithCertificat
       // Client-side - use API route
       console.log('🔍 getPilotById: Client-side - using API route...');
 
-      const response = await fetch(`/api/pilots?id=${pilotId}`);
+      // CRITICAL FIX: Disable Next.js fetch caching to always get fresh data
+      const response = await fetch(`/api/pilots?id=${pilotId}`, {
+        cache: 'no-store', // Disable Next.js fetch cache
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       console.log('🔍 getPilotById: API response status:', response.status);
 
@@ -325,7 +339,14 @@ export async function getPilotCertifications(pilotId: string) {
     const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`;
     console.log('🔍 getPilotCertifications: API URL:', apiUrl);
 
-    const response = await fetch(apiUrl);
+    // CRITICAL FIX: Disable Next.js fetch caching to always get fresh data
+    const response = await fetch(apiUrl, {
+      cache: 'no-store', // Disable Next.js fetch cache
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
 
     console.log('🔍 getPilotCertifications: API response status:', response.status);
 
@@ -468,8 +489,11 @@ export async function updatePilot(
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify(cleanedData),
+        cache: 'no-store', // Disable Next.js fetch cache
       });
 
       if (!response.ok) {
@@ -874,7 +898,14 @@ export async function getPilotCertificationsWithAllTypes(pilotId: string) {
     const apiUrl = `${baseUrl}/api/certifications?pilotId=${pilotId}`;
     console.log('🔍 getPilotCertificationsWithAllTypes: API URL:', apiUrl);
 
-    const response = await fetch(apiUrl);
+    // CRITICAL FIX: Disable Next.js fetch caching to always get fresh data
+    const response = await fetch(apiUrl, {
+      cache: 'no-store', // Disable Next.js fetch cache
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
 
     console.log('🔍 getPilotCertificationsWithAllTypes: API response status:', response.status);
 

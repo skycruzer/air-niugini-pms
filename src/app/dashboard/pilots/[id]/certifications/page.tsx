@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -111,6 +112,7 @@ function CertificationRow({
 export default function PilotCertificationsPage() {
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user, isLoading: authLoading } = useAuth();
   const [pilot, setPilot] = useState<any>(null);
   const [certifications, setCertifications] = useState<CertificationData[]>([]);
@@ -285,6 +287,13 @@ export default function PilotCertificationsPage() {
       }
 
       console.log('✅ Certification Page: Successfully updated certifications');
+
+      // Invalidate all related queries to force refetch with fresh data
+      await queryClient.invalidateQueries({ queryKey: ['pilot', pilotId] });
+      await queryClient.invalidateQueries({ queryKey: ['pilot-certifications', pilotId] });
+      await queryClient.invalidateQueries({ queryKey: ['pilots'] });
+
+      console.log('✅ Certification Page: Cache invalidated, redirecting...');
 
       // Redirect back to pilot detail page with refresh parameter to force data reload
       router.push(`/dashboard/pilots/${pilotId}?refresh=${Date.now()}`);
