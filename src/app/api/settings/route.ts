@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    console.log('🔧 Settings API: Fetching all settings...');
+    logger.debug('Settings API: Fetching all settings');
 
     const { data, error } = await supabaseAdmin.from('settings').select('*').order('key');
 
     if (error) {
-      console.error('❌ Settings API: Error fetching settings:', error);
+      logger.error('Settings API: Error fetching settings', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    console.log('✅ Settings API: Found', data?.length || 0, 'settings');
+    logger.info('Settings API: Found settings', { count: data?.length || 0 });
 
     // Transform flat settings array into structured data
     const settingsMap =
@@ -50,7 +51,7 @@ export async function GET() {
       data: structuredData,
     });
   } catch (error) {
-    console.error('❌ Settings API: Unexpected error:', error);
+    logger.error('Settings API: Unexpected error', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch settings' },
       { status: 500 }
@@ -70,7 +71,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.log('🔧 Settings API: Updating setting:', key);
+    logger.debug('Settings API: Updating setting', { key });
 
     // Upsert the setting
     const { data, error } = await supabaseAdmin
@@ -88,18 +89,18 @@ export async function PUT(request: NextRequest) {
       .select();
 
     if (error) {
-      console.error('❌ Settings API: Error updating setting:', error);
+      logger.error('Settings API: Error updating setting', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    console.log('✅ Settings API: Updated setting successfully');
+    logger.info('Settings API: Updated setting successfully', { key });
 
     return NextResponse.json({
       success: true,
       data: data?.[0],
     });
   } catch (error) {
-    console.error('❌ Settings API: Unexpected error:', error);
+    logger.error('Settings API: Unexpected error', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update setting' },
       { status: 500 }

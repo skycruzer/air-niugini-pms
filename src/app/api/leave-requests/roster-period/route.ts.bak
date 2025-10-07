@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getLeaveRequestsByRosterPeriodAdmin } from '@/lib/leave-service';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const rosterPeriod = searchParams.get('period');
+
+    if (!rosterPeriod) {
+      return NextResponse.json(
+        { success: false, error: 'Roster period parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    console.log(`🔍 API: Fetching leave requests for roster period: ${rosterPeriod}`);
+
+    const requests = await getLeaveRequestsByRosterPeriodAdmin(rosterPeriod);
+
+    console.log(`✅ API: Found ${requests.length} leave requests for ${rosterPeriod}`);
+
+    return NextResponse.json({
+      success: true,
+      data: requests,
+      meta: {
+        rosterPeriod,
+        count: requests.length,
+      },
+    });
+  } catch (error) {
+    console.error('Error in roster period API:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch leave requests',
+      },
+      { status: 500 }
+    );
+  }
+}

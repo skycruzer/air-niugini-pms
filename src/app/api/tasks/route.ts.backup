@@ -1,0 +1,171 @@
+/**
+ * @fileoverview Tasks API routes
+ * Handles CRUD operations for task management
+ *
+ * @author Air Niugini Development Team
+ * @version 1.0.0
+ * @since 2025-10-06
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { validateRequest } from '@/lib/validation-schemas';
+import { z } from 'zod';
+import { withAuth, permissions } from '@/middleware/auth';
+import { getTasks, createTask, getTaskStatistics, getTaskCategories } from '@/lib/task-service';
+import { logger } from '@/lib/logger';
+
+// Mark this route as dynamic
+export const dynamic = 'force-dynamic';
+
+const createTaskSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().optional(),
+  category_id: z.string().uuid().optional(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
+  assigned_to: z.string().uuid().optional(),
+  related_pilot_id: z.string().uuid().optional(),
+  related_matter_id: z.string().uuid().optional(),
+  due_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}T/)
+    .optional(),
+  estimated_hours: z.number().min(0).optional(),
+  is_recurring: z.boolean().optional(),
+  recurrence_pattern: z
+    .object({
+      frequency: z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']),
+      interval: z.number().int().min(1),
+      end_date: z.string().optional(),
+      count: z.number().int().min(1).optional(),
+    })
+    .optional(),
+  parent_task_id: z.string().uuid().optional(),
+  tags: z.array(z.string()).optional(),
+  checklist_items: z
+    .array(
+      z.object({
+        id: z.string(),
+        text: z.string(),
+        completed: z.boolean(),
+      })
+    )
+    .optional(),
+});
+
+/**
+ * GET /api/tasks
+ * Retrieves tasks with optional filters
+ * @auth Required - Admin and Manager roles only
+ */
+export const GET = withAuth(
+  async (request: NextRequest, { user }) => {
+    try {
+      const { searchParams } = new URL(request.url);
+      const action = searchParams.get('action');
+
+      // Statistics endpoint
+      if (action === 'statistics') {
+        const assigned_to = searchParams.get('assigned_to') || undefined;
+        const created_by = searchParams.get('created_by') || undefined;
+        const start_date = searchParams.get('start_date') || undefined;
+        const end_date = searchParams.get('end_date') || undefined;
+
+        const statistics = await getTaskStatistics({
+          assigned_to,
+          created_by,
+          start_date,
+          end_date,
+        });
+
+        return NextResponse.json({
+          success: true,
+          data: statistics,
+        });
+      }
+
+      // Categories endpoint
+      if (action === 'categories') {
+        const categories = await getTaskCategories();
+        return NextResponse.json({
+          success: true,
+          data: categories,
+        });
+      }
+
+      // List tasks
+      const filters = {
+        status: searchParams.get('status') || undefined,
+        priority: searchParams.get('priority') || undefined,
+        assigned_to: searchParams.get('assigned_to') || undefined,
+        created_by: searchParams.get('created_by') || undefined,
+        category_id: searchParams.get('category_id') || undefined,
+        related_pilot_id: searchParams.get('related_pilot_id') || undefined,
+        include_completed: searchParams.get('include_completed') === 'true',
+      };
+
+      const tasks = await getTasks(filters);
+
+      return NextResponse.json({
+        success: true,
+        data: tasks,
+      });
+    } catch (error) {
+      console.error('Error in GET /api/tasks:', error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to fetch tasks',
+        },
+        { status: 500 }
+      );
+    }
+  },
+  { roles: ['admin', 'manager'] }
+);
+
+/**
+ * POST /api/tasks
+ * Creates a new task
+ * @auth Required - Admin and Manager roles only
+ */
+export const POST = withAuth(
+  async (request: NextRequest, { user }) => {
+    try {
+      const body = await request.json();
+
+      // Validate request body
+      const validation = validateRequest(createTaskSchema, body);
+      if (!validation.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: validation.error,
+            details: validation.details,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Create task with authenticated user context for audit trail
+      const task = await createTask(validation.data, user.id);
+
+      return NextResponse.json(
+        {
+          success: true,
+          data: task,
+        },
+        { status: 201 }
+      );
+    } catch (error) {
+      console.error('Error in POST /api/tasks:', error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to create task',
+        },
+        { status: 500 }
+      );
+    }
+  },
+  { roles: ['admin', 'manager'] }
+);

@@ -8,6 +8,7 @@
  */
 
 import { getSupabaseAdmin } from './supabase';
+import { logger } from '@/lib/logger';
 
 // Get admin client instance for server-side operations
 const supabase = getSupabaseAdmin();
@@ -137,7 +138,7 @@ export async function getIncidentTypes(): Promise<IncidentType[]> {
     .order('name');
 
   if (error) {
-    console.error('Error fetching incident types:', error);
+    logger.error('Error fetching incident types', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch incident types');
   }
 
@@ -151,7 +152,7 @@ export async function getIncidentTypeById(id: string): Promise<IncidentType | nu
   const { data, error } = await supabase.from('incident_types').select('*').eq('id', id).single();
 
   if (error) {
-    console.error('Error fetching incident type:', error);
+    logger.error('Error fetching incident type', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 
@@ -207,7 +208,7 @@ export async function getDisciplinaryMatters(filters?: {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching disciplinary matters:', error);
+    logger.error('Error fetching disciplinary matters', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch disciplinary matters');
   }
 
@@ -234,7 +235,7 @@ export async function getDisciplinaryMatterById(id: string) {
     .single();
 
   if (error) {
-    console.error('Error fetching disciplinary matter:', error);
+    logger.error('Error fetching disciplinary matter', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch disciplinary matter');
   }
 
@@ -267,7 +268,7 @@ export async function createDisciplinaryMatter(
     .single();
 
   if (error) {
-    console.error('Error creating disciplinary matter:', error);
+    logger.error('Error creating disciplinary matter', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create disciplinary matter');
   }
 
@@ -308,7 +309,7 @@ export async function updateDisciplinaryMatter(
     .single();
 
   if (error) {
-    console.error('Error updating disciplinary matter:', error);
+    logger.error('Error updating disciplinary matter', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to update disciplinary matter');
   }
 
@@ -343,7 +344,7 @@ export async function deleteDisciplinaryMatter(id: string, userId: string) {
   const { error } = await supabase.from('disciplinary_matters').delete().eq('id', id);
 
   if (error) {
-    console.error('Error deleting disciplinary matter:', error);
+    logger.error('Error deleting disciplinary matter', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to delete disciplinary matter');
   }
 
@@ -370,7 +371,7 @@ export async function getDisciplinaryActions(matterId: string) {
     .order('action_date', { ascending: false });
 
   if (error) {
-    console.error('Error fetching disciplinary actions:', error);
+    logger.error('Error fetching disciplinary actions', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch disciplinary actions');
   }
 
@@ -418,7 +419,7 @@ export async function createDisciplinaryAction(
     .single();
 
   if (error) {
-    console.error('Error creating disciplinary action:', error);
+    logger.error('Error creating disciplinary action', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create disciplinary action');
   }
 
@@ -445,7 +446,7 @@ export async function getDisciplinaryComments(matterId: string) {
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching disciplinary comments:', error);
+    logger.error('Error fetching disciplinary comments', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch disciplinary comments');
   }
 
@@ -475,7 +476,7 @@ export async function createDisciplinaryComment(
     .single();
 
   if (error) {
-    console.error('Error creating disciplinary comment:', error);
+    logger.error('Error creating disciplinary comment', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create comment');
   }
 
@@ -507,7 +508,7 @@ async function logDisciplinaryAudit(
   });
 
   if (error) {
-    console.error('Error logging disciplinary audit:', error);
+    logger.error('Error logging disciplinary audit', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -527,7 +528,7 @@ export async function getDisciplinaryAuditLog(matterId: string) {
     .order('timestamp', { ascending: false });
 
   if (error) {
-    console.error('Error fetching disciplinary audit log:', error);
+    logger.error('Error fetching disciplinary audit log', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch audit log');
   }
 
@@ -563,7 +564,7 @@ export async function getDisciplinaryStatistics(filters?: {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching disciplinary statistics:', error);
+    logger.error('Error fetching disciplinary statistics', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch statistics');
   }
 

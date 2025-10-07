@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { runDailyCertificationCheck } from '@/lib/scheduled-jobs';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[Cron] Running daily certification check...');
+    logger.debug('[Cron] Running daily certification check...');
 
     const result = await runDailyCertificationCheck();
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Cron] Daily certification check failed:', error);
+    logger.error('[Cron] Daily certification check failed:', error);
     return NextResponse.json(
       {
         success: false,

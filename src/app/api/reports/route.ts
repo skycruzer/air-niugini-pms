@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { pdfReportDataService } from '@/lib/pdf-data-service';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
   const { searchParams } = new URL(request.url);
   const reportType = searchParams.get('type');
 
-  console.log(`🔍 API /reports: Generating ${reportType} report...`);
+  logger.debug(`🔍 API /reports: Generating ${reportType} report...`);
 
   try {
     switch (reportType) {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('🚨 API /reports: Error generating report:', {
+    logger.error(' API /reports: Error generating report:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       details: error instanceof Error ? error.stack : String(error),
       reportType,
@@ -176,7 +177,7 @@ async function generateFleetComplianceReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Fleet compliance report generated with ${totalPilots} pilots`);
+  logger.debug(`✅ API /reports: Fleet compliance report generated with ${totalPilots} pilots`);
 
   return NextResponse.json({
     success: true,
@@ -273,7 +274,7 @@ async function generateRiskAssessmentReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Risk assessment report generated`);
+  logger.debug(`✅ API /reports: Risk assessment report generated`);
 
   return NextResponse.json({
     success: true,
@@ -350,7 +351,7 @@ async function generatePilotSummaryReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Pilot summary report generated for ${pilots?.length} pilots`);
+  logger.debug(`✅ API /reports: Pilot summary report generated for ${pilots?.length} pilots`);
 
   return NextResponse.json({
     success: true,
@@ -418,7 +419,7 @@ async function generateCertificationForecastReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Certification forecast report generated`);
+  logger.debug(`✅ API /reports: Certification forecast report generated`);
 
   return NextResponse.json({
     success: true,
@@ -464,7 +465,7 @@ async function generateFleetAnalyticsReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Fleet analytics report generated`);
+  logger.debug(`✅ API /reports: Fleet analytics report generated`);
 
   return NextResponse.json({
     success: true,
@@ -516,7 +517,7 @@ async function generateOperationalReadinessReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Operational readiness report generated`);
+  logger.debug(`✅ API /reports: Operational readiness report generated`);
 
   return NextResponse.json({
     success: true,
@@ -558,7 +559,7 @@ async function generatePlanningRosteringReport(supabaseAdmin: any) {
     const { settingsService } = await import('@/lib/settings-service');
     settings = await settingsService.getSettings();
   } catch (error) {
-    console.warn('⚠️ Failed to fetch settings, using defaults:', error);
+    logger.warn('⚠️ Failed to fetch settings, using defaults:', error);
     // Use default settings if service fails
     settings = {
       pilot_requirements: {
@@ -908,7 +909,7 @@ async function generatePlanningRosteringReport(supabaseAdmin: any) {
     generatedBy: 'Air Niugini PMS',
   };
 
-  console.log(`✅ API /reports: Planning and rostering report generated`);
+  logger.debug(`✅ API /reports: Planning and rostering report generated`);
 
   return NextResponse.json({
     success: true,
@@ -1030,7 +1031,7 @@ async function generateFleetManagementReport(supabaseAdmin: any) {
       'Air Niugini PMS'
     );
 
-    console.log(`✅ API /reports: Fleet management report generated`);
+    logger.debug(`✅ API /reports: Fleet management report generated`);
 
     return NextResponse.json({
       success: true,
@@ -1038,7 +1039,7 @@ async function generateFleetManagementReport(supabaseAdmin: any) {
       type: 'fleet-management',
     });
   } catch (error) {
-    console.error('❌ Fleet management report generation failed:', error);
+    logger.error(' Fleet management report generation failed:', error);
     throw error;
   }
 }

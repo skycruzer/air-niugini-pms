@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { differenceInDays } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    console.log('📋 API /analytics/certification: Getting certification analytics...');
+    logger.debug('📋 API /analytics/certification: Getting certification analytics...');
 
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -151,10 +152,10 @@ export async function GET() {
       checkTypeDistribution,
     };
 
-    console.log('✅ API /analytics/certification: Successfully retrieved certification analytics');
+    logger.info(' API /analytics/certification: Successfully retrieved certification analytics');
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('❌ API /analytics/certification: Error:', error);
+    logger.error(' API /analytics/certification: Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to get certification analytics' },
       { status: 500 }

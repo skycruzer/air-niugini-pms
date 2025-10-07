@@ -89,13 +89,13 @@ export default function TasksPage() {
               <div className="flex rounded-lg border border-gray-300 overflow-hidden">
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-4 py-2 ${viewMode === 'list' ? 'bg-[#E4002B] text-white' : 'bg-white text-gray-700'} hover:bg-[#C00020] hover:text-white transition-colors`}
+                  className={`px-4 py-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'} hover:bg-blue-700 hover:text-white transition-colors`}
                 >
                   <ListIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('kanban')}
-                  className={`px-4 py-2 ${viewMode === 'kanban' ? 'bg-[#E4002B] text-white' : 'bg-white text-gray-700'} hover:bg-[#C00020] hover:text-white transition-colors`}
+                  className={`px-4 py-2 ${viewMode === 'kanban' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'} hover:bg-blue-700 hover:text-white transition-colors`}
                 >
                   <LayoutGrid className="w-5 h-5" />
                 </button>
@@ -103,7 +103,7 @@ export default function TasksPage() {
 
               <Link
                 href="/dashboard/tasks/new"
-                className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 New Task
@@ -152,7 +152,7 @@ export default function TasksPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >
@@ -168,7 +168,7 @@ export default function TasksPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                   value={filters.priority}
                   onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
                 >
@@ -182,7 +182,7 @@ export default function TasksPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                   value={filters.category_id}
                   onChange={(e) => setFilters({ ...filters, category_id: e.target.value })}
                 >
@@ -320,7 +320,7 @@ function TasksListView({ tasks, isLoading }: { tasks: any[]; isLoading: boolean 
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-[#E4002B] h-2 rounded-full"
+                        className="bg-blue-600 h-2 rounded-full"
                         style={{ width: `${task.progress_percentage}%` }}
                       />
                     </div>
@@ -330,7 +330,7 @@ function TasksListView({ tasks, isLoading }: { tasks: any[]; isLoading: boolean 
                 <td className="px-6 py-4">
                   <Link
                     href={`/dashboard/tasks/${task.id}`}
-                    className="text-[#E4002B] hover:text-[#C00020] font-medium"
+                    className="text-blue-600 hover:text-blue-700 font-medium"
                   >
                     View
                   </Link>
@@ -397,7 +397,7 @@ function TasksKanbanView({ tasks, isLoading }: { tasks: any[]; isLoading: boolea
                   <div className="mt-2 flex items-center gap-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-1.5">
                       <div
-                        className="bg-[#E4002B] h-1.5 rounded-full"
+                        className="bg-blue-600 h-1.5 rounded-full"
                         style={{ width: `${task.progress_percentage}%` }}
                       />
                     </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLeaveRequestsByRosterPeriodAdmin } from '@/lib/leave-service';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,11 +16,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`🔍 API: Fetching leave requests for roster period: ${rosterPeriod}`);
+    logger.debug(`🔍 API: Fetching leave requests for roster period: ${rosterPeriod}`);
 
     const requests = await getLeaveRequestsByRosterPeriodAdmin(rosterPeriod);
 
-    console.log(`✅ API: Found ${requests.length} leave requests for ${rosterPeriod}`);
+    logger.debug(`✅ API: Found ${requests.length} leave requests for ${rosterPeriod}`);
 
     return NextResponse.json({
       success: true,
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in roster period API:', error);
+    logger.error('Error in roster period API:', error);
     return NextResponse.json(
       {
         success: false,

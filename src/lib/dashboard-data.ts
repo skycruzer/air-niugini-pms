@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // Create a service role client for dashboard data (bypasses RLS)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -93,7 +94,7 @@ export const dashboardDataService = {
         compliance,
       };
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+      logger.error('Error fetching dashboard stats', error instanceof Error ? error : new Error(String(error)));
       // Return fallback data on error
       return {
         totalPilots: 0,
@@ -128,13 +129,13 @@ export const dashboardDataService = {
         .order('expiry_date', { ascending: true });
 
       if (error) {
-        console.error('Error fetching expiring certifications:', error);
+        logger.error('Error fetching expiring certifications', error instanceof Error ? error : new Error(String(error)));
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getExpiringCertifications:', error);
+      logger.error('Error in getExpiringCertifications', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   },
@@ -158,13 +159,13 @@ export const dashboardDataService = {
         .order('expiry_date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching expired certifications:', error);
+        logger.error('Error fetching expired certifications', error instanceof Error ? error : new Error(String(error)));
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getExpiredCertifications:', error);
+      logger.error('Error in getExpiredCertifications', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   },

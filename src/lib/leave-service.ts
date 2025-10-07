@@ -1,5 +1,6 @@
 import { supabase, getSupabaseAdmin, handleSupabaseError } from './supabase';
 import { getCurrentRosterPeriod, getRosterPeriodFromDate } from './roster-utils';
+import { logger } from '@/lib/logger';
 
 export interface LeaveRequest {
   id: string;
@@ -77,7 +78,7 @@ export async function getAllLeaveRequests(): Promise<LeaveRequest[]> {
 
     return result.data || [];
   } catch (error) {
-    console.error('Error fetching leave requests:', error);
+    logger.error('Error fetching leave requests', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -124,7 +125,7 @@ export async function getLeaveRequestById(requestId: string): Promise<LeaveReque
       reviewer_name: request.reviewer?.name || null,
     };
   } catch (error) {
-    console.error('Error fetching leave request:', error);
+    logger.error('Error fetching leave request', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -152,7 +153,7 @@ export async function getPilotLeaveRequests(pilotId: string): Promise<LeaveReque
       reviewer_name: request.reviewer?.name || null,
     }));
   } catch (error) {
-    console.error('Error fetching pilot leave requests:', error);
+    logger.error('Error fetching pilot leave requests', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -160,7 +161,7 @@ export async function getPilotLeaveRequests(pilotId: string): Promise<LeaveReque
 // Create a new leave request
 export async function createLeaveRequest(requestData: LeaveRequestFormData): Promise<LeaveRequest> {
   try {
-    console.log('📝 Creating leave request via API...', requestData);
+    logger.debug('Creating leave request via API', requestData);
 
     const response = await fetch('/api/leave-requests', {
       method: 'POST',
@@ -176,10 +177,10 @@ export async function createLeaveRequest(requestData: LeaveRequestFormData): Pro
       throw new Error(result.error || 'Failed to create leave request');
     }
 
-    console.log('✅ Leave request created successfully:', result.data.id);
+    logger.info('Leave request created successfully', { id: result.data.id });
     return result.data;
   } catch (error) {
-    console.error('Error creating leave request:', error);
+    logger.error('Error creating leave request', error instanceof Error ? error : new Error(String(error)));
     throw new Error(error instanceof Error ? error.message : 'Failed to create leave request');
   }
 }
@@ -190,7 +191,7 @@ export async function updateLeaveRequest(
   requestData: Partial<LeaveRequestFormData>
 ): Promise<LeaveRequest> {
   try {
-    console.log('📝 Updating leave request via API...', { requestId, requestData });
+    logger.debug('Updating leave request via API', { requestId, requestData });
 
     const response = await fetch('/api/leave-requests', {
       method: 'PATCH',
@@ -209,10 +210,10 @@ export async function updateLeaveRequest(
       throw new Error(result.error || 'Failed to update leave request');
     }
 
-    console.log('✅ Leave request updated successfully:', result.data.id);
+    logger.info('Leave request updated successfully', { id: result.data.id });
     return result.data;
   } catch (error) {
-    console.error('Error updating leave request:', error);
+    logger.error('Error updating leave request', error instanceof Error ? error : new Error(String(error)));
     throw new Error(error instanceof Error ? error.message : 'Failed to update leave request');
   }
 }
@@ -225,7 +226,7 @@ export async function updateLeaveRequestStatus(
   reviewComments?: string
 ): Promise<LeaveRequest> {
   try {
-    console.log('🔄 Updating leave request status via API...', { requestId, status });
+    logger.debug('Updating leave request status via API...', { requestId, status });
 
     const response = await fetch('/api/leave-requests', {
       method: 'PUT',
@@ -246,10 +247,10 @@ export async function updateLeaveRequestStatus(
       throw new Error(result.error || 'Failed to update leave request status');
     }
 
-    console.log('✅ Leave request status updated successfully:', result.data.id);
+    logger.info('Leave request status updated successfully', { data: result.data.id });
     return result.data;
   } catch (error) {
-    console.error('Error updating leave request status:', error);
+    logger.error('Error updating leave request status', error instanceof Error ? error : new Error(String(error)));
     throw new Error(
       error instanceof Error ? error.message : 'Failed to update leave request status'
     );
@@ -276,7 +277,7 @@ export async function deleteLeaveRequest(requestId: string): Promise<void> {
 
     if (error) throw error;
   } catch (error) {
-    console.error('Error deleting leave request:', error);
+    logger.error('Error deleting leave request', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -324,7 +325,7 @@ export async function getLeaveRequestStats(): Promise<LeaveRequestStats> {
 
     return stats;
   } catch (error) {
-    console.error('Error fetching leave request stats:', error);
+    logger.error('Error fetching leave request stats', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -358,7 +359,7 @@ export async function getPendingLeaveRequests(): Promise<LeaveRequest[]> {
       employee_id: request.pilots?.employee_id || 'N/A',
     }));
   } catch (error) {
-    console.error('Error fetching pending leave requests:', error);
+    logger.error('Error fetching pending leave requests', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -405,7 +406,7 @@ export async function checkLeaveConflicts(
       employee_id: request.pilots?.employee_id || 'N/A',
     }));
   } catch (error) {
-    console.error('Error checking leave conflicts:', error);
+    logger.error('Error checking leave conflicts', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -445,7 +446,7 @@ export async function getLeaveRequestsByRosterPeriod(
       reviewer_name: request.reviewer?.name || null,
     }));
   } catch (error) {
-    console.error('Error fetching leave requests by roster period:', error);
+    logger.error('Error fetching leave requests by roster period', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }
@@ -455,7 +456,7 @@ export async function getLeaveRequestsByRosterPeriodAdmin(
   rosterPeriod: string
 ): Promise<LeaveRequest[]> {
   try {
-    console.log(`🔧 Admin query: Fetching leave requests for ${rosterPeriod}...`);
+    logger.debug('Admin query: Fetching leave requests for ${rosterPeriod}...');
 
     const { data: requests, error } = await getSupabaseAdmin()
       .from('leave_requests')
@@ -477,11 +478,11 @@ export async function getLeaveRequestsByRosterPeriodAdmin(
       .order('start_date', { ascending: true });
 
     if (error) {
-      console.error('❌ Admin query error:', error);
+      logger.error('Admin query error', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
-    console.log(`✅ Admin query: Found ${requests?.length || 0} leave requests`);
+    logger.debug('Admin query: Found ${requests?.length || 0} leave requests');
 
     return (requests || []).map((request: any) => ({
       ...request,
@@ -492,7 +493,7 @@ export async function getLeaveRequestsByRosterPeriodAdmin(
       reviewer_name: request.reviewer?.name || null,
     }));
   } catch (error) {
-    console.error('Error fetching leave requests by roster period (admin):', error);
+    logger.error('Error fetching leave requests by roster period (admin)', error instanceof Error ? error : new Error(String(error)));
     throw new Error(handleSupabaseError(error));
   }
 }

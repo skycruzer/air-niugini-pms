@@ -56,7 +56,10 @@ export const authService = {
   // Login with Supabase Auth
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      console.log('🔐 Starting login attempt for:', email);
+      // Security: Don't log email addresses in production
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔐 Starting login attempt');
+      }
 
       const {
         data: { user: authUser },
@@ -66,19 +69,17 @@ export const authService = {
         password,
       });
 
-      console.log('🔍 Supabase Auth response:', {
-        hasUser: !!authUser,
-        userId: authUser?.id,
-        email: authUser?.email,
-        error: signInError?.message,
-      });
-
       if (signInError || !authUser) {
-        console.error('❌ Authentication failed:', signInError?.message);
+        // Don't log specific error details that could help attackers
+        if (process.env.NODE_ENV === 'development') {
+          console.error('❌ Authentication failed');
+        }
         return null;
       }
 
-      console.log('✅ Supabase Auth successful, fetching user profile...');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Supabase Auth successful, fetching user profile...');
+      }
 
       // Get user profile from our users table
       const { data: userData, error: userError } = await supabase
@@ -87,15 +88,10 @@ export const authService = {
         .eq('email', authUser.email)
         .single();
 
-      console.log('🔍 User profile query result:', {
-        hasData: !!userData,
-        userEmail: userData?.email,
-        userRole: userData?.role,
-        error: userError?.message,
-      });
-
       if (userError || !userData) {
-        console.error('❌ Failed to get user profile:', userError?.message);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('❌ Failed to get user profile');
+        }
         return null;
       }
 
@@ -107,15 +103,20 @@ export const authService = {
         created_at: userData.created_at,
       };
 
-      console.log('✅ Login successful for user:', {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ Login successful');
+      }
 
-      // Store user in localStorage for quick access
+      // Store minimal user data in sessionStorage (more secure than localStorage)
+      // Session storage is cleared when tab closes, reducing exposure window
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth-user', JSON.stringify(user));
+        const sessionData = {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+          // Don't store email - fetch from Supabase session when needed
+        };
+        sessionStorage.setItem('auth-user', JSON.stringify(sessionData));
       }
 
       return user;
@@ -125,14 +126,23 @@ export const authService = {
     }
   },
 
-  // Get current user (try from localStorage first, then Supabase)
+  // Get current user (try from sessionStorage first, then Supabase)
   getCurrentUser(): AuthUser | null {
     if (typeof window === 'undefined') return null;
 
-    const stored = localStorage.getItem('auth-user');
+    const stored = sessionStorage.getItem('auth-user');
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const sessionData = JSON.parse(stored);
+        // Reconstruct AuthUser with stored data
+        // Email will be fetched from Supabase session when needed
+        return {
+          id: sessionData.id,
+          name: sessionData.name,
+          role: sessionData.role,
+          email: '', // Will be populated by getSession if needed
+          created_at: sessionData.created_at || '',
+        } as AuthUser;
       } catch {
         return null;
       }
@@ -171,9 +181,14 @@ export const authService = {
         created_at: userData.created_at,
       };
 
-      // Update localStorage
+      // Update sessionStorage with minimal data
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth-user', JSON.stringify(user));
+        const sessionData = {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+        };
+        sessionStorage.setItem('auth-user', JSON.stringify(sessionData));
       }
 
       return user;
@@ -188,6 +203,8 @@ export const authService = {
     try {
       await supabase.auth.signOut();
       if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('auth-user');
+        // Also clear any legacy localStorage data
         localStorage.removeItem('auth-user');
       }
     } catch (error) {

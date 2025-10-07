@@ -10,6 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   checkLeaveEligibility,
   checkBulkLeaveEligibility,
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       data: eligibility,
     });
   } catch (error) {
-    console.error('Error checking leave eligibility:', error);
+    logger.error('Error checking leave eligibility:', error);
     return NextResponse.json(
       {
         success: false,
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error('Error in leave eligibility GET:', error);
+    logger.error('Error in leave eligibility GET:', error);
     return NextResponse.json(
       {
         success: false,

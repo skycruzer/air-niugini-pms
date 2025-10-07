@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getCertificationStatus } from '@/lib/certification-utils';
+import { logger } from '@/lib/logger';
+import { invalidateCache, CACHE_INVALIDATION_PATTERNS } from '@/lib/cache-service';
 
 // Mark this route as dynamic
 export const dynamic = 'force-dynamic';
@@ -14,7 +17,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Pilot ID is required' }, { status: 400 });
     }
 
-    console.log('🔍 API /certifications: Fetching certifications for pilot:', pilotId);
+    logger.debug('API /certifications: Fetching certifications for pilot', { pilotId });
 
     // Get all check types using service role (bypasses RLS)
     const { data: checkTypes, error: checkTypesError } = await getSupabaseAdmin()
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
       .order('check_code', { ascending: true });
 
     if (checkTypesError) {
-      console.error('🚨 API /certifications: Error fetching check types:', checkTypesError);
+      logger.error('API /certifications: Error fetching check types', checkTypesError);
       return NextResponse.json({ success: false, error: checkTypesError.message }, { status: 500 });
     }
 
@@ -35,17 +38,14 @@ export async function GET(request: NextRequest) {
       .eq('pilot_id', pilotId);
 
     if (checksError) {
-      console.error('🚨 API /certifications: Error fetching pilot checks:', checksError);
+      logger.error('API /certifications: Error fetching pilot checks', checksError);
       return NextResponse.json({ success: false, error: checksError.message }, { status: 500 });
     }
 
-    console.log(
-      '🔍 API /certifications: Found',
-      checkTypes?.length || 0,
-      'check types and',
-      pilotChecks?.length || 0,
-      'existing checks'
-    );
+    logger.debug('API /certifications: Found check types and existing checks', {
+      checkTypesCount: checkTypes?.length || 0,
+      existingChecksCount: pilotChecks?.length || 0,
+    });
 
     // Create a map of existing certifications
     const existingChecks = new Map();
@@ -69,18 +69,16 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    console.log(
-      '🔍 API /certifications: Returning',
-      result.length,
-      'certification types with status data'
-    );
+    logger.debug('API /certifications: Returning certification types with status data', {
+      count: result.length,
+    });
 
     return NextResponse.json({
       success: true,
       data: result,
     });
   } catch (error) {
-    console.error('🚨 API /certifications: Fatal error:', error);
+    logger.error('API /certifications: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -104,8 +102,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.log('🔍 API /certifications PUT: Updating certifications for pilot:', pilotId);
-    console.log('🔍 API /certifications PUT: Certifications to update:', certifications.length);
+    logger.debug('API /certifications PUT: Updating certifications', {
+      pilotId,
+      certificationsCount: certifications.length,
+    });
 
     // Convert the data format expected by the database
     const updates = certifications.map((cert: any) => ({
@@ -121,12 +121,12 @@ export async function PUT(request: NextRequest) {
     });
 
     if (error) {
-      console.error('🚨 API /certifications PUT: Database error:', error);
+      logger.error('API /certifications PUT: Database error', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
     // Fetch fresh data after upsert to avoid cache issues
-    console.log('🔄 Fetching fresh certification data after update...');
+    logger.debug('Fetching fresh certification data after update');
     const { data: freshData, error: fetchError } = await getSupabaseAdmin()
       .from('pilot_checks')
       .select()
@@ -137,25 +137,34 @@ export async function PUT(request: NextRequest) {
       );
 
     if (fetchError) {
-      console.error('🚨 API /certifications PUT: Error fetching updated data:', fetchError);
+      logger.error('API /certifications PUT: Error fetching updated data', fetchError);
       return NextResponse.json(
         { success: false, error: 'Update succeeded but failed to fetch updated data' },
         { status: 500 }
       );
     }
 
-    console.log(
-      '✅ API /certifications PUT: Successfully updated',
-      freshData?.length || 0,
-      'certification records'
-    );
+    logger.info('API /certifications PUT: Successfully updated certification records', {
+      count: freshData?.length || 0,
+    });
+
+    // Invalidate cache since certification data was updated
+    invalidateCache([...CACHE_INVALIDATION_PATTERNS.PILOT_DATA_UPDATED]);
+    logger.debug('Cache invalidated for certification data update');
+
+    // Revalidate Next.js cache for pilot pages
+    revalidatePath('/dashboard/pilots');
+    revalidatePath(`/dashboard/pilots/${pilotId}`);
+    revalidatePath(`/dashboard/pilots/${pilotId}/certifications`);
+    revalidatePath('/dashboard/certifications');
+    logger.debug('Next.js paths revalidated for pilot', { pilotId });
 
     return NextResponse.json({
       success: true,
       data: freshData,
     });
   } catch (error) {
-    console.error('🚨 API /certifications PUT: Fatal error:', error);
+    logger.error('API /certifications PUT: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

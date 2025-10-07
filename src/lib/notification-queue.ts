@@ -11,6 +11,7 @@
  */
 
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
 import {
   sendCertificationExpiryAlert,
   sendLeaveRequestNotification,
@@ -80,14 +81,14 @@ export async function queueNotification(
       .single();
 
     if (error) {
-      console.error('Failed to queue notification:', error);
+      logger.error('Failed to queue notification', error instanceof Error ? error : new Error(String(error)));
       return { success: false, error: error.message };
     }
 
-    console.log('Notification queued successfully:', data.id);
+    logger.info('Notification queued successfully', { data: data.id });
     return { success: true, queueId: data.id };
   } catch (error) {
-    console.error('Error queuing notification:', error);
+    logger.error('Error queuing notification', error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -122,16 +123,16 @@ export async function queueBatchNotifications(
     const { data, error } = await supabaseAdmin.from('notification_queue').insert(records).select();
 
     if (error) {
-      console.error('Failed to queue batch notifications:', error);
+      logger.error('Failed to queue batch notifications', error instanceof Error ? error : new Error(String(error)));
       return { success: false, queuedCount: 0, errors: [error.message] };
     }
 
     queuedCount = data?.length || 0;
-    console.log(`Successfully queued ${queuedCount} notifications`);
+    logger.debug('Successfully queued ${queuedCount} notifications');
 
     return { success: true, queuedCount, errors: [] };
   } catch (error) {
-    console.error('Error queuing batch notifications:', error);
+    logger.error('Error queuing batch notifications', error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
       queuedCount,
@@ -167,11 +168,11 @@ export async function processNotificationQueue(limit: number = 50): Promise<Proc
     }
 
     if (!notifications || notifications.length === 0) {
-      console.log('No pending notifications to process');
+      logger.debug('No pending notifications to process');
       return { processed: 0, successful: 0, failed: 0, errors: [] };
     }
 
-    console.log(`Processing ${notifications.length} notifications...`);
+    logger.debug('Processing ${notifications.length} notifications...');
 
     // Process each notification
     for (const notif of notifications) {
@@ -216,7 +217,7 @@ export async function processNotificationQueue(limit: number = 50): Promise<Proc
     );
     return { processed, successful, failed, errors };
   } catch (error) {
-    console.error('Error processing notification queue:', error);
+    logger.error('Error processing notification queue', error instanceof Error ? error : new Error(String(error)));
     return {
       processed,
       successful,
@@ -303,7 +304,7 @@ async function sendQueuedNotification(
         return { success: false, error: `Unknown notification type: ${notif.notification_type}` };
     }
   } catch (error) {
-    console.error('Error sending queued notification:', error);
+    logger.error('Error sending queued notification', error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -341,7 +342,7 @@ async function updateNotificationStatus(
     .eq('id', notificationId);
 
   if (error) {
-    console.error('Failed to update notification status:', error);
+    logger.error('Failed to update notification status', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -368,7 +369,7 @@ async function updateNotificationAttempt(
     .eq('id', notificationId);
 
   if (error) {
-    console.error('Failed to update notification attempt:', error);
+    logger.error('Failed to update notification attempt', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -397,7 +398,7 @@ async function logNotification(
   });
 
   if (error) {
-    console.error('Failed to log notification:', error);
+    logger.error('Failed to log notification', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -433,7 +434,7 @@ export async function cancelNotification(notificationId: string): Promise<boolea
     .eq('status', 'pending'); // Only cancel pending notifications
 
   if (error) {
-    console.error('Failed to cancel notification:', error);
+    logger.error('Failed to cancel notification', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 
@@ -454,7 +455,7 @@ export async function getNotificationStatus(notificationId: string): Promise<any
     .single();
 
   if (error) {
-    console.error('Failed to get notification status:', error);
+    logger.error('Failed to get notification status', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 
@@ -474,7 +475,7 @@ export async function getPendingNotificationsCount(): Promise<number> {
     .eq('status', 'pending');
 
   if (error) {
-    console.error('Failed to get pending notifications count:', error);
+    logger.error('Failed to get pending notifications count', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 
@@ -499,10 +500,10 @@ export async function cleanupOldQueueItems(): Promise<number> {
     .lt('updated_at', sevenDaysAgo.toISOString());
 
   if (error) {
-    console.error('Failed to cleanup old queue items:', error);
+    logger.error('Failed to cleanup old queue items', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 
-  console.log('Cleaned up old queue items');
+  logger.debug('Cleaned up old queue items');
   return 0;
 }

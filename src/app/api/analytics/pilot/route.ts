@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { differenceInYears } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    console.log('📊 API /analytics/pilot: Getting pilot analytics...');
+    logger.info(' API /analytics/pilot: Getting pilot analytics...');
 
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -110,10 +111,10 @@ export async function GET() {
       retirementPlanning,
     };
 
-    console.log('✅ API /analytics/pilot: Successfully retrieved pilot analytics');
+    logger.info(' API /analytics/pilot: Successfully retrieved pilot analytics');
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('❌ API /analytics/pilot: Error:', error);
+    logger.error(' API /analytics/pilot: Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to get pilot analytics' },
       { status: 500 }

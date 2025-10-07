@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/lib/validation-schemas';
 import { z } from 'zod';
 import { withAuth, permissions } from '@/middleware/auth';
+import { logger } from '@/lib/logger';
 import {
   getDisciplinaryMatters,
   createDisciplinaryMatter,
@@ -103,7 +104,7 @@ export const GET = withAuth(
         data: matters,
       });
     } catch (error) {
-      console.error('Error in GET /api/disciplinary-matters:', error);
+      logger.error('Error in GET /api/disciplinary-matters:', error);
       return NextResponse.json(
         {
           success: false,
@@ -150,7 +151,7 @@ export const POST = withAuth(
         { status: 201 }
       );
     } catch (error) {
-      console.error('Error in POST /api/disciplinary-matters:', error);
+      logger.error('Error in POST /api/disciplinary-matters:', error);
       return NextResponse.json(
         {
           success: false,

@@ -57,7 +57,7 @@ export default function DisciplinaryMattersPage() {
             </div>
             <Link
               href="/dashboard/disciplinary/new"
-              className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5 mr-2" />
               New Case
@@ -99,7 +99,7 @@ export default function DisciplinaryMattersPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >

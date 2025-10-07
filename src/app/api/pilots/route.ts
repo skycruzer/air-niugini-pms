@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { invalidateCache, CACHE_INVALIDATION_PATTERNS } from '@/lib/cache-service';
+import { logger } from '@/lib/logger';
 
 // Mark this route as dynamic
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic';
 async function getSinglePilot(pilotId: string) {
   const supabaseAdmin = getSupabaseAdmin();
   try {
-    console.log('🔍 API /pilots: Fetching pilot with ID:', pilotId);
+    logger.debug('API /pilots: Fetching pilot', { pilotId });
 
     // Get single pilot using service role (bypasses RLS)
     const { data: pilot, error: pilotError } = await supabaseAdmin
@@ -18,7 +19,7 @@ async function getSinglePilot(pilotId: string) {
       .single();
 
     if (pilotError) {
-      console.error('🚨 API /pilots: Error fetching pilot:', pilotError);
+      logger.error('API /pilots: Error fetching pilot', pilotError);
       return NextResponse.json({ success: false, error: pilotError.message }, { status: 500 });
     }
 
@@ -52,18 +53,10 @@ async function getSinglePilot(pilotId: string) {
         checksError = result.error;
         break; // Success, exit retry loop
       } catch (error) {
-        console.warn(
-          `🚨 API /pilots: Attempt ${attempt} failed for single pilot ${pilotId}:`,
-          error
-        );
+        logger.warn(`API /pilots: Attempt ${attempt} failed for single pilot`, { pilotId, error });
         checksError = error;
         if (attempt === 2) {
-          console.error(`🚨 API /pilots: Error fetching checks for pilot ${pilotId}:`, {
-            message: error instanceof Error ? error.message : 'Unknown error',
-            details: error instanceof Error ? error.stack : String(error),
-            hint: '',
-            code: '',
-          });
+          logger.error(`API /pilots: Error fetching checks for pilot`, error, { pilotId });
         }
       }
     }
@@ -101,14 +94,14 @@ async function getSinglePilot(pilotId: string) {
       certificationStatus: certificationCounts,
     };
 
-    console.log('🔍 API /pilots: Returning single pilot data');
+    logger.debug('API /pilots: Returning single pilot data');
 
     return NextResponse.json({
       success: true,
       data: result,
     });
   } catch (error) {
-    console.error('🚨 API /pilots: Fatal error fetching single pilot:', error);
+    logger.error('API /pilots: Fatal error fetching single pilot', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -116,25 +109,26 @@ async function getSinglePilot(pilotId: string) {
 export async function PUT(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
   try {
-    console.log('🚀 API /pilots PUT: Starting PUT request');
-    console.log('🔍 API /pilots PUT: Admin client type:', typeof supabaseAdmin);
-    console.log('🔍 API /pilots PUT: Admin client has from method:', !!supabaseAdmin.from);
+    logger.debug('API /pilots PUT: Starting PUT request', {
+      adminClientType: typeof supabaseAdmin,
+      hasFromMethod: !!supabaseAdmin.from,
+    });
 
     const { searchParams } = new URL(request.url);
     const pilotId = searchParams.get('id');
 
-    console.log('🔍 API /pilots PUT: Request URL:', request.url);
-    console.log('🔍 API /pilots PUT: Pilot ID from params:', pilotId);
+    logger.debug('API /pilots PUT: Request details', { url: request.url, pilotId });
 
     if (!pilotId) {
-      console.log('❌ API /pilots PUT: No pilot ID provided');
+      logger.warn('API /pilots PUT: No pilot ID provided');
       return NextResponse.json({ success: false, error: 'Pilot ID is required' }, { status: 400 });
     }
 
     const body = await request.json();
-    console.log('🔍 API /pilots PUT: Updating pilot with ID:', pilotId);
-    console.log('🔍 API /pilots PUT: Request body:', JSON.stringify(body, null, 2));
-    console.log('🔍 API /pilots PUT: Body keys:', Object.keys(body));
+    logger.debug('API /pilots PUT: Updating pilot', {
+      pilotId,
+      bodyKeys: Object.keys(body),
+    });
 
     // First check if pilot exists
     const { data: existingPilot, error: checkError } = await supabaseAdmin
@@ -144,14 +138,14 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (checkError) {
-      console.error('🚨 API /pilots PUT: Error checking existing pilot:', checkError);
+      logger.error('API /pilots PUT: Error checking existing pilot', checkError);
       return NextResponse.json(
         { success: false, error: `Pilot not found: ${checkError.message}` },
         { status: 404 }
       );
     }
 
-    console.log('✅ API /pilots PUT: Found existing pilot:', existingPilot);
+    logger.debug('API /pilots PUT: Found existing pilot', { existingPilot });
 
     // Clean and validate the body data
     const cleanedBody = { ...body };
@@ -169,7 +163,7 @@ export async function PUT(request: NextRequest) {
         .single();
 
       if (!contractTypeExists) {
-        console.log('🚨 API /pilots PUT: Invalid contract type:', cleanedBody.contract_type);
+        logger.warn('API /pilots PUT: Invalid contract type', { contractType: cleanedBody.contract_type });
         return NextResponse.json(
           {
             success: false,
@@ -185,37 +179,33 @@ export async function PUT(request: NextRequest) {
       cleanedBody.middle_name = null;
     }
 
-    console.log(
-      '🔧 API /pilots PUT: Cleaned body for update:',
-      JSON.stringify(cleanedBody, null, 2)
-    );
+    logger.debug('API /pilots PUT: Cleaned body for update', { bodyKeys: Object.keys(cleanedBody) });
 
     // Use service role client to bypass RLS
-    console.log('🔧 API /pilots PUT: Performing update...');
-    console.log('🔧 API /pilots PUT: Service role client ready, attempting database update');
+    logger.debug('API /pilots PUT: Performing update');
 
     try {
       // Test if we can do a simple select first
-      console.log('🧪 Testing service role with simple select...');
+      logger.debug('Testing service role with simple select');
       const testResult = await supabaseAdmin.from('pilots').select('id').eq('id', pilotId).single();
 
-      console.log('🧪 Test select result:', {
+      logger.debug('Test select result', {
         success: !testResult.error,
         error: testResult.error?.message,
-        data: !!testResult.data,
+        hasData: !!testResult.data,
       });
     } catch (testError) {
-      console.error('🧪 Test select failed:', testError);
+      logger.error('Test select failed', testError);
     }
 
-    console.log('🔧 Now attempting actual update...');
+    logger.debug('Now attempting actual update');
     const { error } = await supabaseAdmin.from('pilots').update(cleanedBody).eq('id', pilotId);
 
     if (error) {
-      console.error('🚨 API /pilots PUT: Supabase error details:', error);
-      console.error('🚨 API /pilots PUT: Error code:', error.code);
-      console.error('🚨 API /pilots PUT: Error message:', error.message);
-      console.error('🚨 API /pilots PUT: Error details:', error.details);
+      logger.error('API /pilots PUT: Supabase error', error, {
+        code: error.code,
+        details: error.details,
+      });
       return NextResponse.json(
         {
           success: false,
@@ -229,7 +219,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Fetch fresh data after update to avoid cache issues
-    console.log('🔄 Fetching fresh data after update...');
+    logger.debug('Fetching fresh data after update');
     const { data: freshData, error: fetchError } = await supabaseAdmin
       .from('pilots')
       .select()
@@ -237,30 +227,25 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (fetchError || !freshData) {
-      console.error('🚨 API /pilots PUT: Error fetching updated data:', fetchError);
+      logger.error('API /pilots PUT: Error fetching updated data', fetchError);
       return NextResponse.json(
         { success: false, error: 'Update succeeded but failed to fetch updated data' },
         { status: 500 }
       );
     }
 
-    console.log('✅ API /pilots PUT: Successfully updated pilot');
-    console.log('✅ API /pilots PUT: Fresh updated data:', JSON.stringify(freshData, null, 2));
+    logger.info('API /pilots PUT: Successfully updated pilot', { pilotId });
 
     // Invalidate cache since pilot data was updated
     invalidateCache([...CACHE_INVALIDATION_PATTERNS.PILOT_DATA_UPDATED]);
-    console.log('🗑️ Cache invalidated for pilot data update');
+    logger.debug('Cache invalidated for pilot data update');
 
     return NextResponse.json({
       success: true,
       data: freshData,
     });
   } catch (error) {
-    console.error('🚨 API /pilots PUT: Fatal error:', error);
-    console.error(
-      '🚨 API /pilots PUT: Error stack:',
-      error instanceof Error ? error.stack : 'No stack'
-    );
+    logger.error('API /pilots PUT: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -272,11 +257,11 @@ export async function GET(request: NextRequest) {
     const pilotId = searchParams.get('id');
 
     if (pilotId) {
-      console.log('🔍 API /pilots: Fetching single pilot with ID:', pilotId);
+      logger.debug('API /pilots: Fetching single pilot', { pilotId });
       return await getSinglePilot(pilotId);
     }
 
-    console.log('🔍 API /pilots: Fetching all pilots with service role...');
+    logger.debug('API /pilots: Fetching all pilots with service role');
 
     // Get all pilots using service role (bypasses RLS) ordered by seniority
     const { data: pilots, error: pilotsError } = await supabaseAdmin
@@ -285,11 +270,11 @@ export async function GET(request: NextRequest) {
       .order('seniority_number', { ascending: true, nullsFirst: false });
 
     if (pilotsError) {
-      console.error('🚨 API /pilots: Error fetching pilots:', pilotsError);
+      logger.error('API /pilots: Error fetching pilots', pilotsError);
       return NextResponse.json({ success: false, error: pilotsError.message }, { status: 500 });
     }
 
-    console.log('🔍 API /pilots: Found', pilots?.length || 0, 'pilots');
+    logger.debug('API /pilots: Found pilots', { count: pilots?.length || 0 });
 
     // ✅ PERFORMANCE OPTIMIZATION: Single query instead of N+1 queries
     // Fetch all pilot checks in one query with JOIN to avoid N+1 problem
@@ -309,15 +294,13 @@ export async function GET(request: NextRequest) {
       .order('pilot_id');
 
     if (checksError) {
-      console.error('🚨 API /pilots: Error fetching pilot checks:', checksError);
+      logger.error('API /pilots: Error fetching pilot checks', checksError);
       // Continue with pilots data even if checks fail
     }
 
-    console.log(
-      '🔍 API /pilots: Fetched',
-      allPilotChecks?.length || 0,
-      'certification records in single query'
-    );
+    logger.debug('API /pilots: Fetched certification records', {
+      count: allPilotChecks?.length || 0,
+    });
 
     // Group checks by pilot_id for efficient lookup
     const checksByPilot = (allPilotChecks || []).reduce((acc: any, check: any) => {
@@ -368,18 +351,16 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    console.log(
-      '🔍 API /pilots: Returning',
-      pilotsWithCerts.length,
-      'pilots with certification data'
-    );
+    logger.debug('API /pilots: Returning pilots with certification data', {
+      count: pilotsWithCerts.length,
+    });
 
     return NextResponse.json({
       success: true,
       data: pilotsWithCerts,
     });
   } catch (error) {
-    console.error('🚨 API /pilots: Fatal error:', error);
+    logger.error('API /pilots: Fatal error', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

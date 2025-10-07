@@ -10,6 +10,7 @@ import {
   OperationalReadinessPDFDocument,
 } from '@/lib/pdf-fleet-management';
 import { validatePDFRequest, validateReportType, validateUUID } from '@/lib/pdf-validation';
+import { logger } from '@/lib/logger';
 
 /**
  * PDF Report Generation API Endpoint
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     try {
       validatePDFRequest(requestData);
     } catch (validationError) {
-      console.error('❌ API /reports/pdf: Validation error:', validationError);
+      logger.error(' API /reports/pdf: Validation error:', validationError);
       return NextResponse.json(
         {
           success: false,
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     const { reportType, pilotId, generatedBy = 'System' } = requestData;
 
-    console.log(`🔍 API /reports/pdf: Generating ${reportType} PDF report`);
+    logger.debug(`🔍 API /reports/pdf: Generating ${reportType} PDF report`);
 
     // Validate report type
     try {
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    console.log(
+    logger.debug(
       `✅ API /reports/pdf: Successfully generated ${reportType} PDF (${pdfBuffer.length} bytes)`
     );
 
@@ -207,7 +208,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('🚨 API /reports/pdf: Error generating PDF:', {
+    logger.error(' API /reports/pdf: Error generating PDF:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : String(error),
     });

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/middleware/auth';
 import { validateRequest, isValidUUID } from '@/lib/validation-schemas';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 import {
   getTaskById,
   updateTask,
@@ -84,7 +85,7 @@ export const GET = withAuth(async (request: NextRequest, { user, params }: any) 
       data: response,
     });
   } catch (error) {
-    console.error('Error in GET /api/tasks/[id]:', error);
+    logger.error('Error in GET /api/tasks/[id]:', error);
     return NextResponse.json({ success: false, error: 'Failed to fetch task' }, { status: 500 });
   }
 });
@@ -122,7 +123,7 @@ export const PATCH = withAuth(async (request: NextRequest, { user, params }: any
       data: task,
     });
   } catch (error) {
-    console.error('Error in PATCH /api/tasks/[id]:', error);
+    logger.error('Error in PATCH /api/tasks/[id]:', error);
     return NextResponse.json({ success: false, error: 'Failed to update task' }, { status: 500 });
   }
 });
@@ -156,7 +157,7 @@ export const DELETE = withAuth(async (request: NextRequest, { user, params }: an
       message: 'Task deleted successfully',
     });
   } catch (error) {
-    console.error('Error in DELETE /api/tasks/[id]:', error);
+    logger.error('Error in DELETE /api/tasks/[id]:', error);
     return NextResponse.json({ success: false, error: 'Failed to delete task' }, { status: 500 });
   }
 });

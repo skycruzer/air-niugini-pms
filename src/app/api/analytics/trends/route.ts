@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('📈 API /analytics/trends: Getting trend analytics from real Supabase data...');
+    logger.debug('📈 API /analytics/trends: Getting trend analytics from real Supabase data...');
 
     const supabaseAdmin = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
@@ -148,10 +149,10 @@ export async function GET(request: NextRequest) {
       performance,
     };
 
-    console.log('✅ API /analytics/trends: Successfully retrieved real trend analytics');
+    logger.info(' API /analytics/trends: Successfully retrieved real trend analytics');
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('❌ API /analytics/trends: Error:', error);
+    logger.error(' API /analytics/trends: Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to get trend analytics' },
       { status: 500 }

@@ -6,6 +6,7 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 // Types for sync queue
 export interface SyncQueueItem {
@@ -30,7 +31,7 @@ export function getSyncQueue(): SyncQueueItem[] {
     const queue = localStorage.getItem(SYNC_QUEUE_KEY);
     return queue ? JSON.parse(queue) : [];
   } catch (error) {
-    console.error('Error reading sync queue:', error);
+    logger.error('Error reading sync queue', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -46,7 +47,7 @@ export function saveSyncQueue(queue: SyncQueueItem[]): void {
     // Dispatch event to notify sync indicator
     window.dispatchEvent(new CustomEvent('sync-queue-updated', { detail: { queue } }));
   } catch (error) {
-    console.error('Error saving sync queue:', error);
+    logger.error('Error saving sync queue', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -386,7 +387,7 @@ export function setupAutoSync(queryClient: QueryClient): void {
 
   // Listen for online event
   window.addEventListener('online', () => {
-    console.log('Connection restored, processing sync queue...');
+    logger.debug('Connection restored, processing sync queue');
     processSyncQueue(queryClient);
   });
 

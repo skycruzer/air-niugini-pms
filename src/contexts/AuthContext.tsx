@@ -26,10 +26,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Check for existing session on mount
     const initializeAuth = async () => {
       try {
-        // First try localStorage for quick access
+        // First try sessionStorage for quick access (more secure than localStorage)
         let currentUser = authService.getCurrentUser();
 
-        // If no user in localStorage, check Supabase session
+        // If no user in sessionStorage, check Supabase session
         if (!currentUser) {
           currentUser = await authService.getSession();
         }

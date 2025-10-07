@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 
 // CSRF token configuration
 const CSRF_TOKEN_LENGTH = 32;
@@ -41,7 +42,7 @@ function startCleanupTimer() {
     }
 
     if (tokensRemoved > 0) {
-      console.log(`🧹 CSRF cleanup: Removed ${tokensRemoved} expired tokens`);
+      logger.debug(`CSRF cleanup: Removed ${tokensRemoved} expired tokens`);
     }
   }, CLEANUP_INTERVAL);
 }
@@ -60,7 +61,7 @@ export function generateCsrfToken(userId?: string): string {
     userId,
   });
 
-  console.log('🔐 Generated new CSRF token:', {
+  logger.debug('Generated new CSRF token', {
     token: token.substring(0, 8) + '...',
     userId: userId || 'anonymous',
   });
@@ -73,14 +74,14 @@ export function generateCsrfToken(userId?: string): string {
  */
 export function validateCsrfToken(token: string, userId?: string): boolean {
   if (!token) {
-    console.warn('🚫 CSRF validation failed: No token provided');
+    logger.warn('CSRF validation failed: No token provided');
     return false;
   }
 
   const tokenData = csrfTokenStore.get(token);
 
   if (!tokenData) {
-    console.warn('🚫 CSRF validation failed: Token not found in store');
+    logger.warn('CSRF validation failed: Token not found in store');
     return false;
   }
 
@@ -88,18 +89,18 @@ export function validateCsrfToken(token: string, userId?: string): boolean {
   const now = Date.now();
   const maxAge = CSRF_TOKEN_MAX_AGE * 1000;
   if (now - tokenData.createdAt > maxAge) {
-    console.warn('🚫 CSRF validation failed: Token expired');
+    logger.warn('CSRF validation failed: Token expired');
     csrfTokenStore.delete(token);
     return false;
   }
 
   // Validate user ID if provided
   if (userId && tokenData.userId && tokenData.userId !== userId) {
-    console.warn('🚫 CSRF validation failed: User ID mismatch');
+    logger.warn('CSRF validation failed: User ID mismatch');
     return false;
   }
 
-  console.log('✅ CSRF token validated successfully');
+  logger.debug('CSRF token validated successfully');
   return true;
 }
 
@@ -172,7 +173,7 @@ export async function validateCsrfMiddleware(
 
   // Both tokens must be present and match
   if (!headerToken || !cookieToken || headerToken !== cookieToken) {
-    console.warn('🚫 CSRF validation failed: Token mismatch or missing', {
+    logger.warn('CSRF validation failed: Token mismatch or missing', {
       method: request.method,
       url: request.url,
       hasHeaderToken: !!headerToken,
@@ -194,7 +195,7 @@ export async function validateCsrfMiddleware(
   const isValid = validateCsrfToken(headerToken, userId);
 
   if (!isValid) {
-    console.warn('🚫 CSRF validation failed: Invalid token', {
+    logger.warn('CSRF validation failed: Invalid token', {
       method: request.method,
       url: request.url,
       userId,
@@ -244,7 +245,7 @@ export function withCsrfProtection(
  */
 export function invalidateCsrfToken(token: string): void {
   csrfTokenStore.delete(token);
-  console.log('🗑️ CSRF token invalidated');
+  logger.debug('CSRF token invalidated');
 }
 
 /**
@@ -261,7 +262,7 @@ export function clearUserCsrfTokens(userId: string): void {
   }
 
   if (tokensCleared > 0) {
-    console.log(`🗑️ Cleared ${tokensCleared} CSRF tokens for user ${userId}`);
+    logger.debug(`Cleared ${tokensCleared} CSRF tokens for user ${userId}`);
   }
 }
 

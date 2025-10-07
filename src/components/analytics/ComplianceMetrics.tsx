@@ -121,21 +121,21 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
               <div className="flex items-center justify-center mb-2">
                 <CheckCircle2 className="h-5 w-5 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-green-600">{statusData[0].value}</div>
+              <div className="text-2xl font-bold text-green-600">{statusData[0]?.value ?? 0}</div>
               <div className="text-xs text-gray-600">Current</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
               </div>
-              <div className="text-2xl font-bold text-amber-600">{statusData[1].value}</div>
+              <div className="text-2xl font-bold text-amber-600">{statusData[1]?.value ?? 0}</div>
               <div className="text-xs text-gray-600">Expiring Soon</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-2">
                 <XCircle className="h-5 w-5 text-red-600" />
               </div>
-              <div className="text-2xl font-bold text-red-600">{statusData[2].value}</div>
+              <div className="text-2xl font-bold text-red-600">{statusData[2]?.value ?? 0}</div>
               <div className="text-xs text-gray-600">Expired</div>
             </div>
           </div>
@@ -196,9 +196,9 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
         <CardContent>
           <CertificationStatusChart
             data={{
-              current: statusData[0].value,
-              expiring: statusData[1].value,
-              expired: statusData[2].value,
+              current: statusData[0]?.value ?? 0,
+              expiring: statusData[1]?.value ?? 0,
+              expired: statusData[2]?.value ?? 0,
             }}
             variant="pie"
             height={300}
@@ -278,13 +278,13 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
                 </p>
               </div>
             </div>
-            {statusData[2].value > 0 && (
+            {(statusData[2]?.value ?? 0) > 0 && (
               <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
                 <div>
                   <p className="font-semibold text-red-900">Action Required</p>
                   <p className="text-sm text-red-700">
-                    {statusData[2].value} expired certifications require immediate renewal
+                    {statusData[2]?.value ?? 0} expired certifications require immediate renewal
                   </p>
                 </div>
               </div>

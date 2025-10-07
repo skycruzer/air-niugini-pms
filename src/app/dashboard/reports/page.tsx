@@ -17,6 +17,7 @@ import {
   exportComplianceReport,
 } from '@/lib/export-utils';
 import { calculateRetirementInfo } from '@/lib/retirement-utils';
+import { BarChart3, TrendingUp, FileText, Download } from 'lucide-react';
 
 interface ReportSummary {
   totalPilots: number;
@@ -324,7 +325,7 @@ export default function ReportsPage() {
             <div
               key={report.id}
               className={`card-aviation cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                selectedReport === report.id ? 'ring-2 ring-air-niugini-red' : ''
+                selectedReport === report.id ? 'ring-2 ring-blue-600' : ''
               }`}
               onClick={() => generateReport(report.id)}
             >
@@ -362,7 +363,7 @@ export default function ReportsPage() {
         {/* Professional PDF Export Section */}
         <div className="card-aviation mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-[#E4002B] rounded-lg flex items-center justify-center">
+            <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white text-sm">📄</span>
             </span>
             Professional PDF Reports
@@ -390,8 +391,8 @@ export default function ReportsPage() {
         {/* Quick Data Export Section */}
         <div className="card-aviation mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-8 h-8 bg-[#E4002B] rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm">📊</span>
+            <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Download className="text-white w-5 h-5" />
             </span>
             Quick Data Exports
           </h2>
@@ -423,9 +424,10 @@ export default function ReportsPage() {
                   })
                   .catch(() => setError('Failed to export pilots data'));
               }}
-              className="btn-secondary text-sm justify-center"
+              className="btn-secondary text-sm justify-center flex items-center gap-2"
             >
-              📋 Export All Pilots
+              <FileText className="w-4 h-4" />
+              Export All Pilots
             </button>
 
             <button
@@ -510,8 +512,8 @@ export default function ReportsPage() {
         {/* Loading State */}
         {loading && (
           <div className="card-aviation text-center py-12">
-            <div className="w-16 h-16 bg-air-niugini-red rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <span className="text-white text-2xl">📊</span>
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <BarChart3 className="text-white w-8 h-8" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Generating Report...</h3>
             <p className="text-gray-600">Processing data and compiling results</p>
@@ -557,7 +559,8 @@ export default function ReportsPage() {
                     disabled={loading}
                     title="Export report data to CSV format"
                   >
-                    📊 Export CSV
+                    <BarChart3 className="w-4 h-4 mr-2 inline" />
+                    Export CSV
                   </button>
                   {REPORT_TYPES.find((r) => r.id === selectedReport)?.pdfSupported ? (
                     <button
@@ -614,7 +617,7 @@ export default function ReportsPage() {
                     <div className="text-sm text-gray-600">Expired</div>
                   </div>
                   <div className="card-aviation text-center">
-                    <div className="text-2xl font-bold text-air-niugini-red">
+                    <div className="text-2xl font-bold text-blue-600">
                       {(reportData.summary as any).complianceRate}%
                     </div>
                     <div className="text-sm text-gray-600">Compliance</div>
@@ -1056,7 +1059,7 @@ export default function ReportsPage() {
                             year: 'numeric',
                           })}
                         </h4>
-                        <div className="text-2xl font-bold text-air-niugini-red">
+                        <div className="text-2xl font-bold text-blue-600">
                           {certs.length}
                         </div>
                         <div className="text-sm text-gray-600">certifications expiring</div>
@@ -1120,7 +1123,7 @@ export default function ReportsPage() {
                     <div className="text-sm text-gray-600">Pending Requests</div>
                   </div>
                   <div className="card-aviation text-center">
-                    <div className="text-2xl font-bold text-air-niugini-red">
+                    <div className="text-2xl font-bold text-blue-600">
                       {Math.round(
                         (reportData.availability.availablePilots /
                           reportData.availability.totalPilots) *
@@ -1397,7 +1400,7 @@ export default function ReportsPage() {
                           <div className="text-sm text-gray-600">Pending</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-2xl font-bold text-air-niugini-red">
+                          <div className="text-2xl font-bold text-blue-600">
                             {(reportData as any).rosterAnalysis.availabilityPercentage.overall}%
                           </div>
                           <div className="text-sm text-gray-600">Overall Availability</div>
@@ -1441,8 +1444,8 @@ export default function ReportsPage() {
         {/* Initial State */}
         {!selectedReport && !loading && (
           <div className="card-aviation text-center py-16">
-            <div className="w-20 h-20 bg-gradient-to-br from-air-niugini-red to-red-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-white text-3xl">📊</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <TrendingUp className="text-white w-10 h-10" />
             </div>
             <h2 className="text-heading-large text-gray-900 mb-4">Professional Fleet Reporting</h2>
             <p className="text-body-large text-gray-600 max-w-2xl mx-auto mb-8">

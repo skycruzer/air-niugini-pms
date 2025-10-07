@@ -1,6 +1,21 @@
+'use client';
+
+import { useEffect } from 'react';
 import { WifiOff, RefreshCw, Home, Signal } from 'lucide-react';
 
 export default function Offline() {
+  // Auto-reload when connection is restored (secure alternative to dangerouslySetInnerHTML)
+  useEffect(() => {
+    const handleOnline = () => {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, []);
+
   return (
     <html>
       <body>
@@ -170,19 +185,6 @@ export default function Offline() {
             </div>
           </div>
         </div>
-
-        {/* Auto-reload script when connection is restored */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.addEventListener('online', function() {
-                setTimeout(function() {
-                  window.location.reload();
-                }, 1000);
-              });
-            `,
-          }}
-        />
       </body>
     </html>
   );

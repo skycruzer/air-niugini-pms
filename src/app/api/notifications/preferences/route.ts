@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
       data,
     });
   } catch (error) {
-    console.error('API Error [GET /api/notifications/preferences]:', error);
+    logger.error('API Error [GET /api/notifications/preferences]:', error);
     return NextResponse.json(
       {
         success: false,
@@ -145,7 +146,7 @@ export async function PUT(request: NextRequest) {
       message: 'Notification preferences updated successfully',
     });
   } catch (error) {
-    console.error('API Error [PUT /api/notifications/preferences]:', error);
+    logger.error('API Error [PUT /api/notifications/preferences]:', error);
     return NextResponse.json(
       {
         success: false,

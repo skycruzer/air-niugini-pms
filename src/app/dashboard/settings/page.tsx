@@ -14,6 +14,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Settings, RefreshCw, CheckCircle, Sliders, Save, Bell, Users } from 'lucide-react';
 
 const alertThresholdsSchema = z.object({
   critical_days: z.number().min(1).max(30),
@@ -210,7 +211,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <span className="text-3xl mr-3">⚙️</span>
+                  <Settings className="w-8 h-8 mr-3" />
                   System Settings
                 </h1>
                 <p className="text-gray-600 mt-1">
@@ -222,15 +223,16 @@ export default function SettingsPage() {
                 disabled={saving === 'reset'}
                 className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
-                <span className="mr-2">🔄</span>
+                <RefreshCw className="w-4 h-4 mr-2" />
                 {saving === 'reset' ? 'Resetting...' : 'Reset to Defaults'}
               </button>
             </div>
 
             {/* Messages */}
             {successMessage && (
-              <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800">
-                ✅ {successMessage}
+              <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 text-green-800 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                {successMessage}
               </div>
             )}
             {errorMessage && (
@@ -243,7 +245,7 @@ export default function SettingsPage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
-                <div className="w-8 h-8 border-4 border-[#E4002B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading settings...</p>
               </div>
             </div>
@@ -255,33 +257,33 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab('general')}
                   className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === 'general'
-                      ? 'bg-white text-[#E4002B] shadow-sm'
+                      ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  <span className="mr-2">🎛️</span>
+                  <Sliders className="w-4 h-4 mr-2" />
                   General
                 </button>
                 <button
                   onClick={() => setActiveTab('alerts')}
                   className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === 'alerts'
-                      ? 'bg-white text-[#E4002B] shadow-sm'
+                      ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  <span className="mr-2">🚨</span>
+                  <Bell className="w-4 h-4 mr-2" />
                   Alert Thresholds
                 </button>
                 <button
                   onClick={() => setActiveTab('requirements')}
                   className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === 'requirements'
-                      ? 'bg-white text-[#E4002B] shadow-sm'
+                      ? 'bg-white text-blue-600 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  <span className="mr-2">👥</span>
+                  <Users className="w-4 h-4 mr-2" />
                   Pilot Requirements
                 </button>
               </div>
@@ -291,7 +293,7 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
                   <div className="p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                      <span className="mr-2">🎛️</span>
+                      <Sliders className="w-5 h-5 mr-2" />
                       General Settings
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -312,7 +314,7 @@ export default function SettingsPage() {
                           {...appTitleForm.register('app_title')}
                           type="text"
                           id="app_title"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                           placeholder="Enter application title"
                         />
                         {appTitleForm.formState.errors.app_title && (
@@ -329,7 +331,7 @@ export default function SettingsPage() {
                         <button
                           type="submit"
                           disabled={saving === 'app_title'}
-                          className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors disabled:opacity-50"
+                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                         >
                           {saving === 'app_title' ? (
                             <>
@@ -338,7 +340,7 @@ export default function SettingsPage() {
                             </>
                           ) : (
                             <>
-                              <span className="mr-2">💾</span>
+                              <Save className="w-4 h-4 mr-2" />
                               Save Changes
                             </>
                           )}
@@ -495,7 +497,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={saving === 'alerts'}
-                        className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors disabled:opacity-50"
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                       >
                         {saving === 'alerts' ? (
                           <>
@@ -504,7 +506,7 @@ export default function SettingsPage() {
                           </>
                         ) : (
                           <>
-                            <span className="mr-2">💾</span>
+                            <Save className="w-4 h-4 mr-2" />
                             Save Alert Thresholds
                           </>
                         )}
@@ -547,7 +549,7 @@ export default function SettingsPage() {
                             id="pilot_retirement_age"
                             min="60"
                             max="70"
-                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                           />
                           <span className="text-sm text-gray-600">years</span>
                         </div>
@@ -568,7 +570,7 @@ export default function SettingsPage() {
                           id="number_of_aircraft"
                           min="1"
                           max="10"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                         />
                       </div>
 
@@ -587,7 +589,7 @@ export default function SettingsPage() {
                           id="captains_per_hull"
                           min="1"
                           max="20"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                         />
                       </div>
 
@@ -606,7 +608,7 @@ export default function SettingsPage() {
                           id="first_officers_per_hull"
                           min="1"
                           max="20"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                         />
                       </div>
 
@@ -625,7 +627,7 @@ export default function SettingsPage() {
                           id="minimum_captains_per_hull"
                           min="1"
                           max="30"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                         />
                       </div>
 
@@ -644,7 +646,7 @@ export default function SettingsPage() {
                           id="minimum_first_officers_per_hull"
                           min="1"
                           max="30"
-                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                          className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                         />
                       </div>
 
@@ -665,7 +667,7 @@ export default function SettingsPage() {
                             id="training_captains_per_pilots"
                             min="1"
                             max="50"
-                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                           />
                           <span className="text-sm text-gray-600">pilots</span>
                         </div>
@@ -688,7 +690,7 @@ export default function SettingsPage() {
                             id="examiners_per_pilots"
                             min="1"
                             max="50"
-                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#E4002B] focus:border-[#E4002B]"
+                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-600 focus:border-blue-600"
                           />
                           <span className="text-sm text-gray-600">pilots</span>
                         </div>
@@ -699,7 +701,7 @@ export default function SettingsPage() {
                       <button
                         type="submit"
                         disabled={saving === 'requirements'}
-                        className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors disabled:opacity-50"
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                       >
                         {saving === 'requirements' ? (
                           <>
@@ -708,7 +710,7 @@ export default function SettingsPage() {
                           </>
                         ) : (
                           <>
-                            <span className="mr-2">💾</span>
+                            <Save className="w-4 h-4 mr-2" />
                             Save Requirements
                           </>
                         )}

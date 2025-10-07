@@ -8,6 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   getPilotAnalytics,
   getCertificationAnalytics,
@@ -23,7 +24,7 @@ import {
  */
 export async function GET() {
   try {
-    console.log('🧪 Analytics Test API: Starting test...');
+    logger.debug(' Analytics Test API: Starting test...');
 
     const testResults = {
       timestamp: new Date().toISOString(),
@@ -185,8 +186,8 @@ export async function GET() {
             : 'all_failed',
     };
 
-    console.log('✅ Analytics Test API: Test completed');
-    console.log('📊 Test summary:', summary);
+    logger.info(' Analytics Test API: Test completed');
+    logger.info(' Test summary:', summary);
 
     return NextResponse.json({
       success: true,
@@ -195,7 +196,7 @@ export async function GET() {
       message: `Analytics test completed. ${summary.successful}/${summary.totalServices} services working correctly.`,
     });
   } catch (error) {
-    console.error('❌ Analytics Test API: Test failed:', error);
+    logger.error(' Analytics Test API: Test failed:', error);
 
     return NextResponse.json(
       {
@@ -216,7 +217,7 @@ export async function POST(request: Request) {
   try {
     const { service, filters } = await request.json();
 
-    console.log(`🧪 Analytics Test API: Testing specific service: ${service}`);
+    logger.debug(`🧪 Analytics Test API: Testing specific service: ${service}`);
 
     let result;
 
@@ -243,7 +244,7 @@ export async function POST(request: Request) {
         throw new Error(`Unknown service: ${service}`);
     }
 
-    console.log(`✅ Analytics Test API: ${service} service test passed`);
+    logger.debug(`✅ Analytics Test API: ${service} service test passed`);
 
     return NextResponse.json({
       success: true,
@@ -252,7 +253,7 @@ export async function POST(request: Request) {
       message: `${service} analytics service test passed`,
     });
   } catch (error) {
-    console.error('❌ Analytics Test API: Service test failed:', error);
+    logger.error(' Analytics Test API: Service test failed:', error);
 
     return NextResponse.json(
       {

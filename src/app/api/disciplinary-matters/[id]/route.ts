@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/middleware/auth';
 import { validateRequest, isValidUUID } from '@/lib/validation-schemas';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 import {
   getDisciplinaryMatterById,
   updateDisciplinaryMatter,
@@ -77,7 +78,7 @@ export const GET = withAuth(
         data: response,
       });
     } catch (error) {
-      console.error('Error in GET /api/disciplinary-matters/[id]:', error);
+      logger.error('Error in GET /api/disciplinary-matters/[id]:', error);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch disciplinary matter' },
         { status: 500 }
@@ -121,7 +122,7 @@ export const PATCH = withAuth(
         data: matter,
       });
     } catch (error) {
-      console.error('Error in PATCH /api/disciplinary-matters/[id]:', error);
+      logger.error('Error in PATCH /api/disciplinary-matters/[id]:', error);
       return NextResponse.json(
         { success: false, error: 'Failed to update disciplinary matter' },
         { status: 500 }
@@ -151,7 +152,7 @@ export const DELETE = withAuth(
         message: 'Disciplinary matter deleted successfully',
       });
     } catch (error) {
-      console.error('Error in DELETE /api/disciplinary-matters/[id]:', error);
+      logger.error('Error in DELETE /api/disciplinary-matters/[id]:', error);
       return NextResponse.json(
         { success: false, error: 'Failed to delete disciplinary matter' },
         { status: 500 }

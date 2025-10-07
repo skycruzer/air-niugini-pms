@@ -1,0 +1,50 @@
+/**
+ * Air Niugini B767 Pilot Management System
+ * Cron Job: Daily Certification Check
+ *
+ * POST /api/cron/daily-certification-check
+ * Schedule: Daily at 8:00 AM
+ * Purpose: Check for expiring certifications and queue notifications
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { runDailyCertificationCheck } from '@/lib/scheduled-jobs';
+import { logger } from '@/lib/logger';
+
+export async function POST(request: NextRequest) {
+  try {
+    // Optional: Verify cron secret for security
+    const cronSecret = request.headers.get('x-cron-secret');
+    if (process.env.CRON_SECRET && cronSecret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    console.log('[Cron] Running daily certification check...');
+
+    const result = await runDailyCertificationCheck();
+
+    return NextResponse.json({
+      success: result.success,
+      jobName: result.jobName,
+      duration: result.duration,
+      details: result.details,
+      error: result.error,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('[Cron] Daily certification check failed:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// Allow GET for manual testing
+export async function GET(request: NextRequest) {
+  return POST(request);
+}

@@ -3,6 +3,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { createElement } from 'react';
 import { getLeaveRequestsByRosterPeriodAdmin } from '@/lib/leave-service';
 import { getRosterPeriodFromDate, getFutureRosterPeriods } from '@/lib/roster-utils';
+import { logger } from '@/lib/logger';
 import {
   createRosterLeaveReportDocument,
   createRosterLeaveReportData,
@@ -14,7 +15,7 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('🎯 Starting roster planning PDF report generation...');
+    logger.debug('🎯 Starting roster planning PDF report generation...');
 
     const body = await request.json();
     const { rosterPeriod, generatedBy } = body;
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`📊 Generating report for roster period: ${rosterPeriod}`);
+    logger.debug(`📊 Generating report for roster period: ${rosterPeriod}`);
 
     // Find the roster period details
     const futureRosters = getFutureRosterPeriods(12);
@@ -48,19 +49,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch leave requests for the roster period
-    console.log(`📋 Fetching leave requests for ${rosterPeriod}...`);
+    logger.debug(`📋 Fetching leave requests for ${rosterPeriod}...`);
     const leaveRequests = await getLeaveRequestsByRosterPeriodAdmin(rosterPeriod);
 
-    console.log(`✅ Found ${leaveRequests.length} leave requests`);
+    logger.debug(`✅ Found ${leaveRequests.length} leave requests`);
 
     // Create report data
     const reportData = createRosterLeaveReportData(selectedRoster, leaveRequests, generatedBy);
 
     // Generate PDF
-    console.log('🔄 Generating roster planning PDF document...');
+    logger.debug(' Generating roster planning PDF document...');
     const pdfBuffer = await renderToBuffer(createRosterLeaveReportDocument(reportData));
 
-    console.log('✅ Roster planning PDF generated successfully');
+    logger.info(' Roster planning PDF generated successfully');
 
     // Generate filename
     const filename = generateRosterLeaveReportFilename(rosterPeriod);
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Error generating roster planning PDF report:', error);
+    logger.error(' Error generating roster planning PDF report:', error);
 
     return NextResponse.json(
       {
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('📅 Fetching available roster periods...');
+    logger.debug('📅 Fetching available roster periods...');
 
     const url = new URL(request.url);
     const monthsAhead = parseInt(url.searchParams.get('months') || '12');
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
       data: rosterOptions,
     });
   } catch (error) {
-    console.error('❌ Error fetching roster periods:', error);
+    logger.error(' Error fetching roster periods:', error);
 
     return NextResponse.json(
       {

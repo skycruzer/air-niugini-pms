@@ -16,7 +16,7 @@ import { LazyBulkCertificationModal } from '@/components/lazy';
 import { LazyLoader } from '@/components/ui/LazyLoader';
 import { FleetTimelineView } from '@/components/certifications/FleetTimelineView';
 import { CategoryTimelineView } from '@/components/certifications/CategoryTimelineView';
-// Using emojis instead of lucide-react icons for consistency
+import { FileEdit, List, Calendar as CalendarIcon, BarChart3, Target } from 'lucide-react';
 
 interface CheckType {
   id: string;
@@ -201,9 +201,9 @@ export default function CertificationsPage() {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setShowBulkModal(true)}
-                  className="flex items-center px-3 py-2 text-white bg-[#E4002B] hover:bg-[#C00020] rounded-lg transition-colors"
+                  className="flex items-center px-3 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                 >
-                  <span className="mr-2">📝</span>
+                  <FileEdit className="w-4 h-4 mr-2" />
                   Bulk Update
                 </button>
                 <div className="h-6 w-px bg-gray-300 mx-1"></div>
@@ -211,44 +211,44 @@ export default function CertificationsPage() {
                   onClick={() => setCurrentView('list')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     currentView === 'list'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="mr-2">📋</span>
+                  <List className="w-4 h-4 mr-2" />
                   List
                 </button>
                 <button
                   onClick={() => setCurrentView('calendar')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     currentView === 'calendar'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="mr-2">📅</span>
+                  <CalendarIcon className="w-4 h-4 mr-2" />
                   Calendar
                 </button>
                 <button
                   onClick={() => setCurrentView('timeline')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     currentView === 'timeline'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="mr-2">📊</span>
+                  <BarChart3 className="w-4 h-4 mr-2" />
                   Timeline
                 </button>
                 <button
                   onClick={() => setCurrentView('category-timeline')}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     currentView === 'category-timeline'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="mr-2">🎯</span>
+                  <Target className="w-4 h-4 mr-2" />
                   By Category
                 </button>
               </div>
@@ -319,7 +319,7 @@ export default function CertificationsPage() {
                     onClick={() => setFilter('all')}
                     className={`px-3 py-1 rounded-full text-sm transition-colors ${
                       filter === 'all'
-                        ? 'bg-[#E4002B] text-white'
+                        ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -331,7 +331,7 @@ export default function CertificationsPage() {
                       onClick={() => setFilter(category)}
                       className={`px-3 py-1 rounded-full text-sm transition-colors ${
                         filter === category
-                          ? 'bg-[#E4002B] text-white'
+                          ? 'bg-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >

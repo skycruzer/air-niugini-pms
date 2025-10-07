@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { format, addDays } from 'date-fns';
 import { getRosterPeriodFromDate } from '@/lib/roster-utils';
 import { getExpiringCertifications } from '@/lib/expiring-certifications-service';
+import { logger } from '@/lib/logger';
 import {
   createCertificationExpiryReportDocument,
   createCertificationExpiryReportData,
@@ -15,7 +16,7 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('🎯 Starting certification expiry PDF report generation...');
+    logger.debug('🎯 Starting certification expiry PDF report generation...');
 
     const body = await request.json();
     const { timeframeDays, generatedBy } = body;
@@ -35,14 +36,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`📊 Generating report for timeframe: ${timeframeDays} days`);
+    logger.debug(`📊 Generating report for timeframe: ${timeframeDays} days`);
 
     // Fetch expiring certifications using the service function (direct call, no HTTP)
-    console.log(`📋 Fetching expiring certifications for ${timeframeDays} days...`);
+    logger.debug(`📋 Fetching expiring certifications for ${timeframeDays} days...`);
 
     const serviceData = await getExpiringCertifications(timeframeDays);
 
-    console.log(`✅ Found ${serviceData.length} expiring certifications`);
+    logger.debug(`✅ Found ${serviceData.length} expiring certifications`);
 
     // Transform service data to match PDF interface format
     const certifications = serviceData.map((cert: any) => ({
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
       expiry_roster_display: cert.expiry_roster_display || 'Unknown',
     }));
 
-    console.log(`🔄 Transformed ${certifications.length} certifications for PDF generation`);
+    logger.debug(`🔄 Transformed ${certifications.length} certifications for PDF generation`);
 
     // Create report data
     const reportData = createCertificationExpiryReportData(
@@ -73,21 +74,21 @@ export async function POST(request: NextRequest) {
     );
 
     // Generate PDF
-    console.log('🔄 Generating PDF document...');
+    logger.debug(' Generating PDF document...');
 
     let pdfBuffer: Buffer;
     try {
       const pdfDocumentElement = createCertificationExpiryReportDocument(reportData);
-      console.log('📄 PDF document created, rendering to buffer...');
+      logger.debug('📄 PDF document created, rendering to buffer...');
 
       pdfBuffer = await renderToBuffer(pdfDocumentElement);
-      console.log('✅ PDF buffer generated successfully, size:', pdfBuffer.length, 'bytes');
+      logger.info(' PDF buffer generated successfully, size:', pdfBuffer.length, 'bytes');
 
       if (pdfBuffer.length === 0) {
         throw new Error('PDF buffer is empty');
       }
     } catch (pdfError: any) {
-      console.error('❌ PDF generation error:', pdfError);
+      logger.error(' PDF generation error:', pdfError);
       throw new Error(`PDF generation failed: ${pdfError?.message || 'Unknown error'}`);
     }
 
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Error generating certification expiry PDF report:', error);
+    logger.error(' Error generating certification expiry PDF report:', error);
 
     return NextResponse.json(
       {
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('📅 Fetching available timeframe options...');
+    logger.debug('📅 Fetching available timeframe options...');
 
     const timeframeOptions = [
       { value: 30, label: 'Next 30 Days', description: 'Immediate attention required' },
@@ -137,7 +138,7 @@ export async function GET(request: NextRequest) {
       data: timeframeOptions,
     });
   } catch (error) {
-    console.error('❌ Error fetching timeframe options:', error);
+    logger.error(' Error fetching timeframe options:', error);
 
     return NextResponse.json(
       {

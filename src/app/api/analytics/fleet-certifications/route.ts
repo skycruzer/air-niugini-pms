@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { differenceInDays, format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       .order('expiry_date', { ascending: true });
 
     if (error) {
-      console.error('Error fetching certifications:', error);
+      logger.error('Analytics fleet-certifications: Error fetching certifications', error);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch certification data' },
         { status: 500 }
@@ -224,7 +225,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Fleet certifications API error:', error);
+    logger.error('Analytics fleet-certifications: API error', error);
     return NextResponse.json(
       {
         success: false,

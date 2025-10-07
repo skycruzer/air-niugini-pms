@@ -26,6 +26,9 @@ import { pilotSearchService, SearchResult } from '@/lib/search-service';
 import { usePilotSort } from '@/hooks/usePilotSort';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PilotStatsGrid } from '@/components/shared/PilotStatsGrid';
+import { DashboardBreadcrumb, breadcrumbConfigs } from '@/components/layout/DashboardBreadcrumb';
+import { PilotListSkeleton } from '@/components/pilots/PilotListSkeleton';
+import { Users, Download, AlertTriangle, Plus, Search, Settings, BarChart3, RefreshCw, LayoutGrid, List, Table } from 'lucide-react';
 
 type ViewMode = 'card' | 'list' | 'table';
 
@@ -319,14 +322,15 @@ export default function PilotsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className="p-4 md:p-6">
+          {/* Breadcrumb Navigation */}
+          <DashboardBreadcrumb items={breadcrumbConfigs.pilots.list} className="mb-4" />
+
           {/* Header */}
           <header className="mb-6 md:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center">
-                  <span className="text-2xl md:text-3xl mr-2 md:mr-3" aria-hidden="true">
-                    👨‍✈️
-                  </span>
+                  <Users className="w-7 h-7 md:w-8 md:h-8 mr-2 md:mr-3 text-blue-600" aria-hidden="true" />
                   Pilot Management
                 </h1>
                 <p className="text-sm md:text-base text-gray-600 mt-1">
@@ -341,34 +345,34 @@ export default function PilotsPage() {
                     onClick={() => handleViewModeChange('card')}
                     className={`px-3 py-2 rounded-md text-sm transition-colors ${
                       viewMode === 'card'
-                        ? 'bg-white text-[#E4002B] shadow-sm font-semibold'
+                        ? 'bg-white text-blue-600 shadow-sm font-semibold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                     title="Card view"
                   >
-                    <span>🔲</span>
+                    <LayoutGrid className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleViewModeChange('list')}
                     className={`px-3 py-2 rounded-md text-sm transition-colors ${
                       viewMode === 'list'
-                        ? 'bg-white text-[#E4002B] shadow-sm font-semibold'
+                        ? 'bg-white text-blue-600 shadow-sm font-semibold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                     title="List view"
                   >
-                    <span>☰</span>
+                    <List className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleViewModeChange('table')}
                     className={`px-3 py-2 rounded-md text-sm transition-colors ${
                       viewMode === 'table'
-                        ? 'bg-white text-[#E4002B] shadow-sm font-semibold'
+                        ? 'bg-white text-blue-600 shadow-sm font-semibold'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                     title="Table view"
                   >
-                    <span>▦</span>
+                    <Table className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -380,9 +384,7 @@ export default function PilotsPage() {
                     title="Export current pilot list to CSV"
                     aria-label={`Export ${filteredPilots.length} pilots to CSV`}
                   >
-                    <span className="mr-2" aria-hidden="true">
-                      📊
-                    </span>
+                    <Download className="w-4 h-4 mr-2" aria-hidden="true" />
                     Export ({filteredPilots.length})
                   </button>
 
@@ -392,9 +394,7 @@ export default function PilotsPage() {
                     title="Export compliance report (expired/expiring certifications)"
                     aria-label="Export compliance report"
                   >
-                    <span className="mr-2" aria-hidden="true">
-                      ⚠️
-                    </span>
+                    <AlertTriangle className="w-4 h-4 mr-2" aria-hidden="true" />
                     <span className="hidden sm:inline">Compliance Report</span>
                     <span className="sm:hidden">Compliance</span>
                   </button>
@@ -406,9 +406,7 @@ export default function PilotsPage() {
                     className="mobile-button-primary text-sm"
                     aria-label="Add new pilot to the system"
                   >
-                    <span className="mr-2" aria-hidden="true">
-                      ➕
-                    </span>
+                    <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
                     Add New Pilot
                   </button>
                 )}
@@ -429,12 +427,10 @@ export default function PilotsPage() {
                   <label htmlFor="pilot-search" className="sr-only">
                     Search pilots by name or employee ID
                   </label>
-                  <span
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
                     aria-hidden="true"
-                  >
-                    🔍
-                  </span>
+                  />
                   <input
                     id="pilot-search"
                     type="text"
@@ -495,14 +491,14 @@ export default function PilotsPage() {
                     onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
                   >
-                    <span>⚙️</span>
+                    <Settings className="w-4 h-4" />
                     <span>{showAdvancedFilters ? 'Hide' : 'Show'} Advanced</span>
                   </button>
                 </div>
 
                 {/* Results Count */}
                 <div className="flex items-center text-sm text-gray-600">
-                  <span className="mr-1">📊</span>
+                  <BarChart3 className="w-4 h-4 mr-1" />
                   <span className="font-medium">{filteredPilots.length}</span> of {pilots.length}{' '}
                   pilots
                 </div>
@@ -582,7 +578,7 @@ export default function PilotsPage() {
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2"
                       >
-                        <span>🔄</span>
+                        <RefreshCw className="w-4 h-4" />
                         Clear All Filters
                       </button>
                     </div>
@@ -608,25 +604,10 @@ export default function PilotsPage() {
           {/* Pilots Display */}
           <main role="main" aria-label="Pilots listing">
             {loading ? (
-              <div className="text-center py-8 md:py-12">
-                <div className="loading-spinner-lg mx-auto"></div>
-                <p
-                  className="text-gray-600 mt-4 text-sm md:text-base"
-                  role="status"
-                  aria-live="polite"
-                >
-                  Loading pilots...
-                </p>
-                <div className="mt-4 space-y-2">
-                  <div className="skeleton h-4 w-32 mx-auto"></div>
-                  <div className="skeleton h-4 w-24 mx-auto"></div>
-                </div>
-              </div>
+              <PilotListSkeleton viewMode={viewMode} count={6} />
             ) : filteredPilots.length === 0 ? (
               <div className="text-center py-8 md:py-12">
-                <span className="text-4xl md:text-6xl block mb-4" aria-hidden="true">
-                  👨‍✈️
-                </span>
+                <Users className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 text-gray-400" aria-hidden="true" />
                 <h3 className="mobile-subheading md:text-lg font-medium text-gray-900 mb-2">
                   No pilots found
                 </h3>

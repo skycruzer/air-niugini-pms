@@ -15,6 +15,7 @@
 import { Resend } from 'resend';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { differenceInDays, format } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // CONFIGURATION
@@ -106,14 +107,14 @@ async function sendEmail(
     });
 
     if (error) {
-      console.error('Email send error:', error);
+      logger.error('Email send error', error instanceof Error ? error : new Error(String(error)));
       return { success: false, error: error.message };
     }
 
-    console.log('Email sent successfully:', data?.id);
+    logger.info('Email sent successfully', { data: data?.id });
     return { success: true, messageId: data?.id };
   } catch (error) {
-    console.error('Email service error:', error);
+    logger.error('Email service error', error instanceof Error ? error : new Error(String(error)));
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -560,7 +561,7 @@ export async function sendBatchCertificationAlerts(
       .eq('certification_expiry_alerts', true);
 
     if (prefsError) {
-      console.warn('Could not load notification preferences:', prefsError);
+      logger.warn('Could not load notification preferences:', prefsError);
     }
 
     const enabledUserIds = new Set(preferences?.map((p) => p.user_id) || []);
@@ -609,7 +610,7 @@ export async function sendBatchCertificationAlerts(
 
     return { sent, failed, errors };
   } catch (error) {
-    console.error('Batch certification alerts error:', error);
+    logger.error('Batch certification alerts error', error instanceof Error ? error : new Error(String(error)));
     return {
       sent,
       failed: failed + 1,
@@ -632,7 +633,7 @@ export async function getUserNotificationPreferences(userId: string) {
     .single();
 
   if (error) {
-    console.error('Error fetching notification preferences:', error);
+    logger.error('Error fetching notification preferences', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 

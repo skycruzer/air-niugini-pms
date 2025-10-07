@@ -16,6 +16,7 @@
 
 import { getSupabaseAdmin } from './supabase';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // ===================================
 // TYPES & INTERFACES
@@ -183,7 +184,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching audit logs:', error);
+      logger.error('Error fetching audit logs', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
@@ -197,7 +198,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}): Promise<Audit
       totalPages,
     };
   } catch (error) {
-    console.error('Error in getAuditLogs:', error);
+    logger.error('Error in getAuditLogs', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -216,13 +217,13 @@ export async function getAuditLogById(id: string): Promise<AuditLog | null> {
       .single();
 
     if (error) {
-      console.error('Error fetching audit log:', error);
+      logger.error('Error fetching audit log', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     return data;
   } catch (error) {
-    console.error('Error in getAuditLogById:', error);
+    logger.error('Error in getAuditLogById', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -245,13 +246,13 @@ export async function getRecordAuditHistory(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching record audit history:', error);
+      logger.error('Error fetching record audit history', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error in getRecordAuditHistory:', error);
+    logger.error('Error in getRecordAuditHistory', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -272,13 +273,13 @@ export async function getRecentAuditActivity(days: number = 7): Promise<AuditLog
       .limit(100);
 
     if (error) {
-      console.error('Error fetching recent audit activity:', error);
+      logger.error('Error fetching recent audit activity', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error in getRecentAuditActivity:', error);
+    logger.error('Error in getRecentAuditActivity', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -308,7 +309,7 @@ export async function getAuditStats(startDate?: Date, endDate?: Date): Promise<A
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching audit stats:', error);
+      logger.error('Error fetching audit stats', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
@@ -391,7 +392,7 @@ export async function getAuditStats(startDate?: Date, endDate?: Date): Promise<A
       recentActivity,
     };
   } catch (error) {
-    console.error('Error in getAuditStats:', error);
+    logger.error('Error in getAuditStats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -420,7 +421,7 @@ export async function getUserActivitySummary(
     const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching user activity summary:', error);
+      logger.error('Error fetching user activity summary', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
@@ -455,7 +456,7 @@ export async function getUserActivitySummary(
       action_breakdown,
     };
   } catch (error) {
-    console.error('Error in getUserActivitySummary:', error);
+    logger.error('Error in getUserActivitySummary', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -477,7 +478,7 @@ export async function getTableModificationHistory(
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching table modification history:', error);
+      logger.error('Error fetching table modification history', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
@@ -504,7 +505,7 @@ export async function getTableModificationHistory(
       recent_changes,
     };
   } catch (error) {
-    console.error('Error in getTableModificationHistory:', error);
+    logger.error('Error in getTableModificationHistory', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -583,14 +584,14 @@ export async function getAuditedTables(): Promise<string[]> {
     const { data, error } = await supabaseAdmin.from('audit_logs').select('table_name');
 
     if (error) {
-      console.error('Error fetching audited tables:', error);
+      logger.error('Error fetching audited tables', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     const tables = [...new Set((data || []).map((log) => log.table_name))];
     return tables.sort();
   } catch (error) {
-    console.error('Error in getAuditedTables:', error);
+    logger.error('Error in getAuditedTables', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -608,7 +609,7 @@ export async function getAuditedUsers(): Promise<{ email: string; role: string }
       .not('user_email', 'is', null);
 
     if (error) {
-      console.error('Error fetching audited users:', error);
+      logger.error('Error fetching audited users', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
@@ -627,7 +628,7 @@ export async function getAuditedUsers(): Promise<{ email: string; role: string }
 
     return users.sort((a, b) => a.email.localeCompare(b.email));
   } catch (error) {
-    console.error('Error in getAuditedUsers:', error);
+    logger.error('Error in getAuditedUsers', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -663,13 +664,13 @@ export async function getCertificationAuditTrail(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching certification audit trail:', error);
+      logger.error('Error fetching certification audit trail', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error in getCertificationAuditTrail:', error);
+    logger.error('Error in getCertificationAuditTrail', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -706,13 +707,13 @@ export async function getPilotAuditTrail(
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching pilot audit trail:', error);
+      logger.error('Error fetching pilot audit trail', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
 
     return data || [];
   } catch (error) {
-    console.error('Error in getPilotAuditTrail:', error);
+    logger.error('Error in getPilotAuditTrail', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }

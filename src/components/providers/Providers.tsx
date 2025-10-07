@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { PresenceProvider } from '@/contexts/PresenceContext';
+import { CollaborativeCursors } from '@/components/presence/CollaborativeCursors';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -23,7 +25,12 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
+      <AuthProvider>
+        <PresenceProvider>
+          {children}
+          <CollaborativeCursors />
+        </PresenceProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

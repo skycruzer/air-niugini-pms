@@ -5,6 +5,7 @@
  */
 
 import { QueryClient } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 
 // Cache version - increment when schema changes
 export const CACHE_VERSION = 'v1.0.0';
@@ -39,7 +40,7 @@ export function hasCacheVersionChanged(): boolean {
     const storedVersion = localStorage.getItem(CACHE_VERSION_KEY);
     return storedVersion !== CACHE_VERSION;
   } catch (error) {
-    console.error('Error checking cache version:', error);
+    logger.error('Error checking cache version', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -53,7 +54,7 @@ export function updateCacheVersion(): void {
   try {
     localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
   } catch (error) {
-    console.error('Error updating cache version:', error);
+    logger.error('Error updating cache version', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -61,7 +62,7 @@ export function updateCacheVersion(): void {
  * Clear all caches (React Query + Service Worker)
  */
 export async function clearAllCaches(queryClient: QueryClient): Promise<void> {
-  console.log('Clearing all caches...');
+  logger.debug('Clearing all caches');
 
   // Clear React Query cache
   queryClient.clear();
@@ -71,9 +72,9 @@ export async function clearAllCaches(queryClient: QueryClient): Promise<void> {
     try {
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
-      console.log('Service Worker caches cleared');
+      logger.debug('Service Worker caches cleared');
     } catch (error) {
-      console.error('Error clearing Service Worker caches:', error);
+      logger.error('Error clearing Service Worker caches', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -87,9 +88,9 @@ export async function clearAllCaches(queryClient: QueryClient): Promise<void> {
           localStorage.removeItem(key);
         }
       });
-      console.log('LocalStorage cleared (preserved user preferences)');
+      logger.debug('LocalStorage cleared (preserved user preferences)');
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
+      logger.error('Error clearing localStorage', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -103,11 +104,11 @@ export async function clearAllCaches(queryClient: QueryClient): Promise<void> {
  */
 export async function warmCache(queryClient: QueryClient): Promise<void> {
   if (!navigator.onLine) {
-    console.log('Offline - skipping cache warming');
+    logger.debug('Offline - skipping cache warming');
     return;
   }
 
-  console.log('Warming cache with critical data...');
+  logger.debug('Warming cache with critical data');
 
   try {
     // Pre-fetch critical queries in parallel
@@ -143,9 +144,9 @@ export async function warmCache(queryClient: QueryClient): Promise<void> {
       }),
     ]);
 
-    console.log('Cache warming completed');
+    logger.debug('Cache warming completed');
   } catch (error) {
-    console.error('Error warming cache:', error);
+    logger.error('Error warming cache', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -169,9 +170,9 @@ export async function precacheRoutes(): Promise<void> {
       )
     );
 
-    console.log('Critical routes pre-cached');
+    logger.debug('Critical routes pre-cached');
   } catch (error) {
-    console.error('Error pre-caching routes:', error);
+    logger.error('Error pre-caching routes', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -205,14 +206,14 @@ export async function invalidateStaleCaches(): Promise<void> {
             !currentCacheNames.includes(cacheName) && !cacheName.includes(CACHE_VERSION)
         )
         .map((cacheName) => {
-          console.log(`Deleting old cache: ${cacheName}`);
+          logger.debug('Deleting old cache: ${cacheName}');
           return caches.delete(cacheName);
         })
     );
 
-    console.log('Stale caches invalidated');
+    logger.debug('Stale caches invalidated');
   } catch (error) {
-    console.error('Error invalidating stale caches:', error);
+    logger.error('Error invalidating stale caches', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -238,7 +239,7 @@ export async function getCacheStats(): Promise<{
       );
       stats.reactQuery = new Blob([queryCache]).size;
     } catch (error) {
-      console.error('Error calculating React Query cache size:', error);
+      logger.error('Error calculating React Query cache size', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -252,7 +253,7 @@ export async function getCacheStats(): Promise<{
         stats.serviceWorker += requests.length;
       }
     } catch (error) {
-      console.error('Error calculating Service Worker cache size:', error);
+      logger.error('Error calculating Service Worker cache size', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -267,7 +268,7 @@ export async function getCacheStats(): Promise<{
       }
       stats.localStorage = total;
     } catch (error) {
-      console.error('Error calculating localStorage size:', error);
+      logger.error('Error calculating localStorage size', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -279,11 +280,11 @@ export async function getCacheStats(): Promise<{
  * Call this on app startup
  */
 export async function initializeCacheManagement(queryClient: QueryClient): Promise<void> {
-  console.log('Initializing PWA cache management...');
+  logger.debug('Initializing PWA cache management');
 
   // Check if cache version changed
   if (hasCacheVersionChanged()) {
-    console.log('Cache version changed - clearing old caches');
+    logger.debug('Cache version changed - clearing old caches');
     await clearAllCaches(queryClient);
   }
 
@@ -296,7 +297,7 @@ export async function initializeCacheManagement(queryClient: QueryClient): Promi
   // Pre-cache critical routes
   await precacheRoutes();
 
-  console.log('PWA cache management initialized');
+  logger.debug('PWA cache management initialized');
 }
 
 /**
@@ -309,7 +310,7 @@ export function setupPeriodicCacheCleanup(queryClient: QueryClient): void {
   // Run cleanup every 30 minutes
   const interval = setInterval(
     async () => {
-      console.log('Running periodic cache cleanup...');
+      logger.debug('Running periodic cache cleanup');
       await invalidateStaleCaches();
     },
     30 * 60 * 1000
@@ -351,7 +352,7 @@ export async function invalidateResource(
   queryClient: QueryClient,
   resource: 'pilots' | 'certifications' | 'leave' | 'all'
 ): Promise<void> {
-  console.log(`Invalidating ${resource} cache...`);
+  logger.debug('Invalidating ${resource} cache...');
 
   switch (resource) {
     case 'pilots':
@@ -376,5 +377,5 @@ export async function invalidateResource(
       break;
   }
 
-  console.log(`${resource} cache invalidated`);
+  logger.debug('${resource} cache invalidated');
 }

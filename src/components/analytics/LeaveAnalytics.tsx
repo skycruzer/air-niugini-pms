@@ -154,7 +154,7 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
                   cy="50%"
                   labelLine={false}
                   label={({ type, count, percent }) =>
-                    `${type}: ${count} (${(percent * 100).toFixed(0)}%)`
+                    `${type}: ${count} (${((percent as number) * 100).toFixed(0)}%)`
                   }
                   outerRadius={100}
                   fill="#8884d8"

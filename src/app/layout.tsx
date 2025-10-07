@@ -4,7 +4,7 @@ import './globals.css';
 import { Providers } from '@/components/providers/Providers';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { CommandPaletteProvider } from '@/components/command/CommandPaletteProvider';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -72,36 +72,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Providers>
               <CommandPaletteProvider>{children}</CommandPaletteProvider>
             </Providers>
-            {/* Toast notifications with Air Niugini branding */}
+            {/* Sonner Toast notifications with Air Niugini branding */}
             <Toaster
               position="top-right"
+              theme="light"
               toastOptions={{
-                duration: 4000,
                 style: {
-                  background: '#FFFFFF',
-                  color: '#000000',
-                  border: '1px solid #e5e7eb',
-                  boxShadow:
-                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                  maxWidth: '500px',
+                  border: '2px solid #E4002B',
+                  borderRadius: '0.5rem',
                 },
-                success: {
-                  iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#FFFFFF',
-                  },
-                },
-                error: {
-                  duration: 6000,
-                  style: {
-                    borderLeftWidth: '4px',
-                    borderLeftColor: '#E4002B',
-                  },
-                  iconTheme: {
-                    primary: '#E4002B',
-                    secondary: '#FFFFFF',
-                  },
-                },
+                className: 'bg-white text-[#000000]',
               }}
             />
           </div>

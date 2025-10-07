@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   sendCertificationExpiryAlert,
   sendLeaveRequestNotification,
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       message: `Test notification sent successfully to ${recipient.email}`,
     });
   } catch (error) {
-    console.error('API Error [/api/notifications/test]:', error);
+    logger.error('API Error [/api/notifications/test]:', error);
     return NextResponse.json(
       {
         success: false,

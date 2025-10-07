@@ -7,6 +7,7 @@
 
 import { getSupabaseAdmin } from './supabase';
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 
 export interface BackupMetadata {
   id: string;
@@ -302,7 +303,7 @@ export class BackupService {
         // Clean old backups
         await this.cleanOldBackups(config.retentionDays);
       } catch (error) {
-        console.error('Automated backup failed:', error);
+        logger.error('Automated backup failed', error instanceof Error ? error : new Error(String(error)));
       }
     }, intervalMs);
   }

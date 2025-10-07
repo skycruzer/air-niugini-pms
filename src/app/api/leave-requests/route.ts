@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getRosterPeriodFromDate } from '@/lib/roster-utils';
 import { differenceInDays } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    console.log('🔍 API /leave-requests: Fetching leave requests with OPTIMIZED JOIN query...');
+    logger.debug(' API /leave-requests: Fetching leave requests with OPTIMIZED JOIN query...');
 
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -27,14 +28,14 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('🚨 API /leave-requests: Query error:', error);
+      logger.error(' API /leave-requests: Query error:', error);
       return NextResponse.json(
         { success: false, error: error.message || 'Failed to fetch leave requests' },
         { status: 500 }
       );
     }
 
-    console.log('🔍 API /leave-requests: Found', requests?.length || 0, 'leave requests');
+    logger.debug(' API /leave-requests: Found', requests?.length || 0, 'leave requests');
 
     // ⚡ OPTIMIZED: Transform data without additional queries
     const transformedRequests = (requests || []).map((request: any) => {
@@ -50,7 +51,7 @@ export async function GET() {
         pilots: undefined, // Remove the nested object from response
       };
     });
-    console.log(
+    logger.debug(
       '🔍 API /leave-requests: Sample request:',
       JSON.stringify(transformedRequests[0], null, 2)
     );
@@ -60,7 +61,7 @@ export async function GET() {
       data: transformedRequests,
     });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error:', error);
+    logger.error(' API /leave-requests: Fatal error:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -68,7 +69,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const requestData = await request.json();
-    console.log('📝 API /leave-requests: Creating new leave request...', requestData);
+    logger.debug('📝 API /leave-requests: Creating new leave request...', requestData);
 
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('🚨 API /leave-requests: Error creating request:', error);
+      logger.error(' API /leave-requests: Error creating request:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
 
@@ -120,14 +121,14 @@ export async function POST(request: Request) {
       reviewer_name: null,
     };
 
-    console.log('✅ API /leave-requests: Created leave request:', responseData.id);
+    logger.info(' API /leave-requests: Created leave request:', responseData.id);
 
     return NextResponse.json({
       success: true,
       data: responseData,
     });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error creating request:', error);
+    logger.error(' API /leave-requests: Fatal error creating request:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -135,7 +136,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const requestData = await request.json();
-    console.log('🔄 API /leave-requests: Updating leave request status...', requestData);
+    logger.debug(' API /leave-requests: Updating leave request status...', requestData);
 
     const supabaseAdmin = getSupabaseAdmin();
     const { id, status, reviewer_comments } = requestData;
@@ -178,7 +179,7 @@ export async function PUT(request: Request) {
       .single();
 
     if (error) {
-      console.error('🚨 API /leave-requests: Error updating request:', error);
+      logger.error(' API /leave-requests: Error updating request:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
 
@@ -195,14 +196,14 @@ export async function PUT(request: Request) {
       pilots: undefined, // Remove the nested object from response
     };
 
-    console.log(`✅ API /leave-requests: ${status} leave request:`, responseData.id);
+    logger.debug(`✅ API /leave-requests: ${status} leave request:`, responseData.id);
 
     return NextResponse.json({
       success: true,
       data: responseData,
     });
   } catch (error) {
-    console.error('🚨 API /leave-requests: Fatal error updating request:', error);
+    logger.error(' API /leave-requests: Fatal error updating request:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -210,7 +211,7 @@ export async function PUT(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const requestData = await request.json();
-    console.log('✏️ API /leave-requests PATCH: Updating leave request data...', requestData);
+    logger.debug('✏️ API /leave-requests PATCH: Updating leave request data...', requestData);
 
     const supabaseAdmin = getSupabaseAdmin();
     const { id, ...updateData } = requestData;
@@ -256,7 +257,7 @@ export async function PATCH(request: Request) {
       .single();
 
     if (error) {
-      console.error('🚨 API /leave-requests PATCH: Error updating request:', error);
+      logger.error(' API /leave-requests PATCH: Error updating request:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
     }
 
@@ -273,14 +274,14 @@ export async function PATCH(request: Request) {
       pilots: undefined, // Remove the nested object from response
     };
 
-    console.log('✅ API /leave-requests PATCH: Updated leave request:', responseData.id);
+    logger.info(' API /leave-requests PATCH: Updated leave request:', responseData.id);
 
     return NextResponse.json({
       success: true,
       data: responseData,
     });
   } catch (error) {
-    console.error('🚨 API /leave-requests PATCH: Fatal error updating request:', error);
+    logger.error(' API /leave-requests PATCH: Fatal error updating request:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

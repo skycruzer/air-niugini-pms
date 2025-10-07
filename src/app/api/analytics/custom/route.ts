@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * Custom Analytics API Route
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Custom analytics error:', error);
+    logger.error('Custom analytics error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate custom analytics' },
       { status: 500 }

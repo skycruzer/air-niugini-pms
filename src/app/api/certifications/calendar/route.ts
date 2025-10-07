@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getCertificationStatus } from '@/lib/certification-utils';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 API /certifications/calendar: Fetching certification calendar data');
+    logger.debug(' API /certifications/calendar: Fetching certification calendar data');
 
     // Get all pilot certifications with expiry dates for calendar display
     const { data: certifications, error } = await getSupabaseAdmin()
@@ -27,11 +28,11 @@ export async function GET(request: NextRequest) {
       .order('expiry_date', { ascending: true });
 
     if (error) {
-      console.error('🚨 API /certifications/calendar: Database error:', error);
+      logger.error(' API /certifications/calendar: Database error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    console.log(
+    logger.debug(
       '🔍 API /certifications/calendar: Found',
       certifications?.length || 0,
       'certifications with expiry dates'
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
       status: getCertificationStatus(cert.expiry_date ? new Date(cert.expiry_date) : null),
     }));
 
-    console.log(
+    logger.debug(
       '🔍 API /certifications/calendar: Returning',
       result.length,
       'certification calendar items'
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    console.error('🚨 API /certifications/calendar: Fatal error:', error);
+    logger.error(' API /certifications/calendar: Fatal error:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

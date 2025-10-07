@@ -12,6 +12,7 @@ import { validateRequest } from '@/lib/validation-schemas';
 import { z } from 'zod';
 import { withAuth, permissions } from '@/middleware/auth';
 import { getTasks, createTask, getTaskStatistics, getTaskCategories } from '@/lib/task-service';
+import { logger } from '@/lib/logger';
 
 // Mark this route as dynamic
 export const dynamic = 'force-dynamic';
@@ -109,7 +110,7 @@ export const GET = withAuth(
         data: tasks,
       });
     } catch (error) {
-      console.error('Error in GET /api/tasks:', error);
+      logger.error('Error in GET /api/tasks:', error);
       return NextResponse.json(
         {
           success: false,
@@ -156,7 +157,7 @@ export const POST = withAuth(
         { status: 201 }
       );
     } catch (error) {
-      console.error('Error in POST /api/tasks:', error);
+      logger.error('Error in POST /api/tasks:', error);
       return NextResponse.json(
         {
           success: false,

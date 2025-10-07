@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { addMonths, differenceInDays } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Analytics forecast error:', error);
+    logger.error('Analytics forecasts: Error generating forecast', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate forecast' },
       { status: 500 }

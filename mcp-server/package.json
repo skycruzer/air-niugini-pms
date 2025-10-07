@@ -1,0 +1,10 @@
+{
+  "name": "air-niugini-mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Air Niugini MCP Server for Claude Agent SDK",
+  "main": "dist/mcp-server/index-simple.js",
+  "exports": {
+    ".": "./dist/mcp-server/index-simple.js"
+  }
+}

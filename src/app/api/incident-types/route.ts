@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/middleware/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 // Mark this route as dynamic
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ export const GET = withAuth(
         .order('name', { ascending: true });
 
       if (error) {
-        console.error('Error fetching incident types:', error);
+        logger.error('Error fetching incident types:', error);
         return NextResponse.json(
           {
             success: false,
@@ -45,7 +46,7 @@ export const GET = withAuth(
         data: incidentTypes,
       });
     } catch (error) {
-      console.error('Error in GET /api/incident-types:', error);
+      logger.error('Error in GET /api/incident-types:', error);
       return NextResponse.json(
         {
           success: false,

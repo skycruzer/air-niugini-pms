@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 /**
  * Safely retrieves and validates Supabase configuration from environment variables
@@ -25,9 +26,10 @@ function getSupabaseConfig() {
   // Environment validation - silent in production
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Critical: Missing required Supabase environment variables!');
-    console.error('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'Present' : 'Missing');
-    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'Missing');
+    logger.error('Critical: Missing required Supabase environment variables!', undefined, {
+      url: supabaseUrl ? 'Present' : 'Missing',
+      anonKey: supabaseAnonKey ? 'Present' : 'Missing',
+    });
     throw new Error('Supabase configuration missing. Please check your environment variables.');
   }
 
@@ -68,8 +70,10 @@ function createSupabaseAdmin() {
   // Admin client validation - silent in production
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('❌ Critical: Missing Supabase environment variables in production');
-    console.error('❌ URL:', !!supabaseUrl, 'ServiceKey:', !!supabaseServiceKey);
+    logger.error('Critical: Missing Supabase environment variables in production', undefined, {
+      hasUrl: !!supabaseUrl,
+      hasServiceKey: !!supabaseServiceKey,
+    });
     throw new Error('Supabase configuration missing - cannot perform admin operations');
   }
 
@@ -303,7 +307,7 @@ interface SupabaseError {
  * }
  */
 export const handleSupabaseError = (error: SupabaseError | Error | unknown): string => {
-  console.error('Supabase error:', error);
+  logger.error('Supabase error occurred', error instanceof Error ? error : new Error(String(error)));
 
   if (error && typeof error === 'object' && 'message' in error) {
     return (error as SupabaseError).message || 'An unexpected error occurred';

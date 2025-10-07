@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { CertificationCalendar } from '@/components/calendar/CertificationCalendar';
 import { CertificationTimeline } from '@/components/certifications/CertificationTimeline';
+import { CertificationCalendarSkeleton } from '@/components/certifications/CertificationCalendarSkeleton';
 import { Calendar, ArrowLeft, LayoutList } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -104,10 +105,7 @@ export default function CertificationCalendarPage() {
       <ProtectedRoute>
         <DashboardLayout>
           <div className="p-6">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto"></div>
-              <p className="text-gray-600 mt-2">Loading certification calendar...</p>
-            </div>
+            <CertificationCalendarSkeleton viewMode={viewMode} />
           </div>
         </DashboardLayout>
       </ProtectedRoute>

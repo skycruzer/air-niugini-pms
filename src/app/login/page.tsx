@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import dynamicImport from 'next/dynamic';
+import { Shield, Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
 // Dynamic import for non-critical background elements
 const BackgroundElements = dynamicImport(() => import('./components/BackgroundElements'), {
   ssr: false,
   loading: () => (
-    <div className="absolute inset-0 bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red" />
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900" />
   ),
 });
 
@@ -43,7 +44,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-aviation-navy via-blue-900 to-air-niugini-red overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 overflow-hidden">
       {/* Background Elements - Dynamically loaded */}
       <BackgroundElements />
 
@@ -59,7 +60,7 @@ export default function LoginPage() {
             <div className="flex items-center text-white group">
               <div className="relative mr-4">
                 {/* Enhanced glow effects */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-air-niugini-red to-air-niugini-gold rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <div className="absolute inset-0 bg-air-niugini-gold rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity"></div>
 
                 {/* Logo container */}
@@ -93,7 +94,8 @@ export default function LoginPage() {
             <div className="text-center lg:text-left animate-fade-in">
               <div className="mb-8">
                 <div className="inline-flex items-center bg-white px-4 py-2 rounded-full text-sm font-bold mb-6 text-gray-900 shadow-lg">
-                  🛡️ Secure Access Portal
+                  <Shield className="w-4 h-4 mr-2" />
+                  Secure Access Portal
                 </div>
                 <h2
                   className="text-display-medium font-black mb-4 text-white"
@@ -166,9 +168,9 @@ export default function LoginPage() {
               <div className="card-premium bg-white/95 backdrop-blur-md border border-white/20 shadow-2xl">
                 <div className="text-center mb-8">
                   <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-air-niugini-red/20 rounded-2xl blur-lg"></div>
-                    <div className="relative w-16 h-16 bg-gradient-to-br from-air-niugini-red to-red-600 rounded-2xl flex items-center justify-center mx-auto">
-                      <span className="text-white text-3xl">🛡️</span>
+                    <div className="absolute inset-0 bg-blue-600/20 rounded-2xl blur-lg"></div>
+                    <div className="relative w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto">
+                      <Shield className="text-white w-8 h-8" />
                     </div>
                   </div>
                   <h3 className="text-heading-large text-gray-900 mb-2">Secure Sign In</h3>
@@ -180,7 +182,7 @@ export default function LoginPage() {
                 {/* Error Message */}
                 {error && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start">
-                    <span className="text-red-500 mr-3 mt-0.5 flex-shrink-0 text-lg">⚠️</span>
+                    <AlertTriangle className="text-red-500 w-5 h-5 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-red-800">Authentication Error</p>
                       <p className="text-red-700 text-sm mt-1">{error}</p>
@@ -194,7 +196,7 @@ export default function LoginPage() {
                     <label className="form-label">Email Address</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <span className="h-5 w-5 text-gray-400">📧</span>
+                        <Mail className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         id="email"
@@ -213,7 +215,7 @@ export default function LoginPage() {
                     <label className="form-label">Password</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <span className="h-5 w-5 text-gray-400">🔒</span>
+                        <Lock className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         id="password"
@@ -229,9 +231,11 @@ export default function LoginPage() {
                         className="absolute inset-y-0 right-0 pr-4 flex items-center"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        <span className="h-5 w-5 text-gray-400 hover:text-gray-600">
-                          {showPassword ? '🙈' : '👁️'}
-                        </span>
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -248,7 +252,10 @@ export default function LoginPage() {
                         Authenticating...
                       </>
                     ) : (
-                      <>🛡️ Sign In to Dashboard</>
+                      <>
+                        <Shield className="w-5 h-5 mr-2 inline" />
+                        Sign In to Dashboard
+                      </>
                     )}
                   </button>
                 </form>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * Report Generation API Route
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Report generation error:', error);
+    logger.error('Report generation error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to generate report' },
       { status: 500 }

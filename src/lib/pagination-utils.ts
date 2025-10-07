@@ -196,7 +196,7 @@ export function applyCursorPagination<T>(
         paginatedQuery = paginatedQuery.lt(cursorField, value);
       }
     } catch (error) {
-      console.error('Error parsing cursor:', error);
+      logger.error('Error parsing cursor', error instanceof Error ? error : new Error(String(error)));
       // Continue without cursor if invalid
     }
   }
@@ -245,7 +245,7 @@ export async function getTotalCount(query: any): Promise<number> {
   const { count, error } = await query.select('*', { count: 'exact', head: true });
 
   if (error) {
-    console.error('Error getting total count:', error);
+    logger.error('Error getting total count', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 
@@ -342,6 +342,6 @@ export class PaginationResponseBuilder<T> {
 export async function getEstimatedCount(tableName: string): Promise<number> {
   // This would typically use database statistics or cached counts
   // For now, return a conservative estimate
-  console.log(`📊 Using estimated count for table: ${tableName}`);
+  logger.debug('Using estimated count for table: ${tableName}');
   return -1; // -1 indicates estimate not available
 }

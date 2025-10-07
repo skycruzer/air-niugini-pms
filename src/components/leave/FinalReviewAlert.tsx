@@ -1,5 +1,5 @@
 /**
- * FINAL REVIEW ALERT COMPONENT
+ * FINAL REVIEW ALERT COMPONENT (shadcn/ui Upgraded)
  *
  * Displays a prominent alert 22 days before next roster period begins
  * Reminds administrators to review and finalize pending leave requests
@@ -14,17 +14,19 @@
  * - URGENT (≤7 days): Red alert with immediate action required
  * - WARNING (8-22 days): Yellow alert for review window
  * - INFO (>22 days): Blue informational countdown
+ *
+ * Upgraded with shadcn/ui Alert component for:
+ * - WCAG 2.1 AA compliance (proper ARIA roles)
+ * - Consistent Air Niugini branding
+ * - Better accessibility (screen reader support)
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  getFinalReviewAlert,
-  type FinalReviewAlert as AlertData,
-  formatRosterPeriod,
-} from '@/lib/roster-utils';
-import { AlertTriangle, Clock, Info } from 'lucide-react';
+import { getFinalReviewAlert, type FinalReviewAlert as AlertData } from '@/lib/roster-utils';
+import { AlertTriangle, Clock, Info, AlertOctagon } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface FinalReviewAlertProps {
   pendingCount: number; // Count of pending requests for NEXT roster period ONLY
@@ -58,58 +60,65 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
     return null;
   }
 
-  // Determine styling based on severity
-  const getAlertStyles = () => {
+  // Determine styling and icon based on severity
+  const getAlertConfig = () => {
     switch (alert.severity) {
       case 'urgent':
         return {
-          container: 'bg-red-50 border-red-500',
-          icon: 'text-red-600',
-          title: 'text-red-900',
-          text: 'text-red-800',
-          badge: 'bg-red-100 text-red-900',
-          IconComponent: AlertTriangle,
+          variant: 'destructive' as const,
+          className: 'border-[#E4002B] bg-red-50',
+          icon: AlertOctagon,
+          iconClassName: 'h-5 w-5 text-[#E4002B]',
+          titleClassName: 'text-[#E4002B] font-bold',
+          descriptionClassName: 'text-[#000000]',
+          badgeClassName: 'bg-[#E4002B] text-white',
+          actionClassName: 'bg-[#E4002B] hover:bg-[#C00020] text-white',
+          detailsClassName: 'bg-red-100 border-2 border-red-300',
         };
       case 'warning':
         return {
-          container: 'bg-yellow-50 border-yellow-500',
-          icon: 'text-yellow-600',
-          title: 'text-yellow-900',
-          text: 'text-yellow-800',
-          badge: 'bg-yellow-100 text-yellow-900',
-          IconComponent: Clock,
+          variant: 'default' as const,
+          className: 'border-[#FFC72C] bg-yellow-50',
+          icon: AlertTriangle,
+          iconClassName: 'h-5 w-5 text-[#FFC72C]',
+          titleClassName: 'text-[#000000] font-semibold',
+          descriptionClassName: 'text-[#000000]/80',
+          badgeClassName: 'bg-[#FFC72C] text-[#000000]',
+          actionClassName: 'bg-[#FFC72C] hover:bg-[#F5A623] text-[#000000]',
+          detailsClassName: 'bg-yellow-100 border-2 border-yellow-300',
         };
       default:
         return {
-          container: 'bg-blue-50 border-blue-500',
-          icon: 'text-blue-600',
-          title: 'text-blue-900',
-          text: 'text-blue-800',
-          badge: 'bg-blue-100 text-blue-900',
-          IconComponent: Info,
+          variant: 'default' as const,
+          className: 'border-[#E4002B]/30 bg-white',
+          icon: Info,
+          iconClassName: 'h-5 w-5 text-[#E4002B]',
+          titleClassName: 'text-[#000000] font-medium',
+          descriptionClassName: 'text-[#000000]/70',
+          badgeClassName: 'bg-[#E4002B]/10 text-[#E4002B]',
+          actionClassName: 'bg-[#E4002B] hover:bg-[#C00020] text-white',
+          detailsClassName: 'bg-blue-100 border-2 border-blue-300',
         };
     }
   };
 
-  const styles = getAlertStyles();
-  const IconComponent = styles.IconComponent;
+  const config = getAlertConfig();
+  const IconComponent = config.icon;
 
   return (
-    <div className={`border-l-4 ${styles.container} rounded-lg p-6 mb-6 shadow-md`}>
+    <Alert variant={config.variant} className={`${config.className} mb-6 shadow-md`}>
       <div className="flex items-start">
-        <div className={`${styles.icon} mr-4 mt-1`}>
-          <IconComponent className="w-8 h-8" />
-        </div>
+        <IconComponent className={config.iconClassName} />
 
-        <div className="flex-1">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <h3 className={`text-xl font-bold ${styles.title}`}>
+        <div className="flex-1 ml-4">
+          {/* Header with countdown badge */}
+          <div className="flex items-center justify-between mb-2">
+            <AlertTitle className={config.titleClassName}>
               {alert.severity === 'urgent' ? '🚨 ' : ''}
               Final Review Deadline
-            </h3>
+            </AlertTitle>
             {alert.isWithinReviewWindow && (
-              <span className={`px-4 py-2 rounded-full font-bold text-lg ${styles.badge}`}>
+              <span className={`px-4 py-2 rounded-full font-bold text-sm ${config.badgeClassName}`}>
                 {alert.daysUntilRosterStarts} {alert.daysUntilRosterStarts === 1 ? 'DAY' : 'DAYS'}{' '}
                 LEFT
               </span>
@@ -117,10 +126,12 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
           </div>
 
           {/* Message */}
-          <p className={`text-base mb-4 ${styles.text} font-medium`}>{alert.message}</p>
+          <AlertDescription className={`mb-4 ${config.descriptionClassName}`}>
+            <p className="font-medium">{alert.message}</p>
+          </AlertDescription>
 
           {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-lg p-4 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
             <div>
               <p className="text-sm text-gray-600 mb-1">Current Roster</p>
               <p className="font-bold text-gray-900">{alert.currentRoster.code}</p>
@@ -158,33 +169,22 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
             </div>
           </div>
 
-          {/* Action Required (only if pending requests) */}
+          {/* Action Required (only if pending requests within review window) */}
           {pendingCount > 0 && alert.isWithinReviewWindow && (
-            <div
-              className={`mt-4 p-4 rounded-lg ${alert.severity === 'urgent' ? 'bg-red-100 border-2 border-red-300' : 'bg-yellow-100 border-2 border-yellow-300'}`}
-            >
+            <div className={`mt-4 p-4 rounded-lg ${config.detailsClassName}`}>
               <div className="flex items-start justify-between mb-3">
-                <p
-                  className={`font-bold ${alert.severity === 'urgent' ? 'text-red-900' : 'text-yellow-900'}`}
-                >
-                  ⚠️ ACTION REQUIRED:
-                </p>
+                <p className="font-bold text-[#000000]">⚠️ ACTION REQUIRED:</p>
                 {onViewRequests && (
                   <button
                     onClick={onViewRequests}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm ${
-                      alert.severity === 'urgent'
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm ${config.actionClassName}`}
+                    aria-label="View pending leave requests"
                   >
                     📋 View Pending Requests
                   </button>
                 )}
               </div>
-              <ul
-                className={`list-disc list-inside space-y-1 text-sm ${alert.severity === 'urgent' ? 'text-red-800' : 'text-yellow-800'}`}
-              >
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#000000]/80">
                 <li>
                   Review all {pendingCount} pending leave request(s) for {alert.nextRoster.code}
                 </li>
@@ -196,6 +196,6 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
           )}
         </div>
       </div>
-    </div>
+    </Alert>
   );
 }

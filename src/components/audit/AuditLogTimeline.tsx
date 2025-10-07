@@ -103,6 +103,11 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
         const logsForDate = groupedLogs[date];
         const dateObj = parseISO(date);
 
+        // Skip if no logs for this date
+        if (!logsForDate || logsForDate.length === 0) {
+          return null;
+        }
+
         return (
           <div key={date} className="relative">
             {/* Date Header */}

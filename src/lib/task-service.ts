@@ -9,6 +9,7 @@
 
 import { getSupabaseAdmin } from './supabase';
 import { addDays, addWeeks, addMonths, parseISO } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // Get admin client instance for server-side operations
 const supabase = getSupabaseAdmin();
@@ -127,7 +128,7 @@ export async function getTaskCategories(): Promise<TaskCategory[]> {
     .order('display_order');
 
   if (error) {
-    console.error('Error fetching task categories:', error);
+    logger.error('Error fetching task categories', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch task categories');
   }
 
@@ -147,7 +148,7 @@ export async function createTaskCategory(category: {
   const { data, error } = await supabase.from('task_categories').insert(category).select().single();
 
   if (error) {
-    console.error('Error creating task category:', error);
+    logger.error('Error creating task category', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create task category');
   }
 
@@ -217,7 +218,7 @@ export async function getTasks(filters?: {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching tasks:', error);
+    logger.error('Error fetching tasks', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch tasks');
   }
 
@@ -246,7 +247,7 @@ export async function getTaskById(id: string) {
     .single();
 
   if (error) {
-    console.error('Error fetching task:', error);
+    logger.error('Error fetching task', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch task');
   }
 
@@ -281,7 +282,7 @@ export async function createTask(input: CreateTaskInput, createdBy: string) {
     .single();
 
   if (error) {
-    console.error('Error creating task:', error);
+    logger.error('Error creating task', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create task');
   }
 
@@ -334,7 +335,7 @@ export async function updateTask(id: string, input: UpdateTaskInput, userId: str
     .single();
 
   if (error) {
-    console.error('Error updating task:', error);
+    logger.error('Error updating task', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to update task');
   }
 
@@ -369,7 +370,7 @@ export async function deleteTask(id: string, userId: string) {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
 
   if (error) {
-    console.error('Error deleting task:', error);
+    logger.error('Error deleting task', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to delete task');
   }
 
@@ -396,7 +397,7 @@ export async function getTaskComments(taskId: string) {
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching task comments:', error);
+    logger.error('Error fetching task comments', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch task comments');
   }
 
@@ -436,7 +437,7 @@ export async function createTaskComment(
     .single();
 
   if (error) {
-    console.error('Error creating task comment:', error);
+    logger.error('Error creating task comment', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to create comment');
   }
 
@@ -505,7 +506,7 @@ async function createRecurringTaskInstances(
     const { error } = await supabase.from('tasks').insert(instances);
 
     if (error) {
-      console.error('Error creating recurring task instances:', error);
+      logger.error('Error creating recurring task instances', error instanceof Error ? error : new Error(String(error)));
     }
   }
 }
@@ -535,7 +536,7 @@ async function logTaskAudit(
   });
 
   if (error) {
-    console.error('Error logging task audit:', error);
+    logger.error('Error logging task audit', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -555,7 +556,7 @@ export async function getTaskAuditLog(taskId: string) {
     .order('timestamp', { ascending: false });
 
   if (error) {
-    console.error('Error fetching task audit log:', error);
+    logger.error('Error fetching task audit log', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch audit log');
   }
 
@@ -595,7 +596,7 @@ export async function getTaskStatistics(filters?: {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching task statistics:', error);
+    logger.error('Error fetching task statistics', error instanceof Error ? error : new Error(String(error)));
     throw new Error('Failed to fetch statistics');
   }
 

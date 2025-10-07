@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { cacheService } from '@/lib/cache-service';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/dashboard/stats
@@ -13,13 +14,12 @@ import { cacheService } from '@/lib/cache-service';
  */
 export async function GET() {
   try {
-    console.log('📊 Dashboard Stats API: Starting request...');
+    logger.debug('Dashboard Stats API: Starting request');
 
     // Use cache service for pilot statistics - much more efficient than direct queries
     const stats = await cacheService.getPilotStats();
 
-    console.log('✅ Dashboard Stats API: Retrieved cached statistics');
-    console.log('📊 Stats summary:', {
+    logger.info('Dashboard Stats API: Retrieved cached statistics', {
       totalPilots: stats.totalPilots,
       captains: stats.captains,
       firstOfficers: stats.firstOfficers,
@@ -48,11 +48,11 @@ export async function GET() {
 
     return NextResponse.json(apiResponse);
   } catch (error) {
-    console.error('🚨 Dashboard Stats API: Cache service error:', error);
+    logger.error('Dashboard Stats API: Cache service error', error);
 
     // Fallback to direct database queries when cache service fails
     try {
-      console.log('📊 Dashboard Stats API: Attempting direct database fallback...');
+      logger.debug('Dashboard Stats API: Attempting direct database fallback');
       const { getSupabaseAdmin } = await import('@/lib/supabase');
       const supabaseAdmin = getSupabaseAdmin();
 
@@ -81,10 +81,10 @@ export async function GET() {
         lastUpdated: new Date().toISOString(),
       };
 
-      console.log('✅ Dashboard Stats API: Direct database fallback successful:', fallbackStats);
+      logger.info('Dashboard Stats API: Direct database fallback successful', fallbackStats);
       return NextResponse.json(fallbackStats, { status: 200 });
     } catch (fallbackError) {
-      console.error('🚨 Dashboard Stats API: Direct database fallback also failed:', fallbackError);
+      logger.error('Dashboard Stats API: Direct database fallback also failed', fallbackError);
 
       // Final fallback - return zeros
       const finalFallbackStats = {

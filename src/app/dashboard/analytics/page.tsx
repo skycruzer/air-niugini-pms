@@ -11,40 +11,43 @@ import { Suspense } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Loading component for the analytics dashboard
+// Loading component for the analytics dashboard (shadcn/ui upgraded)
 function AnalyticsLoading() {
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="animate-pulse">
-        {/* Header skeleton */}
-        <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-1"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-        </div>
+    <div
+      className="p-6 max-w-7xl mx-auto space-y-6"
+      role="status"
+      aria-label="Loading analytics dashboard"
+    >
+      {/* Header skeleton */}
+      <div className="mb-8">
+        <Skeleton className="h-8 w-1/3 mb-2 bg-gray-200" />
+        <Skeleton className="h-4 w-1/2 mb-1 bg-gray-200" />
+        <Skeleton className="h-3 w-1/4 bg-gray-200" />
+      </div>
 
-        {/* Filter skeleton */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="h-6 bg-gray-200 rounded w-32"></div>
-            <div className="h-8 bg-gray-200 rounded w-24"></div>
-          </div>
+      {/* Filter skeleton */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-6 w-32 bg-gray-200" />
+          <Skeleton className="h-8 w-24 bg-gray-200" />
         </div>
+      </div>
 
-        {/* KPI cards skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
-          ))}
-        </div>
+      {/* KPI cards skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-32 bg-gray-200 rounded-xl" />
+        ))}
+      </div>
 
-        {/* Charts skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-80 bg-gray-200 rounded-xl"></div>
-          ))}
-        </div>
+      {/* Charts skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-80 bg-gray-200 rounded-xl" />
+        ))}
       </div>
     </div>
   );

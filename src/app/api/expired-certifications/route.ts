@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
   try {
-    console.log('🔍 API /expired-certifications: Fetching pilots with expired certifications');
+    logger.debug(' API /expired-certifications: Fetching pilots with expired certifications');
 
     // Calculate today's date
     const today = new Date().toISOString().split('T')[0];
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
       .order('expiry_date', { ascending: false });
 
     if (error) {
-      console.error('🚨 API /expired-certifications: Database error:', error);
+      logger.error(' API /expired-certifications: Database error:', error);
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     const result = Array.from(pilotsMap.values());
 
-    console.log(
+    logger.debug(
       '🔍 API /expired-certifications: Found',
       result.length,
       'pilots with expired certifications'
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
       data: result,
     });
   } catch (error) {
-    console.error('🚨 API /expired-certifications: Fatal error:', error);
+    logger.error(' API /expired-certifications: Fatal error:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

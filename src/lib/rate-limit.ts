@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 // Rate limit configuration types
 export enum RateLimitTier {
@@ -95,7 +96,7 @@ function startCleanupTimer() {
     }
 
     if (entriesRemoved > 0) {
-      console.log(`🧹 Rate limit cleanup: Removed ${entriesRemoved} expired entries`);
+      logger.debug(`Rate limit cleanup: Removed ${entriesRemoved} expired entries`);
     }
   }, CLEANUP_INTERVAL);
 }
@@ -160,7 +161,7 @@ export async function checkRateLimit(
   if (entry.count > config.maxRequests) {
     const retryAfter = Math.ceil((entry.resetTime - now) / 1000);
 
-    console.warn('🚫 Rate limit exceeded:', {
+    logger.warn('Rate limit exceeded', {
       identifier,
       tier,
       count: entry.count,

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { getRoleDisplayName, getRoleColor, permissions } from '@/lib/auth-utils';
 import { getCurrentRosterPeriod, formatRosterPeriod } from '@/lib/roster-utils';
+import { NavIcons, UIIcons } from '@/lib/icon-mapping';
+import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -25,12 +27,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }, []);
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '🏠', description: 'Overview and analytics' },
-    { name: 'Pilots', href: '/dashboard/pilots', icon: '👥', description: 'Manage pilot records' },
+    { name: 'Dashboard', href: '/dashboard', icon: NavIcons.dashboard, description: 'Overview and analytics' },
+    { name: 'Pilots', href: '/dashboard/pilots', icon: NavIcons.pilots, description: 'Manage pilot records' },
     {
       name: 'Certifications',
       href: '/dashboard/certifications',
-      icon: '📄',
+      icon: NavIcons.certifications,
       description: 'Track certifications',
       submenu: [
         {
@@ -56,9 +58,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       ],
     },
     {
+      name: 'Documents',
+      href: '/dashboard/documents',
+      icon: NavIcons.certifications,
+      description: 'Manage documents',
+    },
+    {
+      name: 'Forms',
+      href: '/dashboard/forms',
+      icon: NavIcons.leave,
+      description: 'Review form submissions',
+      requiresPermission: 'forms',
+    },
+    {
       name: 'Leave Requests',
       href: '/dashboard/leave',
-      icon: '📅',
+      icon: NavIcons.leave,
       description: 'Manage leave requests',
       submenu: [
         { name: 'Leave Requests', href: '/dashboard/leave', description: 'Manage requests' },
@@ -77,35 +92,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     {
       name: 'Disciplinary',
       href: '/dashboard/disciplinary',
-      icon: '⚖️',
+      icon: NavIcons.disciplinary,
       description: 'Incident tracking',
       requiresPermission: 'disciplinary',
     },
     {
       name: 'Tasks',
       href: '/dashboard/tasks',
-      icon: '✅',
+      icon: NavIcons.tasks,
       description: 'To-Do list',
     },
     {
       name: 'Reports',
       href: '/dashboard/reports',
-      icon: '📊',
+      icon: NavIcons.reports,
       description: 'Fleet reports',
       requiresPermission: 'reports',
     },
-    // Audit Logs feature not yet implemented (requires database migration)
-    // {
-    //   name: 'Audit Logs',
-    //   href: '/dashboard/audit',
-    //   icon: '🔍',
-    //   description: 'System audit trail',
-    //   requiresPermission: 'audit',
-    // },
     {
       name: 'Settings',
       href: '/dashboard/settings',
-      icon: '⚙️',
+      icon: NavIcons.settings,
       description: 'System configuration',
       requiresPermission: 'settings',
     },
@@ -118,6 +125,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       return permissions.canViewReports(user);
     }
     if (item.requiresPermission === 'disciplinary') {
+      return permissions.canEdit(user); // Admin/Manager only
+    }
+    if (item.requiresPermission === 'forms') {
       return permissions.canEdit(user); // Admin/Manager only
     }
     // Audit logs temporarily disabled
@@ -143,7 +153,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Skip to content link for accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-air-niugini-red text-white px-4 py-2 rounded-lg z-50 focus:z-50"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50 focus:z-50"
       >
         Skip to main content
       </a>
@@ -172,9 +182,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close navigation menu"
               >
-                <span className="h-6 w-6 text-white text-2xl" aria-hidden="true">
-                  ✖️
-                </span>
+                <X className="h-6 w-6 text-white" aria-hidden="true" />
               </button>
             </div>
 
@@ -184,7 +192,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="aviation-header p-6">
                 <div className="flex items-center">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-air-niugini-gold rounded-lg blur-md opacity-30"></div>
+                    <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30"></div>
                     <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
                       <img
                         src="/images/air-niugini-logo.jpg"
@@ -232,9 +240,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         className={`mobile-nav-item ${isActive ? 'active' : ''}`}
                         aria-current={isActive ? 'page' : undefined}
                       >
-                        <span className="h-5 w-5 mr-3 text-lg" aria-hidden="true">
-                          {item.icon}
-                        </span>
+                        <item.icon className="h-5 w-5 mr-3" aria-hidden="true" />
                         <div className="flex-1">
                           <p className="font-medium">{item.name}</p>
                           <p className="text-xs opacity-75">{item.description}</p>
@@ -251,7 +257,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                               onClick={() => setSidebarOpen(false)}
                               className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
                                 pathname === subItem.href
-                                  ? 'bg-[#E4002B] text-white'
+                                  ? 'bg-blue-600 text-white'
                                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                               }`}
                             >
@@ -269,7 +275,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="mt-auto border-t border-gray-200 p-4">
                 <div className="flex items-center">
                   <div className="relative">
-                    <div className="h-10 w-10 bg-gradient-to-br from-air-niugini-red to-red-600 rounded-xl flex items-center justify-center">
+                    <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
                       <span className="h-5 w-5 text-white text-lg">👤</span>
                     </div>
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
@@ -288,9 +294,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     title="Sign Out"
                     aria-label="Sign out of your account"
                   >
-                    <span className="h-5 w-5 text-lg" aria-hidden="true">
-                      🚪
-                    </span>
+                    <UIIcons.logout className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -312,7 +316,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center justify-between">
               <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''}`}>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-air-niugini-gold rounded-lg blur-md opacity-30"></div>
+                  <div className="absolute inset-0 bg-blue-400 rounded-lg blur-md opacity-30"></div>
                   <div className="relative bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
                     <img
                       src="/images/air-niugini-logo.jpg"
@@ -336,12 +340,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 }
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
-                <span
-                  className={`h-4 w-4 transform transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`}
-                  aria-hidden="true"
-                >
-                  ▶️
-                </span>
+                {sidebarCollapsed ? (
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
             </div>
           </div>
@@ -370,10 +373,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Collapsed Roster Indicator */}
           {currentRoster && sidebarCollapsed && (
             <div className="mx-2 mb-4 -mt-2">
-              <div className="bg-air-niugini-red rounded-lg p-2 flex flex-col items-center">
-                <span className="w-4 h-4 text-red-200 mb-1">🕐</span>
+              <div className="bg-blue-600 rounded-lg p-2 flex flex-col items-center">
+                <span className="w-4 h-4 text-blue-200 mb-1">🕐</span>
                 <span className="text-xs text-white font-bold">{currentRoster.daysRemaining}</span>
-                <span className="text-xs text-red-200">days</span>
+                <span className="text-xs text-blue-200">days</span>
               </div>
             </div>
           )}
@@ -394,9 +397,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     } ${sidebarCollapsed ? 'justify-center' : ''}`}
                     title={sidebarCollapsed ? `${item.name} - ${item.description}` : undefined}
                   >
-                    <span className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'} text-lg`}>
-                      {item.icon}
-                    </span>
+                    <item.icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'}`} aria-hidden="true" />
                     {!sidebarCollapsed && (
                       <div className="flex-1">
                         <p className="font-medium">{item.name}</p>
@@ -408,7 +409,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
                     {/* Active indicator for collapsed state */}
                     {sidebarCollapsed && isActive && (
-                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-air-niugini-gold rounded-l-full"></div>
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full"></div>
                     )}
                   </Link>
 
@@ -421,7 +422,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                           href={subItem.href}
                           className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
                             pathname === subItem.href
-                              ? 'bg-[#E4002B] text-white'
+                              ? 'bg-blue-600 text-white'
                               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                           }`}
                         >
@@ -464,7 +465,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* About Section */}
           {!sidebarCollapsed && (
             <div className="px-4 mb-4">
-              <div className="bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-xl p-4 text-white">
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-4 text-white">
                 <h4 className="text-xs font-medium mb-3 uppercase tracking-wider opacity-90">
                   About
                 </h4>
@@ -505,7 +506,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex-shrink-0 border-t border-gray-200 p-4">
             <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : ''}`}>
               <div className="relative">
-                <div className="h-10 w-10 bg-gradient-to-br from-air-niugini-red to-red-600 rounded-xl flex items-center justify-center">
+                <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
                   <span className="h-5 w-5 text-white text-lg">👤</span>
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
@@ -526,7 +527,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Sign Out"
                   >
-                    <span className="h-4 w-4 text-lg">🚪</span>
+                    <UIIcons.logout className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </>
               )}
@@ -557,13 +558,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               aria-expanded={sidebarOpen}
               aria-controls="mobile-sidebar"
             >
-              <span className="h-5 w-5 text-lg" aria-hidden="true">
-                ☰
-              </span>
+              <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
 
             <div className="flex items-center">
-              <span className="h-5 w-5 text-air-niugini-red mr-2">✈️</span>
+              <NavIcons.dashboard className="h-5 w-5 text-blue-600 mr-2" />
               <span className="font-semibold text-gray-900">Air Niugini</span>
             </div>
 
@@ -573,9 +572,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 aria-label={`Notifications${notifications.length > 0 ? ` (${notifications.length} new)` : ''}`}
                 title="View notifications"
               >
-                <span className="h-5 w-5" aria-hidden="true">
-                  🔔
-                </span>
+                <UIIcons.notification className="h-5 w-5" aria-hidden="true" />
                 {notifications.length > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     <span className="sr-only">{notifications.length} new notifications</span>
@@ -589,9 +586,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 aria-label="Sign out of your account"
                 title="Sign out"
               >
-                <span className="h-5 w-5" aria-hidden="true">
-                  🚪
-                </span>
+                <UIIcons.logout className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
           </div>

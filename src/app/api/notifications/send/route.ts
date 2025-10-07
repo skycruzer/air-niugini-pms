@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { queueNotification, type QueuedNotification } from '@/lib/notification-queue';
 import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       message: 'Notification queued successfully',
     });
   } catch (error) {
-    console.error('API Error [/api/notifications/send]:', error);
+    logger.error('API Error [/api/notifications/send]:', error);
     return NextResponse.json(
       {
         success: false,

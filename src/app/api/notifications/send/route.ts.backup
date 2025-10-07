@@ -1,0 +1,83 @@
+/**
+ * Air Niugini B767 Pilot Management System
+ * API Route: Send Notification
+ *
+ * POST /api/notifications/send
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { queueNotification, type QueuedNotification } from '@/lib/notification-queue';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { logger } from '@/lib/logger';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    // Validate required fields
+    if (!body.email_address || !body.notification_type || !body.subject || !body.template_data) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Missing required fields: email_address, notification_type, subject, template_data',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Verify user authentication (optional but recommended)
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const supabaseAdmin = getSupabaseAdmin();
+      const token = authHeader.replace('Bearer ', '');
+
+      const {
+        data: { user },
+        error: authError,
+      } = await supabaseAdmin.auth.getUser(token);
+
+      if (authError || !user) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      }
+    }
+
+    const notification: QueuedNotification = {
+      user_id: body.user_id,
+      email_address: body.email_address,
+      notification_type: body.notification_type,
+      subject: body.subject,
+      template_name: body.template_name || body.notification_type,
+      template_data: body.template_data,
+      priority: body.priority || 5,
+      scheduled_for: body.scheduled_for ? new Date(body.scheduled_for) : undefined,
+    };
+
+    const result = await queueNotification(notification);
+
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: result.error,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      queueId: result.queueId,
+      message: 'Notification queued successfully',
+    });
+  } catch (error) {
+    console.error('API Error [/api/notifications/send]:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+      },
+      { status: 500 }
+    );
+  }
+}

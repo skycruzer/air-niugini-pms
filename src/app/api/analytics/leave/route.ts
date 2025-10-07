@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    console.log('📅 API /analytics/leave: Getting leave analytics...');
+    logger.debug('📅 API /analytics/leave: Getting leave analytics...');
 
     const supabaseAdmin = getSupabaseAdmin();
 
@@ -120,10 +121,10 @@ export async function GET() {
       typeBreakdown,
     };
 
-    console.log('✅ API /analytics/leave: Successfully retrieved leave analytics');
+    logger.info(' API /analytics/leave: Successfully retrieved leave analytics');
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
-    console.error('❌ API /analytics/leave: Error:', error);
+    logger.error(' API /analytics/leave: Error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to get leave analytics' },
       { status: 500 }

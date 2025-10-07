@@ -32,7 +32,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to console (in production, you'd send to error tracking service)
     console.error('Global Error Boundary caught an error:', error, errorInfo);
 
@@ -55,7 +55,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     });
   };
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
