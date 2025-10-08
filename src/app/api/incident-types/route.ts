@@ -8,7 +8,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/middleware/auth';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
@@ -18,35 +17,19 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/incident-types
  * Retrieves all incident types for dropdown selection
- * @auth Required - Admin and Manager roles only
+ * Public endpoint - No auth required (reference data only)
  */
-export const GET = withAuth(
-  async (request: NextRequest, { user }) => {
-    try {
-      const supabaseAdmin = getSupabaseAdmin();
+export async function GET(request: NextRequest) {
+  try {
+    const supabaseAdmin = getSupabaseAdmin();
 
-      const { data: incidentTypes, error } = await supabaseAdmin
-        .from('incident_types')
-        .select('id, code, name, description, severity_level, requires_review')
-        .order('name', { ascending: true });
+    const { data: incidentTypes, error } = await supabaseAdmin
+      .from('incident_types')
+      .select('id, code, name, description, severity_level, requires_review')
+      .order('name', { ascending: true});
 
-      if (error) {
-        logger.error('Error fetching incident types:', error);
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Failed to fetch incident types',
-          },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: incidentTypes,
-      });
-    } catch (error) {
-      logger.error('Error in GET /api/incident-types:', error);
+    if (error) {
+      logger.error('Error fetching incident types:', error);
       return NextResponse.json(
         {
           success: false,
@@ -55,6 +38,26 @@ export const GET = withAuth(
         { status: 500 }
       );
     }
-  },
-  { roles: ['admin', 'manager'] }
-);
+
+    const response = NextResponse.json({
+      success: true,
+      data: incidentTypes,
+    });
+
+    // Add cache control headers
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
+  } catch (error) {
+    logger.error('Error in GET /api/incident-types:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to fetch incident types',
+      },
+      { status: 500 }
+    );
+  }
+}
