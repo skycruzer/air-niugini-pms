@@ -6,17 +6,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Modern Professional Theme (2024-2025 Standards) */
+  /* ============================================================================
+     AIR NIUGINI BRAND COLORS (Official Brand Palette)
+     ============================================================================ */
+  --air-niugini-red: #E4002B;       /* Primary brand color */
+  --air-niugini-red-dark: #C00020;  /* Hover/pressed states */
+  --air-niugini-red-light: #FF1A4D; /* Light accents */
+  --air-niugini-gold: #FFC72C;      /* Secondary/accent color */
+  --air-niugini-gold-dark: #E6B027; /* Gold hover states */
+  --air-niugini-black: #000000;     /* Navigation, text */
+  --air-niugini-white: #FFFFFF;     /* Backgrounds */
+
+  /* Modern Professional Theme (Air Niugini Branded) */
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 221 83% 53%; /* Professional Blue */
+
+  /* Primary = Air Niugini Red */
+  --primary: 349 100% 45%;          /* #E4002B converted to HSL */
   --primary-foreground: 0 0% 100%;
-  --secondary: 239 84% 67%; /* Indigo Accent */
-  --secondary-foreground: 0 0% 100%;
+
+  /* Secondary = Air Niugini Gold */
+  --secondary: 45 100% 58%;         /* #FFC72C converted to HSL */
+  --secondary-foreground: 0 0% 0%;
+
   --muted: 214 32% 91%;
   --muted-foreground: 215 16% 47%;
   --accent: 214 32% 91%;
@@ -25,22 +41,34 @@
   --destructive-foreground: 0 0% 100%;
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 221 83% 53%;
+
+  /* Ring = Air Niugini Red */
+  --ring: 349 100% 45%;
   --radius: 0.75rem;
 
-  /* Professional Blue Palette (Primary) */
-  --blue-50: #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-500: #3b82f6;
-  --blue-600: #2563eb;
-  --blue-700: #1d4ed8;
-  --blue-900: #1e3a8a;
+  /* Air Niugini Red Palette */
+  --an-red-50: #FFF5F7;
+  --an-red-100: #FFE5EA;
+  --an-red-200: #FFCCD5;
+  --an-red-300: #FF99AA;
+  --an-red-400: #FF6680;
+  --an-red-500: #E4002B;    /* Primary brand */
+  --an-red-600: #C00020;    /* Dark hover */
+  --an-red-700: #9C0019;
+  --an-red-800: #780013;
+  --an-red-900: #54000D;
 
-  /* Indigo Palette (Secondary) */
-  --indigo-50: #eef2ff;
-  --indigo-500: #6366f1;
-  --indigo-600: #4f46e5;
-  --indigo-700: #4338ca;
+  /* Air Niugini Gold Palette */
+  --an-gold-50: #FFFDF5;
+  --an-gold-100: #FFF9E5;
+  --an-gold-200: #FFF3CC;
+  --an-gold-300: #FFE799;
+  --an-gold-400: #FFDB66;
+  --an-gold-500: #FFC72C;   /* Secondary brand */
+  --an-gold-600: #E6B800;
+  --an-gold-700: #B38F00;
+  --an-gold-800: #806600;
+  --an-gold-900: #4D3D00;
 
   /* Slate Palette (Neutral Base) */
   --slate-50: #f8fafc;
@@ -66,21 +94,22 @@
   --neutral-800: var(--slate-800);
   --neutral-900: var(--slate-900);
 
-  /* Semantic Colors */
-  --success: #10b981;
+  /* Aviation Status Colors (FAA Standards - KEEP UNCHANGED) */
+  --success: #10b981;       /* Green - Current */
   --success-light: #34d399;
-  --warning: #f59e0b;
+  --warning: #f59e0b;       /* Yellow - Expiring Soon */
   --warning-light: #fcd34d;
-  --error: #ef4444;
+  --error: #ef4444;         /* Red - Expired */
   --error-light: #f87171;
-  --info: #3b82f6;
+  --info: #3b82f6;          /* Blue - Info */
   --info-light: #60a5fa;
 
-  /* Modern Gradients */
-  --gradient-primary: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-700) 100%);
-  --gradient-secondary: linear-gradient(135deg, var(--indigo-600) 0%, var(--indigo-700) 100%);
-  --gradient-aviation: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-600) 100%);
+  /* Air Niugini Brand Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--air-niugini-red) 0%, var(--air-niugini-red-dark) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--air-niugini-gold) 0%, var(--air-niugini-gold-dark) 100%);
+  --gradient-aviation: linear-gradient(135deg, var(--air-niugini-red-dark) 0%, var(--air-niugini-red) 100%);
   --gradient-surface: linear-gradient(135deg, var(--slate-50) 0%, #ffffff 100%);
+  --gradient-header: linear-gradient(135deg, var(--air-niugini-red) 0%, #B80020 100%);
 
   /* Shadows */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -218,24 +247,7 @@ body {
   border-color: var(--air-niugini-gold);
 }
 
-/* Aviation Theme Classes */
-.aviation-navy {
-  background-color: var(--aviation-navy);
-}
-
-.aviation-blue {
-  background-color: var(--aviation-blue);
-}
-
-.text-aviation-navy {
-  color: var(--aviation-navy);
-}
-
-.text-aviation-blue {
-  color: var(--aviation-blue);
-}
-
-/* Professional Button System */
+/* Professional Button System (Air Niugini Branded) */
 .btn {
   @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer;
   box-shadow: var(--shadow-sm);
@@ -261,46 +273,46 @@ body {
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--blue-600);
+  outline: 2px solid var(--air-niugini-red);
   outline-offset: 2px;
 }
 
 .btn-primary {
   background: var(--gradient-primary);
   color: white;
-  border: 1px solid var(--blue-600);
+  border: 1px solid var(--air-niugini-red);
 }
 
 .btn-primary:hover {
-  background: var(--blue-700);
+  background: var(--air-niugini-red-dark);
 }
 
 .btn-primary:focus {
-  ring-color: var(--blue-600);
+  ring-color: var(--air-niugini-red);
 }
 
 .btn-secondary {
   background: var(--gradient-secondary);
-  color: white;
-  border: 1px solid var(--indigo-600);
+  color: var(--air-niugini-black);
+  border: 1px solid var(--air-niugini-gold);
 }
 
 .btn-secondary:hover {
-  background: var(--indigo-700);
+  background: var(--air-niugini-gold-dark);
 }
 
 .btn-secondary:focus {
-  ring-color: var(--indigo-600);
+  ring-color: var(--air-niugini-gold);
 }
 
 .btn-outline {
   background: transparent;
-  color: var(--blue-600);
-  border: 2px solid var(--blue-600);
+  color: var(--air-niugini-red);
+  border: 2px solid var(--air-niugini-red);
 }
 
 .btn-outline:hover {
-  background: var(--blue-600);
+  background: var(--air-niugini-red);
   color: white;
 }
 
@@ -319,15 +331,15 @@ body {
 .btn-aviation {
   background: var(--gradient-aviation);
   color: white;
-  border: 1px solid var(--aviation-navy);
+  border: 1px solid var(--air-niugini-red-dark);
 }
 
 .btn-aviation:hover {
-  background: var(--aviation-navy);
+  background: var(--air-niugini-red-dark);
 }
 
 .btn-aviation:focus {
-  ring-color: var(--aviation-blue);
+  ring-color: var(--air-niugini-red);
 }
 
 /* Button Sizes */
@@ -347,7 +359,7 @@ body {
   @apply px-10 py-5 text-xl;
 }
 
-/* Card System */
+/* Card System (Air Niugini Branded) */
 .card {
   @apply bg-white border border-gray-200 rounded-xl p-6;
   box-shadow: var(--shadow-sm);
@@ -366,11 +378,17 @@ body {
 }
 
 .card-aviation {
-  @apply bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6;
+  @apply bg-gradient-to-br from-red-50 to-orange-50 border rounded-xl p-6;
+  border-color: var(--air-niugini-red);
   box-shadow: var(--shadow-md);
 }
 
-/* Status System */
+.card-header-branded {
+  background: var(--gradient-primary);
+  @apply text-white rounded-t-xl -m-6 mb-6 p-6;
+}
+
+/* Status System (Aviation Standards - UNCHANGED) */
 .status-indicator {
   @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
 }
@@ -395,17 +413,17 @@ body {
   @apply bg-blue-100 text-blue-800 border border-blue-200;
 }
 
-/* Loading States */
+/* Loading States (Air Niugini Branded) */
 .loading-spinner {
   @apply animate-spin rounded-full border-2 border-gray-200;
-  border-top-color: var(--blue-600);
+  border-top-color: var(--air-niugini-red);
   width: 20px;
   height: 20px;
 }
 
 .loading-spinner-lg {
   @apply animate-spin rounded-full border-4 border-gray-200;
-  border-top-color: var(--blue-600);
+  border-top-color: var(--air-niugini-red);
   width: 40px;
   height: 40px;
 }
@@ -414,16 +432,16 @@ body {
   @apply bg-gray-200 animate-pulse rounded;
 }
 
-/* Form Elements */
+/* Form Elements (Air Niugini Branded) */
 .form-input {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg transition-all duration-200;
   box-shadow: var(--shadow-xs);
 }
 
 .form-input:focus {
-  @apply outline-none border-blue-600 ring-2;
-  ring-color: rgba(37, 99, 235, 0.1);
-  border-color: var(--blue-600);
+  @apply outline-none ring-2;
+  border-color: var(--air-niugini-red);
+  ring-color: rgba(228, 0, 43, 0.1);
   box-shadow: var(--shadow-sm);
 }
 
@@ -439,22 +457,23 @@ body {
   @apply text-sm text-gray-500 mt-1;
 }
 
-/* Navigation */
+/* Navigation (Air Niugini Branded) */
 .nav-link {
   @apply flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200;
 }
 
 .nav-link-active {
-  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md;
+  background: var(--gradient-primary);
+  @apply text-white shadow-md;
 }
 
 .nav-link-inactive {
   @apply text-gray-600 hover:text-gray-900 hover:bg-gray-50;
 }
 
-/* Aviation-Specific Elements */
+/* Aviation-Specific Elements (Air Niugini Branded) */
 .aviation-header {
-  background: var(--gradient-aviation);
+  background: var(--gradient-header);
   @apply text-white;
 }
 
@@ -591,7 +610,7 @@ body {
   scroll-snap-align: start;
 }
 
-/* Mobile Navigation Enhancements */
+/* Mobile Navigation Enhancements (Air Niugini Branded) */
 .mobile-nav-item {
   @apply flex items-center w-full p-4 text-left rounded-lg transition-colors;
   min-height: 56px;
@@ -602,7 +621,8 @@ body {
 }
 
 .mobile-nav-item.active {
-  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white;
+  background: var(--gradient-primary);
+  @apply text-white;
 }
 
 /* Mobile Typography */
@@ -629,7 +649,9 @@ body {
 }
 
 .mobile-input:focus {
-  @apply outline-none border-blue-600 ring-2 ring-blue-600/20;
+  @apply outline-none ring-2;
+  border-color: var(--air-niugini-red);
+  ring-color: rgba(228, 0, 43, 0.2);
 }
 
 .mobile-select {
@@ -643,11 +665,12 @@ body {
 }
 
 .mobile-button-primary {
-  @apply mobile-button bg-blue-600 text-white;
+  @apply mobile-button text-white;
+  background: var(--air-niugini-red);
 }
 
 .mobile-button-primary:hover {
-  @apply bg-blue-700;
+  background: var(--air-niugini-red-dark);
 }
 
 .mobile-button-secondary {
@@ -699,11 +722,11 @@ body {
     min-height: 44px;
   }
 
-  /* Improve horizontal scrolling indicators */
+  /* Improve horizontal scrolling indicators (Air Niugini branded) */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: #e4002b transparent;
+    scrollbar-color: var(--air-niugini-red) transparent;
   }
 
   .overflow-x-auto::-webkit-scrollbar {
@@ -715,7 +738,7 @@ body {
   }
 
   .overflow-x-auto::-webkit-scrollbar-thumb {
-    background: var(--blue-600);
+    background: var(--air-niugini-red);
     border-radius: 3px;
   }
 
@@ -915,7 +938,7 @@ body {
   }
 }
 
-/* Scrollbar Utilities */
+/* Scrollbar Utilities (Air Niugini Branded) */
 .scrollbar-hide {
   /* Hide scrollbar for Chrome, Safari and Opera */
   -webkit-overflow-scrolling: touch;
@@ -925,6 +948,30 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
+}
+
+.scrollbar-branded {
+  scrollbar-width: thin;
+  scrollbar-color: var(--air-niugini-red) var(--neutral-100);
+}
+
+.scrollbar-branded::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-branded::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+  border-radius: 4px;
+}
+
+.scrollbar-branded::-webkit-scrollbar-thumb {
+  background: var(--air-niugini-red);
+  border-radius: 4px;
+}
+
+.scrollbar-branded::-webkit-scrollbar-thumb:hover {
+  background: var(--air-niugini-red-dark);
 }
 
 /* Accessibility */
@@ -937,7 +984,7 @@ body {
 }
 
 .focus-visible:focus {
-  outline: 2px solid var(--blue-600);
+  outline: 2px solid var(--air-niugini-red);
   outline-offset: 2px;
 }
 
@@ -1028,7 +1075,7 @@ body {
   animation: slide-in-right 0.4s ease-out;
 }
 
-/* Command Palette Specific Styles */
+/* Command Palette Specific Styles (Air Niugini Branded) */
 [cmdk-root] {
   max-height: 500px;
 }
@@ -1042,11 +1089,16 @@ body {
 }
 
 [cmdk-item][aria-selected='true'] {
-  @apply bg-blue-600/10 text-blue-600;
+  background: var(--air-niugini-red);
+  @apply text-white;
 }
 
 [cmdk-input] {
   @apply outline-none;
+}
+
+[cmdk-input]:focus {
+  border-color: var(--air-niugini-red);
 }
 
 /* Loading Skeleton Styles */
@@ -1073,10 +1125,10 @@ body {
   @apply bg-white border border-gray-200 rounded-xl p-6 space-y-4;
 }
 
-/* Real-time Update Indicator */
+/* Real-time Update Indicator (Air Niugini Branded) */
 @keyframes update-flash {
   0% {
-    background-color: rgba(37, 99, 235, 0.1);
+    background-color: rgba(228, 0, 43, 0.1);
   }
   100% {
     background-color: transparent;
