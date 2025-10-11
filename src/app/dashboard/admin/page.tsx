@@ -2,8 +2,22 @@
 
 import Link from 'next/link';
 import { Users, MessageSquare, Settings, Shield, ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 export default function AdminDashboardPage() {
+  // Fetch pending registrations count
+  const { data: registrations, isLoading } = useQuery({
+    queryKey: ['admin', 'pilot-registrations'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/pilot-registrations');
+      if (!response.ok) throw new Error('Failed to fetch registrations');
+      const result = await response.json();
+      return result.data || [];
+    },
+    staleTime: 1000 * 60, // 1 minute
+  });
+
+  const pendingCount = registrations?.length || 0;
   const adminSections = [
     {
       title: 'Pilot Registrations',
@@ -118,13 +132,19 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Quick Stats (Optional - can be enhanced with real data) */}
+        {/* Quick Stats */}
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending Registrations</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">-</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {isLoading ? (
+                    <span className="animate-pulse">-</span>
+                  ) : (
+                    pendingCount
+                  )}
+                </p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
