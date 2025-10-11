@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ReactNode } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getCurrentRosterPeriod,
@@ -450,7 +451,8 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      <DashboardLayout>
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
           {!isLoaded ? (
             <DashboardSkeleton />
           ) : (
@@ -1203,6 +1205,7 @@ export default function DashboardPage() {
             </LazyLoader>
           )}
         </div>
+      </DashboardLayout>
     </ProtectedRoute>
   );
 }
