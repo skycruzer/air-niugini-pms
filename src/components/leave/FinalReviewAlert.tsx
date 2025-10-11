@@ -66,37 +66,37 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
       case 'urgent':
         return {
           variant: 'destructive' as const,
-          className: 'border-[#E4002B] bg-red-50',
+          className: 'border-[#4F46E5] bg-red-50',
           icon: AlertOctagon,
-          iconClassName: 'h-5 w-5 text-[#E4002B]',
-          titleClassName: 'text-[#E4002B] font-bold',
+          iconClassName: 'h-5 w-5 text-[#4F46E5]',
+          titleClassName: 'text-[#4F46E5] font-bold',
           descriptionClassName: 'text-[#000000]',
-          badgeClassName: 'bg-[#E4002B] text-white',
-          actionClassName: 'bg-[#E4002B] hover:bg-[#C00020] text-white',
+          badgeClassName: 'bg-[#4F46E5] text-white',
+          actionClassName: 'bg-[#4F46E5] hover:bg-[#4338CA] text-white',
           detailsClassName: 'bg-red-100 border-2 border-red-300',
         };
       case 'warning':
         return {
           variant: 'default' as const,
-          className: 'border-[#FFC72C] bg-yellow-50',
+          className: 'border-[#06B6D4] bg-yellow-50',
           icon: AlertTriangle,
-          iconClassName: 'h-5 w-5 text-[#FFC72C]',
+          iconClassName: 'h-5 w-5 text-[#06B6D4]',
           titleClassName: 'text-[#000000] font-semibold',
           descriptionClassName: 'text-[#000000]/80',
-          badgeClassName: 'bg-[#FFC72C] text-[#000000]',
-          actionClassName: 'bg-[#FFC72C] hover:bg-[#F5A623] text-[#000000]',
+          badgeClassName: 'bg-[#06B6D4] text-[#000000]',
+          actionClassName: 'bg-[#06B6D4] hover:bg-[#F5A623] text-[#000000]',
           detailsClassName: 'bg-yellow-100 border-2 border-yellow-300',
         };
       default:
         return {
           variant: 'default' as const,
-          className: 'border-[#E4002B]/30 bg-white',
+          className: 'border-[#4F46E5]/30 bg-white',
           icon: Info,
-          iconClassName: 'h-5 w-5 text-[#E4002B]',
+          iconClassName: 'h-5 w-5 text-[#4F46E5]',
           titleClassName: 'text-[#000000] font-medium',
           descriptionClassName: 'text-[#000000]/70',
-          badgeClassName: 'bg-[#E4002B]/10 text-[#E4002B]',
-          actionClassName: 'bg-[#E4002B] hover:bg-[#C00020] text-white',
+          badgeClassName: 'bg-[#4F46E5]/10 text-[#4F46E5]',
+          actionClassName: 'bg-[#4F46E5] hover:bg-[#4338CA] text-white',
           detailsClassName: 'bg-blue-100 border-2 border-blue-300',
         };
     }
@@ -151,7 +151,7 @@ export function FinalReviewAlert({ pendingCount, onViewRequests }: FinalReviewAl
             <div>
               <p className="text-sm text-gray-600 mb-1">Pending Requests (Next Roster)</p>
               <p
-                className={`font-bold text-2xl ${pendingCount > 0 ? 'text-[#E4002B]' : 'text-green-600'}`}
+                className={`font-bold text-2xl ${pendingCount > 0 ? 'text-[#4F46E5]' : 'text-green-600'}`}
               >
                 {pendingCount}
               </p>

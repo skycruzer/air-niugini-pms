@@ -375,7 +375,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
         </h3>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600 mt-1">
           <div>
-            Current roster: <span className="font-medium text-[#E4002B]">{currentRoster.code}</span>
+            Current roster: <span className="font-medium text-[#4F46E5]">{currentRoster.code}</span>
             <span className="mx-2">•</span>
             Ends: {format(currentRoster.endDate, 'dd MMM yyyy')}
           </div>
@@ -398,7 +398,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
           </label>
           <select
             {...register('pilot_id')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
           >
             <option value="">Select a pilot...</option>
             {pilots.map((pilot) => (
@@ -481,7 +481,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
                   value={type.value}
                   className="sr-only peer"
                 />
-                <div className="border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#E4002B]/50 peer-checked:border-[#E4002B] peer-checked:bg-[#E4002B]/5 transition-colors">
+                <div className="border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#4F46E5]/50 peer-checked:border-[#4F46E5] peer-checked:bg-[#4F46E5]/5 transition-colors">
                   <div className="text-center">
                     <span className="text-2xl block mb-1">{type.icon}</span>
                     <span className="font-medium text-sm">{type.label}</span>
@@ -505,7 +505,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
             <input
               type="date"
               {...register('request_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               max={format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.request_date && (
@@ -520,7 +520,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
             </label>
             <select
               {...register('request_method')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
             >
               <option value="">Select advisory method...</option>
               <option value="ORACLE">Oracle (Rostering System)</option>
@@ -543,7 +543,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
             <input
               type="date"
               {...register('start_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               min={format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.start_date && (
@@ -558,7 +558,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
             <input
               type="date"
               {...register('end_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               min={watch('start_date') || format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.end_date && (
@@ -656,7 +656,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
           <textarea
             {...register('reason')}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent resize-none"
             placeholder="Provide additional details for your leave request..."
           />
         </div>
@@ -680,7 +680,7 @@ export function LeaveRequestForm({ onSuccess, onCancel, editingRequest }: LeaveR
           <button
             type="submit"
             disabled={loading || conflicts.length > 0}
-            className="px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+            className="px-6 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
           >
             {loading ? (
               <>

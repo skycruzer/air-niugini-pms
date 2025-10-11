@@ -46,8 +46,8 @@ const ACTION_COLORS = {
   SOFT_DELETE: '#f59e0b', // amber
 };
 
-const AIR_NIUGINI_RED = '#E4002B';
-const AIR_NIUGINI_GOLD = '#FFC72C';
+const PRIMARY_INDIGO = '#4F46E5';
+const ACCENT_CYAN = '#06B6D4';
 
 export function AuditLogCharts({ stats }: AuditLogChartsProps) {
   // Prepare data for activity timeline
@@ -179,9 +179,9 @@ export function AuditLogCharts({ stats }: AuditLogChartsProps) {
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke={AIR_NIUGINI_RED}
+                stroke={PRIMARY_INDIGO}
                 strokeWidth={3}
-                dot={{ fill: AIR_NIUGINI_RED, r: 4 }}
+                dot={{ fill: PRIMARY_INDIGO, r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
@@ -263,7 +263,7 @@ export function AuditLogCharts({ stats }: AuditLogChartsProps) {
               />
               <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill={AIR_NIUGINI_RED} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="count" fill={PRIMARY_INDIGO} radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -291,7 +291,7 @@ export function AuditLogCharts({ stats }: AuditLogChartsProps) {
               />
               <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" fill={AIR_NIUGINI_GOLD} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="count" fill={ACCENT_CYAN} radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -8,7 +8,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, User } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { User } from '@/lib/supabase';
 
 /**
  * Authentication result interface
@@ -39,11 +40,14 @@ export async function validateSession(request: NextRequest): Promise<AuthResult>
 
     const token = authHeader.substring(7);
 
-    // Verify the session token with Supabase
+    // Use admin client for server-side token validation
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // Verify the session token with Supabase (using admin client)
     const {
       data: { user: authUser },
       error: authError,
-    } = await supabase.auth.getUser(token);
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !authUser) {
       return {
@@ -52,8 +56,8 @@ export async function validateSession(request: NextRequest): Promise<AuthResult>
       };
     }
 
-    // Fetch user details from an_users table
-    const { data: userData, error: userError } = await supabase
+    // Fetch user details from an_users table (using admin client)
+    const { data: userData, error: userError } = await supabaseAdmin
       .from('an_users')
       .select('*')
       .eq('email', authUser.email)

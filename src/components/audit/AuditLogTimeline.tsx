@@ -111,7 +111,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
         return (
           <div key={date} className="relative">
             {/* Date Header */}
-            <div className="sticky top-0 z-10 bg-white border-b-2 border-[#E4002B] pb-2 mb-6">
+            <div className="sticky top-0 z-10 bg-white border-b-2 border-[#4F46E5] pb-2 mb-6">
               <div className="flex items-center">
                 <span className="text-2xl mr-3">📅</span>
                 <div>
@@ -145,7 +145,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
                     {/* Timeline Card */}
                     <div
                       className={`ml-6 card cursor-pointer hover:shadow-lg transition-all ${
-                        isExpanded ? 'ring-2 ring-[#E4002B]' : ''
+                        isExpanded ? 'ring-2 ring-[#4F46E5]' : ''
                       }`}
                       onClick={() => onLogClick?.(log)}
                     >
@@ -190,7 +190,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
                             e.stopPropagation();
                             toggleExpanded(log.id);
                           }}
-                          className="text-[#E4002B] hover:text-[#C00020] font-medium text-sm ml-4"
+                          className="text-[#4F46E5] hover:text-[#4338CA] font-medium text-sm ml-4"
                         >
                           {isExpanded ? '▲' : '▼'}
                         </button>
@@ -209,7 +209,7 @@ export function AuditLogTimeline({ logs, onLogClick }: AuditLogTimelineProps) {
                                 {log.changed_fields.map((field, idx) => (
                                   <span
                                     key={idx}
-                                    className="px-2 py-1 bg-[#FFC72C]/20 text-gray-800 rounded text-xs font-medium border border-[#FFC72C]/40"
+                                    className="px-2 py-1 bg-[#06B6D4]/20 text-gray-800 rounded text-xs font-medium border border-[#06B6D4]/40"
                                   >
                                     {field}
                                   </span>

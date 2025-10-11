@@ -9,21 +9,21 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Air Niugini Pilot Management System',
-  description: 'B767 Fleet Pilot Certification and Leave Management System for Air Niugini',
-  keywords: ['Air Niugini', 'Pilot Management', 'B767', 'Certification', 'Leave Management'],
-  authors: [{ name: 'Air Niugini IT Department' }],
+  title: 'Fleet Office Management System',
+  description: 'Professional pilot certification tracking and leave management for fleet operations',
+  keywords: ['Fleet Management', 'Pilot Management', 'Certification Tracking', 'Leave Management', 'Fleet Operations'],
+  authors: [{ name: 'Fleet Office Management Team' }],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Air Niugini PMS',
+    title: 'Fleet Office',
   },
   openGraph: {
     type: 'website',
-    title: 'Air Niugini Pilot Management System',
-    description: 'B767 Fleet Pilot Certification and Leave Management',
-    siteName: 'Air Niugini PMS',
+    title: 'Fleet Office Management System',
+    description: 'Professional fleet operations management with pilot certification tracking',
+    siteName: 'Fleet Office',
   },
 };
 
@@ -32,7 +32,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#E4002B',
+  themeColor: '#0EA5E9', // Professional Sky Blue
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -49,18 +49,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* PWA Manifest */}
         <link rel="manifest" href="/manifest.json" />
 
-        {/* Theme Colors */}
-        <meta name="theme-color" content="#E4002B" />
-        <meta name="msapplication-TileColor" content="#E4002B" />
+        {/* Theme Colors - Professional Sky Blue */}
+        <meta name="theme-color" content="#0EA5E9" />
+        <meta name="msapplication-TileColor" content="#0EA5E9" />
 
         {/* iOS Support */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Air Niugini PMS" />
+        <meta name="apple-mobile-web-app-title" content="Fleet Office" />
 
         {/* Android/Chrome */}
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Air Niugini PMS" />
+        <meta name="application-name" content="Fleet Office" />
 
         {/* Microsoft */}
         <meta name="msapplication-TileImage" content="/icon-192x192.png" />
@@ -72,13 +72,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Providers>
               <CommandPaletteProvider>{children}</CommandPaletteProvider>
             </Providers>
-            {/* Sonner Toast notifications with Air Niugini branding */}
+            {/* Sonner Toast notifications with professional branding */}
             <Toaster
               position="top-right"
               theme="light"
               toastOptions={{
                 style: {
-                  border: '2px solid #E4002B',
+                  border: '2px solid #0EA5E9', // Professional Sky Blue
                   borderRadius: '0.5rem',
                 },
                 className: 'bg-white text-[#000000]',

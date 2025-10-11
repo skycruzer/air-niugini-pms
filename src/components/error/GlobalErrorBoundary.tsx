@@ -104,7 +104,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={this.handleReset}
-                className="px-6 py-3 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors font-medium"
+                className="px-6 py-3 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors font-medium"
               >
                 Try Again
               </button>

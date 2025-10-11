@@ -1,13 +1,14 @@
 {
-  "name": "air-niugini-pms",
+  "name": "fleet-office-management",
   "version": "1.0.0",
-  "description": "Air Niugini B767 Pilot Management System - Professional fleet operations management with pilot certification tracking and leave management",
+  "description": "Professional Fleet Office Management System - Comprehensive pilot certification tracking and leave management for fleet operations",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "SKIP_ENV_VALIDATION=true next build",
-    "build:analyze": "ANALYZE=true SKIP_ENV_VALIDATION=true next build",
-    "build:production": "NODE_ENV=production next build",
+    "prebuild": "node prebuild.js",
+    "dev": "node dev-server.js",
+    "build": "node fix-build.js",
+    "build:analyze": "node prebuild.js && ANALYZE=true SKIP_ENV_VALIDATION=true next build",
+    "build:production": "node prebuild.js && NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -28,12 +29,13 @@
     "mcp:dev": "tsc --project mcp-server/tsconfig.json --watch"
   },
   "keywords": [
-    "aviation",
+    "fleet-management",
     "pilot-management",
-    "air-niugini",
-    "b767",
+    "certification-tracking",
+    "leave-management",
     "fleet-operations",
-    "certification-tracking"
+    "aviation",
+    "crew-management"
   ],
   "author": "Maurice Rondeau <PIN PNG LTD>",
   "license": "ISC",
@@ -101,6 +103,7 @@
     "typescript": "^5.9.2",
     "uuid": "^13.0.0",
     "workbox-webpack-plugin": "^7.3.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.12"
   },
   "devDependencies": {

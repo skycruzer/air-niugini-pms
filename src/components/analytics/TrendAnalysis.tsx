@@ -127,7 +127,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                 <div className="text-2xl font-bold">87%</div>
                 <p className="text-xs text-gray-500">Model accuracy</p>
               </div>
-              <Activity className="h-5 w-5 text-[#E4002B]" />
+              <Activity className="h-5 w-5 text-[#4F46E5]" />
             </div>
           </CardContent>
         </Card>
@@ -155,7 +155,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
             variant={chartType === 'line' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setChartType('line')}
-            className={chartType === 'line' ? 'bg-[#E4002B] hover:bg-[#C00020]' : ''}
+            className={chartType === 'line' ? 'bg-[#4F46E5] hover:bg-[#4338CA]' : ''}
           >
             Line Chart
           </Button>
@@ -163,7 +163,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
             variant={chartType === 'area' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setChartType('area')}
-            className={chartType === 'area' ? 'bg-[#E4002B] hover:bg-[#C00020]' : ''}
+            className={chartType === 'area' ? 'bg-[#4F46E5] hover:bg-[#4338CA]' : ''}
           >
             Area Chart
           </Button>
@@ -197,7 +197,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                 <Line
                   type="monotone"
                   dataKey="compliance"
-                  stroke="#E4002B"
+                  stroke="#4F46E5"
                   strokeWidth={2}
                   name="Compliance Rate"
                   dot={{ r: 4 }}
@@ -206,7 +206,7 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                   <Line
                     type="monotone"
                     dataKey="forecast"
-                    stroke="#FFC72C"
+                    stroke="#06B6D4"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     name="Forecast"
@@ -224,8 +224,8 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                 <Area
                   type="monotone"
                   dataKey="compliance"
-                  stroke="#E4002B"
-                  fill="#E4002B"
+                  stroke="#4F46E5"
+                  fill="#4F46E5"
                   fillOpacity={0.3}
                   name="Compliance Rate"
                 />
@@ -233,8 +233,8 @@ export default function TrendAnalysis({ timeRange }: TrendAnalysisProps) {
                   <Area
                     type="monotone"
                     dataKey="forecast"
-                    stroke="#FFC72C"
-                    fill="#FFC72C"
+                    stroke="#06B6D4"
+                    fill="#06B6D4"
                     fillOpacity={0.2}
                     strokeDasharray="5 5"
                     name="Forecast"

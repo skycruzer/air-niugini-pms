@@ -1,7 +1,7 @@
 /**
- * Air Niugini Design System Tokens
- * Complete design token system for Air Niugini B767 Pilot Management System
- * Maintains brand consistency across all components
+ * Design System Tokens
+ * Complete design token system for B767 Pilot Management System
+ * Maintains design consistency across all components
  */
 
 // ============================================================================
@@ -9,25 +9,25 @@
 // ============================================================================
 
 export const colors = {
-  // Air Niugini Brand Colors (Primary)
+  // Primary Brand Colors
   brand: {
     red: {
-      DEFAULT: '#E4002B',
-      dark: '#C00020',
+      DEFAULT: '#4F46E5',
+      dark: '#4338CA',
       light: '#FF1A4D',
       50: '#FFF5F7',
       100: '#FFE5EA',
       200: '#FFCCD5',
       300: '#FF99AA',
       400: '#FF6680',
-      500: '#E4002B',
-      600: '#C00020',
+      500: '#4F46E5',
+      600: '#4338CA',
       700: '#9C0019',
       800: '#780013',
       900: '#54000D',
     },
     gold: {
-      DEFAULT: '#FFC72C',
+      DEFAULT: '#06B6D4',
       dark: '#E6B800',
       light: '#FFD75C',
       50: '#FFFDF5',
@@ -35,7 +35,7 @@ export const colors = {
       200: '#FFF3CC',
       300: '#FFE799',
       400: '#FFDB66',
-      500: '#FFC72C',
+      500: '#06B6D4',
       600: '#E6B800',
       700: '#B38F00',
       800: '#806600',
@@ -338,8 +338,8 @@ export const animations = {
 // ============================================================================
 
 export const gradients = {
-  primary: 'linear-gradient(135deg, #E4002B 0%, #C00020 100%)',
-  secondary: 'linear-gradient(135deg, #FFC72C 0%, #E6B800 100%)',
+  primary: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+  secondary: 'linear-gradient(135deg, #06B6D4 0%, #E6B800 100%)',
   aviation: 'linear-gradient(135deg, #1E3A8A 0%, #0EA5E9 100%)',
   surface: 'linear-gradient(135deg, #FAFAFA 0%, #FFFFFF 100%)',
   success: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',

@@ -124,9 +124,9 @@ export function BulkActionsBar({
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-4xl px-4"
         >
-          <div className="bg-white rounded-lg shadow-2xl border-2 border-[#E4002B] overflow-hidden">
+          <div className="bg-white rounded-lg shadow-2xl border-2 border-[#4F46E5] overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white px-4 py-3 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white px-4 py-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center font-bold">
                   {selectedCount}
@@ -246,7 +246,7 @@ export function BulkActionsBar({
               {/* Processing Indicator */}
               {isProcessing && (
                 <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-center space-x-2 text-sm text-gray-600">
-                  <div className="w-4 h-4 border-2 border-[#E4002B] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
                   <span>Processing...</span>
                 </div>
               )}

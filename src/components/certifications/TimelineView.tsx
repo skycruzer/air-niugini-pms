@@ -101,7 +101,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
           <p className="text-gray-600 mt-2">Loading timeline...</p>
         </div>
       </div>
@@ -131,7 +131,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
           </p>
           <button
             onClick={() => router.push(`/dashboard/pilots/${pilotId}/certifications`)}
-            className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Add Certifications
           </button>
@@ -153,7 +153,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
     <div className="space-y-6">
       {/* Pilot Header */}
       {pilot && (
-        <div className="bg-gradient-to-r from-[#E4002B] to-red-600 rounded-lg shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-[#4F46E5] to-red-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-2">
@@ -167,7 +167,7 @@ export function TimelineView({ pilotId }: TimelineViewProps) {
             </div>
             <button
               onClick={() => router.push(`/dashboard/pilots/${pilotId}/certifications`)}
-              className="px-4 py-2 bg-white text-[#E4002B] rounded-lg hover:bg-gray-100 transition-colors font-medium"
+              className="px-4 py-2 bg-white text-[#4F46E5] rounded-lg hover:bg-gray-100 transition-colors font-medium"
             >
               Edit Certifications
             </button>

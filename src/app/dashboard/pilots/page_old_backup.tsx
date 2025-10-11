@@ -433,7 +433,7 @@ export default function PilotsPage() {
                     placeholder="Search pilots..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mobile-input md:w-full pl-10 pr-4 focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="mobile-input md:w-full pl-10 pr-4 focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     aria-describedby="search-help"
                   />
                   <div id="search-help" className="sr-only">
@@ -450,7 +450,7 @@ export default function PilotsPage() {
                     id="role-filter"
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value as any)}
-                    className="mobile-select focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="mobile-select focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     aria-label="Filter pilots by role"
                   >
                     <option value="all">All Roles</option>
@@ -464,7 +464,7 @@ export default function PilotsPage() {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
@@ -502,7 +502,7 @@ export default function PilotsPage() {
                     <select
                       value={filterCertStatus}
                       onChange={(e) => setFilterCertStatus(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                     >
                       <option value="all">All Certifications</option>
                       <option value="current">✅ All Current</option>
@@ -519,7 +519,7 @@ export default function PilotsPage() {
                     <select
                       value={filterContract}
                       onChange={(e) => setFilterContract(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                     >
                       <option value="all">All Contracts</option>
                       <option value="Fulltime">Fulltime</option>
@@ -536,7 +536,7 @@ export default function PilotsPage() {
                     <select
                       value={filterSeniority}
                       onChange={(e) => setFilterSeniority(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                     >
                       <option value="all">All Seniority</option>
                       <option value="senior">🥇 Senior (1-9)</option>

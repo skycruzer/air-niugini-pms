@@ -469,9 +469,7 @@ export async function getLeaveRequestsByRosterPeriodAdmin(
           last_name,
           employee_id
         ),
-        reviewer:an_users!reviewed_by (
-          name
-        )
+        reviewer:an_users(name)
       `
       )
       .eq('roster_period', rosterPeriod)

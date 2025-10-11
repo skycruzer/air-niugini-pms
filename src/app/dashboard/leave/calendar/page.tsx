@@ -90,7 +90,7 @@ export default function LeaveCalendarPage() {
               <div className="h-6 w-px bg-gray-300" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <Calendar className="w-7 h-7 text-[#E4002B] mr-3" />
+                  <Calendar className="w-7 h-7 text-[#4F46E5] mr-3" />
                   Interactive Leave Calendar
                 </h1>
                 <p className="text-gray-600 mt-1">Drag and drop to reschedule leave requests</p>
@@ -109,7 +109,7 @@ export default function LeaveCalendarPage() {
           {/* Calendar Component */}
           {loading ? (
             <div className="flex items-center justify-center p-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46E5]" />
               <span className="ml-3 text-gray-600">Loading calendar...</span>
             </div>
           ) : (

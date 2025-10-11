@@ -121,7 +121,7 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Roster Period:</span>
-                <span className="text-sm font-medium text-[#E4002B]">{request.roster_period}</span>
+                <span className="text-sm font-medium text-[#4F46E5]">{request.roster_period}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Start Date:</span>
@@ -212,7 +212,7 @@ export function LeaveApprovalWorkflow({ request, onUpdate, onError }: LeaveAppro
                     value={reviewComments}
                     onChange={(e) => setReviewComments(e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent resize-none"
                     placeholder="Add comments about your decision..."
                   />
                 </div>

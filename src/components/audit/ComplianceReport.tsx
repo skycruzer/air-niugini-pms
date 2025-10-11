@@ -128,7 +128,7 @@ export function ComplianceReport({ onClose }: ComplianceReportProps) {
   return (
     <div className="bg-white rounded-lg shadow-xl max-w-6xl mx-auto max-h-[90vh] overflow-y-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white px-6 py-4 rounded-t-lg sticky top-0 z-10">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white px-6 py-4 rounded-t-lg sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold mb-1">Compliance Reports</h2>
@@ -206,7 +206,7 @@ export function ComplianceReport({ onClose }: ComplianceReportProps) {
           <button
             onClick={generateReport}
             disabled={isGenerating || !startDate || !endDate}
-            className="btn bg-[#E4002B] text-white hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn bg-[#4F46E5] text-white hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? (
               <>
@@ -227,7 +227,7 @@ export function ComplianceReport({ onClose }: ComplianceReportProps) {
       {reportData && reportStats && (
         <div className="p-6 space-y-6">
           {/* Report Header */}
-          <div className="border-l-4 border-[#E4002B] pl-4">
+          <div className="border-l-4 border-[#4F46E5] pl-4">
             <h3 className="text-xl font-bold text-gray-900 mb-2">{getReportTitle()}</h3>
             <p className="text-sm text-gray-600 mb-4">{getReportDescription()}</p>
 
@@ -283,7 +283,7 @@ export function ComplianceReport({ onClose }: ComplianceReportProps) {
           <div className="flex justify-end">
             <button
               onClick={handleExport}
-              className="btn bg-[#FFC72C] text-gray-900 hover:bg-[#E0B020] font-semibold"
+              className="btn bg-[#06B6D4] text-gray-900 hover:bg-[#E0B020] font-semibold"
             >
               <span className="mr-2">📥</span>
               Export to CSV

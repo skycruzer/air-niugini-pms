@@ -34,15 +34,15 @@ const variantStyles = {
   },
   primary: {
     bg: 'bg-white',
-    iconBg: 'bg-[#E4002B]/10',
-    iconColor: 'text-[#E4002B]',
-    border: 'border-[#E4002B]/20',
+    iconBg: 'bg-[#4F46E5]/10',
+    iconColor: 'text-[#4F46E5]',
+    border: 'border-[#4F46E5]/20',
   },
   secondary: {
     bg: 'bg-white',
-    iconBg: 'bg-[#FFC72C]/10',
-    iconColor: 'text-[#FFC72C]',
-    border: 'border-[#FFC72C]/20',
+    iconBg: 'bg-[#06B6D4]/10',
+    iconColor: 'text-[#06B6D4]',
+    border: 'border-[#06B6D4]/20',
   },
   success: {
     bg: 'bg-white',

@@ -133,7 +133,7 @@ export function CertificationCalendar({
 
     // Selected date styling
     if (selectedDate && isSameDay(date, selectedDate)) {
-      classes += ' bg-[#E4002B] text-white shadow-lg';
+      classes += ' bg-[#4F46E5] text-white shadow-lg';
     } else if (hasEvents) {
       // Event status styling with enhanced colors
       switch (status) {
@@ -331,7 +331,7 @@ export function CertificationCalendar({
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
       {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white p-6">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Calendar className="w-6 h-6" />
@@ -349,7 +349,7 @@ export function CertificationCalendar({
               <button
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'month' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
+                  viewMode === 'month' ? 'bg-white text-[#4F46E5]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <Grid className="w-4 h-4 inline mr-1" />
@@ -358,7 +358,7 @@ export function CertificationCalendar({
               <button
                 onClick={() => setViewMode('year')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'year' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
+                  viewMode === 'year' ? 'bg-white text-[#4F46E5]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <List className="w-4 h-4 inline mr-1" />
@@ -455,7 +455,7 @@ export function CertificationCalendar({
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-[#E4002B] bg-red-100 px-2 py-1 rounded">
+                          <span className="text-sm font-medium text-[#4F46E5] bg-red-100 px-2 py-1 rounded">
                             {event.checkCode}
                           </span>
                           <span className="text-sm text-gray-600">{event.checkDescription}</span>

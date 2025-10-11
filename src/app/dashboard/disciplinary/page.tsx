@@ -9,15 +9,24 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, lazy } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Plus, Filter, FileText, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { apiGet } from '@/lib/api-client';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LazyLoader } from '@/components/ui/LazyLoader';
+
+// Lazy load the modal
+const DisciplinaryMatterModal = lazy(() =>
+  import('@/components/disciplinary/DisciplinaryMatterModal').then((mod) => ({
+    default: mod.DisciplinaryMatterModal,
+  }))
+);
 
 export default function DisciplinaryMattersPage() {
+  const [showAddModal, setShowAddModal] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
     severity: 'all',
@@ -25,7 +34,7 @@ export default function DisciplinaryMattersPage() {
   });
 
   // Fetch disciplinary matters
-  const { data: matters, isLoading } = useQuery({
+  const { data: matters, isLoading, refetch } = useQuery({
     queryKey: ['disciplinary-matters', filters],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -38,12 +47,17 @@ export default function DisciplinaryMattersPage() {
   });
 
   // Fetch statistics
-  const { data: stats } = useQuery({
+  const { data: stats, refetch: refetchStats } = useQuery({
     queryKey: ['disciplinary-stats'],
     queryFn: async () => {
       return apiGet('/api/disciplinary-matters?action=statistics');
     },
   });
+
+  const handleAddSuccess = () => {
+    refetch();
+    refetchStats();
+  };
 
   return (
     <ProtectedRoute>
@@ -55,13 +69,13 @@ export default function DisciplinaryMattersPage() {
               <h1 className="text-3xl font-bold text-gray-900">Disciplinary Matters</h1>
               <p className="text-gray-600 mt-1">Track and manage pilot disciplinary cases</p>
             </div>
-            <Link
-              href="/dashboard/disciplinary/new"
+            <button
+              onClick={() => setShowAddModal(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5 mr-2" />
               New Case
-            </Link>
+            </button>
           </div>
 
           {/* Statistics Cards */}
@@ -114,7 +128,7 @@ export default function DisciplinaryMattersPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
                 <select
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   value={filters.severity}
                   onChange={(e) => setFilters({ ...filters, severity: e.target.value })}
                 >
@@ -184,7 +198,7 @@ export default function DisciplinaryMattersPage() {
                         <td className="px-6 py-4">
                           <Link
                             href={`/dashboard/disciplinary/${matter.id}`}
-                            className="text-[#E4002B] hover:text-[#C00020] font-medium"
+                            className="text-[#4F46E5] hover:text-[#4338CA] font-medium"
                           >
                             View
                           </Link>
@@ -197,6 +211,17 @@ export default function DisciplinaryMattersPage() {
             )}
           </div>
         </div>
+
+        {/* Add Modal */}
+        {showAddModal && (
+          <LazyLoader type="modal">
+            <DisciplinaryMatterModal
+              isOpen={showAddModal}
+              onClose={() => setShowAddModal(false)}
+              onSuccess={handleAddSuccess}
+            />
+          </LazyLoader>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
   );

@@ -94,7 +94,7 @@ export function PilotQuickView({
             aria-labelledby="quick-view-title"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white p-4 md:p-6">
+            <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white p-4 md:p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl font-bold">
@@ -131,7 +131,7 @@ export function PilotQuickView({
                   </span>
                 )}
                 {pilot.seniority_number && (
-                  <span className="px-3 py-1 bg-[#FFC72C] text-gray-900 text-sm rounded-full font-semibold">
+                  <span className="px-3 py-1 bg-[#06B6D4] text-gray-900 text-sm rounded-full font-semibold">
                     🏆 Seniority #{pilot.seniority_number}
                   </span>
                 )}
@@ -228,7 +228,7 @@ export function PilotQuickView({
                             onViewFull(`${pilot.id}/certifications`);
                             onClose();
                           }}
-                          className="mt-3 text-sm text-[#E4002B] hover:text-[#C00020] font-medium"
+                          className="mt-3 text-sm text-[#4F46E5] hover:text-[#4338CA] font-medium"
                         >
                           View All Certifications →
                         </button>
@@ -259,7 +259,7 @@ export function PilotQuickView({
                       onEdit(pilot.id);
                       onClose();
                     }}
-                    className="flex-1 px-4 py-3 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors flex items-center justify-center space-x-2"
+                    className="flex-1 px-4 py-3 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors flex items-center justify-center space-x-2"
                   >
                     <span>✏️</span>
                     <span>Edit Pilot</span>
@@ -272,7 +272,7 @@ export function PilotQuickView({
                   onViewFull(`${pilot.id}/certifications`);
                   onClose();
                 }}
-                className="w-full mt-3 px-4 py-2 bg-[#FFC72C] text-gray-900 rounded-lg hover:bg-[#E6B329] transition-colors flex items-center justify-center space-x-2"
+                className="w-full mt-3 px-4 py-2 bg-[#06B6D4] text-gray-900 rounded-lg hover:bg-[#E6B329] transition-colors flex items-center justify-center space-x-2"
               >
                 <span>📋</span>
                 <span>Manage Certifications</span>

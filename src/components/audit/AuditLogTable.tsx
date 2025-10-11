@@ -104,7 +104,7 @@ export function AuditLogTable({
         {log.changed_fields.map((field, index) => (
           <span
             key={index}
-            className="px-2 py-1 bg-[#FFC72C]/20 text-gray-800 rounded text-xs font-medium border border-[#FFC72C]/40"
+            className="px-2 py-1 bg-cyan-100 text-gray-800 rounded text-xs font-medium border border-cyan-300"
           >
             {field}
           </span>
@@ -183,7 +183,7 @@ export function AuditLogTable({
       <div className="hidden lg:block card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white">
+            <thead className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                   Timestamp
@@ -249,7 +249,7 @@ export function AuditLogTable({
                             e.stopPropagation();
                             toggleRowExpansion(log.id);
                           }}
-                          className="text-[#E4002B] hover:text-[#C00020] font-medium text-sm"
+                          className="text-[#4F46E5] hover:text-[#4338CA] font-medium text-sm"
                         >
                           {isExpanded ? '▲ Hide' : '▼ Show'}
                         </button>
@@ -334,7 +334,7 @@ export function AuditLogTable({
                     e.stopPropagation();
                     toggleRowExpansion(log.id);
                   }}
-                  className="text-[#E4002B] font-medium text-sm"
+                  className="text-[#4F46E5] font-medium text-sm"
                 >
                   {isExpanded ? '▲' : '▼'}
                 </button>
@@ -422,7 +422,7 @@ export function AuditLogTable({
                   onClick={() => onPageChange?.(pageNum)}
                   className={`px-3 py-1 text-sm font-medium rounded-md ${
                     currentPage === pageNum
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
                   }`}
                 >

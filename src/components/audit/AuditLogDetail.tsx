@@ -201,7 +201,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
   return (
     <div className="bg-white rounded-lg shadow-xl max-w-5xl mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white px-6 py-4 rounded-t-lg">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white px-6 py-4 rounded-t-lg">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold mb-1">Audit Log Details</h2>
@@ -225,7 +225,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
             onClick={() => setActiveTab('details')}
             className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'details'
-                ? 'border-[#E4002B] text-[#E4002B]'
+                ? 'border-[#4F46E5] text-[#4F46E5]'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -235,7 +235,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
             onClick={() => setActiveTab('changes')}
             className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'changes'
-                ? 'border-[#E4002B] text-[#E4002B]'
+                ? 'border-[#4F46E5] text-[#4F46E5]'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -245,7 +245,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
             onClick={() => setActiveTab('history')}
             className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'history'
-                ? 'border-[#E4002B] text-[#E4002B]'
+                ? 'border-[#4F46E5] text-[#4F46E5]'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -348,7 +348,7 @@ export function AuditLogDetail({ log, onClose }: AuditLogDetailProps) {
                       log.changed_fields.map((field, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-[#FFC72C]/20 text-gray-800 rounded text-xs font-medium border border-[#FFC72C]/40"
+                          className="px-2 py-1 bg-[#06B6D4]/20 text-gray-800 rounded text-xs font-medium border border-[#06B6D4]/40"
                         >
                           {field}
                         </span>

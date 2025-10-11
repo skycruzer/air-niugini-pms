@@ -25,14 +25,28 @@ export async function authenticatedFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  // Get current session from Supabase
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  // Get current session from Supabase with retry logic for race conditions
+  let session = null;
+  let error = null;
+
+  // Try to get session, with a short wait if needed for initialization
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const result = await supabase.auth.getSession();
+    session = result.data.session;
+    error = result.error;
+
+    if (session?.access_token || error) {
+      break; // Got session or definitive error
+    }
+
+    // Session not ready yet, wait briefly before retry
+    if (attempt < 2) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
 
   if (error || !session?.access_token) {
-    console.error('Authentication error:', error);
+    console.error('Authentication error:', error || 'No session available');
     throw new Error('No active session. Please log in again.');
   }
 

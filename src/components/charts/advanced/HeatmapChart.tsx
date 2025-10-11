@@ -28,7 +28,7 @@ export default function HeatmapChart({
   data,
   title = 'Heatmap',
   description,
-  colorScale = ['#FEF3C7', '#E4002B'],
+  colorScale = ['#FEF3C7', '#4F46E5'],
 }: HeatmapChartProps) {
   // Get unique x and y values
   const xValues = useMemo(() => Array.from(new Set(data.map((d) => d.x))), [data]);

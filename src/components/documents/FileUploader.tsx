@@ -229,8 +229,8 @@ export function FileUploader({
         {...getRootProps()}
         className={cn(
           'relative rounded-lg border-2 border-dashed p-8 text-center transition-all duration-200',
-          'hover:border-[#E4002B] hover:bg-red-50/50 cursor-pointer',
-          isDragActive && 'border-[#E4002B] bg-red-50',
+          'hover:border-[#4F46E5] hover:bg-red-50/50 cursor-pointer',
+          isDragActive && 'border-[#4F46E5] bg-red-50',
           isDragReject && 'border-red-500 bg-red-50',
           (disabled || isUploading) && 'opacity-50 cursor-not-allowed pointer-events-none'
         )}
@@ -242,7 +242,7 @@ export function FileUploader({
           <div
             className={cn(
               'rounded-full p-4 transition-colors',
-              isDragActive ? 'bg-[#E4002B] text-white' : 'bg-gray-100 text-gray-600'
+              isDragActive ? 'bg-[#4F46E5] text-white' : 'bg-gray-100 text-gray-600'
             )}
           >
             <Upload className="w-8 h-8" />
@@ -347,7 +347,7 @@ export function FileUploader({
             <Button
               onClick={() => handleUpload()}
               disabled={isUploading || files.every((f) => f.uploadStatus === 'success')}
-              className="w-full bg-[#E4002B] hover:bg-[#C00020] text-white"
+              className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white"
             >
               {isUploading
                 ? 'Uploading...'

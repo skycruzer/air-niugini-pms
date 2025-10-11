@@ -40,7 +40,7 @@ export default function RosterPlanningPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E4002B]" />
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#4F46E5]" />
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-blue-800">Loading...</h3>
@@ -412,7 +412,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-[#E4002B] rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-[#4F46E5] rounded-lg flex items-center justify-center">
                   <span className="text-white text-xl">📋</span>
                 </div>
                 <div>
@@ -427,7 +427,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
                 <button
                   onClick={handleEmailToPlanner}
                   disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
-                  className="px-4 py-2 bg-[#FFC72C] text-gray-900 rounded-lg hover:bg-[#FFB800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-[#06B6D4] text-gray-900 rounded-lg hover:bg-[#FFB800] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                 >
                   <span>📧</span>
                   <span>Email to Planners</span>
@@ -436,7 +436,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
                 <button
                   onClick={handleGeneratePDF}
                   disabled={!state.selectedRosterPeriod || state.leaveRequests.length === 0}
-                  className="px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                 >
                   <span>📄</span>
                   <span>Generate PDF Report</span>
@@ -463,7 +463,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-[#E4002B]">
+                  <div className="text-2xl font-bold text-[#4F46E5]">
                     {state.stats.totalRequests}
                   </div>
                   <div className="text-sm text-gray-600">Total Requests</div>
@@ -510,7 +510,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
           {state.isLoading && (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
                 <span className="ml-3 text-gray-600">Loading leave requests...</span>
               </div>
             </div>

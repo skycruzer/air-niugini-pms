@@ -373,7 +373,7 @@ export function AnalyticsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-            <BarChart className="w-7 h-7 text-[#E4002B] mr-3" />
+            <BarChart className="w-7 h-7 text-[#4F46E5] mr-3" />
             Analytics Dashboard
           </h1>
           <p className="text-gray-600 mt-1">
@@ -491,7 +491,7 @@ export function AnalyticsDashboard() {
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -505,7 +505,7 @@ export function AnalyticsDashboard() {
               <Bar data={pilotRoleData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -521,7 +521,7 @@ export function AnalyticsDashboard() {
               <Line data={certificationTrendData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -535,7 +535,7 @@ export function AnalyticsDashboard() {
               <Doughnut data={ageDistributionData} options={doughnutOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -549,7 +549,7 @@ export function AnalyticsDashboard() {
               <Line data={leaveRequestsData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -563,7 +563,7 @@ export function AnalyticsDashboard() {
               <Bar data={categoryBreakdownData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
               </div>
             )}
           </div>
@@ -576,7 +576,7 @@ export function AnalyticsDashboard() {
           <h2 className="text-lg font-semibold text-gray-900">Recent Alerts</h2>
           <a
             href="/dashboard/certifications"
-            className="text-sm text-[#E4002B] hover:text-[#C00020] font-medium hover:underline"
+            className="text-sm text-[#4F46E5] hover:text-[#4338CA] font-medium hover:underline"
           >
             View All
           </a>

@@ -1,9 +1,6 @@
-import { differenceInDays, addDays, format } from 'date-fns';
+import Link from 'next/link';
+import { differenceInDays, addDays, format, startOfDay } from 'date-fns';
 import { getSupabaseAdmin } from '@/lib/supabase';
-
-// Mark this page as dynamic since it fetches dashboard stats
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 // Roster calculation functions
 const ROSTER_DURATION = 28;
@@ -14,7 +11,8 @@ const KNOWN_ROSTER = {
 };
 
 function getCurrentRosterPeriod() {
-  const today = new Date();
+  // Normalize to midnight local time to avoid timezone issues
+  const today = startOfDay(new Date());
 
   // Check if we're still in the known roster period
   if (today <= KNOWN_ROSTER.endDate) {
@@ -112,8 +110,16 @@ async function getDashboardStats() {
   }
 }
 
-export default async function HomePage() {
-  const stats = await getDashboardStats();
+export default function HomePage() {
+  // Use static data to avoid database calls during page load
+  const stats = {
+    totalPilots: 27,
+    captains: 22,
+    firstOfficers: 5,
+    certifications: 571,
+    checkTypes: 34,
+    compliance: 95,
+  };
   const currentRoster = getCurrentRosterPeriod();
 
   return (
@@ -148,20 +154,20 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="ml-6">
-                  <h1 className="text-display-medium text-white font-black drop-shadow-lg">
+                  <h1 className="text-display-medium text-white font-black drop-shadow-2xl" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)' }}>
                     Air Niugini
                   </h1>
-                  <p className="text-body-large text-blue-100 mt-1 drop-shadow-md">
+                  <p className="text-body-large text-white font-bold mt-1 drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.6)' }}>
                     Papua New Guinea&apos;s National Airline
                   </p>
                 </div>
               </div>
 
               <div className="mb-8">
-                <h2 className="text-heading-large text-white mb-4">
+                <h2 className="text-heading-large text-white font-bold mb-4 drop-shadow-lg" style={{ textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.6)' }}>
                   Professional Pilot Management System
                 </h2>
-                <p className="text-body-large text-blue-100 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                <p className="text-body-large text-white font-semibold max-w-2xl mx-auto lg:mx-0 leading-relaxed drop-shadow-md" style={{ textShadow: '0 2px 6px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5)' }}>
                   Advanced B767 fleet operations management with comprehensive pilot certification
                   tracking, intelligent leave management, and real-time compliance monitoring.
                 </p>
@@ -169,9 +175,9 @@ export default async function HomePage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <a href="/login" className="btn btn-primary btn-lg group">
+                <Link href="/login" className="btn btn-primary btn-lg group">
                   Access Dashboard
-                </a>
+                </Link>
                 <a
                   href="#features"
                   className="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-aviation-navy"
@@ -203,7 +209,7 @@ export default async function HomePage() {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-[#FFC72C] rounded-xl flex items-center justify-center mb-3 mx-auto">
+                    <div className="w-12 h-12 bg-[#06B6D4] rounded-xl flex items-center justify-center mb-3 mx-auto">
                       <span className="text-white text-xl font-bold">👥</span>
                     </div>
                     <p className="text-2xl font-bold text-gray-900">{stats.totalPilots}</p>
@@ -393,9 +399,9 @@ export default async function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <a href="/login" className="btn btn-primary btn-lg">
+              <Link href="/login" className="btn btn-primary btn-lg">
                 Sign In to Dashboard
-              </a>
+              </Link>
             </div>
 
             <div className="bg-blue-50/50 border border-blue-200/50 rounded-2xl p-6 max-w-md mx-auto">

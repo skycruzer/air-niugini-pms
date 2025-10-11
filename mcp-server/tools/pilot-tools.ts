@@ -11,15 +11,15 @@ import { getSupabaseAdmin } from '../../src/lib/supabase-admin';
 /**
  * Get all pilots with optional filtering by role or status
  */
-export const getPilotsTool = tool({
-  name: 'get_pilots',
-  description: 'Retrieve all pilots or filter by role (Captain/First Officer) and status',
-  parameters: z.object({
+export const getPilotsTool = tool(
+  'get_pilots',
+  'Retrieve all pilots or filter by role (Captain/First Officer) and status',
+  {
     role: z.enum(['Captain', 'First Officer', 'all']).optional().describe('Filter by pilot role'),
     status: z.enum(['Active', 'Inactive', 'all']).optional().describe('Filter by pilot status'),
     include_certifications: z.boolean().optional().describe('Include certification counts'),
-  }),
-  execute: async ({ role, status, include_certifications }) => {
+  },
+  async ({ role, status, include_certifications }) => {
     const supabase = getSupabaseAdmin();
 
     let query = supabase
@@ -46,49 +46,52 @@ export const getPilotsTool = tool({
     }
 
     return {
-      success: true,
-      count: data.length,
-      pilots: data,
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            success: true,
+            count: data.length,
+            pilots: data,
+          }, null, 2),
+        },
+      ],
     };
-  },
-});
+  }
+);
 
 /**
  * Get detailed pilot information by ID or employee ID
  */
-export const getPilotDetailsTool = tool({
-  name: 'get_pilot_details',
-  description:
-    'Get comprehensive details for a specific pilot including certifications and qualifications',
-  parameters: z.object({
+export const getPilotDetailsTool = tool(
+  'get_pilot_details',
+  'Get comprehensive details for a specific pilot including certifications and qualifications',
+  {
     pilot_id: z.string().optional().describe('Database UUID of the pilot'),
     employee_id: z.string().optional().describe('Air Niugini employee ID'),
-  }),
-  execute: async ({ pilot_id, employee_id }) => {
+  },
+  async ({ pilot_id, employee_id }) => {
     if (!pilot_id && !employee_id) {
       throw new Error('Either pilot_id or employee_id must be provided');
     }
 
     const supabase = getSupabaseAdmin();
 
-    let query = supabase
-      .from('pilots')
-      .select(
-        `
-        *,
-        pilot_checks(
-          id,
-          expiry_date,
-          last_check_date,
-          check_types(
-            check_code,
-            check_description,
-            category
-          )
+    const selectFields = `
+      *,
+      pilot_checks(
+        id,
+        expiry_date,
+        last_check_date,
+        check_types(
+          check_code,
+          check_description,
+          category
         )
-      `
       )
-      .single();
+    `;
+
+    let query = supabase.from('pilots').select(selectFields);
 
     if (pilot_id) {
       query = query.eq('id', pilot_id);
@@ -96,37 +99,41 @@ export const getPilotDetailsTool = tool({
       query = query.eq('employee_id', employee_id);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.single();
 
     if (error) {
       throw new Error(`Failed to fetch pilot details: ${error.message}`);
     }
 
     return {
-      success: true,
-      pilot: data,
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            success: true,
+            pilot: data,
+          }, null, 2),
+        },
+      ],
     };
-  },
-});
+  }
+);
 
 /**
- * Get seniority list for captains and first officers
+ * Get pilot seniority list
  */
-export const getSeniorityListTool = tool({
-  name: 'get_seniority_list',
-  description: 'Get the complete seniority list for all pilots, ordered by seniority number',
-  parameters: z.object({
-    role: z.enum(['Captain', 'First Officer', 'all']).optional().describe('Filter by role'),
-  }),
-  execute: async ({ role }) => {
+export const getSeniorityListTool = tool(
+  'get_seniority_list',
+  'Retrieve the complete seniority list of all pilots ordered by seniority number',
+  {
+    role: z.enum(['Captain', 'First Officer', 'all']).optional().describe('Filter by pilot role'),
+  },
+  async ({ role }) => {
     const supabase = getSupabaseAdmin();
 
     let query = supabase
       .from('pilots')
-      .select(
-        'id, employee_id, first_name, last_name, role, seniority_number, commencement_date, status'
-      )
-      .not('seniority_number', 'is', null)
+      .select('id, employee_id, first_name, last_name, role, seniority_number, commencement_date')
       .order('seniority_number', { ascending: true });
 
     if (role && role !== 'all') {
@@ -140,98 +147,106 @@ export const getSeniorityListTool = tool({
     }
 
     return {
-      success: true,
-      count: data.length,
-      seniority_list: data.map((pilot, index) => ({
-        rank: index + 1,
-        ...pilot,
-      })),
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            success: true,
+            count: data.length,
+            seniority_list: data,
+          }, null, 2),
+        },
+      ],
     };
-  },
-});
+  }
+);
 
 /**
  * Search pilots by name or employee ID
  */
-export const searchPilotsTool = tool({
-  name: 'search_pilots',
-  description: 'Search for pilots by name or employee ID',
-  parameters: z.object({
-    search_term: z.string().describe('Search term for name or employee ID'),
-    limit: z.number().optional().describe('Maximum number of results (default: 10)'),
-  }),
-  execute: async ({ search_term, limit = 10 }) => {
+export const searchPilotsTool = tool(
+  'search_pilots',
+  'Search for pilots by name or employee ID using fuzzy matching',
+  {
+    search_term: z.string().describe('Name or employee ID to search for'),
+    role: z.enum(['Captain', 'First Officer', 'all']).optional().describe('Filter by pilot role'),
+  },
+  async ({ search_term, role }) => {
     const supabase = getSupabaseAdmin();
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('pilots')
       .select('id, employee_id, first_name, last_name, role, status, seniority_number')
       .or(
         `first_name.ilike.%${search_term}%,last_name.ilike.%${search_term}%,employee_id.ilike.%${search_term}%`
-      )
-      .limit(limit);
+      );
+
+    if (role && role !== 'all') {
+      query = query.eq('role', role);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Failed to search pilots: ${error.message}`);
     }
 
     return {
-      success: true,
-      count: data.length,
-      results: data,
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            success: true,
+            count: data.length,
+            results: data,
+            search_term,
+          }, null, 2),
+        },
+      ],
     };
-  },
-});
+  }
+);
 
 /**
- * Get fleet statistics and overview
+ * Get fleet statistics and metrics
  */
-export const getFleetStatsTool = tool({
-  name: 'get_fleet_stats',
-  description:
-    'Get comprehensive fleet statistics including pilot counts, certification status, and compliance metrics',
-  parameters: z.object({}),
-  execute: async () => {
+export const getFleetStatsTool = tool(
+  'get_fleet_stats',
+  'Retrieve comprehensive fleet statistics including pilot counts, averages, and distributions',
+  {},
+  async () => {
     const supabase = getSupabaseAdmin();
 
-    // Get pilot counts by role
     const { data: pilots, error: pilotsError } = await supabase
       .from('pilots')
-      .select('id, role, status');
+      .select('id, role, status, commencement_date');
 
     if (pilotsError) {
-      throw new Error(`Failed to fetch pilots: ${pilotsError.message}`);
+      throw new Error(`Failed to fetch fleet stats: ${pilotsError.message}`);
     }
 
-    const captains = pilots.filter((p) => p.role === 'Captain');
-    const firstOfficers = pilots.filter((p) => p.role === 'First Officer');
-    const activePilots = pilots.filter((p) => p.status === 'Active');
-
-    // Get certification status from view
-    const { data: certStats, error: certError } = await supabase
-      .from('compliance_dashboard')
-      .select('*')
-      .single();
-
-    if (certError) {
-      throw new Error(`Failed to fetch certification stats: ${certError.message}`);
-    }
+    const stats = {
+      total_pilots: pilots.length,
+      by_role: {
+        captains: pilots.filter((p) => p.role === 'Captain').length,
+        first_officers: pilots.filter((p) => p.role === 'First Officer').length,
+      },
+      by_status: {
+        active: pilots.filter((p) => p.status === 'Active').length,
+        inactive: pilots.filter((p) => p.status === 'Inactive').length,
+      },
+    };
 
     return {
-      success: true,
-      fleet_overview: {
-        total_pilots: pilots.length,
-        active_pilots: activePilots.length,
-        captains: {
-          total: captains.length,
-          active: captains.filter((p) => p.status === 'Active').length,
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            success: true,
+            statistics: stats,
+          }, null, 2),
         },
-        first_officers: {
-          total: firstOfficers.length,
-          active: firstOfficers.filter((p) => p.status === 'Active').length,
-        },
-      },
-      certification_compliance: certStats,
+      ],
     };
-  },
-});
+  }
+);

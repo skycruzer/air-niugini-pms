@@ -8,25 +8,25 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        // Air Niugini Primary (Red)
+        // Primary (Indigo)
         default:
-          'border-transparent bg-[#E4002B] text-white shadow-sm hover:bg-[#C00020]',
+          'border-transparent bg-[#4F46E5] text-white shadow-sm hover:bg-[#4338CA]',
 
-        // Air Niugini Secondary (Gold)
+        // Secondary (Cyan)
         secondary:
-          'border-transparent bg-[#FFC72C] text-black shadow-sm hover:bg-[#E6B027]',
+          'border-transparent bg-[#06B6D4] text-white shadow-sm hover:bg-[#0891B2]',
 
-        // Destructive
+        // Destructive (Rose)
         destructive:
-          'border-transparent bg-red-600 text-white shadow-sm hover:bg-red-700',
+          'border-transparent bg-rose-500 text-white shadow-sm hover:bg-rose-600',
 
-        // Outline (Air Niugini Red - WCAG AA compliant contrast)
-        outline: 'text-[#C00020] border-[#E4002B]',
+        // Outline (Indigo - WCAG AA compliant contrast)
+        outline: 'text-[#4338CA] border-[#4F46E5]',
 
-        // Aviation status badges (keep unchanged for compliance)
-        success: 'border-transparent bg-green-100 text-green-800',
+        // Modern semantic status badges
+        success: 'border-transparent bg-emerald-100 text-emerald-800',
         warning: 'border-transparent bg-amber-100 text-amber-800',
-        error: 'border-transparent bg-red-100 text-red-800',
+        error: 'border-transparent bg-rose-100 text-rose-800',
         info: 'border-transparent bg-blue-100 text-blue-800',
       },
     },

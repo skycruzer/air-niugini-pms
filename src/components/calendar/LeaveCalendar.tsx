@@ -175,7 +175,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
 
     // Selected date styling
     if (selectedDate && isSameDay(date, selectedDate)) {
-      classes += ' bg-[#E4002B] text-white shadow-lg';
+      classes += ' bg-[#4F46E5] text-white shadow-lg';
     } else if (hasEvents) {
       // Event status styling - prioritize most important status
       if (statuses.includes('DENIED')) {
@@ -356,7 +356,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
       {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white p-6">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Calendar className="w-6 h-6" />
@@ -374,7 +374,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
               <button
                 onClick={() => setViewMode('month')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'month' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
+                  viewMode === 'month' ? 'bg-white text-[#4F46E5]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <Grid className="w-4 h-4 inline mr-1" />
@@ -383,7 +383,7 @@ export function LeaveCalendar({ leaveRequests, onDateSelect }: LeaveCalendarProp
               <button
                 onClick={() => setViewMode('year')}
                 className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  viewMode === 'year' ? 'bg-white text-[#E4002B]' : 'text-red-100 hover:text-white'
+                  viewMode === 'year' ? 'bg-white text-[#4F46E5]' : 'text-red-100 hover:text-white'
                 }`}
               >
                 <List className="w-4 h-4 inline mr-1" />

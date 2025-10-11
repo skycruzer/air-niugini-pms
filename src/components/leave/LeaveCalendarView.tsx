@@ -78,7 +78,7 @@ export function LeaveCalendarView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
         <span className="ml-2 text-gray-600">Loading leave calendar...</span>
       </div>
     );

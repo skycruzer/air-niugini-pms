@@ -9,8 +9,8 @@ import toast, { Toast, Renderable, ValueOrFunction } from 'react-hot-toast';
 
 // Air Niugini brand colors for consistent styling
 const BRAND_COLORS = {
-  red: '#E4002B',
-  gold: '#FFC72C',
+  red: '#4F46E5',
+  gold: '#06B6D4',
   black: '#000000',
   white: '#FFFFFF',
 };

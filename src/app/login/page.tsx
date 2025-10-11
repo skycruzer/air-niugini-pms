@@ -4,16 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import dynamicImport from 'next/dynamic';
 import { Shield, Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
-
-// Dynamic import for non-critical background elements
-const BackgroundElements = dynamicImport(() => import('./components/BackgroundElements'), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900" />
-  ),
-});
+import BackgroundElements from './components/BackgroundElements';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

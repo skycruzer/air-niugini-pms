@@ -204,7 +204,7 @@ export default function NotificationCenter() {
         return <Info className={`${iconClass} text-gray-500`} />;
       case 'bell':
       default:
-        return <Bell className={`${iconClass} text-[#E4002B]`} />;
+        return <Bell className={`${iconClass} text-[#4F46E5]`} />;
     }
   };
 
@@ -235,7 +235,7 @@ export default function NotificationCenter() {
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-[#E4002B]"
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-[#4F46E5]"
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </Badge>
@@ -280,7 +280,7 @@ export default function NotificationCenter() {
                       <p className="text-sm font-semibold text-gray-900">
                         {notification.title}
                         {!notification.is_read && (
-                          <span className="ml-2 inline-block w-2 h-2 bg-[#E4002B] rounded-full" />
+                          <span className="ml-2 inline-block w-2 h-2 bg-[#4F46E5] rounded-full" />
                         )}
                       </p>
                       <Button
@@ -324,7 +324,7 @@ export default function NotificationCenter() {
             <div className="p-2">
               <Button
                 variant="ghost"
-                className="w-full text-[#E4002B] hover:text-[#C00020] hover:bg-red-50"
+                className="w-full text-[#4F46E5] hover:text-[#4338CA] hover:bg-red-50"
                 onClick={() => {
                   window.location.href = '/dashboard/notifications';
                   setOpen(false);

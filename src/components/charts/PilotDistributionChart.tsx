@@ -29,12 +29,12 @@ export function PilotDistributionChart({
     {
       name: 'Captains',
       count: captains,
-      color: '#E4002B',
+      color: '#4F46E5',
     },
     {
       name: 'First Officers',
       count: firstOfficers,
-      color: '#FFC72C',
+      color: '#06B6D4',
     },
     {
       name: 'Training Captains',

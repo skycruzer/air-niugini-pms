@@ -137,7 +137,7 @@ export function CertificationHistory({
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
           <p className="text-gray-600 mt-2">Loading certification history...</p>
         </div>
       </div>
@@ -178,7 +178,7 @@ export function CertificationHistory({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-red-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-red-600 rounded-lg shadow-lg p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center mb-2">
@@ -192,7 +192,7 @@ export function CertificationHistory({
           </div>
           <button
             onClick={handleExport}
-            className="flex items-center px-4 py-2 bg-white text-[#E4002B] rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            className="flex items-center px-4 py-2 bg-white text-[#4F46E5] rounded-lg hover:bg-gray-100 transition-colors font-medium"
           >
             <Download className="w-4 h-4 mr-2" />
             Export PDF
@@ -285,7 +285,7 @@ export function CertificationHistory({
                   <div
                     className={`absolute left-6 w-5 h-5 rounded-full border-2 ${
                       isCurrent
-                        ? 'bg-[#E4002B] border-[#E4002B]'
+                        ? 'bg-[#4F46E5] border-[#4F46E5]'
                         : status.color === 'green'
                           ? 'bg-green-500 border-green-600'
                           : 'bg-gray-300 border-gray-400'
@@ -295,7 +295,7 @@ export function CertificationHistory({
                   {/* Entry Card */}
                   <div
                     className={`bg-gray-50 rounded-lg border ${
-                      isCurrent ? 'border-[#E4002B] shadow-md' : 'border-gray-200'
+                      isCurrent ? 'border-[#4F46E5] shadow-md' : 'border-gray-200'
                     } overflow-hidden`}
                   >
                     <button
@@ -306,7 +306,7 @@ export function CertificationHistory({
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-1">
                             {isCurrent && (
-                              <span className="px-2 py-1 bg-[#E4002B] text-white text-xs font-medium rounded">
+                              <span className="px-2 py-1 bg-[#4F46E5] text-white text-xs font-medium rounded">
                                 Current
                               </span>
                             )}

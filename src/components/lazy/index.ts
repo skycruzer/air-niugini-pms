@@ -45,6 +45,12 @@ export const LazyLeaveRequestReviewModal = lazy(() =>
   }))
 );
 
+export const LazyLeaveBidModal = lazy(() =>
+  import('@/components/leave/LeaveBidModal').then((mod) => ({
+    default: mod.LeaveBidModal,
+  }))
+);
+
 export const LazyRetirementReportModal = lazy(() =>
   import('@/components/reports/RetirementReportModal').then((mod) => ({
     default: mod.RetirementReportModal,

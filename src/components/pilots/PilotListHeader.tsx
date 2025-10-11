@@ -25,7 +25,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
       );
     }
     return (
-      <span className="text-[#E4002B] ml-1" aria-hidden="true">
+      <span className="text-[#4F46E5] ml-1" aria-hidden="true">
         {sortDirection === 'asc' ? '▲' : '▼'}
       </span>
     );
@@ -48,7 +48,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
               onClick={() => handleSort('name')}
               className={`px-2 py-1 text-xs rounded ${
                 sortField === 'name'
-                  ? 'bg-[#E4002B] text-white'
+                  ? 'bg-[#4F46E5] text-white'
                   : 'bg-white text-gray-600 border border-gray-300'
               }`}
             >
@@ -58,7 +58,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
               onClick={() => handleSort('role')}
               className={`px-2 py-1 text-xs rounded ${
                 sortField === 'role'
-                  ? 'bg-[#E4002B] text-white'
+                  ? 'bg-[#4F46E5] text-white'
                   : 'bg-white text-gray-600 border border-gray-300'
               }`}
             >
@@ -68,7 +68,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
               onClick={() => handleSort('seniority_number')}
               className={`px-2 py-1 text-xs rounded ${
                 sortField === 'seniority_number'
-                  ? 'bg-[#E4002B] text-white'
+                  ? 'bg-[#4F46E5] text-white'
                   : 'bg-white text-gray-600 border border-gray-300'
               }`}
             >
@@ -90,7 +90,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
           <div className="col-span-2">
             <button
               onClick={() => handleSort('name')}
-              className="flex items-center hover:text-[#E4002B] transition-colors"
+              className="flex items-center hover:text-[#4F46E5] transition-colors"
               aria-label={`Sort by name ${sortField === 'name' ? `(currently ${sortDirection})` : ''}`}
             >
               Name
@@ -102,7 +102,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
           <div>
             <button
               onClick={() => handleSort('role')}
-              className="flex items-center hover:text-[#E4002B] transition-colors"
+              className="flex items-center hover:text-[#4F46E5] transition-colors"
               aria-label={`Sort by role ${sortField === 'role' ? `(currently ${sortDirection})` : ''}`}
             >
               Role
@@ -114,7 +114,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
           <div className="text-center">
             <button
               onClick={() => handleSort('seniority_number')}
-              className="flex items-center justify-center hover:text-[#E4002B] transition-colors"
+              className="flex items-center justify-center hover:text-[#4F46E5] transition-colors"
               aria-label={`Sort by seniority ${sortField === 'seniority_number' ? `(currently ${sortDirection})` : ''}`}
             >
               Seniority
@@ -126,7 +126,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
           <div className="text-center">
             <button
               onClick={() => handleSort('is_active')}
-              className="flex items-center justify-center hover:text-[#E4002B] transition-colors"
+              className="flex items-center justify-center hover:text-[#4F46E5] transition-colors"
               aria-label={`Sort by status ${sortField === 'is_active' ? `(currently ${sortDirection})` : ''}`}
             >
               Status
@@ -138,7 +138,7 @@ export function PilotListHeader({ sortField, sortDirection, onSort }: PilotListH
           <div className="text-center">
             <button
               onClick={() => handleSort('certificationStatus')}
-              className="flex items-center justify-center hover:text-[#E4002B] transition-colors"
+              className="flex items-center justify-center hover:text-[#4F46E5] transition-colors"
               aria-label={`Sort by certification status ${sortField === 'certificationStatus' ? `(currently ${sortDirection})` : ''}`}
             >
               Certifications

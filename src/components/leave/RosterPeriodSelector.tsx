@@ -46,7 +46,7 @@ export function RosterPeriodSelector({
       <div className={`relative ${className}`}>
         <div className="border border-gray-300 rounded-lg px-4 py-3 bg-gray-50">
           <div className="flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#E4002B]" />
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#4F46E5]" />
             <span className="text-sm text-gray-600">Loading roster periods...</span>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function RosterPeriodSelector({
       <select
         value={selectedPeriod || ''}
         onChange={(e) => onPeriodChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent transition-colors"
+        className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent transition-colors"
       >
         <option value="">Choose a roster period...</option>
         {futureRosters.map((roster) => (
@@ -85,11 +85,11 @@ export function RosterPeriodSelector({
 
       {/* Selected Roster Details */}
       {selectedRoster && (
-        <div className="mt-3 p-3 bg-[#E4002B]/5 border border-[#E4002B]/20 rounded-lg">
+        <div className="mt-3 p-3 bg-[#4F46E5]/5 border border-[#4F46E5]/20 rounded-lg">
           <div className="flex items-center justify-between text-sm">
             <div>
               <span className="font-medium text-gray-900">Selected Period:</span>
-              <span className="ml-2 font-bold text-[#E4002B]">{selectedRoster.code}</span>
+              <span className="ml-2 font-bold text-[#4F46E5]">{selectedRoster.code}</span>
             </div>
             <div className="text-gray-600">
               {selectedRoster.daysRemaining > 0 ? (

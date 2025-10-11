@@ -169,7 +169,7 @@ export default function AuditLogsPage() {
               <div className="flex items-center space-x-3 mt-4 lg:mt-0">
                 <button
                   onClick={() => setShowComplianceReport(true)}
-                  className="btn bg-[#FFC72C] text-gray-900 hover:bg-[#E0B020] font-semibold"
+                  className="btn bg-[#06B6D4] text-gray-900 hover:bg-[#E0B020] font-semibold"
                 >
                   <span className="mr-2">📋</span>
                   Compliance Report
@@ -177,7 +177,7 @@ export default function AuditLogsPage() {
 
                 <button
                   onClick={() => setShowExportModal(true)}
-                  className="btn bg-[#E4002B] text-white hover:bg-[#C00020]"
+                  className="btn bg-[#4F46E5] text-white hover:bg-[#4338CA]"
                 >
                   <span className="mr-2">📥</span>
                   Export
@@ -266,7 +266,7 @@ export default function AuditLogsPage() {
                   onClick={() => setViewMode('table')}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                     viewMode === 'table'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -278,7 +278,7 @@ export default function AuditLogsPage() {
                   onClick={() => setViewMode('timeline')}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                     viewMode === 'timeline'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -290,7 +290,7 @@ export default function AuditLogsPage() {
                   onClick={() => setViewMode('charts')}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                     viewMode === 'charts'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >

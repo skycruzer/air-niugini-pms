@@ -259,7 +259,7 @@ export function LeaveRequestsList({
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
         <p className="text-gray-600 mt-2">Loading leave requests...</p>
       </div>
     );
@@ -330,7 +330,7 @@ export function LeaveRequestsList({
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Roster Period</p>
-                <p className="font-medium text-[#E4002B]">{request.roster_period}</p>
+                <p className="font-medium text-[#4F46E5]">{request.roster_period}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Dates</p>
@@ -396,7 +396,7 @@ export function LeaveRequestsList({
                 {canEditRequest(request) && (
                   <button
                     onClick={() => setEditingRequest(request)}
-                    className="px-3 py-1 text-sm bg-[#FFC72C] text-gray-900 rounded-md hover:bg-yellow-400 transition-colors font-medium"
+                    className="px-3 py-1 text-sm bg-[#06B6D4] text-gray-900 rounded-md hover:bg-yellow-400 transition-colors font-medium"
                   >
                     Edit
                   </button>

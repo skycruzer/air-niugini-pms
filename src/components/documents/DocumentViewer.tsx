@@ -126,9 +126,9 @@ export function DocumentViewer({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {isPDF ? (
-                <FileText className="w-5 h-5 text-[#E4002B]" />
+                <FileText className="w-5 h-5 text-[#4F46E5]" />
               ) : (
-                <ImageIcon className="w-5 h-5 text-[#E4002B]" />
+                <ImageIcon className="w-5 h-5 text-[#4F46E5]" />
               )}
               <DialogTitle className="text-lg font-semibold truncate max-w-md">
                 {documentName}
@@ -194,7 +194,7 @@ export function DocumentViewer({
           {isLoading && !error && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-3">
-                <div className="w-12 h-12 border-4 border-[#E4002B] border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="w-12 h-12 border-4 border-[#4F46E5] border-t-transparent rounded-full animate-spin mx-auto" />
                 <p className="text-gray-600">Loading document...</p>
               </div>
             </div>
@@ -213,7 +213,7 @@ export function DocumentViewer({
                     setError(null);
                   }}
                   variant="outline"
-                  className="border-[#E4002B] text-[#E4002B] hover:bg-red-50"
+                  className="border-[#4F46E5] text-[#4F46E5] hover:bg-red-50"
                 >
                   Retry
                 </Button>
@@ -260,7 +260,7 @@ export function DocumentViewer({
                 <p className="text-gray-600">Preview not available for this document type</p>
                 <Button
                   onClick={handleDownload}
-                  className="bg-[#E4002B] hover:bg-[#C00020] text-white"
+                  className="bg-[#4F46E5] hover:bg-[#4338CA] text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download to View

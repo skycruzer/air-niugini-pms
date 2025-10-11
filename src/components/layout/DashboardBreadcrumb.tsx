@@ -42,7 +42,7 @@ export function DashboardBreadcrumb({ items, className = '' }: DashboardBreadcru
           <BreadcrumbLink asChild>
             <Link
               href="/dashboard"
-              className="flex items-center gap-1 text-[#E4002B] hover:text-[#C00020] transition-colors"
+              className="flex items-center gap-1 text-[#4F46E5] hover:text-[#4338CA] transition-colors"
             >
               <Home className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -70,7 +70,7 @@ export function DashboardBreadcrumb({ items, className = '' }: DashboardBreadcru
                   <BreadcrumbLink asChild>
                     <Link
                       href={item.href || '#'}
-                      className="text-[#E4002B] hover:text-[#C00020] transition-colors"
+                      className="text-[#4F46E5] hover:text-[#4338CA] transition-colors"
                     >
                       {item.label}
                     </Link>

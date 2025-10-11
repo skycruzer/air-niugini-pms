@@ -68,7 +68,7 @@ export default function AdvancedAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#E4002B]">Advanced Analytics</h1>
+          <h1 className="text-3xl font-bold text-[#4F46E5]">Advanced Analytics</h1>
           <p className="text-gray-600 mt-1">
             Interactive analytics with predictive insights and drill-down capabilities
           </p>
@@ -118,7 +118,7 @@ export default function AdvancedAnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Compliance Rate</CardTitle>
-            <Activity className="h-4 w-4 text-[#E4002B]" />
+            <Activity className="h-4 w-4 text-[#4F46E5]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">94.8%</div>
@@ -140,7 +140,7 @@ export default function AdvancedAnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Leave Utilization</CardTitle>
-            <Calendar className="h-4 w-4 text-[#FFC72C]" />
+            <Calendar className="h-4 w-4 text-[#06B6D4]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">68%</div>

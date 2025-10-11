@@ -27,7 +27,7 @@ export function ViewToggle({
           flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200
           ${
             viewMode === 'grid'
-              ? 'bg-[#E4002B] text-white shadow-sm'
+              ? 'bg-[#4F46E5] text-white shadow-sm'
               : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
           }
           ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -51,7 +51,7 @@ export function ViewToggle({
           flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-200
           ${
             viewMode === 'list'
-              ? 'bg-[#E4002B] text-white shadow-sm'
+              ? 'bg-[#4F46E5] text-white shadow-sm'
               : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
           }
           ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}

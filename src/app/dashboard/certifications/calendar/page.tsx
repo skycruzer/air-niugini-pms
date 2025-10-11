@@ -143,7 +143,7 @@ export default function CertificationCalendarPage() {
               <div className="h-6 w-px bg-gray-300" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <Calendar className="w-7 h-7 text-[#E4002B] mr-3" />
+                  <Calendar className="w-7 h-7 text-[#4F46E5] mr-3" />
                   Certification Calendar & Timeline
                 </h1>
                 <p className="text-gray-600 mt-1">
@@ -158,7 +158,7 @@ export default function CertificationCalendarPage() {
                 onClick={() => setViewMode('calendar')}
                 className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
                   viewMode === 'calendar'
-                    ? 'bg-[#E4002B] text-white'
+                    ? 'bg-[#4F46E5] text-white'
                     : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -169,7 +169,7 @@ export default function CertificationCalendarPage() {
                 onClick={() => setViewMode('timeline')}
                 className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
                   viewMode === 'timeline'
-                    ? 'bg-[#E4002B] text-white'
+                    ? 'bg-[#4F46E5] text-white'
                     : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
                 }`}
               >

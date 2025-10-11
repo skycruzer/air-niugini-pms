@@ -108,13 +108,13 @@ export function RosterPeriodNavigator({
             aria-label="Previous roster period (←)"
             title="← Previous Period"
           >
-            <ChevronLeft className="h-5 w-5 text-gray-700 group-hover:text-[#E4002B]" />
+            <ChevronLeft className="h-5 w-5 text-gray-700 group-hover:text-[#4F46E5]" />
           </button>
 
           {/* Current period info */}
           <div className="flex-1 text-center px-4">
             <div className="flex items-center justify-center space-x-3">
-              <Calendar className="h-5 w-5 text-[#E4002B]" />
+              <Calendar className="h-5 w-5 text-[#4F46E5]" />
 
               <div>
                 <h3 className="text-lg font-bold text-gray-900">{currentPeriod.code}</h3>
@@ -125,7 +125,7 @@ export function RosterPeriodNavigator({
               </div>
 
               {isCurrentPeriod && (
-                <span className="px-2 py-1 bg-[#E4002B] text-white text-xs font-medium rounded-full">
+                <span className="px-2 py-1 bg-[#4F46E5] text-white text-xs font-medium rounded-full">
                   Current
                 </span>
               )}
@@ -147,7 +147,7 @@ export function RosterPeriodNavigator({
             aria-label="Next roster period (→)"
             title="→ Next Period"
           >
-            <ChevronRight className="h-5 w-5 text-gray-700 group-hover:text-[#E4002B]" />
+            <ChevronRight className="h-5 w-5 text-gray-700 group-hover:text-[#4F46E5]" />
           </button>
         </div>
 
@@ -161,7 +161,7 @@ export function RosterPeriodNavigator({
               ${
                 isCurrentPeriod
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-[#E4002B] text-white hover:bg-[#C00020]'
+                  : 'bg-[#4F46E5] text-white hover:bg-[#4338CA]'
               }
             `}
             title="Home - Go to current period"
@@ -177,7 +177,7 @@ export function RosterPeriodNavigator({
 
       {/* Countdown to next roster period */}
       {showCountdown && isCurrentPeriod && (
-        <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] rounded-lg p-4 text-white">
+        <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] rounded-lg p-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Clock className="h-6 w-6" />
@@ -236,7 +236,7 @@ export function RosterPeriodNavigator({
                     w-full flex items-center justify-between p-3 rounded-lg transition-all
                     ${
                       isCurrent
-                        ? 'bg-[#E4002B] text-white ring-2 ring-[#E4002B] ring-offset-2'
+                        ? 'bg-[#4F46E5] text-white ring-2 ring-[#4F46E5] ring-offset-2'
                         : 'bg-gray-50 hover:bg-gray-100 text-gray-900'
                     }
                   `}
@@ -245,7 +245,7 @@ export function RosterPeriodNavigator({
                     <div
                       className={`
                       w-2 h-2 rounded-full
-                      ${isActive ? 'bg-[#FFC72C]' : isCurrent ? 'bg-white' : 'bg-gray-400'}
+                      ${isActive ? 'bg-[#06B6D4]' : isCurrent ? 'bg-white' : 'bg-gray-400'}
                     `}
                      />
 
@@ -263,7 +263,7 @@ export function RosterPeriodNavigator({
                       <span
                         className={`
                         px-2 py-0.5 rounded-full text-xs font-medium
-                        ${isCurrent ? 'bg-white text-[#E4002B]' : 'bg-[#E4002B] text-white'}
+                        ${isCurrent ? 'bg-white text-[#4F46E5]' : 'bg-[#4F46E5] text-white'}
                       `}
                       >
                         Active

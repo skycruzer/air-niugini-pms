@@ -122,7 +122,7 @@ describe('StatCard Component', () => {
         <StatCard title="Test" value="100" variant="primary" icon={Users} />
       );
       const iconContainer = container.querySelector('.p-3.rounded-xl');
-      expect(iconContainer).toHaveClass('bg-[#E4002B]/10');
+      expect(iconContainer).toHaveClass('bg-[#4F46E5]/10');
     });
 
     it('applies secondary variant with Air Niugini gold', () => {
@@ -130,7 +130,7 @@ describe('StatCard Component', () => {
         <StatCard title="Test" value="100" variant="secondary" icon={Users} />
       );
       const iconContainer = container.querySelector('.p-3.rounded-xl');
-      expect(iconContainer).toHaveClass('bg-[#FFC72C]/10');
+      expect(iconContainer).toHaveClass('bg-[#06B6D4]/10');
     });
 
     it('applies success variant styles', () => {
@@ -302,7 +302,7 @@ describe('CompactStatCard Component', () => {
       <CompactStatCard title="Pilots" value="27" variant="primary" icon={Users} />
     );
     const iconContainer = container.querySelector('.p-2.rounded-lg');
-    expect(iconContainer).toHaveClass('bg-[#E4002B]/10');
+    expect(iconContainer).toHaveClass('bg-[#4F46E5]/10');
   });
 
   it('applies custom className', () => {
@@ -319,7 +319,7 @@ describe('Air Niugini Branding', () => {
     const { container } = render(
       <StatCard title="Test" value="100" variant="primary" icon={Users} />
     );
-    const iconContainer = container.querySelector('.text-\\[\\#E4002B\\]');
+    const iconContainer = container.querySelector('.text-\\[\\#4F46E5\\]');
     expect(iconContainer).toBeInTheDocument();
   });
 
@@ -327,7 +327,7 @@ describe('Air Niugini Branding', () => {
     const { container } = render(
       <StatCard title="Test" value="100" variant="secondary" icon={Users} />
     );
-    const iconContainer = container.querySelector('.text-\\[\\#FFC72C\\]');
+    const iconContainer = container.querySelector('.text-\\[\\#06B6D4\\]');
     expect(iconContainer).toBeInTheDocument();
   });
 

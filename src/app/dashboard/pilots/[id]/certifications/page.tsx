@@ -52,7 +52,7 @@ function CertificationRow({
     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-4 border-b border-gray-100 last:border-b-0">
       {/* Check Code */}
       <div className="md:col-span-2">
-        <span className="font-semibold text-[#E4002B]">{cert.checkCode}</span>
+        <span className="font-semibold text-[#4F46E5]">{cert.checkCode}</span>
       </div>
 
       {/* Description */}
@@ -85,7 +85,7 @@ function CertificationRow({
           type="date"
           value={value}
           onChange={(e) => onChange(cert.checkTypeId, e.target.value)}
-          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] ${
+          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] ${
             error ? 'border-red-300' : 'border-gray-300'
           }`}
         />
@@ -329,7 +329,7 @@ export default function PilotCertificationsPage() {
         <DashboardLayout>
           <div className="p-6">
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
               <p className="text-gray-600 mt-2">Loading certification data...</p>
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function PilotCertificationsPage() {
               </p>
               <button
                 onClick={() => router.push('/dashboard/pilots')}
-                className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 <span className="mr-2">⬅️</span>
                 Back to Pilots
@@ -482,7 +482,7 @@ export default function PilotCertificationsPage() {
                   type="submit"
                   disabled={saving}
                   onClick={() => console.log('🔧 DEBUG: Save button clicked!')}
-                  className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center px-6 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {saving ? (
                     <>

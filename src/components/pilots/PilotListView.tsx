@@ -98,7 +98,7 @@ function PilotListItem({
 
   const itemClasses = `
     bg-white border border-gray-200 rounded-lg p-3 md:p-4 hover:shadow-md transition-all duration-200 cursor-pointer
-    ${isSelected ? 'ring-2 ring-[#E4002B] bg-red-50' : ''}
+    ${isSelected ? 'ring-2 ring-[#4F46E5] bg-red-50' : ''}
   `.trim();
 
   return (
@@ -121,7 +121,7 @@ function PilotListItem({
                   e.stopPropagation();
                   onToggleSelect(pilot.id);
                 }}
-                className="w-5 h-5 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B] cursor-pointer"
+                className="w-5 h-5 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5] cursor-pointer"
                 aria-label={`Select ${pilot.first_name} ${pilot.last_name}`}
               />
             </label>
@@ -129,7 +129,7 @@ function PilotListItem({
         )}
 
         {/* Avatar */}
-        <div className="w-10 h-10 bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-full flex items-center justify-center text-white flex-shrink-0">
+        <div className="w-10 h-10 bg-gradient-to-br from-[#4F46E5] to-[#4338CA] rounded-full flex items-center justify-center text-white flex-shrink-0">
           <span className="text-sm font-semibold">
             {pilot.first_name[0]}
             {pilot.last_name[0]}

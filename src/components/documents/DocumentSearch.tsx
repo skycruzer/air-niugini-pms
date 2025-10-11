@@ -159,7 +159,7 @@ export function DocumentSearch({
           />
         </div>
 
-        <Button onClick={onSearch} className="h-12 px-6 bg-[#E4002B] hover:bg-[#C00020] text-white">
+        <Button onClick={onSearch} className="h-12 px-6 bg-[#4F46E5] hover:bg-[#4338CA] text-white">
           <Search className="w-5 h-5 mr-2" />
           Search
         </Button>
@@ -171,13 +171,13 @@ export function DocumentSearch({
               variant="outline"
               className={cn(
                 'h-12 px-6 border-2',
-                activeFiltersCount > 0 && 'border-[#E4002B] text-[#E4002B]'
+                activeFiltersCount > 0 && 'border-[#4F46E5] text-[#4F46E5]'
               )}
             >
               <Filter className="w-5 h-5 mr-2" />
               Filters
               {activeFiltersCount > 0 && (
-                <Badge className="ml-2 bg-[#E4002B] text-white">{activeFiltersCount}</Badge>
+                <Badge className="ml-2 bg-[#4F46E5] text-white">{activeFiltersCount}</Badge>
               )}
             </Button>
           </PopoverTrigger>
@@ -284,7 +284,7 @@ export function DocumentSearch({
                   onSearch();
                   setIsFilterOpen(false);
                 }}
-                className="w-full bg-[#E4002B] hover:bg-[#C00020] text-white"
+                className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white"
               >
                 Apply Filters
               </Button>

@@ -129,7 +129,7 @@ export function CertificationTimeline({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Calendar className="w-5 h-5 text-[#E4002B] mr-2" />
+              <Calendar className="w-5 h-5 text-[#4F46E5] mr-2" />
               Certification Timeline
             </h3>
             <span className="text-sm text-gray-500">
@@ -185,7 +185,7 @@ export function CertificationTimeline({
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                 showFilters
-                  ? 'bg-[#E4002B] text-white'
+                  ? 'bg-[#4F46E5] text-white'
                   : 'text-gray-600 hover:text-gray-900 border border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -209,7 +209,7 @@ export function CertificationTimeline({
                   onClick={() => setSelectedCategories([])}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     selectedCategories.length === 0
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -221,7 +221,7 @@ export function CertificationTimeline({
                     onClick={() => toggleCategory(category)}
                     className={`flex items-center px-3 py-1 rounded-full text-sm transition-colors ${
                       selectedCategories.includes(category)
-                        ? 'bg-[#E4002B] text-white'
+                        ? 'bg-[#4F46E5] text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -265,10 +265,10 @@ export function CertificationTimeline({
           >
             {/* Today Marker */}
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-[#E4002B] z-10"
+              className="absolute top-0 bottom-0 w-0.5 bg-[#4F46E5] z-10"
               style={{ left: `${todayPosition}%` }}
             >
-              <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#E4002B] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#4F46E5] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                 Today
               </div>
             </div>
@@ -335,7 +335,7 @@ export function CertificationTimeline({
                         )}
                         <div className="space-y-2">
                           <div className="flex items-start justify-between">
-                            <span className="font-bold text-[#E4002B]">{cert.checkCode}</span>
+                            <span className="font-bold text-[#4F46E5]">{cert.checkCode}</span>
                             <span
                               className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(cert.category)}`}
                             >

@@ -126,7 +126,7 @@ export default function PilotAnalytics({ timeRange }: PilotAnalyticsProps) {
                 <XAxis dataKey="range" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#E4002B" name="Pilots" />
+                <Bar dataKey="count" fill="#4F46E5" name="Pilots" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -163,7 +163,7 @@ export default function PilotAnalytics({ timeRange }: PilotAnalyticsProps) {
               <XAxis dataKey="certifications" name="Certifications" />
               <YAxis dataKey="compliance" name="Compliance %" domain={[85, 100]} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-              <Scatter name="Pilots" data={certificationByPilot} fill="#E4002B">
+              <Scatter name="Pilots" data={certificationByPilot} fill="#4F46E5">
                 {certificationByPilot.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}

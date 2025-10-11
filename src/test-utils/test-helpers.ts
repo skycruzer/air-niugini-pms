@@ -168,7 +168,7 @@ export function assertAirNiuginiBranding(element: HTMLElement) {
   const backgroundColor = styles.backgroundColor;
   const color = styles.color;
 
-  // Check for Air Niugini colors (red #E4002B, gold #FFC72C, black #000000)
+  // Check for Air Niugini colors (red #4F46E5, gold #06B6D4, black #000000)
   const hasRedBrand = backgroundColor.includes('228, 0, 43'); // rgb(228, 0, 43)
   const hasGoldBrand = backgroundColor.includes('255, 199, 44'); // rgb(255, 199, 44)
   const hasBlackBrand = color.includes('0, 0, 0'); // rgb(0, 0, 0)

@@ -357,8 +357,8 @@ export interface FleetStatistics {
  */
 export interface AirNiuginiStyles {
   colors: {
-    primary: string; // #E4002B - Air Niugini Red
-    secondary: string; // #FFC72C - Air Niugini Gold
+    primary: string; // #4F46E5 - Air Niugini Red
+    secondary: string; // #06B6D4 - Air Niugini Gold
     black: string; // #000000 - Brand Black
     white: string; // #FFFFFF - Background
     gray: {

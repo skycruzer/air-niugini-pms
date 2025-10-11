@@ -43,9 +43,9 @@ export function PilotTableView({
       return <span className="text-gray-400">⇅</span>;
     }
     return sortDirection === 'asc' ? (
-      <span className="text-[#E4002B]">↑</span>
+      <span className="text-[#4F46E5]">↑</span>
     ) : (
-      <span className="text-[#E4002B]">↓</span>
+      <span className="text-[#4F46E5]">↓</span>
     );
   };
 
@@ -81,7 +81,7 @@ export function PilotTableView({
                         if (input) input.indeterminate = someSelected;
                       }}
                       onChange={onToggleSelectAll}
-                      className="w-5 h-5 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B] cursor-pointer"
+                      className="w-5 h-5 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5] cursor-pointer"
                       aria-label="Select all pilots"
                     />
                   </label>
@@ -90,7 +90,7 @@ export function PilotTableView({
               <th scope="col" className="px-4 py-3 text-left">
                 <button
                   onClick={() => onSort?.('first_name')}
-                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#E4002B] transition-colors"
+                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#4F46E5] transition-colors"
                 >
                   <span>Name</span>
                   {renderSortIcon('first_name')}
@@ -99,7 +99,7 @@ export function PilotTableView({
               <th scope="col" className="px-4 py-3 text-left">
                 <button
                   onClick={() => onSort?.('employee_id')}
-                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#E4002B] transition-colors"
+                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#4F46E5] transition-colors"
                 >
                   <span>Employee ID</span>
                   {renderSortIcon('employee_id')}
@@ -108,7 +108,7 @@ export function PilotTableView({
               <th scope="col" className="px-4 py-3 text-left">
                 <button
                   onClick={() => onSort?.('role')}
-                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#E4002B] transition-colors"
+                  className="flex items-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#4F46E5] transition-colors"
                 >
                   <span>Role</span>
                   {renderSortIcon('role')}
@@ -117,7 +117,7 @@ export function PilotTableView({
               <th scope="col" className="px-4 py-3 text-center">
                 <button
                   onClick={() => onSort?.('seniority_number')}
-                  className="flex items-center justify-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#E4002B] transition-colors w-full"
+                  className="flex items-center justify-center space-x-1 text-xs font-semibold text-gray-700 uppercase tracking-wider hover:text-[#4F46E5] transition-colors w-full"
                 >
                   <span>Seniority</span>
                   {renderSortIcon('seniority_number')}
@@ -239,7 +239,7 @@ function PilotTableRow({
                 e.stopPropagation();
                 onToggleSelect(pilot.id);
               }}
-              className="w-5 h-5 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B] cursor-pointer"
+              className="w-5 h-5 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5] cursor-pointer"
               aria-label={`Select ${pilot.first_name} ${pilot.last_name}`}
             />
           </label>
@@ -247,7 +247,7 @@ function PilotTableRow({
       )}
       <td className="px-4 py-4">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#4F46E5] to-[#4338CA] rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
             {pilot.first_name[0]}
             {pilot.last_name[0]}
           </div>
@@ -361,12 +361,12 @@ function PilotTableRowMobile({
                 e.stopPropagation();
                 onToggleSelect(pilot.id);
               }}
-              className="w-5 h-5 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B]"
+              className="w-5 h-5 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]"
             />
           </label>
         )}
 
-        <div className="w-10 h-10 bg-gradient-to-br from-[#E4002B] to-[#C00020] rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+        <div className="w-10 h-10 bg-gradient-to-br from-[#4F46E5] to-[#4338CA] rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
           {pilot.first_name[0]}
           {pilot.last_name[0]}
         </div>

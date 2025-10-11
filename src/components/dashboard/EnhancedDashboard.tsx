@@ -145,7 +145,7 @@ export function EnhancedDashboard({
 
           <button
             onClick={handleExportData}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#E4002B] rounded-lg hover:bg-[#C00020] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#4F46E5] rounded-lg hover:bg-[#4338CA] transition-colors"
           >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>

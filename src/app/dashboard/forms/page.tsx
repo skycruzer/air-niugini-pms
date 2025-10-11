@@ -132,7 +132,7 @@ export default function FormsManagementPage() {
           {/* Header */}
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <FileText className="w-8 h-8 mr-3 text-[#E4002B]" />
+              <FileText className="w-8 h-8 mr-3 text-[#4F46E5]" />
               Forms Management
             </h1>
             <p className="text-gray-600 mt-1">
@@ -169,7 +169,7 @@ export default function FormsManagementPage() {
                     placeholder="Search forms by title or pilot name..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   />
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function FormsManagementPage() {
                   onClick={() => setStatusFilter('active')}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     statusFilter === 'active'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -189,7 +189,7 @@ export default function FormsManagementPage() {
                   onClick={() => setStatusFilter('archived')}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     statusFilter === 'archived'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -199,7 +199,7 @@ export default function FormsManagementPage() {
                   onClick={() => setStatusFilter('all')}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     statusFilter === 'all'
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
@@ -265,7 +265,7 @@ export default function FormsManagementPage() {
                               setSelectedSubmission(submission);
                               setShowDetailModal(true);
                             }}
-                            className="px-3 py-1.5 bg-[#E4002B] text-white text-sm rounded-lg hover:bg-[#C00020] transition-colors flex items-center"
+                            className="px-3 py-1.5 bg-[#4F46E5] text-white text-sm rounded-lg hover:bg-[#4338CA] transition-colors flex items-center"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             View

@@ -5,20 +5,19 @@ import {
   differenceInHours,
   differenceInMinutes,
   differenceInSeconds,
+  startOfDay,
 } from 'date-fns';
 
-// Constants based on the current roster information
+// Constants for simple RP1-RP13 annual cycle
 const ROSTER_DURATION = 28;
-const KNOWN_ROSTER = {
-  number: 11,
-  year: 2025,
-  endDate: new Date('2025-10-10'),
-};
+const PERIODS_PER_YEAR = 13; // 13 periods × 28 days = 364 days
 
-// Special year transition logic - RP14/2025 ends on 2/1/26, then RP1/2026 starts 3/1/26
-const YEAR_2025_LAST_ROSTER_END = new Date('2026-01-02'); // 2/1/26 (end of RP14/2025)
-const YEAR_2026_FIRST_ROSTER_START = new Date('2026-01-03'); // 3/1/26 (start of RP1/2026)
-const LAST_ROSTER_NUMBER_2025 = 14; // RP14/2025 is the last roster of 2025
+// Known roster: RP12/2025 starts October 11, 2025
+const KNOWN_ROSTER = {
+  number: 12,
+  year: 2025,
+  startDate: new Date('2025-10-11'),
+};
 
 export interface RosterPeriod {
   code: string;
@@ -30,90 +29,39 @@ export interface RosterPeriod {
 }
 
 /**
- * Get the roster number of the last roster of 2025 (RP14/2025 ends 2/1/26)
- */
-function getLastRosterOf2025(): number {
-  return LAST_ROSTER_NUMBER_2025;
-}
-
-/**
- * Calculate the current roster period based on the known roster RP11/2025
+ * Calculate the current roster period based on RP12/2025 starting Oct 11, 2025
+ * Simple annual cycle: RP1-RP13 (13 periods × 28 days = 364 days)
+ * After RP13/YYYY, next period is RP1/(YYYY+1)
  */
 export function getCurrentRosterPeriod(): RosterPeriod {
-  const today = new Date();
+  // Normalize to midnight local time to avoid timezone issues
+  const today = startOfDay(new Date());
 
-  // Check if we're still in the known roster period
-  if (today <= KNOWN_ROSTER.endDate) {
-    const knownStartDate = addDays(KNOWN_ROSTER.endDate, -ROSTER_DURATION + 1);
-    const daysRemaining = Math.max(0, differenceInDays(KNOWN_ROSTER.endDate, today));
+  // Calculate days since known roster start
+  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.startDate);
 
-    return {
-      code: `RP${KNOWN_ROSTER.number}/${KNOWN_ROSTER.year}`,
-      number: KNOWN_ROSTER.number,
-      year: KNOWN_ROSTER.year,
-      startDate: knownStartDate,
-      endDate: KNOWN_ROSTER.endDate,
-      daysRemaining,
-    };
-  }
-
-  // Get the last roster number of 2025
-  const lastRosterOf2025 = getLastRosterOf2025();
-
-  // Calculate for periods after the known roster
-  const daysSinceKnown = differenceInDays(today, KNOWN_ROSTER.endDate);
+  // Calculate how many complete periods have passed
   const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION);
-  let rosterNumber = KNOWN_ROSTER.number + periodsPassed + 1;
+
+  // Calculate roster number (wraps at 13)
+  let rosterNumber = KNOWN_ROSTER.number + periodsPassed;
   let year = KNOWN_ROSTER.year;
 
-  // Handle the special year transition
-  if (rosterNumber > lastRosterOf2025) {
-    // We're past the last roster of 2025, calculate for 2026
-    year = 2026;
-
-    // Special handling for the gap between 2/1/26 and 3/1/26
-    if (today > YEAR_2025_LAST_ROSTER_END && today < YEAR_2026_FIRST_ROSTER_START) {
-      // We're in the gap between years - use the first roster of 2026
-      rosterNumber = 1;
-      const startDate = YEAR_2026_FIRST_ROSTER_START;
-      const endDate = addDays(startDate, ROSTER_DURATION - 1);
-      const daysRemaining = Math.max(0, differenceInDays(endDate, today));
-
-      return {
-        code: `RP${rosterNumber}/${year}`,
-        number: rosterNumber,
-        year,
-        startDate,
-        endDate,
-        daysRemaining,
-      };
-    }
-
-    // Calculate which roster of 2026 we're in
-    if (today >= YEAR_2026_FIRST_ROSTER_START) {
-      const daysSince2026Start = differenceInDays(today, YEAR_2026_FIRST_ROSTER_START);
-      const periodsSince2026 = Math.floor(daysSince2026Start / ROSTER_DURATION);
-      rosterNumber = 1 + periodsSince2026;
-    } else {
-      rosterNumber = 1;
-    }
+  // Handle year rollover: after RP13, go to RP1 of next year
+  while (rosterNumber > PERIODS_PER_YEAR) {
+    rosterNumber -= PERIODS_PER_YEAR;
+    year += 1;
   }
 
-  // Calculate dates based on the roster number and year
-  let startDate: Date;
-  let endDate: Date;
-
-  if (year === 2025) {
-    // Regular calculation for 2025 rosters
-    startDate = addDays(KNOWN_ROSTER.endDate, periodsPassed * ROSTER_DURATION + 1);
-    endDate = addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION);
-  } else {
-    // 2026 rosters start from the special date
-    const periodsFrom2026Start = rosterNumber - 1;
-    startDate = addDays(YEAR_2026_FIRST_ROSTER_START, periodsFrom2026Start * ROSTER_DURATION);
-    endDate = addDays(startDate, ROSTER_DURATION - 1);
+  // Handle past dates (before known roster)
+  while (rosterNumber <= 0) {
+    rosterNumber += PERIODS_PER_YEAR;
+    year -= 1;
   }
 
+  // Calculate start and end dates
+  const startDate = addDays(KNOWN_ROSTER.startDate, periodsPassed * ROSTER_DURATION);
+  const endDate = addDays(startDate, ROSTER_DURATION - 1);
   const daysRemaining = Math.max(0, differenceInDays(endDate, today));
 
   return {
@@ -130,100 +78,35 @@ export function getCurrentRosterPeriod(): RosterPeriod {
  * Get roster period from a specific date
  */
 export function getRosterPeriodFromDate(date: Date): RosterPeriod {
+  // Use date as-is without timezone normalization to avoid date shifting
   const targetDate = new Date(date);
 
-  // Check if the date is within the known roster period
-  const knownStartDate = addDays(KNOWN_ROSTER.endDate, -ROSTER_DURATION + 1);
-  if (targetDate >= knownStartDate && targetDate <= KNOWN_ROSTER.endDate) {
-    return {
-      code: `RP${KNOWN_ROSTER.number}/${KNOWN_ROSTER.year}`,
-      number: KNOWN_ROSTER.number,
-      year: KNOWN_ROSTER.year,
-      startDate: knownStartDate,
-      endDate: KNOWN_ROSTER.endDate,
-      daysRemaining: Math.max(0, differenceInDays(KNOWN_ROSTER.endDate, new Date())),
-    };
-  }
+  // Calculate days since known roster start (using normalized comparison)
+  const daysSinceKnown = differenceInDays(targetDate, KNOWN_ROSTER.startDate);
 
-  // Get the last roster number of 2025
-  const lastRosterOf2025 = getLastRosterOf2025();
-
-  // Handle dates before the known roster (past dates)
-  if (targetDate < knownStartDate) {
-    const daysBefore = differenceInDays(knownStartDate, targetDate);
-    const periodsBefore = Math.ceil(daysBefore / ROSTER_DURATION);
-    let rosterNumber = KNOWN_ROSTER.number - periodsBefore;
-    let year = KNOWN_ROSTER.year;
-
-    // Handle year transitions for past dates
-    while (rosterNumber <= 0) {
-      year -= 1;
-      rosterNumber += 13; // Assuming 13 periods per year for past years
-    }
-
-    const startDate = addDays(knownStartDate, -periodsBefore * ROSTER_DURATION);
-    const endDate = addDays(startDate, ROSTER_DURATION - 1);
-
-    return {
-      code: `RP${rosterNumber}/${year}`,
-      number: rosterNumber,
-      year,
-      startDate,
-      endDate,
-      daysRemaining: Math.max(0, differenceInDays(endDate, new Date())),
-    };
-  }
-
-  // Handle future dates
-  const daysSinceKnown = differenceInDays(targetDate, KNOWN_ROSTER.endDate);
+  // Calculate how many complete periods have passed (can be negative for past dates)
   const periodsPassed = Math.floor(daysSinceKnown / ROSTER_DURATION);
-  let rosterNumber = KNOWN_ROSTER.number + periodsPassed + 1;
+
+  // Calculate roster number
+  let rosterNumber = KNOWN_ROSTER.number + periodsPassed;
   let year = KNOWN_ROSTER.year;
 
-  // Check if we're dealing with 2026 or later
-  if (rosterNumber > lastRosterOf2025 || targetDate > YEAR_2025_LAST_ROSTER_END) {
-    year = 2026;
-
-    // Special case: dates in the gap between 2/1/26 and 3/1/26
-    if (targetDate > YEAR_2025_LAST_ROSTER_END && targetDate < YEAR_2026_FIRST_ROSTER_START) {
-      // Return the first roster of 2026 (starts 3/1/26)
-      return {
-        code: 'RP1/2026',
-        number: 1,
-        year: 2026,
-        startDate: YEAR_2026_FIRST_ROSTER_START,
-        endDate: addDays(YEAR_2026_FIRST_ROSTER_START, ROSTER_DURATION - 1),
-        daysRemaining: Math.max(
-          0,
-          differenceInDays(addDays(YEAR_2026_FIRST_ROSTER_START, ROSTER_DURATION - 1), new Date())
-        ),
-      };
-    }
-
-    // Calculate which roster of 2026 this date falls in
-    if (targetDate >= YEAR_2026_FIRST_ROSTER_START) {
-      const daysSince2026Start = differenceInDays(targetDate, YEAR_2026_FIRST_ROSTER_START);
-      const periodsSince2026 = Math.floor(daysSince2026Start / ROSTER_DURATION);
-      rosterNumber = 1 + periodsSince2026;
-    } else {
-      rosterNumber = 1;
-    }
+  // Handle year rollover
+  while (rosterNumber > PERIODS_PER_YEAR) {
+    rosterNumber -= PERIODS_PER_YEAR;
+    year += 1;
   }
 
-  // Calculate dates based on the roster number and year
-  let startDate: Date;
-  let endDate: Date;
-
-  if (year === 2025) {
-    // Regular calculation for 2025 rosters
-    startDate = addDays(KNOWN_ROSTER.endDate, periodsPassed * ROSTER_DURATION + 1);
-    endDate = addDays(KNOWN_ROSTER.endDate, (periodsPassed + 1) * ROSTER_DURATION);
-  } else {
-    // 2026 rosters start from the special date
-    const periodsFrom2026Start = rosterNumber - 1;
-    startDate = addDays(YEAR_2026_FIRST_ROSTER_START, periodsFrom2026Start * ROSTER_DURATION);
-    endDate = addDays(startDate, ROSTER_DURATION - 1);
+  // Handle past dates
+  while (rosterNumber <= 0) {
+    rosterNumber += PERIODS_PER_YEAR;
+    year -= 1;
   }
+
+  // Calculate start and end dates
+  const startDate = addDays(KNOWN_ROSTER.startDate, periodsPassed * ROSTER_DURATION);
+  const endDate = addDays(startDate, ROSTER_DURATION - 1);
+  const daysRemaining = Math.max(0, differenceInDays(endDate, new Date()));
 
   return {
     code: `RP${rosterNumber}/${year}`,
@@ -231,7 +114,7 @@ export function getRosterPeriodFromDate(date: Date): RosterPeriod {
     year,
     startDate,
     endDate,
-    daysRemaining: Math.max(0, differenceInDays(endDate, new Date())),
+    daysRemaining,
   };
 }
 
@@ -330,8 +213,8 @@ export function getFutureRosterPeriods(monthsAhead: number = 12): RosterPeriod[]
   let currentPeriod = current;
 
   // Calculate approximately how many periods we need for the given months
-  // Roughly 365 days / 28 days per period = ~13 periods per year
-  const periodsNeeded = Math.ceil((monthsAhead * 30) / ROSTER_DURATION);
+  // 13 periods per year × (months / 12)
+  const periodsNeeded = Math.ceil((monthsAhead / 12) * PERIODS_PER_YEAR);
 
   for (let i = 0; i < periodsNeeded; i++) {
     periods.push(currentPeriod);

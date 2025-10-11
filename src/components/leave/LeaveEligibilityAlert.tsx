@@ -6,7 +6,7 @@
  *
  * Upgraded with shadcn/ui Alert component for:
  * - WCAG 2.1 AA compliance (proper ARIA roles, screen reader support)
- * - Consistent Air Niugini branding (#E4002B red, #FFC72C gold)
+ * - Consistent Air Niugini branding (#4F46E5 red, #06B6D4 gold)
  * - Better accessibility and visual hierarchy
  *
  * Business Logic (Updated 2025-10-04):

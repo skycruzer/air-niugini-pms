@@ -169,11 +169,14 @@ function StatCard({
 
   return (
     <div
-      className={`fleet-card bg-gradient-to-br ${backgroundClasses[color]} relative overflow-hidden group ${animate ? 'animate-fade-in' : ''} ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
+      className={`card-glass-premium relative overflow-hidden group ${animate ? 'animate-fade-in' : ''} ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-all duration-300' : ''}`}
       onClick={onClick}
     >
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.08]">
+      {/* Glass morphism background with subtle gradient */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${backgroundClasses[color]} opacity-[0.03]`} />
+
+      {/* Background decoration - floating icon */}
+      <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.06] floating-element">
         <IconComponent className="absolute inset-0 transform rotate-12 translate-x-8 -translate-y-8 w-full h-full text-gray-400" />
       </div>
 
@@ -190,7 +193,7 @@ function StatCard({
           </div>
 
           <div
-            className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform border border-white`}
+            className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300 border border-white glow-effect`}
           >
             <IconComponent className="w-7 h-7 text-white" />
           </div>
@@ -199,7 +202,7 @@ function StatCard({
         {trend && (
           <div className="flex items-center">
             <div
-              className={`flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${
+              className={`flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm backdrop-blur-sm ${
                 trend.direction === 'up'
                   ? 'bg-green-500/20 text-green-800 border border-green-300'
                   : 'bg-red-500/20 text-red-800 border border-red-300'
@@ -245,11 +248,11 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
   return (
     <a
       href={href}
-      className="card group relative overflow-hidden border-2 border-gray-200 bg-white hover:shadow-2xl hover:border-blue-300 transition-all duration-300"
+      className="card-glass group relative overflow-hidden hover:shadow-2xl transition-all duration-300"
     >
       <div className="flex items-center">
         <div
-          className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform shadow-lg`}
+          className={`w-14 h-14 bg-gradient-to-br ${colorClasses[color]} rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-all duration-300 shadow-lg glow-effect`}
         >
           <IconComponent className="w-7 h-7 text-white" />
         </div>
@@ -269,8 +272,8 @@ function QuickAction({ title, description, icon, href, color, badge }: QuickActi
         </span>
       </div>
 
-      {/* Hover effect background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
+      {/* Shimmer hover effect */}
+      <div className="absolute inset-0 shimmer -translate-x-full group-hover:translate-x-full pointer-events-none" />
     </a>
   );
 }
@@ -523,7 +526,7 @@ export default function DashboardPage() {
                       <div className="text-center lg:text-right">
                         <p className="text-body-small text-red-100 mb-2">Days Remaining</p>
                         <div className="relative">
-                          <div className="absolute inset-0 bg-[#FFC72C]/20 rounded-3xl blur-2xl" />
+                          <div className="absolute inset-0 bg-[#06B6D4]/20 rounded-3xl blur-2xl" />
                           <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl px-8 py-6 border border-white/20">
                             <p className="text-5xl lg:text-6xl font-black text-white mb-1">
                               {currentRoster?.daysRemaining || 0}
@@ -582,7 +585,7 @@ export default function DashboardPage() {
                               isCurrentRoster
                                 ? 'bg-gradient-to-br from-[#E4002B]/10 to-[#E4002B]/20 border-[#E4002B] shadow-lg'
                                 : index < 3
-                                  ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:border-blue-300'
+                                  ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:border-red-300'
                                   : 'bg-white border-gray-200 hover:border-gray-300'
                             }`}
                           >
@@ -592,23 +595,23 @@ export default function DashboardPage() {
                                   isCurrentRoster
                                     ? 'bg-[#E4002B] text-white'
                                     : index < 3
-                                      ? 'bg-blue-500 text-white'
+                                      ? 'bg-[#C00020] text-white'
                                       : 'bg-gray-500 text-white'
                                 }`}
                               >
                                 {roster.code}
                               </div>
                               {isCurrentRoster && (
-                                <span className="text-xs bg-[#FFC72C] text-[#E4002B] font-bold px-2 py-1 rounded-full">
+                                <span className="text-xs bg-[#FFC72C] text-black font-bold px-2 py-1 rounded-full shadow-md">
                                   ACTIVE
                                 </span>
                               )}
                             </div>
 
                             <div className="space-y-2">
-                              <div className="text-gray-700">
-                                <p className="text-xs text-gray-500 mb-1">Duration</p>
-                                <p className="font-medium text-sm">
+                              <div>
+                                <p className="text-xs text-gray-600 font-semibold mb-1">Duration</p>
+                                <p className="font-semibold text-sm text-gray-900">
                                   {roster.startDate?.toLocaleDateString('en-US', {
                                     month: 'short',
                                     day: 'numeric',
@@ -623,12 +626,12 @@ export default function DashboardPage() {
                               </div>
 
                               <div
-                                className={`flex items-center text-xs ${
+                                className={`flex items-center text-xs font-semibold ${
                                   isCurrentRoster
                                     ? 'text-[#E4002B]'
                                     : isNextRoster
-                                      ? 'text-blue-600'
-                                      : 'text-gray-600'
+                                      ? 'text-[#C00020]'
+                                      : 'text-gray-700'
                                 }`}
                               >
                                 <span className="mr-1">📊</span>
@@ -641,7 +644,7 @@ export default function DashboardPage() {
                               </div>
 
                               {index < 3 && (
-                                <div className="flex items-center text-xs text-blue-600">
+                                <div className="flex items-center text-xs text-[#C00020] font-semibold">
                                   <span className="mr-1">⭐</span>
                                   Planning window
                                 </div>
@@ -651,7 +654,7 @@ export default function DashboardPage() {
                             {/* Progress bar for current roster */}
                             {isCurrentRoster && roster.daysRemaining >= 0 && (
                               <div className="mt-3">
-                                <div className="bg-white/50 rounded-full h-2 overflow-hidden">
+                                <div className="bg-white/50 rounded-full h-2 overflow-hidden border border-gray-300">
                                   <div
                                     className="bg-[#E4002B] h-full transition-all duration-500"
                                     style={{
@@ -659,7 +662,7 @@ export default function DashboardPage() {
                                     }}
                                   />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1 text-center">
+                                <p className="text-xs text-gray-700 font-semibold mt-1 text-center">
                                   Day {28 - roster.daysRemaining} of 28
                                 </p>
                               </div>

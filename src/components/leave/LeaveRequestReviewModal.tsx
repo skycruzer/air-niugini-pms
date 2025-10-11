@@ -122,7 +122,7 @@ export function LeaveRequestReviewModal({
         {/* Header with status */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <User className="w-6 h-6 text-[#E4002B]" />
+            <User className="w-6 h-6 text-[#4F46E5]" />
             <div>
               <h2 className="text-xl font-bold text-gray-900">
                 {request.pilot_name || 'Unknown Pilot'}
@@ -229,7 +229,7 @@ export function LeaveRequestReviewModal({
             value={reviewComments}
             onChange={(e) => setReviewComments(e.target.value)}
             placeholder="Add comments about this leave request decision..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] min-h-[100px]"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] min-h-[100px]"
           />
         </div>
 

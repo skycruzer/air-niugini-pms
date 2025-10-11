@@ -97,7 +97,7 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
             </button>
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-[#E4002B] hover:bg-[#C00020] text-white rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               Export PDF
@@ -108,7 +108,7 @@ export function RetirementReportModal({ isOpen, onClose }: RetirementReportModal
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5]" />
             <span className="ml-3 text-gray-600">Loading retirement data...</span>
           </div>
         )}

@@ -29,6 +29,14 @@ import { PilotStatsGrid } from '@/components/shared/PilotStatsGrid';
 import { DashboardBreadcrumb, breadcrumbConfigs } from '@/components/layout/DashboardBreadcrumb';
 import { PilotListSkeleton } from '@/components/pilots/PilotListSkeleton';
 import { Users, Download, AlertTriangle, Plus, Search, Settings, BarChart3, RefreshCw, LayoutGrid, List, Table } from 'lucide-react';
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showLoadingToast,
+  dismissToast,
+  commonToasts,
+} from '@/components/ui/toast-utils';
 
 type ViewMode = 'card' | 'list' | 'table';
 
@@ -88,7 +96,11 @@ export default function PilotsPage() {
       console.log('✅ fetchPilots: Pilots state updated and search service initialized');
     } catch (err) {
       console.error('Error fetching pilots:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load pilots');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load pilots';
+      setError(errorMessage);
+      showErrorToast('Failed to load pilots', {
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }
@@ -214,11 +226,13 @@ export default function PilotsPage() {
   };
 
   const handleAddPilotSuccess = () => {
+    commonToasts.pilot.created();
     fetchPilots();
   };
 
   const handleEditPilotSuccess = async () => {
     console.log('🔄 Pilot updated successfully, refreshing pilot list...');
+    commonToasts.pilot.updated();
     await fetchPilots();
     console.log('✅ Pilot list refreshed');
     // No need for hard refresh - fetchPilots() updates the state
@@ -230,83 +244,131 @@ export default function PilotsPage() {
   };
 
   const handleExportPilots = () => {
-    const exportData = filteredPilots.map((pilot) => {
-      const retirementInfo = pilot.date_of_birth
-        ? calculateRetirementInfo(pilot.date_of_birth)
-        : null;
+    try {
+      const exportData = filteredPilots.map((pilot) => {
+        const retirementInfo = pilot.date_of_birth
+          ? calculateRetirementInfo(pilot.date_of_birth)
+          : null;
 
-      return {
-        ...pilot,
-        age: pilot.date_of_birth ? calculateAge(pilot.date_of_birth) : undefined,
-        years_of_service: pilot.commencement_date
-          ? calculateYearsOfService(pilot.commencement_date)
-          : undefined,
-        retirement:
-          retirementInfo && retirementInfo.retirementDate
-            ? {
-                retirementDate: retirementInfo.retirementDate.toISOString().split('T')[0],
-                timeToRetirement: retirementInfo.displayText,
-                retirementStatus: retirementInfo.retirementStatus,
-              }
+        return {
+          ...pilot,
+          age: pilot.date_of_birth ? calculateAge(pilot.date_of_birth) : undefined,
+          years_of_service: pilot.commencement_date
+            ? calculateYearsOfService(pilot.commencement_date)
             : undefined,
-        certificationStatus: {
-          ...pilot.certificationStatus,
-          total:
-            pilot.certificationStatus.current +
-            pilot.certificationStatus.expiring +
-            pilot.certificationStatus.expired,
-        },
-      };
-    });
+          retirement:
+            retirementInfo && retirementInfo.retirementDate
+              ? {
+                  retirementDate: retirementInfo.retirementDate.toISOString().split('T')[0],
+                  timeToRetirement: retirementInfo.displayText,
+                  retirementStatus: retirementInfo.retirementStatus,
+                }
+              : undefined,
+          certificationStatus: {
+            ...pilot.certificationStatus,
+            total:
+              pilot.certificationStatus.current +
+              pilot.certificationStatus.expiring +
+              pilot.certificationStatus.expired,
+          },
+        };
+      });
 
-    exportPilotsToCSV(exportData as PilotExportData[], filteredPilots.length !== pilots.length);
+      exportPilotsToCSV(exportData as PilotExportData[], filteredPilots.length !== pilots.length);
+
+      commonToasts.export.success(`pilots_export_${new Date().toISOString().split('T')[0]}.csv`);
+    } catch (error) {
+      console.error('Export failed:', error);
+      commonToasts.export.error();
+    }
   };
 
   const handleExportCompliance = () => {
-    const exportData = pilots.map((pilot) => {
-      const retirementInfo = pilot.date_of_birth
-        ? calculateRetirementInfo(pilot.date_of_birth)
-        : null;
+    try {
+      const exportData = pilots.map((pilot) => {
+        const retirementInfo = pilot.date_of_birth
+          ? calculateRetirementInfo(pilot.date_of_birth)
+          : null;
 
-      return {
-        ...pilot,
-        age: pilot.date_of_birth ? calculateAge(pilot.date_of_birth) : undefined,
-        years_of_service: pilot.commencement_date
-          ? calculateYearsOfService(pilot.commencement_date)
-          : undefined,
-        retirement:
-          retirementInfo && retirementInfo.retirementDate
-            ? {
-                retirementDate: retirementInfo.retirementDate.toISOString().split('T')[0],
-                timeToRetirement: retirementInfo.displayText,
-                retirementStatus: retirementInfo.retirementStatus,
-              }
+        return {
+          ...pilot,
+          age: pilot.date_of_birth ? calculateAge(pilot.date_of_birth) : undefined,
+          years_of_service: pilot.commencement_date
+            ? calculateYearsOfService(pilot.commencement_date)
             : undefined,
-        certificationStatus: {
-          ...pilot.certificationStatus,
-          total:
-            pilot.certificationStatus.current +
-            pilot.certificationStatus.expiring +
-            pilot.certificationStatus.expired,
-        },
-      };
-    });
+          retirement:
+            retirementInfo && retirementInfo.retirementDate
+              ? {
+                  retirementDate: retirementInfo.retirementDate.toISOString().split('T')[0],
+                  timeToRetirement: retirementInfo.displayText,
+                  retirementStatus: retirementInfo.retirementStatus,
+                }
+              : undefined,
+          certificationStatus: {
+            ...pilot.certificationStatus,
+            total:
+              pilot.certificationStatus.current +
+              pilot.certificationStatus.expiring +
+              pilot.certificationStatus.expired,
+          },
+        };
+      });
 
-    exportComplianceReport(exportData as PilotExportData[]);
+      exportComplianceReport(exportData as PilotExportData[]);
+
+      commonToasts.export.success(
+        `compliance_report_${new Date().toISOString().split('T')[0]}.csv`
+      );
+    } catch (error) {
+      console.error('Compliance export failed:', error);
+      commonToasts.export.error();
+    }
   };
 
   const handleBulkDelete = async (ids: string[]) => {
-    // Placeholder - implement bulk delete logic
-    console.log('Bulk delete:', ids);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    fetchPilots();
+    const toastId = showLoadingToast(`Deleting ${ids.length} pilot${ids.length > 1 ? 's' : ''}...`);
+
+    try {
+      // Placeholder - implement bulk delete logic
+      console.log('Bulk delete:', ids);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await fetchPilots();
+
+      dismissToast(toastId);
+      showSuccessToast(`${ids.length} pilot${ids.length > 1 ? 's' : ''} deleted`, {
+        description: 'Selected pilots have been removed from the system',
+      });
+      handleClearSelection();
+    } catch (error) {
+      dismissToast(toastId);
+      showErrorToast('Failed to delete pilots', {
+        description: error instanceof Error ? error.message : 'Please try again',
+      });
+    }
   };
 
   const handleBulkUpdateStatus = async (ids: string[], isActive: boolean) => {
-    // Placeholder - implement bulk status update logic
-    console.log('Bulk update status:', ids, isActive);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    fetchPilots();
+    const toastId = showLoadingToast(
+      `Updating ${ids.length} pilot${ids.length > 1 ? 's' : ''} status...`
+    );
+
+    try {
+      // Placeholder - implement bulk status update logic
+      console.log('Bulk update status:', ids, isActive);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await fetchPilots();
+
+      dismissToast(toastId);
+      showSuccessToast('Status updated successfully', {
+        description: `${ids.length} pilot${ids.length > 1 ? 's' : ''} ${isActive ? 'activated' : 'deactivated'}`,
+      });
+      handleClearSelection();
+    } catch (error) {
+      dismissToast(toastId);
+      showErrorToast('Failed to update pilot status', {
+        description: error instanceof Error ? error.message : 'Please try again',
+      });
+    }
   };
 
   // Search result map for highlighting
@@ -437,7 +499,7 @@ export default function PilotsPage() {
                     placeholder="Search pilots..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mobile-input md:w-full pl-10 pr-4 focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="mobile-input md:w-full pl-10 pr-4 focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     aria-describedby="search-help"
                   />
                   <div id="search-help" className="sr-only">
@@ -463,7 +525,7 @@ export default function PilotsPage() {
                     id="role-filter"
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value as any)}
-                    className="mobile-select focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="mobile-select focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     aria-label="Filter pilots by role"
                   >
                     <option value="all">All Roles</option>
@@ -477,7 +539,7 @@ export default function PilotsPage() {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
@@ -521,7 +583,7 @@ export default function PilotsPage() {
                       <select
                         value={filterCertStatus}
                         onChange={(e) => setFilterCertStatus(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                       >
                         <option value="all">All Certifications</option>
                         <option value="current">✅ All Current</option>
@@ -538,7 +600,7 @@ export default function PilotsPage() {
                       <select
                         value={filterContract}
                         onChange={(e) => setFilterContract(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                       >
                         <option value="all">All Contracts</option>
                         <option value="Fulltime">Fulltime</option>
@@ -555,7 +617,7 @@ export default function PilotsPage() {
                       <select
                         value={filterSeniority}
                         onChange={(e) => setFilterSeniority(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-sm"
                       >
                         <option value="all">All Seniority</option>
                         <option value="senior">🥇 Senior (1-9)</option>

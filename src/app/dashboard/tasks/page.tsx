@@ -9,7 +9,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, lazy } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Plus,
@@ -26,10 +26,19 @@ import { format } from 'date-fns';
 import { apiGet } from '@/lib/api-client';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LazyLoader } from '@/components/ui/LazyLoader';
+
+// Lazy load the modal
+const TaskModal = lazy(() =>
+  import('@/components/tasks/TaskModal').then((mod) => ({
+    default: mod.TaskModal,
+  }))
+);
 
 type ViewMode = 'list' | 'kanban';
 
 export default function TasksPage() {
+  const [showAddModal, setShowAddModal] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [filters, setFilters] = useState({
     status: 'active',
@@ -39,7 +48,7 @@ export default function TasksPage() {
   });
 
   // Fetch tasks
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks, isLoading, refetch } = useQuery({
     queryKey: ['tasks', filters],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -59,7 +68,7 @@ export default function TasksPage() {
   });
 
   // Fetch statistics
-  const { data: stats } = useQuery({
+  const { data: stats, refetch: refetchStats } = useQuery({
     queryKey: ['task-stats'],
     queryFn: async () => {
       return apiGet('/api/tasks?action=statistics');
@@ -73,6 +82,11 @@ export default function TasksPage() {
       return apiGet('/api/tasks?action=categories');
     },
   });
+
+  const handleAddSuccess = () => {
+    refetch();
+    refetchStats();
+  };
 
   return (
     <ProtectedRoute>
@@ -101,13 +115,13 @@ export default function TasksPage() {
                 </button>
               </div>
 
-              <Link
-                href="/dashboard/tasks/new"
+              <button
+                onClick={() => setShowAddModal(true)}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 New Task
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -204,6 +218,17 @@ export default function TasksPage() {
             <TasksKanbanView tasks={tasks?.data || []} isLoading={isLoading} />
           )}
         </div>
+
+        {/* Add Modal */}
+        {showAddModal && (
+          <LazyLoader type="modal">
+            <TaskModal
+              isOpen={showAddModal}
+              onClose={() => setShowAddModal(false)}
+              onSuccess={handleAddSuccess}
+            />
+          </LazyLoader>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
   );

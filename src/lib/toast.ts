@@ -82,7 +82,7 @@ export const toast = {
       action: options?.action,
       duration: 6000, // Longer duration for errors
       style: {
-        border: '2px solid #E4002B',
+        border: '2px solid #4F46E5',
         borderRadius: '0.5rem',
       },
       className: 'bg-red-50 text-red-900',
@@ -196,7 +196,7 @@ export const aviationToast = {
     options?: { description?: string; status?: 'expired' | 'expiring' | 'current' }
   ) => {
     const statusConfig = {
-      expired: { icon: '⚠️', border: '#E4002B', bg: 'bg-red-50', text: 'text-red-900' },
+      expired: { icon: '⚠️', border: '#4F46E5', bg: 'bg-red-50', text: 'text-red-900' },
       expiring: { icon: '⏰', border: '#F59E0B', bg: 'bg-yellow-50', text: 'text-yellow-900' },
       current: { icon: '✓', border: '#10B981', bg: 'bg-green-50', text: 'text-green-900' },
     };
@@ -226,7 +226,7 @@ export const aviationToast = {
       icon: '👨‍✈️',
       action: options?.action,
       style: {
-        border: '2px solid #E4002B',
+        border: '2px solid #4F46E5',
         borderRadius: '0.5rem',
       },
       className: 'bg-white text-[#000000]',
@@ -243,7 +243,7 @@ export const aviationToast = {
     const statusConfig = {
       pending: { icon: '⏳', border: '#3B82F6', bg: 'bg-blue-50', text: 'text-blue-900' },
       approved: { icon: '✓', border: '#10B981', bg: 'bg-green-50', text: 'text-green-900' },
-      denied: { icon: '✗', border: '#E4002B', bg: 'bg-red-50', text: 'text-red-900' },
+      denied: { icon: '✗', border: '#4F46E5', bg: 'bg-red-50', text: 'text-red-900' },
     };
 
     const config = statusConfig[options?.status || 'pending'];
@@ -267,7 +267,7 @@ export const aviationToast = {
       description: options?.description,
       icon: '✈️',
       style: {
-        border: '2px solid #E4002B',
+        border: '2px solid #4F46E5',
         borderRadius: '0.5rem',
       },
       className: 'bg-white text-[#000000]',

@@ -106,8 +106,8 @@ function CalendarDay({ day, onDateClick, onEventClick, showRosterBoundaries }: C
         min-h-[80px] p-1 border border-gray-200 cursor-pointer hover:bg-gray-50
         ${!day.isInCurrentMonth ? 'bg-gray-50 text-gray-400' : ''}
         ${day.isToday ? 'bg-blue-50 border-blue-200' : ''}
-        ${isRosterStart ? 'border-l-4 border-l-[#E4002B]' : ''}
-        ${isRosterEnd ? 'border-r-4 border-r-[#FFC72C]' : ''}
+        ${isRosterStart ? 'border-l-4 border-l-[#4F46E5]' : ''}
+        ${isRosterEnd ? 'border-r-4 border-r-[#06B6D4]' : ''}
       `}
       onClick={() => onDateClick?.(day.date, day.events)}
     >

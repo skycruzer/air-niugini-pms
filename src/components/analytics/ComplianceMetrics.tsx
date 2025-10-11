@@ -157,7 +157,7 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
                 <YAxis domain={[0, 100]} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="compliance" fill="#E4002B" name="Compliance %" />
+                <Bar dataKey="compliance" fill="#4F46E5" name="Compliance %" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -177,8 +177,8 @@ export default function ComplianceMetrics({ timeRange }: ComplianceMetricsProps)
                 <Radar
                   name="Compliance"
                   dataKey="compliance"
-                  stroke="#E4002B"
-                  fill="#E4002B"
+                  stroke="#4F46E5"
+                  fill="#4F46E5"
                   fillOpacity={0.6}
                 />
               </RadarChart>

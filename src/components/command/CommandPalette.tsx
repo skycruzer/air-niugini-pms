@@ -173,7 +173,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
       {/* Command Palette */}
       <div className="fixed top-[20%] left-1/2 transform -translate-x-1/2 w-full max-w-2xl z-50 animate-slide-down">
-        <Command className="rounded-xl border border-[#E4002B]/20 shadow-2xl bg-white overflow-hidden">
+        <Command className="rounded-xl border border-[#4F46E5]/20 shadow-2xl bg-white overflow-hidden">
           <div className="flex items-center border-b border-gray-200 px-4">
             <Search className="w-5 h-5 text-gray-400 mr-3" />
             <Command.Input
@@ -203,7 +203,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         }
                       })
                     }
-                    className="flex items-center px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#E4002B]/10 aria-selected:text-[#E4002B]"
+                    className="flex items-center px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#4F46E5]/10 aria-selected:text-[#4F46E5]"
                   >
                     <Clock className="w-4 h-4 mr-3" />
                     <span className="flex-1">{item.label}</span>
@@ -230,7 +230,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         });
                       })
                     }
-                    className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#E4002B]/10 aria-selected:text-[#E4002B]"
+                    className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#4F46E5]/10 aria-selected:text-[#4F46E5]"
                   >
                     <div className="flex items-center">
                       <Icon className="w-4 h-4 mr-3" />
@@ -262,7 +262,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                           });
                         })
                       }
-                      className="flex items-center px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#E4002B]/10 aria-selected:text-[#E4002B]"
+                      className="flex items-center px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#4F46E5]/10 aria-selected:text-[#4F46E5]"
                     >
                       <Icon className="w-4 h-4 mr-3" />
                       <span>{item.label}</span>
@@ -295,7 +295,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         });
                       })
                     }
-                    className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#E4002B]/10 aria-selected:text-[#E4002B]"
+                    className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-100 aria-selected:bg-[#4F46E5]/10 aria-selected:text-[#4F46E5]"
                   >
                     <div className="flex items-center">
                       <Users className="w-4 h-4 mr-3" />
@@ -335,7 +335,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   </div>
                   <div className="flex items-center space-x-1">
                     <span>Powered by</span>
-                    <span className="font-semibold text-[#E4002B]">Air Niugini</span>
+                    <span className="font-semibold text-[#4F46E5]">Air Niugini</span>
                   </div>
                 </div>
               </div>

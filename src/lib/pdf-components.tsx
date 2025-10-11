@@ -21,8 +21,8 @@ import { PDFReportMetadata, AirNiuginiStyles } from '@/types/pdf-reports';
  */
 export const airNiuginiStyles: AirNiuginiStyles = {
   colors: {
-    primary: '#E4002B', // Air Niugini Red
-    secondary: '#FFC72C', // Air Niugini Gold
+    primary: '#4F46E5', // Air Niugini Red
+    secondary: '#06B6D4', // Air Niugini Gold
     black: '#000000', // Brand Black
     white: '#FFFFFF', // Background
     gray: {

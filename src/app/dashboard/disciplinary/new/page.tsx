@@ -123,7 +123,7 @@ export default function NewDisciplinaryCasePage() {
                 </label>
                 <select
                   {...register('pilot_id')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 >
                   <option value="">Select a pilot</option>
                   {pilotsData?.data?.map((pilot: any) => (
@@ -144,7 +144,7 @@ export default function NewDisciplinaryCasePage() {
                 </label>
                 <select
                   {...register('incident_type_id')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 >
                   <option value="">Select incident type</option>
                   {incidentTypesData?.data?.map((type: any) => (
@@ -167,7 +167,7 @@ export default function NewDisciplinaryCasePage() {
               <input
                 type="text"
                 {...register('title')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 placeholder="Enter case title"
               />
               {errors.title && <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>}
@@ -181,7 +181,7 @@ export default function NewDisciplinaryCasePage() {
               <textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 placeholder="Enter detailed description of the incident"
               />
               {errors.description && (
@@ -198,7 +198,7 @@ export default function NewDisciplinaryCasePage() {
                 <input
                   type="date"
                   {...register('incident_date')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 />
                 {errors.incident_date && (
                   <p className="text-red-600 text-sm mt-1">{errors.incident_date.message}</p>
@@ -212,7 +212,7 @@ export default function NewDisciplinaryCasePage() {
                 </label>
                 <select
                   {...register('severity')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 >
                   <option value="MINOR">Minor</option>
                   <option value="MODERATE">Moderate</option>
@@ -232,7 +232,7 @@ export default function NewDisciplinaryCasePage() {
                 <input
                   type="text"
                   {...register('location')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   placeholder="e.g., Port Moresby"
                 />
               </div>
@@ -245,7 +245,7 @@ export default function NewDisciplinaryCasePage() {
                 <input
                   type="text"
                   {...register('flight_number')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   placeholder="e.g., PX101"
                 />
               </div>
@@ -258,7 +258,7 @@ export default function NewDisciplinaryCasePage() {
                 <input
                   type="text"
                   {...register('aircraft_registration')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   placeholder="e.g., P2-PXA"
                 />
               </div>
@@ -270,7 +270,7 @@ export default function NewDisciplinaryCasePage() {
                 <input
                   type="checkbox"
                   {...register('regulatory_notification_required')}
-                  className="w-4 h-4 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B]"
+                  className="w-4 h-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]"
                 />
                 <label className="ml-2 text-sm font-medium text-gray-700">
                   Regulatory notification required
@@ -285,7 +285,7 @@ export default function NewDisciplinaryCasePage() {
                   <input
                     type="text"
                     {...register('regulatory_body')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     placeholder="e.g., PNG Civil Aviation Safety Authority"
                   />
                 </div>
@@ -303,7 +303,7 @@ export default function NewDisciplinaryCasePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5 mr-2" />
                 {isSubmitting ? 'Creating...' : 'Create Case'}

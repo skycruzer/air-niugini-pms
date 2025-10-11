@@ -52,7 +52,7 @@ export function OfflineIndicator() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -100, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed top-0 left-0 right-0 z-50 bg-[#E4002B] text-white shadow-lg"
+          className="fixed top-0 left-0 right-0 z-50 bg-[#4F46E5] text-white shadow-lg"
           role="alert"
           aria-live="assertive"
         >

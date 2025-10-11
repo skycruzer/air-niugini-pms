@@ -140,7 +140,7 @@ export function AuditLogFilters({
         {hasActiveFilters && (
           <button
             onClick={handleClearFilters}
-            className="text-sm font-medium text-[#E4002B] hover:text-[#C00020] transition-colors flex items-center"
+            className="text-sm font-medium text-[#4F46E5] hover:text-[#4338CA] transition-colors flex items-center"
           >
             <span className="mr-1">✖️</span>
             Clear All
@@ -175,7 +175,7 @@ export function AuditLogFilters({
               disabled={isLoading}
               className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
                 selectedPreset === preset.days
-                  ? 'bg-[#E4002B] text-white border-[#E4002B] shadow-md'
+                  ? 'bg-[#4F46E5] text-white border-[#4F46E5] shadow-md'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -255,7 +255,7 @@ export function AuditLogFilters({
       <div>
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center text-sm font-medium text-[#E4002B] hover:text-[#C00020] transition-colors"
+          className="flex items-center text-sm font-medium text-[#4F46E5] hover:text-[#4338CA] transition-colors"
         >
           <span className="mr-2">{showAdvanced ? '▲' : '▼'}</span>
           {showAdvanced ? 'Hide' : 'Show'} Advanced Filters
@@ -343,11 +343,11 @@ export function AuditLogFilters({
 
           <div className="flex flex-wrap gap-2">
             {selectedUser && (
-              <span className="inline-flex items-center px-3 py-1 bg-[#E4002B]/10 text-[#E4002B] rounded-full text-xs font-medium border border-[#E4002B]/30">
+              <span className="inline-flex items-center px-3 py-1 bg-[#4F46E5]/10 text-[#4F46E5] rounded-full text-xs font-medium border border-[#4F46E5]/30">
                 User: {selectedUser}
                 <button
                   onClick={() => setSelectedUser('')}
-                  className="ml-2 text-[#E4002B] hover:text-[#C00020]"
+                  className="ml-2 text-[#4F46E5] hover:text-[#4338CA]"
                 >
                   ✕
                 </button>

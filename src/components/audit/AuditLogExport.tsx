@@ -91,7 +91,7 @@ export function AuditLogExport({ logs, filters, onClose }: AuditLogExportProps) 
   return (
     <div className="bg-white rounded-lg shadow-xl max-w-lg mx-auto">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white px-6 py-4 rounded-t-lg">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white px-6 py-4 rounded-t-lg">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold mb-1">Export Audit Logs</h2>
@@ -153,7 +153,7 @@ export function AuditLogExport({ logs, filters, onClose }: AuditLogExportProps) 
                 type="checkbox"
                 checked={includeAllPages}
                 onChange={(e) => setIncludeAllPages(e.target.checked)}
-                className="w-4 h-4 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B]"
+                className="w-4 h-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]"
                 disabled={isExporting}
               />
               <span className="text-sm text-gray-700">
@@ -223,7 +223,7 @@ export function AuditLogExport({ logs, filters, onClose }: AuditLogExportProps) 
         <button
           onClick={handleExport}
           disabled={isExporting || !filename.trim()}
-          className="btn bg-[#E4002B] text-white hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn bg-[#4F46E5] text-white hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isExporting ? (
             <>

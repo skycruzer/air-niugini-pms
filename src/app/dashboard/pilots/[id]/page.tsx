@@ -287,7 +287,7 @@ export default function PilotDetailPage() {
               </p>
               <button
                 onClick={() => router.push('/dashboard/pilots')}
-                className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 <span className="mr-2">⬅️</span>
                 Back to Pilots
@@ -341,7 +341,7 @@ export default function PilotDetailPage() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => router.push(`/dashboard/pilots/${pilot.id}/certifications`)}
-                    className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors"
+                    className="flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <span className="mr-2">🛡️</span>
                     Manage Certifications

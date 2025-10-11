@@ -30,34 +30,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Dashboard', href: '/dashboard', icon: NavIcons.dashboard, description: 'Overview and analytics' },
     { name: 'Pilots', href: '/dashboard/pilots', icon: NavIcons.pilots, description: 'Manage pilot records' },
     {
-      name: 'Certifications',
-      href: '/dashboard/certifications',
-      icon: NavIcons.certifications,
-      description: 'Track certifications',
-      submenu: [
-        {
-          name: 'Certification List',
-          href: '/dashboard/certifications',
-          description: 'Manage certifications',
-        },
-        {
-          name: 'Bulk Updates',
-          href: '/dashboard/certifications/bulk',
-          description: 'Mass certification updates',
-        },
-        {
-          name: 'Expiry Calendar',
-          href: '/dashboard/certifications/calendar',
-          description: 'Visual expiry timeline',
-        },
-        {
-          name: 'Expiry Planning',
-          href: '/dashboard/certifications/expiry-planning',
-          description: 'Plan certification renewals',
-        },
-      ],
-    },
-    {
       name: 'Documents',
       href: '/dashboard/documents',
       icon: NavIcons.certifications,
@@ -108,6 +80,37 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       icon: NavIcons.reports,
       description: 'Fleet reports',
       requiresPermission: 'reports',
+      submenu: [
+        {
+          name: 'Certification Calendar',
+          href: '/dashboard/certifications/calendar',
+          description: 'Visual certification timeline',
+        },
+        {
+          name: 'Expiry Planning',
+          href: '/dashboard/certifications/expiry-planning',
+          description: 'Plan certification renewals',
+        },
+      ],
+    },
+    {
+      name: 'Admin',
+      href: '/dashboard/admin',
+      icon: NavIcons.settings,
+      description: 'Admin functions',
+      requiresPermission: 'admin',
+      submenu: [
+        {
+          name: 'Pilot Registrations',
+          href: '/dashboard/admin/pilot-registrations',
+          description: 'Approve pilot registrations',
+        },
+        {
+          name: 'Feedback Moderation',
+          href: '/dashboard/admin/feedback-moderation',
+          description: 'Moderate pilot feedback',
+        },
+      ],
     },
     {
       name: 'Settings',
@@ -129,6 +132,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
     if (item.requiresPermission === 'forms') {
       return permissions.canEdit(user); // Admin/Manager only
+    }
+    if (item.requiresPermission === 'admin') {
+      return permissions.canCreate(user); // Admin only
     }
     // Audit logs temporarily disabled
     // if (item.requiresPermission === 'audit') {
@@ -202,14 +208,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                   </div>
                   <div className="ml-3">
-                    <h1 className="text-lg font-bold text-white">Air Niugini</h1>
-                    <p className="text-xs text-blue-100">B767 Fleet Management</p>
+                    <h1 className="text-lg font-bold text-white drop-shadow-md">Air Niugini</h1>
+                    <p className="text-xs text-white font-semibold drop-shadow-sm">B767 Fleet Management</p>
                   </div>
                 </div>
               </div>
 
-              {/* Mobile Roster */}
-              {currentRoster && (
+              {/* Mobile Roster - Removed */}
+              {/* {currentRoster && (
                 <div className="mx-4 mb-4 -mt-3 relative z-10">
                   <div className="roster-banner p-3 text-sm">
                     <div className="flex items-center justify-between">
@@ -223,7 +229,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Mobile Navigation */}
               <nav className="px-4 space-y-2" role="navigation" aria-label="Main navigation">
@@ -242,8 +248,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       >
                         <item.icon className="h-5 w-5 mr-3" aria-hidden="true" />
                         <div className="flex-1">
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-xs opacity-75">{item.description}</p>
+                          <p className="font-semibold">{item.name}</p>
+                          <p className="text-xs font-medium opacity-90">{item.description}</p>
                         </div>
                       </Link>
 
@@ -257,8 +263,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                               onClick={() => setSidebarOpen(false)}
                               className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
                                 pathname === subItem.href
-                                  ? 'bg-blue-600 text-white'
-                                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                  ? 'bg-blue-600 text-white font-semibold'
+                                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium'
                               }`}
                             >
                               {subItem.name}
@@ -327,8 +333,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 {!sidebarCollapsed && (
                   <div className="ml-3">
-                    <h1 className="text-lg font-bold text-white">Air Niugini</h1>
-                    <p className="text-xs text-blue-100">B767 Fleet Management</p>
+                    <h1 className="text-lg font-bold text-white drop-shadow-md">Air Niugini</h1>
+                    <p className="text-xs text-white font-semibold drop-shadow-sm">B767 Fleet Management</p>
                   </div>
                 )}
               </div>
@@ -349,8 +355,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           </div>
 
-          {/* Desktop Roster Banner */}
-          {currentRoster && !sidebarCollapsed && (
+          {/* Desktop Roster Banner - Removed */}
+          {/* {currentRoster && !sidebarCollapsed && (
             <div className="mx-4 mb-6 -mt-3 relative z-10">
               <div className="roster-banner p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -368,10 +374,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
-          {/* Collapsed Roster Indicator */}
-          {currentRoster && sidebarCollapsed && (
+          {/* Collapsed Roster Indicator - Removed */}
+          {/* {currentRoster && sidebarCollapsed && (
             <div className="mx-2 mb-4 -mt-2">
               <div className="bg-blue-600 rounded-lg p-2 flex flex-col items-center">
                 <span className="w-4 h-4 text-blue-200 mb-1">🕐</span>
@@ -379,7 +385,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <span className="text-xs text-blue-200">days</span>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Desktop Navigation */}
           <nav className={`flex-1 space-y-1 ${sidebarCollapsed ? 'px-2' : 'px-4'}`}>
@@ -400,8 +406,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <item.icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'}`} aria-hidden="true" />
                     {!sidebarCollapsed && (
                       <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-xs opacity-75 group-hover:opacity-100 transition-opacity">
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-xs font-medium opacity-90 group-hover:opacity-100 transition-opacity">
                           {item.description}
                         </p>
                       </div>
@@ -426,8 +432,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                           }`}
                         >
-                          <span className="font-medium">{subItem.name}</span>
-                          <p className="text-xs opacity-75 mt-0.5">{subItem.description}</p>
+                          <span className="font-semibold">{subItem.name}</span>
+                          <p className="text-xs font-medium opacity-90 mt-0.5">{subItem.description}</p>
                         </Link>
                       ))}
                     </div>

@@ -158,7 +158,7 @@ export default function NotificationPreferences() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#E4002B]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#4F46E5]" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function NotificationPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-[#E4002B]" />
+            <Mail className="h-5 w-5 text-[#4F46E5]" />
             Email Notifications
           </CardTitle>
           <CardDescription>
@@ -225,7 +225,7 @@ export default function NotificationPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-[#E4002B]" />
+            <AlertCircle className="h-5 w-5 text-[#4F46E5]" />
             Certification Expiry Alerts
           </CardTitle>
           <CardDescription>
@@ -284,7 +284,7 @@ export default function NotificationPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-[#E4002B]" />
+            <Calendar className="h-5 w-5 text-[#4F46E5]" />
             Leave Request Alerts
           </CardTitle>
           <CardDescription>Get notified about leave requests and approvals</CardDescription>
@@ -334,7 +334,7 @@ export default function NotificationPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-[#E4002B]" />
+            <Info className="h-5 w-5 text-[#4F46E5]" />
             System Notifications
           </CardTitle>
           <CardDescription>Receive important system updates and announcements</CardDescription>
@@ -379,7 +379,7 @@ export default function NotificationPreferences() {
           </div>
 
           {preferences.daily_digest && (
-            <div className="space-y-2 pl-4 border-l-2 border-[#FFC72C]">
+            <div className="space-y-2 pl-4 border-l-2 border-[#06B6D4]">
               <Label htmlFor="digest-time">Daily Digest Time</Label>
               <Input
                 id="digest-time"
@@ -406,7 +406,7 @@ export default function NotificationPreferences() {
         <Button
           onClick={handleSave}
           disabled={saving || !preferences.email_enabled}
-          className="bg-[#E4002B] hover:bg-[#C00020] text-white"
+          className="bg-[#4F46E5] hover:bg-[#4338CA] text-white"
         >
           {saving ? (
             <>

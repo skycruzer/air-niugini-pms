@@ -115,7 +115,7 @@ export function ExpiryTracker({
 
   return (
     <Card className={cn('shadow-lg', className)}>
-      <CardHeader className="border-b bg-gradient-to-r from-[#E4002B] to-[#C00020] text-white">
+      <CardHeader className="border-b bg-gradient-to-r from-[#4F46E5] to-[#4338CA] text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/20 rounded-lg">
@@ -206,7 +206,7 @@ export function ExpiryTracker({
         <div className="max-h-[400px] overflow-y-auto">
           {isLoading ? (
             <div className="p-8 text-center">
-              <div className="w-8 h-8 border-4 border-[#E4002B] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <div className="w-8 h-8 border-4 border-[#4F46E5] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-gray-600">Loading documents...</p>
             </div>
           ) : currentDocuments.length === 0 ? (
@@ -279,7 +279,7 @@ export function ExpiryTracker({
           <div className="p-4 border-t bg-gray-50">
             <Button
               variant="outline"
-              className="w-full border-[#E4002B] text-[#E4002B] hover:bg-red-50"
+              className="w-full border-[#4F46E5] text-[#4F46E5] hover:bg-red-50"
             >
               View All {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)} Documents
             </Button>

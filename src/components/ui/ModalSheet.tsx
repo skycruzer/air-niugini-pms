@@ -62,7 +62,7 @@ export function ModalSheet({ isOpen, onClose, title, children, size = 'lg' }: Mo
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-[#E4002B] to-[#C00020]">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-[#4F46E5] to-[#4338CA]">
           <h2 className="text-xl font-semibold text-white flex items-center">
             <span className="text-2xl mr-3">📝</span>
             {title}

@@ -76,10 +76,10 @@ const LEAVE_TYPE_COLORS = {
   },
   SICK: { bg: 'bg-red-100', border: 'border-red-400', text: 'text-red-800', darkBg: 'bg-red-500' },
   LSL: {
-    bg: 'bg-[#FFC72C]/20',
-    border: 'border-[#FFC72C]',
+    bg: 'bg-[#06B6D4]/20',
+    border: 'border-[#06B6D4]',
     text: 'text-yellow-900',
-    darkBg: 'bg-[#FFC72C]',
+    darkBg: 'bg-[#06B6D4]',
   },
   LWOP: {
     bg: 'bg-gray-100',
@@ -318,7 +318,7 @@ export function InteractiveRosterCalendar({
         <div className="flex items-center space-x-2">
           <button
             onClick={goToToday}
-            className="px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors text-sm font-medium"
           >
             Today
           </button>
@@ -367,7 +367,7 @@ export function InteractiveRosterCalendar({
                   className={`
                     min-h-[120px] p-2 relative transition-colors
                     ${isCurrentMonth ? 'bg-white' : 'bg-gray-50'}
-                    ${isToday ? 'ring-2 ring-[#E4002B] ring-inset' : ''}
+                    ${isToday ? 'ring-2 ring-[#4F46E5] ring-inset' : ''}
                     ${isRosterPeriod ? 'bg-blue-50/30' : ''}
                     ${getAvailabilityColor(available)}
                     hover:bg-gray-50
@@ -381,7 +381,7 @@ export function InteractiveRosterCalendar({
                       className={`
                       text-sm font-medium
                       ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
-                      ${isToday ? 'bg-[#E4002B] text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}
+                      ${isToday ? 'bg-[#4F46E5] text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}
                     `}
                     >
                       {format(day, 'd')}

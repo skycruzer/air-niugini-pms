@@ -217,7 +217,7 @@ export function InlineEditField({
               onChange={(e) => handleChange(e.target.value)}
               className={`
                 w-full px-3 py-2 border rounded-lg
-                focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]
+                focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]
                 ${error ? 'border-red-500' : 'border-gray-300'}
                 ${editClassName}
               `}
@@ -240,7 +240,7 @@ export function InlineEditField({
               maxLength={maxLength}
               className={`
                 w-full px-3 py-2 border rounded-lg
-                focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]
+                focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]
                 ${error ? 'border-red-500' : 'border-gray-300'}
                 ${editClassName}
               `}
@@ -251,7 +251,7 @@ export function InlineEditField({
           {/* Action Buttons */}
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
             {isSaving ? (
-              <div className="w-5 h-5 border-2 border-[#E4002B] border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
             ) : (
               <>
                 <button

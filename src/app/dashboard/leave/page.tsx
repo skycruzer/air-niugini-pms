@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { LazyLeaveRequestModal } from '@/components/lazy';
+import { LazyLeaveRequestModal, LazyLeaveBidModal } from '@/components/lazy';
 import { LazyLoader } from '@/components/ui/LazyLoader';
 import { LeaveRequestsList } from '@/components/leave/LeaveRequestsList';
 import { InteractiveRosterCalendar } from '@/components/leave/InteractiveRosterCalendar';
@@ -28,6 +28,7 @@ import { Calendar, FileEdit, CalendarDays, FileText, Clock, CheckCircle, XCircle
 export default function LeaveRequestsPage() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [showBidModal, setShowBidModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'requests' | 'calendar' | 'availability'>('requests');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [stats, setStats] = useState<LeaveRequestStats | null>(null);
@@ -101,6 +102,11 @@ export default function LeaveRequestsPage() {
     setRefreshTrigger((prev) => prev + 1);
   };
 
+  const handleBidModalSuccess = () => {
+    setShowBidModal(false);
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
   const handleStatsUpdate = (updatedStats: LeaveRequestStats) => {
     setStats(updatedStats);
   };
@@ -166,13 +172,22 @@ export default function LeaveRequestsPage() {
                     </p>
                   </div>
                   {permissions.canCreate(user) && (
-                    <button
-                      onClick={() => setShowModal(true)}
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
-                    >
-                      <FileEdit className="w-4 h-4 mr-2" />
-                      New Request
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowBidModal(true)}
+                        className="flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Submit Leave Bid
+                      </button>
+                      <button
+                        onClick={() => setShowModal(true)}
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        <FileEdit className="w-4 h-4 mr-2" />
+                        New Request
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -286,6 +301,17 @@ export default function LeaveRequestsPage() {
                     isOpen={showModal}
                     onClose={() => setShowModal(false)}
                     onSuccess={handleModalSuccess}
+                  />
+                </LazyLoader>
+              )}
+
+              {/* Leave Bid Modal - Lazy Loaded */}
+              {showBidModal && (
+                <LazyLoader type="modal">
+                  <LazyLeaveBidModal
+                    isOpen={showBidModal}
+                    onClose={() => setShowBidModal(false)}
+                    onSuccess={handleBidModalSuccess}
                   />
                 </LazyLoader>
               )}
@@ -455,7 +481,7 @@ export default function LeaveRequestsPage() {
                   {/* Interactive Calendar with Drag-Drop */}
                   {loading ? (
                     <div className="flex items-center justify-center p-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46E5]" />
                       <span className="ml-3 text-gray-600">Loading calendar...</span>
                     </div>
                   ) : (
@@ -482,7 +508,7 @@ export default function LeaveRequestsPage() {
                   {/* Team Availability View */}
                   {loading ? (
                     <div className="flex items-center justify-center p-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E4002B]" />
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46E5]" />
                       <span className="ml-3 text-gray-600">Loading availability data...</span>
                     </div>
                   ) : (

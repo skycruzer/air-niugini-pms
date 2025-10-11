@@ -85,7 +85,7 @@ export default function AuditLogDetailPage() {
           <div className="mb-6">
             <button
               onClick={handleClose}
-              className="flex items-center text-[#E4002B] hover:text-[#C00020] font-medium transition-colors"
+              className="flex items-center text-[#4F46E5] hover:text-[#4338CA] font-medium transition-colors"
             >
               <span className="mr-2">←</span>
               Back to Audit Logs
@@ -109,7 +109,7 @@ export default function AuditLogDetailPage() {
               <p className="text-gray-600 mb-4">{error}</p>
               <button
                 onClick={handleClose}
-                className="btn bg-[#E4002B] text-white hover:bg-[#C00020]"
+                className="btn bg-[#4F46E5] text-white hover:bg-[#4338CA]"
               >
                 Return to Audit Logs
               </button>

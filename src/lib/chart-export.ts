@@ -351,11 +351,11 @@ export function printChart(chartRef: any, title: string): void {
         .header {
           text-align: center;
           margin-bottom: 20px;
-          border-bottom: 2px solid #E4002B;
+          border-bottom: 2px solid #4F46E5;
           padding-bottom: 20px;
         }
         .header h1 {
-          color: #E4002B;
+          color: #4F46E5;
           margin: 0 0 10px 0;
         }
         .header p {

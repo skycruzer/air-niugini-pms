@@ -160,7 +160,7 @@ export function FleetTimelineView() {
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
           <p className="text-gray-600 mt-2">Loading fleet timeline...</p>
         </div>
       </div>
@@ -205,7 +205,7 @@ export function FleetTimelineView() {
   return (
     <div className="space-y-6">
       {/* Fleet Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-red-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-red-600 rounded-lg shadow-lg p-6 text-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Users className="w-8 h-8 mr-3" />
@@ -229,7 +229,7 @@ export function FleetTimelineView() {
             onClick={() => setSortBy('date')}
             className={`px-3 py-1 rounded-lg text-sm transition-colors ${
               sortBy === 'date'
-                ? 'bg-white text-[#E4002B] font-medium'
+                ? 'bg-white text-[#4F46E5] font-medium'
                 : 'bg-white/20 hover:bg-white/30'
             }`}
           >
@@ -239,7 +239,7 @@ export function FleetTimelineView() {
             onClick={() => setSortBy('pilot')}
             className={`px-3 py-1 rounded-lg text-sm transition-colors ${
               sortBy === 'pilot'
-                ? 'bg-white text-[#E4002B] font-medium'
+                ? 'bg-white text-[#4F46E5] font-medium'
                 : 'bg-white/20 hover:bg-white/30'
             }`}
           >
@@ -249,7 +249,7 @@ export function FleetTimelineView() {
             onClick={() => setSortBy('status')}
             className={`px-3 py-1 rounded-lg text-sm transition-colors ${
               sortBy === 'status'
-                ? 'bg-white text-[#E4002B] font-medium'
+                ? 'bg-white text-[#4F46E5] font-medium'
                 : 'bg-white/20 hover:bg-white/30'
             }`}
           >

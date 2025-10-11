@@ -171,7 +171,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 </button>
                 <button
                   onClick={this.handleHome}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#E4002B] hover:bg-[#C00020] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
                 >
                   <Home className="w-5 h-5" />
                   Dashboard
@@ -184,7 +184,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   Need help?{' '}
                   <a
                     href="mailto:support@airniugini.com.pg"
-                    className="text-[#E4002B] hover:underline font-semibold"
+                    className="text-[#4F46E5] hover:underline font-semibold"
                   >
                     Contact IT Support
                   </a>
@@ -195,8 +195,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {/* Footer */}
             <div className="bg-gradient-to-r from-gray-100 to-gray-50 px-6 py-4 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-                <p className="text-gray-600">Air Niugini B767 Pilot Management System</p>
-                <p className="text-[#E4002B] font-bold">Error Boundary Protection Active</p>
+                <p className="text-gray-600">Fleet Management System</p>
+                <p className="text-[#4F46E5] font-bold">Error Boundary Protection Active</p>
               </div>
             </div>
           </div>

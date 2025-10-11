@@ -23,7 +23,7 @@ interface LazyLoadProps {
 export function LazyLoad({ fallback, children }: LazyLoadProps) {
   const defaultFallback = (
     <div className="flex items-center justify-center p-8">
-      <Loader2 className="w-8 h-8 text-[#E4002B] animate-spin" />
+      <Loader2 className="w-8 h-8 text-[#4F46E5] animate-spin" />
     </div>
   );
 

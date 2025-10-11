@@ -17,12 +17,10 @@ export default function Offline() {
   }, []);
 
   return (
-    <html>
-      <body>
-        <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-xl shadow-2xl overflow-hidden">
             {/* Air Niugini Red Header */}
-            <div className="bg-[#E4002B] p-8">
+            <div className="bg-[#4F46E5] p-8">
               <div className="flex items-center justify-center mb-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
                   <WifiOff className="w-16 h-16 text-white" />
@@ -55,12 +53,12 @@ export default function Offline() {
               {/* Troubleshooting Steps */}
               <div className="bg-neutral-50 rounded-lg p-5">
                 <h3 className="text-base font-semibold text-neutral-900 mb-3 flex items-center">
-                  <WifiOff className="w-5 h-5 mr-2 text-[#E4002B]" />
+                  <WifiOff className="w-5 h-5 mr-2 text-[#4F46E5]" />
                   Troubleshooting Steps:
                 </h3>
                 <ul className="space-y-3 text-sm text-neutral-700">
                   <li className="flex items-start">
-                    <span className="inline-block w-6 h-6 rounded-full bg-[#FFC72C] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                    <span className="inline-block w-6 h-6 rounded-full bg-[#06B6D4] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
                       1
                     </span>
                     <div>
@@ -73,7 +71,7 @@ export default function Offline() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <span className="inline-block w-6 h-6 rounded-full bg-[#FFC72C] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                    <span className="inline-block w-6 h-6 rounded-full bg-[#06B6D4] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
                       2
                     </span>
                     <div>
@@ -86,7 +84,7 @@ export default function Offline() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <span className="inline-block w-6 h-6 rounded-full bg-[#FFC72C] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                    <span className="inline-block w-6 h-6 rounded-full bg-[#06B6D4] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
                       3
                     </span>
                     <div>
@@ -99,7 +97,7 @@ export default function Offline() {
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <span className="inline-block w-6 h-6 rounded-full bg-[#FFC72C] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                    <span className="inline-block w-6 h-6 rounded-full bg-[#06B6D4] text-black text-xs font-bold flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
                       4
                     </span>
                     <div>
@@ -141,7 +139,7 @@ export default function Offline() {
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <button
                   onClick={() => window.location.reload()}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#E4002B] hover:bg-[#C00020] text-white px-6 py-3.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white px-6 py-3.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
                 >
                   <RefreshCw className="w-5 h-5" />
                   Try Again
@@ -168,7 +166,7 @@ export default function Offline() {
                   Still having connection issues?{' '}
                   <a
                     href="mailto:support@airniugini.com.pg"
-                    className="text-[#E4002B] hover:underline font-semibold"
+                    className="text-[#4F46E5] hover:underline font-semibold"
                   >
                     Contact IT Support
                   </a>
@@ -180,12 +178,10 @@ export default function Offline() {
             <div className="bg-gradient-to-r from-neutral-100 to-neutral-50 px-8 py-4 border-t border-neutral-200">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
                 <p className="text-neutral-600">Air Niugini B767 Pilot Management System</p>
-                <p className="text-[#E4002B] font-bold">Papua New Guinea&apos;s National Airline</p>
+                <p className="text-[#4F46E5] font-bold">Papua New Guinea&apos;s National Airline</p>
               </div>
             </div>
           </div>
-        </div>
-      </body>
-    </html>
+    </div>
   );
 }

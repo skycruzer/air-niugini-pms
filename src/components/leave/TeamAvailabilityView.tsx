@@ -186,7 +186,7 @@ export function TeamAvailabilityView({
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <Users className="h-6 w-6 text-[#E4002B]" />
+            <Users className="h-6 w-6 text-[#4F46E5]" />
             <div>
               <h3 className="text-lg font-bold text-gray-900">Team Availability</h3>
               <p className="text-sm text-gray-600">{rosterPeriod.code}</p>
@@ -196,7 +196,7 @@ export function TeamAvailabilityView({
           <div className="flex items-center space-x-2">
             <button
               onClick={handleExport}
-              className="flex items-center space-x-2 px-3 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors text-sm font-medium"
+              className="flex items-center space-x-2 px-3 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors text-sm font-medium"
             >
               <Download className="h-4 w-4" />
               <span>Export</span>
@@ -220,7 +220,7 @@ export function TeamAvailabilityView({
                   px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                   ${
                     filterRole === role
-                      ? 'bg-[#E4002B] text-white'
+                      ? 'bg-[#4F46E5] text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }
                 `}
@@ -236,7 +236,7 @@ export function TeamAvailabilityView({
               id="lowAvailability"
               checked={showOnlyLowAvailability}
               onChange={(e) => setShowOnlyLowAvailability(e.target.checked)}
-              className="rounded text-[#E4002B] focus:ring-[#E4002B]"
+              className="rounded text-[#4F46E5] focus:ring-[#4F46E5]"
             />
             <label htmlFor="lowAvailability" className="text-sm text-gray-700">
               Show only low availability (&lt;60%)
@@ -346,7 +346,7 @@ export function TeamAvailabilityView({
                 aspect-square rounded-lg p-2 transition-all cursor-pointer
                 ${getHeatmapColor(day.percentage)}
                 ${getTextColor(day.percentage)}
-                hover:ring-2 hover:ring-[#E4002B] hover:ring-offset-2
+                hover:ring-2 hover:ring-[#4F46E5] hover:ring-offset-2
               `}
               title={`${format(day.date, 'MMM dd, yyyy')}: ${day.available} available (${day.percentage.toFixed(1)}%)`}
             >

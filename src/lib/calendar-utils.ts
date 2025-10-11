@@ -68,7 +68,7 @@ export interface CalendarDay {
  * @property {'leave' | 'certification' | 'roster-boundary'} type - Event type for styling and behavior
  * @property {string} title - Display title for the event
  * @property {string} [description] - Optional detailed description
- * @property {string} color - CSS color for event styling (e.g., "#E4002B")
+ * @property {string} color - CSS color for event styling (e.g., "#4F46E5")
  * @property {any} [data] - Optional additional data payload
  */
 export interface CalendarEvent {
@@ -236,7 +236,7 @@ export function addRosterBoundariesToCalendar(calendarDays: CalendarDay[]): Cale
         id: `roster-start-${day.rosterPeriod!.code}`,
         type: 'roster-boundary' as const,
         title: `${day.rosterPeriod!.code} Starts`,
-        color: '#E4002B', // Air Niugini red
+        color: '#4F46E5', // Air Niugini red
         data: day.rosterPeriod,
       });
     }
@@ -247,7 +247,7 @@ export function addRosterBoundariesToCalendar(calendarDays: CalendarDay[]): Cale
         id: `roster-end-${day.rosterPeriod!.code}`,
         type: 'roster-boundary' as const,
         title: `${day.rosterPeriod!.code} Ends`,
-        color: '#FFC72C', // Air Niugini gold
+        color: '#06B6D4', // Air Niugini gold
         data: day.rosterPeriod,
       });
     }

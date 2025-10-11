@@ -104,7 +104,7 @@ export function OfflineDataView({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="text-[#E4002B] hover:text-[#C00020] font-medium flex items-center gap-1"
+              className="text-[#4F46E5] hover:text-[#4338CA] font-medium flex items-center gap-1"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Refresh

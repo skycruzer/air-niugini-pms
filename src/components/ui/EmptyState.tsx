@@ -84,7 +84,7 @@ export function EmptyState({
             onClick={action.onClick}
             variant={action.variant === 'primary' ? 'default' : action.variant}
             className={cn(
-              action.variant === 'primary' && 'bg-[#E4002B] hover:bg-[#C00020] text-white'
+              action.variant === 'primary' && 'bg-[#4F46E5] hover:bg-[#4338CA] text-white'
             )}
           >
             {action.label}

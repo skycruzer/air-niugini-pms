@@ -9,8 +9,8 @@
 
 // Air Niugini Brand Colors
 export const AIR_NIUGINI_COLORS = {
-  primary: '#E4002B', // Air Niugini Red
-  secondary: '#FFC72C', // Air Niugini Gold
+  primary: '#4F46E5', // Air Niugini Red
+  secondary: '#06B6D4', // Air Niugini Gold
   success: '#059669', // Green for current certifications
   warning: '#D97706', // Amber for expiring soon
   danger: '#DC2626', // Red for expired

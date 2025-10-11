@@ -307,7 +307,7 @@ export function LeaveConflictDetector({
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <AlertTriangle className="h-6 w-6 text-[#E4002B]" />
+            <AlertTriangle className="h-6 w-6 text-[#4F46E5]" />
             <div>
               <h3 className="font-bold text-gray-900">Conflict Detection</h3>
               <p className="text-sm text-gray-600">
@@ -319,7 +319,7 @@ export function LeaveConflictDetector({
           {allowOverride && (
             <button
               onClick={() => setShowOverrideDialog(true)}
-              className="flex items-center space-x-2 px-3 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors text-sm font-medium"
+              className="flex items-center space-x-2 px-3 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors text-sm font-medium"
             >
               <Shield className="h-4 w-4" />
               <span>Override</span>
@@ -384,7 +384,7 @@ export function LeaveConflictDetector({
                   <ul className="space-y-1">
                     {conflict.suggestions.map((suggestion, i) => (
                       <li key={i} className="text-xs text-gray-700 flex items-start space-x-2">
-                        <span className="text-[#E4002B] font-bold">•</span>
+                        <span className="text-[#4F46E5] font-bold">•</span>
                         <span>{suggestion}</span>
                       </li>
                     ))}
@@ -412,7 +412,7 @@ export function LeaveConflictDetector({
                   </div>
                   <div className="text-xs text-gray-600">{alt.reason}</div>
                 </div>
-                <button className="px-3 py-1.5 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors text-sm font-medium">
+                <button className="px-3 py-1.5 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors text-sm font-medium">
                   Use This
                 </button>
               </div>
@@ -426,7 +426,7 @@ export function LeaveConflictDetector({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center space-x-3 mb-4">
-              <Shield className="h-6 w-6 text-[#E4002B]" />
+              <Shield className="h-6 w-6 text-[#4F46E5]" />
               <h3 className="text-lg font-bold text-gray-900">Override Conflicts</h3>
             </div>
 
@@ -438,7 +438,7 @@ export function LeaveConflictDetector({
               value={overrideReason}
               onChange={(e) => setOverrideReason(e.target.value)}
               placeholder="Enter justification for override..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent resize-none"
               rows={4}
             />
 
@@ -459,7 +459,7 @@ export function LeaveConflictDetector({
                   px-4 py-2 rounded-lg transition-colors font-medium
                   ${
                     overrideReason.trim()
-                      ? 'bg-[#E4002B] text-white hover:bg-[#C00020]'
+                      ? 'bg-[#4F46E5] text-white hover:bg-[#4338CA]'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }
                 `}

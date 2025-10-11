@@ -245,7 +245,7 @@ export function DataTable<T extends Record<string, any>>({
                         size="sm"
                         onClick={() => setCurrentPage(page)}
                         className={cn(
-                          currentPage === page && 'bg-[#E4002B] hover:bg-[#C00020] text-white'
+                          currentPage === page && 'bg-[#4F46E5] hover:bg-[#4338CA] text-white'
                         )}
                       >
                         {page}

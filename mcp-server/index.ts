@@ -57,13 +57,11 @@ import {
 
 /**
  * Air Niugini MCP Server Configuration
+ * SDK v0.1.9 - Simplified API (no description, no config, no start/stop)
  */
 const server = createSdkMcpServer({
   name: 'Air Niugini Pilot Management System',
   version: '1.0.0',
-  description:
-    'MCP server for Air Niugini B767 fleet operations - pilot management, certification tracking, and leave management',
-
   // Register all tools
   tools: [
     // Pilot Management Tools
@@ -87,33 +85,16 @@ const server = createSdkMcpServer({
     detectLeaveConflictsTool,
     getPendingFinalReviewTool,
   ],
-
-  // Server configuration
-  config: {
-    capabilities: {
-      tools: true,
-      resources: false,
-      prompts: false,
-    },
-  },
-});
-
-// Start the MCP server
-server.start().catch((error: Error) => {
-  console.error('Failed to start Air Niugini MCP server:', error);
-  process.exit(1);
 });
 
 // Handle graceful shutdown
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
   console.log('\nShutting down Air Niugini MCP server...');
-  await server.stop();
   process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', () => {
   console.log('\nShutting down Air Niugini MCP server...');
-  await server.stop();
   process.exit(0);
 });
 

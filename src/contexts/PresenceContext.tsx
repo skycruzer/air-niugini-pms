@@ -43,8 +43,8 @@ const PresenceContext = createContext<PresenceContextType | undefined>(undefined
 
 // Assign consistent colors to users
 const USER_COLORS = [
-  '#E4002B', // Air Niugini Red
-  '#FFC72C', // Air Niugini Gold
+  '#4F46E5', // Air Niugini Red
+  '#06B6D4', // Air Niugini Gold
   '#0066CC', // Blue
   '#28A745', // Green
   '#9C27B0', // Purple
@@ -57,7 +57,7 @@ export function PresenceProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [presences, setPresences] = useState<Map<string, UserPresence>>(new Map());
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-  const [userColor, setUserColor] = useState<string>('#E4002B');
+  const [userColor, setUserColor] = useState<string>('#4F46E5');
   const [currentPage, setCurrentPage] = useState<string>('');
 
   // Initialize presence channel

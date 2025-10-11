@@ -43,8 +43,8 @@ ChartJS.register(
 
 // Air Niugini brand colors with extended palette
 const COLORS = {
-  primary: '#E4002B', // Air Niugini Red
-  secondary: '#FFC72C', // Air Niugini Gold
+  primary: '#4F46E5', // Air Niugini Red
+  secondary: '#06B6D4', // Air Niugini Gold
   success: '#059669', // Green for current/good status
   warning: '#D97706', // Amber for expiring/warning
   danger: '#DC2626', // Red for expired/critical

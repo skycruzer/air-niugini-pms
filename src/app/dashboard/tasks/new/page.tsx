@@ -109,7 +109,7 @@ export default function NewTaskPage() {
               <input
                 type="text"
                 {...register('title')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 placeholder="Enter task title"
               />
               {errors.title && <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>}
@@ -121,7 +121,7 @@ export default function NewTaskPage() {
               <textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 placeholder="Enter task description"
               />
             </div>
@@ -134,7 +134,7 @@ export default function NewTaskPage() {
                 </label>
                 <select
                   {...register('priority')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 >
                   <option value="LOW">Low</option>
                   <option value="MEDIUM">Medium</option>
@@ -158,7 +158,7 @@ export default function NewTaskPage() {
                   {...register('estimated_hours', {
                     setValueAs: (v) => (v === '' || v === null ? undefined : parseFloat(v)),
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                   placeholder="0"
                 />
                 {errors.estimated_hours && (
@@ -173,7 +173,7 @@ export default function NewTaskPage() {
               <input
                 type="datetime-local"
                 {...register('due_date')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
               />
             </div>
 
@@ -183,7 +183,7 @@ export default function NewTaskPage() {
               <input
                 type="text"
                 {...register('tags')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 placeholder="Enter tags separated by commas"
               />
               <p className="text-sm text-gray-500 mt-1">
@@ -202,7 +202,7 @@ export default function NewTaskPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center px-4 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5 mr-2" />
                 {isSubmitting ? 'Creating...' : 'Create Task'}

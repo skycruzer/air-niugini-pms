@@ -149,7 +149,7 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
                 yAxisId="right"
                 type="monotone"
                 dataKey="rate"
-                stroke="#E4002B"
+                stroke="#4F46E5"
                 strokeWidth={2}
                 name="Renewal Rate %"
               />
@@ -175,8 +175,8 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
                 type="monotone"
                 dataKey="recurrent"
                 stackId="1"
-                stroke="#E4002B"
-                fill="#E4002B"
+                stroke="#4F46E5"
+                fill="#4F46E5"
                 fillOpacity={0.8}
                 name="Recurrent"
               />
@@ -202,8 +202,8 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
                 type="monotone"
                 dataKey="license"
                 stackId="1"
-                stroke="#FFC72C"
-                fill="#FFC72C"
+                stroke="#06B6D4"
+                fill="#06B6D4"
                 fillOpacity={0.8}
                 name="License"
               />
@@ -228,7 +228,7 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
               <Line
                 type="monotone"
                 dataKey="expiring"
-                stroke="#E4002B"
+                stroke="#4F46E5"
                 strokeWidth={2}
                 name="Historical"
                 dot={{ r: 5 }}
@@ -236,7 +236,7 @@ export default function CertificationAnalytics({ timeRange }: CertificationAnaly
               <Line
                 type="monotone"
                 dataKey="forecast"
-                stroke="#FFC72C"
+                stroke="#06B6D4"
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 name="Forecast"

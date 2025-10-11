@@ -9,30 +9,30 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Air Niugini Primary (Red)
+        // Primary (Indigo)
         default:
-          'bg-[#E4002B] text-white shadow-sm hover:bg-[#C00020] focus-visible:ring-[#E4002B]',
+          'bg-[#4F46E5] text-white shadow-sm hover:bg-[#4338CA] focus-visible:ring-[#4F46E5]',
 
-        // Air Niugini Secondary (Gold)
+        // Secondary (Cyan)
         secondary:
-          'bg-[#FFC72C] text-black shadow-sm hover:bg-[#E6B027] focus-visible:ring-[#FFC72C]',
+          'bg-[#06B6D4] text-white shadow-sm hover:bg-[#0891B2] focus-visible:ring-[#06B6D4]',
 
-        // Destructive (compatible with brand red)
-        destructive: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-600',
+        // Destructive (Rose)
+        destructive: 'bg-rose-500 text-white shadow-sm hover:bg-rose-600 focus-visible:ring-rose-500',
 
-        // Outline (Air Niugini Red)
+        // Outline (Indigo)
         outline:
-          'border-2 border-[#E4002B] bg-background text-[#E4002B] shadow-sm hover:bg-[#E4002B] hover:text-white focus-visible:ring-[#E4002B]',
+          'border-2 border-[#4F46E5] bg-background text-[#4F46E5] shadow-sm hover:bg-[#4F46E5] hover:text-white focus-visible:ring-[#4F46E5]',
 
         // Ghost (neutral)
         ghost: 'hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-400',
 
         // Link
-        link: 'text-[#E4002B] underline-offset-4 hover:underline focus-visible:ring-[#E4002B]',
+        link: 'text-[#4F46E5] underline-offset-4 hover:underline focus-visible:ring-[#4F46E5]',
 
-        // Aviation (gradient)
-        aviation:
-          'bg-gradient-to-r from-[#C00020] to-[#E4002B] text-white shadow-md hover:shadow-lg focus-visible:ring-[#E4002B]',
+        // Accent (gradient)
+        accent:
+          'bg-gradient-to-r from-[#4338CA] to-[#4F46E5] text-white shadow-md hover:shadow-lg focus-visible:ring-[#4F46E5]',
       },
       size: {
         default: 'h-10 px-4 py-2',

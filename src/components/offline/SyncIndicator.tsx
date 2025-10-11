@@ -56,12 +56,12 @@ export function SyncIndicator() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         onClick={() => setIsExpanded(!isExpanded)}
-        className="fixed bottom-6 right-6 z-40 bg-[#E4002B] text-white p-4 rounded-full shadow-lg hover:bg-[#C00020] transition-colors"
+        className="fixed bottom-6 right-6 z-40 bg-[#4F46E5] text-white p-4 rounded-full shadow-lg hover:bg-[#4338CA] transition-colors"
         aria-label={`${queue.length} pending changes`}
       >
         <div className="relative">
           <Upload className="w-6 h-6" />
-          <span className="absolute -top-2 -right-2 bg-[#FFC72C] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute -top-2 -right-2 bg-[#06B6D4] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {queue.length}
           </span>
         </div>
@@ -89,7 +89,7 @@ export function SyncIndicator() {
               className="fixed top-0 right-0 bottom-0 w-full sm:w-96 bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
             >
               {/* Header */}
-              <div className="bg-[#E4002B] text-white p-4 flex items-center justify-between">
+              <div className="bg-[#4F46E5] text-white p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Upload className="w-5 h-5" />
                   <div>
@@ -150,7 +150,7 @@ export function SyncIndicator() {
                 <button
                   onClick={handleSync}
                   disabled={isSyncing || !navigator.onLine}
-                  className="w-full flex items-center justify-center gap-2 bg-[#E4002B] text-white px-4 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#C00020] transition-colors"
+                  className="w-full flex items-center justify-center gap-2 bg-[#4F46E5] text-white px-4 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#4338CA] transition-colors"
                 >
                   <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
                   {isSyncing ? 'Syncing...' : 'Sync Now'}

@@ -39,7 +39,7 @@ function FormField({
         <select
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] ${
             error ? 'border-red-300' : 'border-gray-300'
           }`}
           required={required}
@@ -68,7 +68,7 @@ function FormField({
           type="checkbox"
           checked={value as boolean}
           onChange={(e) => onChange(e.target.checked)}
-          className="h-4 w-4 text-[#E4002B] focus:ring-[#E4002B] border-gray-300 rounded"
+          className="h-4 w-4 text-[#4F46E5] focus:ring-[#4F46E5] border-gray-300 rounded"
         />
         <label className="ml-2 block text-sm text-gray-700">{label}</label>
       </div>
@@ -84,7 +84,7 @@ function FormField({
         type={type}
         value={value as string}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B] ${
+        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5] ${
           error ? 'border-red-300' : 'border-gray-300'
         }`}
         required={required}
@@ -398,7 +398,7 @@ export function PilotAddModal({ isOpen, onClose, onSuccess }: PilotAddModalProps
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-6 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />

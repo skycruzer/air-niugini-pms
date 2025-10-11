@@ -185,7 +185,7 @@ export function BulkCertificationModal({
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-3">
-          <Users className="w-7 h-7 text-[#E4002B]" />
+          <Users className="w-7 h-7 text-[#4F46E5]" />
           <div>
             <h2 className="text-xl font-bold text-gray-900">Bulk Certification Update</h2>
             <p className="text-gray-600 text-sm">
@@ -197,7 +197,7 @@ export function BulkCertificationModal({
         {/* Loading State */}
         {loading && (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
             <p className="text-gray-600 mt-2">Loading data...</p>
           </div>
         )}
@@ -238,7 +238,7 @@ export function BulkCertificationModal({
                 </label>
                 <select
                   {...register('checkTypeId')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 >
                   <option value="">Select a certification type</option>
                   {checkTypes.map((checkType) => (
@@ -259,7 +259,7 @@ export function BulkCertificationModal({
                 <input
                   type="date"
                   {...register('newExpiryDate')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E4002B] focus:border-[#E4002B]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                 />
                 {errors.newExpiryDate && (
                   <p className="text-sm text-red-600 mt-1">{errors.newExpiryDate.message}</p>
@@ -276,7 +276,7 @@ export function BulkCertificationModal({
                 <button
                   type="button"
                   onClick={handleSelectAll}
-                  className="text-sm text-[#E4002B] hover:text-[#C00020]"
+                  className="text-sm text-[#4F46E5] hover:text-[#4338CA]"
                 >
                   {selectAll ? 'Deselect All' : 'Select All'}
                 </button>
@@ -292,7 +292,7 @@ export function BulkCertificationModal({
                       type="checkbox"
                       checked={selectedPilots.includes(pilot.id)}
                       onChange={() => handlePilotSelect(pilot.id)}
-                      className="w-4 h-4 text-[#E4002B] border-gray-300 rounded focus:ring-[#E4002B]"
+                      className="w-4 h-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]"
                     />
                     <div className="ml-3 flex-1">
                       <p className="text-sm font-medium text-gray-900">
@@ -322,7 +322,7 @@ export function BulkCertificationModal({
               <button
                 type="submit"
                 disabled={submitting || selectedPilots.length === 0}
-                className="flex items-center px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center px-6 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {submitting ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />

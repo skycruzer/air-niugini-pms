@@ -301,10 +301,10 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
     <ModalSheet isOpen={isOpen} onClose={onClose} title="New Leave Request" size="xl">
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
         {/* Current Roster Info */}
-        <div className="bg-[#E4002B]/5 border border-[#E4002B]/20 rounded-lg p-4">
+        <div className="bg-[#4F46E5]/5 border border-[#4F46E5]/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-[#E4002B] flex items-center">
+              <h3 className="font-semibold text-[#4F46E5] flex items-center">
                 <span className="mr-2">🗓️</span>
                 Current Roster Period
               </h3>
@@ -330,7 +330,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
           </label>
           <select
             {...register('pilot_id')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
           >
             <option value="">Select a pilot...</option>
             {pilots.map((pilot) => (
@@ -413,7 +413,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
                   value={type.value}
                   className="sr-only peer"
                 />
-                <div className="border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#E4002B]/50 peer-checked:border-[#E4002B] peer-checked:bg-[#E4002B]/5 transition-colors">
+                <div className="border-2 border-gray-200 rounded-lg p-3 cursor-pointer hover:border-[#4F46E5]/50 peer-checked:border-[#4F46E5] peer-checked:bg-[#4F46E5]/5 transition-colors">
                   <div className="text-center">
                     <span className="text-2xl block mb-1">{type.icon}</span>
                     <span className="font-medium text-sm">{type.label}</span>
@@ -437,7 +437,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             <input
               type="date"
               {...register('request_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               max={format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.request_date && (
@@ -452,7 +452,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             </label>
             <select
               {...register('request_method')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
             >
               <option value="">Select advisory method...</option>
               <option value="ORACLE">Oracle (Rostering System)</option>
@@ -475,7 +475,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             <input
               type="date"
               {...register('start_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               min={format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.start_date && (
@@ -490,7 +490,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
             <input
               type="date"
               {...register('end_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent"
               min={watch('start_date') || format(new Date(), 'yyyy-MM-dd')}
             />
             {errors.end_date && (
@@ -588,7 +588,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
           <textarea
             {...register('reason')}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E4002B] focus:border-transparent resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent resize-none"
             placeholder="Provide additional details for your leave request..."
           />
         </div>
@@ -612,7 +612,7 @@ export function LeaveRequestModal({ isOpen, onClose, onSuccess }: LeaveRequestMo
           <button
             type="submit"
             disabled={loading || conflicts.length > 0}
-            className="px-6 py-2 bg-[#E4002B] text-white rounded-lg hover:bg-[#C00020] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+            className="px-6 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
           >
             {loading ? (
               <>

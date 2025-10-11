@@ -172,7 +172,7 @@ export function CategoryTimelineView() {
     return (
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E4002B] mx-auto" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
           <p className="text-gray-600 mt-2">Loading category timelines...</p>
         </div>
       </div>
@@ -208,7 +208,7 @@ export function CategoryTimelineView() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#E4002B] to-red-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-[#4F46E5] to-red-600 rounded-lg shadow-lg p-6 text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <BarChart3 className="w-8 h-8 mr-3" />
@@ -222,7 +222,7 @@ export function CategoryTimelineView() {
           <div className="flex items-center space-x-2">
             <button
               onClick={expandAll}
-              className="px-4 py-2 bg-white text-[#E4002B] rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-white text-[#4F46E5] rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
             >
               Expand All
             </button>

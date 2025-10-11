@@ -38,7 +38,7 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
 
   const leaveByType = useMemo(
     () => [
-      { type: 'RDO', count: 85, color: '#E4002B' },
+      { type: 'RDO', count: 85, color: '#4F46E5' },
       { type: 'WDO', count: 32, color: '#4F46E5' },
       { type: 'Annual', count: 25, color: '#10B981' },
     ],
@@ -209,7 +209,7 @@ export default function LeaveAnalytics({ timeRange }: LeaveAnalyticsProps) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="rdo" fill="#E4002B" name="RDO" />
+              <Bar dataKey="rdo" fill="#4F46E5" name="RDO" />
               <Bar dataKey="wdo" fill="#4F46E5" name="WDO" />
               <Bar dataKey="annual" fill="#10B981" name="Annual Leave" />
             </BarChart>

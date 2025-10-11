@@ -8,9 +8,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/middleware/auth';
 import { validateRequest } from '@/lib/validation-schemas';
 import { z } from 'zod';
-import { withAuth, permissions } from '@/middleware/auth';
 import { logger } from '@/lib/logger';
 import {
   getDisciplinaryMatters,
@@ -63,10 +63,9 @@ const createDisciplinaryMatterSchema = z.object({
 /**
  * GET /api/disciplinary-matters
  * Retrieves disciplinary matters with optional filters
- * @auth Required - Admin and Manager roles only
  */
 export const GET = withAuth(
-  async (request: NextRequest, { user }) => {
+  async (request: NextRequest, { user }: any) => {
     try {
       const { searchParams } = new URL(request.url);
       const action = searchParams.get('action');
@@ -120,10 +119,9 @@ export const GET = withAuth(
 /**
  * POST /api/disciplinary-matters
  * Creates a new disciplinary matter
- * @auth Required - Admin and Manager roles only
  */
 export const POST = withAuth(
-  async (request: NextRequest, { user }) => {
+  async (request: NextRequest, { user }: any) => {
     try {
       const body = await request.json();
 
@@ -140,7 +138,7 @@ export const POST = withAuth(
         );
       }
 
-      // Create disciplinary matter with authenticated user context for audit trail
+      // Create disciplinary matter with user context for audit trail
       const matter = await createDisciplinaryMatter(validation.data, user.id);
 
       return NextResponse.json(
