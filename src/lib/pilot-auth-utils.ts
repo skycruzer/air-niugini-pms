@@ -3,7 +3,7 @@
  * Handles pilot user authentication, separate from admin authentication
  */
 
-import { supabase, getSupabaseAdmin } from './supabase';
+import { supabase } from './supabase';
 import type { Database } from '@/types/supabase';
 
 type PilotUser = Database['public']['Tables']['pilot_users']['Row'];
@@ -52,9 +52,8 @@ class PilotAuthService {
         throw new Error('Your registration is pending approval. Please wait for administrator approval.');
       }
 
-      // Step 4: Update last login timestamp
-      const supabaseAdmin = getSupabaseAdmin();
-      await supabaseAdmin
+      // Step 4: Update last login timestamp (use regular client, user can update their own record)
+      await supabase
         .from('pilot_users')
         .update({
           last_login_at: new Date().toISOString(),

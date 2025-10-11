@@ -9,14 +9,13 @@ import {
   Calendar,
   MessageSquare,
   Bell,
-  User,
   LogOut,
   Plane,
   Menu,
   X,
 } from 'lucide-react';
 
-export default function PilotDashboardLayout({ children }: { children: React.ReactNode }) {
+export default function PilotLayout({ children }: { children: React.ReactNode }) {
   const [pilotUser, setPilotUser] = useState<PilotAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

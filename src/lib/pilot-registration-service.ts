@@ -6,7 +6,6 @@
 import { getSupabaseAdmin } from './supabase';
 import type { Database } from '@/types/supabase';
 
-type PilotUser = Database['public']['Tables']['pilot_users']['Row'];
 type PilotUserInsert = Database['public']['Tables']['pilot_users']['Insert'];
 
 export interface PilotRegistrationData {
@@ -211,16 +210,21 @@ export async function registerPilot(
 /**
  * Get all pending pilot registrations (for admin approval)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getPendingRegistrations(): Promise<any[]> {
   try {
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Get pending pilot_users records
+    // DEBUG: Check if we're using service role
+    console.log('[DEBUG] Service role key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+    console.log('[DEBUG] Service role key first 20 chars:', process.env.SUPABASE_SERVICE_ROLE_KEY?.substring(0, 20));
+
+    // Get pending pilot_users records using RPC function to bypass RLS
     const { data: pilotUsers, error } = await supabaseAdmin
-      .from('pilot_users')
-      .select('*')
-      .eq('registration_approved', false)
-      .order('registration_date', { ascending: false });
+      .rpc('get_pending_pilot_registrations');
+
+    console.log('[DEBUG] pilot_users query result:', { count: pilotUsers?.length, error });
+    console.log('[DEBUG] pilot_users data:', JSON.stringify(pilotUsers, null, 2));
 
     if (error) {
       console.error('Error fetching pending registrations:', error);
@@ -234,6 +238,8 @@ export async function getPendingRegistrations(): Promise<any[]> {
     // Get auth users to check email confirmation status
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
 
+    console.log('[DEBUG] auth.admin.listUsers result:', { count: authData?.users?.length, error: authError });
+
     if (authError) {
       console.error('Error fetching auth users:', authError);
       // Return pilot users without email confirmation status
@@ -245,8 +251,10 @@ export async function getPendingRegistrations(): Promise<any[]> {
     }
 
     // Map pilot users with email confirmation status from auth.users
+    // BUG FIX: Match by email instead of id
     const registrationsWithEmailStatus = pilotUsers.map((pilotUser) => {
-      const authUser = authData.users.find((u) => u.id === pilotUser.id);
+      const authUser = authData.users.find((u) => u.email === pilotUser.email);
+      console.log('[DEBUG] Matching pilot:', pilotUser.email, 'Found auth user:', !!authUser);
       return {
         ...pilotUser,
         email_confirmed: authUser?.email_confirmed_at !== null && authUser?.email_confirmed_at !== undefined,
@@ -254,6 +262,7 @@ export async function getPendingRegistrations(): Promise<any[]> {
       };
     });
 
+    console.log('[DEBUG] Returning registrations:', registrationsWithEmailStatus.length);
     return registrationsWithEmailStatus;
   } catch (error) {
     console.error('Error in getPendingRegistrations:', error);
