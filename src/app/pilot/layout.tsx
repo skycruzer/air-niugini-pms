@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { pilotAuthService, type PilotAuthUser } from '@/lib/pilot-auth-utils';
 import {
@@ -20,8 +20,19 @@ export default function PilotLayout({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/pilot/login', '/pilot/register'];
+  const isPublicRoute = publicRoutes.includes(pathname);
 
   useEffect(() => {
+    // Skip authentication check for public routes
+    if (isPublicRoute) {
+      setIsLoading(false);
+      return;
+    }
+
     const checkAuth = async () => {
       const user = await pilotAuthService.getSession();
 
@@ -35,12 +46,17 @@ export default function PilotLayout({ children }: { children: React.ReactNode })
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, isPublicRoute]);
 
   const handleLogout = async () => {
     await pilotAuthService.logout();
     router.push('/pilot/login');
   };
+
+  // For public routes (login, register), render children without layout
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
