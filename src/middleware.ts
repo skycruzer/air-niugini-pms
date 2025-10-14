@@ -35,26 +35,33 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected pilot routes - require authentication
-  if (request.nextUrl.pathname.startsWith('/pilot/dashboard') ||
-      request.nextUrl.pathname.startsWith('/pilot/leave') ||
-      request.nextUrl.pathname.startsWith('/pilot/feedback') ||
-      request.nextUrl.pathname.startsWith('/pilot/notifications')) {
-    if (!user) {
-      // Redirect to pilot login if not authenticated
-      const url = request.nextUrl.clone();
-      url.pathname = '/pilot/login';
-      return NextResponse.redirect(url);
-    }
-  }
+  // Skip protection for public pages
+  const isPublicPage =
+    request.nextUrl.pathname === '/pilot/login' ||
+    request.nextUrl.pathname === '/login' ||
+    request.nextUrl.pathname === '/pilot/register' ||
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/api/auth');
 
-  // Protected admin routes - require authentication
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!user) {
-      // Redirect to admin login if not authenticated
-      const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
+  if (!isPublicPage) {
+    // Protected pilot routes - require authentication
+    if (request.nextUrl.pathname.startsWith('/pilot')) {
+      if (!user) {
+        // Redirect to pilot login if not authenticated
+        const url = request.nextUrl.clone();
+        url.pathname = '/pilot/login';
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Protected admin routes - require authentication
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      if (!user) {
+        // Redirect to admin login if not authenticated
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        return NextResponse.redirect(url);
+      }
     }
   }
 
