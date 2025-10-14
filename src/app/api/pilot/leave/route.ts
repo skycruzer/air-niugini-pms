@@ -46,11 +46,13 @@ export async function GET(request: NextRequest) {
 
     // Get authenticated pilot user
     const {
-      data: { session },
+      data: { user },
       error: authError,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
+      console.error('[Pilot Leave] Auth error:', authError);
+      console.error('[Pilot Leave] User:', user);
       return NextResponse.json(
         {
           success: false,
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const pilotUserId = session.user.id;
+    const pilotUserId = user.id;
 
     // Get leave requests
     const requests = await getPilotLeaveRequests(pilotUserId);
@@ -105,11 +107,13 @@ export async function POST(request: NextRequest) {
 
     // Get authenticated pilot user
     const {
-      data: { session },
+      data: { user },
       error: authError,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
+      console.error('[Pilot Leave] Auth error:', authError);
+      console.error('[Pilot Leave] User:', user);
       return NextResponse.json(
         {
           success: false,
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pilotUserId = session.user.id;
+    const pilotUserId = user.id;
 
     // Parse and validate request body
     const body = await request.json();
