@@ -3,8 +3,11 @@
  * Handles pilot user authentication, separate from admin authentication
  */
 
-import { supabase } from './supabase';
+import { createClient } from './supabase-browser';
 import type { Database } from '@/types/supabase';
+
+// Create browser client instance
+const supabase = createClient();
 
 type PilotUser = Database['public']['Tables']['pilot_users']['Row'];
 
