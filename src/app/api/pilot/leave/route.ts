@@ -90,12 +90,15 @@ export async function POST(request: NextRequest) {
   try {
     // Create server-side Supabase client from cookies
     const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+    console.log('[Pilot Leave POST] Cookies received:', allCookies.map(c => c.name));
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll: () => cookieStore.getAll(),
+          getAll: () => allCookies,
           setAll: (cookiesToSet) => {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
@@ -111,19 +114,52 @@ export async function POST(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
+    console.log('[Pilot Leave POST] Auth result:', { user: user?.id, error: authError?.message });
+
     if (authError || !user) {
-      console.error('[Pilot Leave] Auth error:', authError);
-      console.error('[Pilot Leave] User:', user);
+      console.error('[Pilot Leave POST] Auth failed - Error:', authError);
+      console.error('[Pilot Leave POST] Auth failed - User:', user);
       return NextResponse.json(
         {
           success: false,
-          error: 'Unauthorized',
+          error: `Unauthorized - ${authError?.message || 'No user found'}`,
         },
         { status: 401 }
       );
     }
 
     const pilotUserId = user.id;
+
+    // Check if pilot user exists and is approved
+    const { data: pilotUser, error: pilotError } = await supabase
+      .from('pilot_users')
+      .select('*')
+      .eq('id', pilotUserId)
+      .single();
+
+    console.log('[Pilot Leave POST] Pilot user check:', { pilotUser, pilotError });
+
+    if (pilotError || !pilotUser) {
+      console.error('[Pilot Leave POST] Pilot user not found:', pilotError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Pilot account not found. Please contact administrator.',
+        },
+        { status: 403 }
+      );
+    }
+
+    if (!pilotUser.registration_approved) {
+      console.error('[Pilot Leave POST] Pilot not approved:', pilotUserId);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Your registration is pending approval. Please contact administrator.',
+        },
+        { status: 403 }
+      );
+    }
 
     // Parse and validate request body
     const body = await request.json();
