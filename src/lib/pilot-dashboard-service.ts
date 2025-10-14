@@ -56,15 +56,19 @@ export async function getPilotDashboardStats(pilotUserId: string): Promise<Dashb
       .select('*', { count: 'exact', head: true })
       .eq('pilot_user_id', pilotUserId);
 
-    // Get unread notifications count (if notifications table exists)
-    // For now, return 0 as placeholder
-    const unreadNotifications = 0;
+    // Get unread notifications count
+    const { count: unreadNotifications } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('recipient_id', pilotUserId)
+      .eq('recipient_type', 'pilot')
+      .eq('is_read', false);
 
     return {
       approvedLeaves: approvedCount || 0,
       pendingRequests: pendingCount || 0,
       feedbackPosts: feedbackCount || 0,
-      unreadNotifications,
+      unreadNotifications: unreadNotifications || 0,
     };
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
