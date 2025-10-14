@@ -2,16 +2,42 @@
 
 import { useEffect, useState } from 'react';
 import { pilotAuthService, type PilotAuthUser } from '@/lib/pilot-auth-utils';
+import {
+  getPilotDashboardStats,
+  getPilotRecentActivity,
+  type DashboardStats,
+  type RecentActivity,
+} from '@/lib/pilot-dashboard-service';
 import { Calendar, MessageSquare, Bell, TrendingUp, Clock, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PilotDashboardPage() {
   const [pilotUser, setPilotUser] = useState<PilotAuthUser | null>(null);
+  const [stats, setStats] = useState<DashboardStats>({
+    approvedLeaves: 0,
+    pendingRequests: 0,
+    feedbackPosts: 0,
+    unreadNotifications: 0,
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
       const user = await pilotAuthService.getSession();
       setPilotUser(user);
+
+      if (user?.id) {
+        // Load dashboard stats
+        setIsLoadingStats(true);
+        const dashboardStats = await getPilotDashboardStats(user.id);
+        setStats(dashboardStats);
+
+        // Load recent activity
+        const activity = await getPilotRecentActivity(user.id);
+        setRecentActivity(activity);
+        setIsLoadingStats(false);
+      }
     };
     loadUser();
   }, []);
@@ -43,7 +69,13 @@ export default function PilotDashboardPage() {
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6 text-green-600" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">0</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {isLoadingStats ? (
+                <div className="loading-spinner" />
+              ) : (
+                stats.approvedLeaves
+              )}
+            </span>
           </div>
           <h3 className="text-gray-600 font-medium">Approved Leaves</h3>
           <p className="text-sm text-gray-500 mt-1">This year</p>
@@ -54,7 +86,13 @@ export default function PilotDashboardPage() {
             <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">0</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {isLoadingStats ? (
+                <div className="loading-spinner" />
+              ) : (
+                stats.pendingRequests
+              )}
+            </span>
           </div>
           <h3 className="text-gray-600 font-medium">Pending Requests</h3>
           <p className="text-sm text-gray-500 mt-1">Awaiting approval</p>
@@ -65,7 +103,13 @@ export default function PilotDashboardPage() {
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <MessageSquare className="w-6 h-6 text-blue-600" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">0</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {isLoadingStats ? (
+                <div className="loading-spinner" />
+              ) : (
+                stats.feedbackPosts
+              )}
+            </span>
           </div>
           <h3 className="text-gray-600 font-medium">My Feedback Posts</h3>
           <p className="text-sm text-gray-500 mt-1">Total posts</p>
@@ -76,7 +120,13 @@ export default function PilotDashboardPage() {
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <Bell className="w-6 h-6 text-purple-600" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">0</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {isLoadingStats ? (
+                <div className="loading-spinner" />
+              ) : (
+                stats.unreadNotifications
+              )}
+            </span>
           </div>
           <h3 className="text-gray-600 font-medium">Notifications</h3>
           <p className="text-sm text-gray-500 mt-1">Unread</p>
@@ -132,18 +182,66 @@ export default function PilotDashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity (Placeholder) */}
+      {/* Recent Activity */}
       <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-        <div className="text-center py-12">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <TrendingUp className="w-10 h-10 text-gray-400" />
+        {isLoadingStats ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="loading-spinner-lg" />
           </div>
-          <p className="text-gray-500 font-medium mb-2">No recent activity</p>
-          <p className="text-sm text-gray-400">
-            Your leave requests and feedback posts will appear here
-          </p>
-        </div>
+        ) : recentActivity.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <TrendingUp className="w-10 h-10 text-gray-400" />
+            </div>
+            <p className="text-gray-500 font-medium mb-2">No recent activity</p>
+            <p className="text-sm text-gray-400">
+              Your leave requests and feedback posts will appear here
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  {activity.type === 'leave_request' ? (
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <MessageSquare className="w-5 h-5 text-green-600" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-900 font-medium">{activity.description}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {new Date(activity.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+                {activity.status && (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      activity.status === 'APPROVED'
+                        ? 'bg-green-100 text-green-700'
+                        : activity.status === 'PENDING'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {activity.status}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
