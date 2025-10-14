@@ -232,9 +232,13 @@ export default function PilotsPage() {
   const handleEditPilotSuccess = async () => {
     console.log('🔄 Pilot updated successfully, refreshing pilot list...');
     commonToasts.pilot.updated();
+
+    // Small delay to ensure database propagation
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     await fetchPilots();
     console.log('✅ Pilot list refreshed');
-    // No need for hard refresh - fetchPilots() updates the state
+    // Force a state update by updating a dummy state if needed
   };
 
   const handleCloseEditModal = () => {

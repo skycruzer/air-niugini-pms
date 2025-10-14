@@ -101,11 +101,14 @@ export async function getAllPilots(): Promise<PilotWithCertifications[]> {
       console.log('🔍 getAllPilots: Client-side - using API route...');
 
       // CRITICAL FIX: Disable Next.js fetch caching to always get fresh data
-      const response = await fetch('/api/pilots', {
+      // Add timestamp to force cache busting
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/pilots?_t=${timestamp}`, {
         cache: 'no-store', // Disable Next.js fetch cache
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
 
