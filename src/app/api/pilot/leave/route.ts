@@ -6,12 +6,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import {
   submitPilotLeaveRequest,
   getPilotLeaveRequests,
   type PilotLeaveRequestData,
 } from '@/lib/pilot-leave-service';
-import { supabase } from '@/lib/supabase';
 
 // Validation schema
 const leaveRequestSchema = z.object({
@@ -26,6 +27,23 @@ const leaveRequestSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
+    // Create server-side Supabase client from cookies
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
     // Get authenticated pilot user
     const {
       data: { session },
@@ -68,6 +86,23 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Create server-side Supabase client from cookies
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
     // Get authenticated pilot user
     const {
       data: { session },
