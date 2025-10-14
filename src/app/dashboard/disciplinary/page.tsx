@@ -14,7 +14,6 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Plus, Filter, FileText, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { apiGet } from '@/lib/api-client';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LazyLoader } from '@/components/ui/LazyLoader';
 
@@ -61,8 +60,7 @@ export default function DisciplinaryMattersPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -222,7 +220,6 @@ export default function DisciplinaryMattersPage() {
             />
           </LazyLoader>
         )}
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

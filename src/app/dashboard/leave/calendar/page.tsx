@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { InteractiveRosterCalendar } from '@/components/leave/InteractiveRosterCalendar';
 import { RosterPeriodNavigator } from '@/components/leave/RosterPeriodNavigator';
@@ -75,8 +74,7 @@ export default function LeaveCalendarPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -134,7 +132,6 @@ export default function LeaveCalendarPage() {
             </div>
           )}
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

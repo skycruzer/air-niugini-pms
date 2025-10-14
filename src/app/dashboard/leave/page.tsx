@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LazyLeaveRequestModal, LazyLeaveBidModal } from '@/components/lazy';
 import { LazyLoader } from '@/components/ui/LazyLoader';
@@ -149,8 +148,7 @@ export default function LeaveRequestsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6">
+      <div className="p-6">
           {/* Breadcrumb Navigation */}
           <DashboardBreadcrumb items={breadcrumbConfigs.leave.list} className="mb-4" />
 
@@ -523,7 +521,6 @@ export default function LeaveRequestsPage() {
             </>
           )}
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

@@ -15,7 +15,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { apiPost } from '@/lib/api-client';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
@@ -72,8 +71,7 @@ export default function NewTaskPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -210,7 +208,6 @@ export default function NewTaskPage() {
             </div>
           </form>
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

@@ -6,7 +6,6 @@ import { permissions } from '@/lib/auth-utils';
 import { format } from 'date-fns';
 import { getRosterPeriodFromDate } from '@/lib/roster-utils';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 interface ExpiringCertification {
   id: string;
@@ -440,8 +439,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div key="certification-expiry-planning" className="p-6 space-y-6">
+      <div key="certification-expiry-planning" className="p-6 space-y-6">
           {/* Page Header */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
@@ -735,7 +733,6 @@ Recipients: ${recipients.split(',').join(', ')}`);
             </div>
           </div>
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

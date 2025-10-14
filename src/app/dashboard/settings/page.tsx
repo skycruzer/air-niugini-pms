@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
@@ -184,8 +183,7 @@ export default function SettingsPage() {
   if (!permissions.canManageSettings(user)) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
+        <div className="p-6">
             <div className="text-center py-16">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-red-600 text-3xl">🚫</span>
@@ -197,15 +195,13 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
-        </DashboardLayout>
       </ProtectedRoute>
     );
   }
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6">
+      <div className="p-6">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -722,7 +718,6 @@ export default function SettingsPage() {
             </>
           )}
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

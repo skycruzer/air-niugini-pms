@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { CertificationCalendar } from '@/components/calendar/CertificationCalendar';
 import { CertificationTimeline } from '@/components/certifications/CertificationTimeline';
@@ -103,11 +102,9 @@ export default function CertificationCalendarPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
+        <div className="p-6">
             <CertificationCalendarSkeleton viewMode={viewMode} />
           </div>
-        </DashboardLayout>
       </ProtectedRoute>
     );
   }
@@ -115,21 +112,18 @@ export default function CertificationCalendarPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
+        <div className="p-6">
             <div className="text-center py-12">
               <p className="text-red-600">{error}</p>
             </div>
           </div>
-        </DashboardLayout>
       </ProtectedRoute>
     );
   }
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -234,7 +228,6 @@ export default function CertificationCalendarPage() {
             />
           )}
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

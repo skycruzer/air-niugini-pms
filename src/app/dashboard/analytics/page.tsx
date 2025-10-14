@@ -9,7 +9,6 @@
 
 import { Suspense } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -88,11 +87,9 @@ function AnalyticsError() {
 export default function AnalyticsPage() {
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <Suspense fallback={<AnalyticsLoading />}>
+      <Suspense fallback={<AnalyticsLoading />}>
           <AnalyticsDashboard />
         </Suspense>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

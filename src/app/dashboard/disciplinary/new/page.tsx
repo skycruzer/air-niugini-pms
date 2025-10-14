@@ -16,7 +16,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { apiPost, apiGet } from '@/lib/api-client';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
@@ -86,8 +85,7 @@ export default function NewDisciplinaryCasePage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -311,7 +309,6 @@ export default function NewDisciplinaryCasePage() {
             </div>
           </form>
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

@@ -24,7 +24,6 @@ import {
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { apiGet } from '@/lib/api-client';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LazyLoader } from '@/components/ui/LazyLoader';
 
@@ -90,8 +89,7 @@ export default function TasksPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -229,7 +227,6 @@ export default function TasksPage() {
             />
           </LazyLoader>
         )}
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

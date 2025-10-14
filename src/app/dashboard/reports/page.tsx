@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import {
   ExpiryTimelineChart,
   ComplianceDonutChart,
@@ -309,8 +308,7 @@ export default function ReportsPage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6">
+    <div className="p-6">
         <div className="mb-8">
           <h1 className="text-display-small text-gray-900 mb-2">Fleet Reports</h1>
           <p className="text-body-medium text-gray-600">
@@ -1469,6 +1467,5 @@ export default function ReportsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import { getCertificationStatus, getCategoryIcon } from '@/lib/certification-utils';
@@ -262,14 +261,12 @@ export default function PilotDetailPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
+        <div className="p-6">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-air-niugini-red mx-auto" />
               <p className="text-gray-600 mt-2">Loading pilot details...</p>
             </div>
           </div>
-        </DashboardLayout>
       </ProtectedRoute>
     );
   }
@@ -277,8 +274,7 @@ export default function PilotDetailPage() {
   if (!pilot) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
+        <div className="p-6">
             <div className="text-center py-12">
               <span className="text-6xl block mb-4">👨‍✈️</span>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Pilot not found</h3>
@@ -294,7 +290,6 @@ export default function PilotDetailPage() {
               </button>
             </div>
           </div>
-        </DashboardLayout>
       </ProtectedRoute>
     );
   }
@@ -308,8 +303,7 @@ export default function PilotDetailPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6">
+      <div className="p-6">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
@@ -584,7 +578,6 @@ export default function PilotDetailPage() {
             </div>
           </div>
         )}
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

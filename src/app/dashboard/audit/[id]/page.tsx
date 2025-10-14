@@ -19,7 +19,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import { getAuditLogById, AuditLog } from '@/lib/audit-log-service';
@@ -79,8 +78,7 @@ export default function AuditLogDetailPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-4 md:p-6 max-w-6xl mx-auto">
+      <div className="p-4 md:p-6 max-w-6xl mx-auto">
           {/* Back Button */}
           <div className="mb-6">
             <button
@@ -119,7 +117,6 @@ export default function AuditLogDetailPage() {
           {/* Audit Log Detail */}
           {log && !isLoading && !error && <AuditLogDetail log={log} onClose={handleClose} />}
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

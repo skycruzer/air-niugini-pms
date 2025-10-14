@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { RosterPeriodSelector } from '@/components/leave/RosterPeriodSelector';
 import { LeaveRequest, getLeaveRequestStats } from '@/lib/leave-service';
 import { permissions } from '@/lib/auth-utils';
@@ -406,8 +405,7 @@ Recipients: ${recipients.split(',').join(', ')}`);
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Page Header */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
@@ -657,7 +655,6 @@ Recipients: ${recipients.split(',').join(', ')}`);
             </div>
           </div>
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

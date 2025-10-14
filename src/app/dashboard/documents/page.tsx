@@ -23,7 +23,6 @@ import {
   Search,
   BarChart3,
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UploadDocumentModal } from '@/components/documents/UploadDocumentModal';
 import { NewFormModal } from '@/components/documents/NewFormModal';
@@ -96,8 +95,7 @@ export default function DocumentsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
@@ -337,7 +335,6 @@ export default function DocumentsPage() {
             pilots={pilots?.data || []}
           />
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

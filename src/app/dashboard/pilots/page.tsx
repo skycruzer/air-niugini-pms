@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import { getAllPilots, PilotWithCertifications } from '@/lib/pilot-service-client';
@@ -382,8 +381,7 @@ export default function PilotsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6">
           {/* Breadcrumb Navigation */}
           <DashboardBreadcrumb items={breadcrumbConfigs.pilots.list} className="mb-4" />
 
@@ -806,7 +804,6 @@ export default function PilotsPage() {
           onDelete={handleBulkDelete}
           onUpdateStatus={handleBulkUpdateStatus}
         />
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }

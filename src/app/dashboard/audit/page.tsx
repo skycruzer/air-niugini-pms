@@ -20,7 +20,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import {
@@ -151,8 +150,7 @@ export default function AuditLogsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-4 md:p-6 max-w-[1600px] mx-auto">
+      <div className="p-4 md:p-6 max-w-[1600px] mx-auto">
           {/* Header */}
           <div className="mb-6 animate-fade-in">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
@@ -359,7 +357,6 @@ export default function AuditLogsPage() {
             <ComplianceReport onClose={() => setShowComplianceReport(false)} />
           </div>
         )}
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }
