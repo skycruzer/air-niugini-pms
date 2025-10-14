@@ -494,10 +494,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </h6>
                     <div className="space-y-1 text-xs opacity-80">
                       <p className="flex items-center">
-                        <span className="mr-2">👨‍💻</span>
-                        Developer: Maurice Rondeau
-                      </p>
-                      <p className="flex items-center">
                         <span className="mr-2">📅</span>
                         Version 1.0 • 2025
                       </p>
