@@ -233,12 +233,16 @@ export default function PilotsPage() {
     console.log('🔄 Pilot updated successfully, refreshing pilot list...');
     commonToasts.pilot.updated();
 
-    // Small delay to ensure database propagation
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Force clear state to ensure React detects the change
+    setPilots([]);
+    setLoading(true);
 
+    // Small delay to ensure database propagation
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    // Fetch fresh data
     await fetchPilots();
-    console.log('✅ Pilot list refreshed');
-    // Force a state update by updating a dummy state if needed
+    console.log('✅ Pilot list refreshed with fresh data');
   };
 
   const handleCloseEditModal = () => {

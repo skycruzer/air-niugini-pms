@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { permissions } from '@/lib/auth-utils';
 import {
@@ -308,17 +307,15 @@ export default function PilotCertificationsPage() {
   if (!permissions.canEdit(user)) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
-            <div className="text-center py-12">
-              <span className="text-6xl block mb-4">🚫</span>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
-              <p className="text-gray-600 mb-4">
-                You don&apos;t have permission to manage certifications.
-              </p>
-            </div>
+        <div className="p-6">
+          <div className="text-center py-12">
+            <span className="text-6xl block mb-4">🚫</span>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
+            <p className="text-gray-600 mb-4">
+              You don&apos;t have permission to manage certifications.
+            </p>
           </div>
-        </DashboardLayout>
+        </div>
       </ProtectedRoute>
     );
   }
@@ -326,14 +323,12 @@ export default function PilotCertificationsPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
-              <p className="text-gray-600 mt-2">Loading certification data...</p>
-            </div>
+        <div className="p-6">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4F46E5] mx-auto" />
+            <p className="text-gray-600 mt-2">Loading certification data...</p>
           </div>
-        </DashboardLayout>
+        </div>
       </ProtectedRoute>
     );
   }
@@ -341,24 +336,22 @@ export default function PilotCertificationsPage() {
   if (!pilot) {
     return (
       <ProtectedRoute>
-        <DashboardLayout>
-          <div className="p-6">
-            <div className="text-center py-12">
-              <span className="text-6xl block mb-4">👨‍✈️</span>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Pilot not found</h3>
-              <p className="text-gray-600 mb-4">
-                The pilot you&apos;re looking for doesn&apos;t exist.
-              </p>
-              <button
-                onClick={() => router.push('/dashboard/pilots')}
-                className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <span className="mr-2">⬅️</span>
-                Back to Pilots
-              </button>
-            </div>
+        <div className="p-6">
+          <div className="text-center py-12">
+            <span className="text-6xl block mb-4">👨‍✈️</span>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Pilot not found</h3>
+            <p className="text-gray-600 mb-4">
+              The pilot you&apos;re looking for doesn&apos;t exist.
+            </p>
+            <button
+              onClick={() => router.push('/dashboard/pilots')}
+              className="inline-flex items-center px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <span className="mr-2">⬅️</span>
+              Back to Pilots
+            </button>
           </div>
-        </DashboardLayout>
+        </div>
       </ProtectedRoute>
     );
   }
@@ -378,8 +371,7 @@ export default function PilotCertificationsPage() {
 
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <div className="p-6 max-w-7xl mx-auto">
+      <div className="p-6 max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center space-x-4 mb-4">
@@ -500,7 +492,6 @@ export default function PilotCertificationsPage() {
             </div>
           </form>
         </div>
-      </DashboardLayout>
     </ProtectedRoute>
   );
 }
