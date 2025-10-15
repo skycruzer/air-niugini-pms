@@ -62,6 +62,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       ],
     },
     {
+      name: 'Flight Requests',
+      href: '/dashboard/flight-requests',
+      icon: NavIcons.pilots,
+      description: 'Manage flight assignments',
+    },
+    {
       name: 'Disciplinary',
       href: '/dashboard/disciplinary',
       icon: NavIcons.disciplinary,
