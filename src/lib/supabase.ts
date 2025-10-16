@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 
 /**
@@ -39,17 +40,29 @@ function getSupabaseConfig() {
   };
 }
 
-// Create Supabase client with error handling and Realtime enabled
+// Create Supabase client with SSR cookie handling for proper authentication
 const config = getSupabaseConfig();
-export const supabase = createClient(config.url, config.key, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
+export const supabase = createBrowserClient(config.url, config.key, {
+  cookies: {
+    get(name) {
+      if (typeof document === 'undefined') return undefined;
+      const cookies = document.cookie.split('; ');
+      const cookie = cookies.find(c => c.startsWith(`${name}=`));
+      return cookie?.split('=')[1];
+    },
+    set(name, value, options) {
+      if (typeof document === 'undefined') return;
+      let cookie = `${name}=${value}`;
+      if (options?.maxAge) cookie += `; Max-Age=${options.maxAge}`;
+      if (options?.path) cookie += `; Path=${options.path}`;
+      if (options?.domain) cookie += `; Domain=${options.domain}`;
+      if (options?.sameSite) cookie += `; SameSite=${options.sameSite}`;
+      if (options?.secure) cookie += '; Secure';
+      document.cookie = cookie;
+    },
+    remove(name, options) {
+      if (typeof document === 'undefined') return;
+      this.set(name, '', { ...options, maxAge: 0 });
     },
   },
 });

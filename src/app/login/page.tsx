@@ -24,7 +24,8 @@ export default function LoginPage() {
     try {
       const success = await login(email, password);
       if (success) {
-        router.push('/dashboard');
+        // Use window.location for hard redirect (more reliable than router.push)
+        window.location.href = '/dashboard';
       } else {
         setError('Invalid email or password. Please check your credentials.');
       }

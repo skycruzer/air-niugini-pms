@@ -56,30 +56,33 @@ export const authService = {
   // Login with Supabase Auth
   async login(email: string, password: string): Promise<AuthUser | null> {
     try {
-      // Security: Don't log email addresses in production
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔐 Starting login attempt');
-      }
+      console.log('🔐 LOGIN ATTEMPT - Starting...');
+      console.log('📧 Email:', email);
+      console.log('🔑 Password length:', password.length);
 
       const {
-        data: { user: authUser },
+        data: { user: authUser, session },
         error: signInError,
       } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      console.log('🔍 Auth Response:');
+      console.log('  - User:', authUser ? '✅ Exists' : '❌ Null');
+      console.log('  - Session:', session ? '✅ Exists' : '❌ Null');
+      console.log('  - Error:', signInError ? signInError.message : 'None');
+
       if (signInError || !authUser) {
-        // Don't log specific error details that could help attackers
-        if (process.env.NODE_ENV === 'development') {
-          console.error('❌ Authentication failed');
-        }
+        console.error('❌ AUTHENTICATION FAILED');
+        console.error('Error details:', signInError);
         return null;
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Supabase Auth successful, fetching user profile...');
-      }
+      console.log('✅ SUPABASE AUTH SUCCESSFUL');
+      console.log('User ID:', authUser.id);
+      console.log('Email:', authUser.email);
+      console.log('Fetching user profile from an_users...');
 
       // Get user profile from our users table
       const { data: userData, error: userError } = await supabase
